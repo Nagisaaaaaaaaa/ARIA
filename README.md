@@ -90,4 +90,7 @@ ARIA adheres to strict coding standards, and we add as many comments as possible
    These two functions, `Auto()` and `DecltypeAuto()`, help better deduce the types from all proxy systems used in ARIA, which makes our codes safe. Read the comments in `Auto.h` and `Property.h` to see how to use them.
 
 
-5. **See `CodingStandards.md` for the detailed coding rules.**
+5. **Coding standards.**
+
+   ARIA uses the coding standards similar to https://llvm.org/docs/CodingStandards.html but very different in naming. Please exactly follow the style of `ARIA::Core`. Read the codes and you will understand.
+
