@@ -1,0 +1,160 @@
+#pragma once
+
+/// \file You may have known that `std::vector<bool>` is a special case in C++ STL.
+/// See https://en.cppreference.com/w/cpp/container/vector_bool.
+/// This special cases make code based on `std::vector` much more error prone,
+/// one of the most tricky bugs is about `auto`, see the following examples.
+///
+/// We refer to these `std::vector<bool>`-like designs as "proxy systems".
+/// In ARIA, there are a lot of proxy systems working together, including:
+///   1. std::vector<bool>,
+///   2. thrust::device_vector,
+///   3. Eigen,
+///   ...,
+/// and the most intensively used one: the ARIA builtin property system, see Property.h.
+///
+/// To help `auto` work better with proxy systems,
+/// this file introduces the `auto + Auto` type deduction.
+
+//
+//
+//
+//
+//
+#include "ARIA/detail/PropertyType.h"
+
+#include <thrust/detail/raw_reference_cast.h>
+
+#include <vector>
+
+namespace ARIA {
+
+/// \brief A function return type wrapper to help `auto` better deduce return types from proxy systems.
+///
+/// \warning Using `auto` for type deduction is unsafe when there exists proxies, for example:
+/// ```cpp
+/// std::vector<bool> v(1);
+/// auto x = v[0];
+/// std::cout << x << std::endl; // 0
+///
+/// v[0] = true;
+/// std::cout << x << std::endl; // ?
+/// ```
+/// It will print `0` at the first time, easy.
+/// But, how about the second time?
+/// It will be `1`, not `0`!
+/// That is because `auto` was not deduced to `bool`, instead,
+/// it was deduced to a magic reference to `bool`, the same case for the ARIA property system.
+/// To make life easier, ALWAYS use `auto + Auto()` type deduction.
+///
+/// You may have imagined that function overloading with C++20 concepts are able to correctly implement `Auto`,
+/// but the truth is that it is error prone,
+/// because we must provide the "most generic" `Auto`, which accepts any types:
+/// ```cpp
+/// template <typename T>
+/// ARIA_HOST_DEVICE auto Auto(const T& v) {
+///   return v;
+/// }
+/// ```
+/// This "most generic" `Auto` makes template type deduction weird, especially when C++20 concepts exist.
+/// That is why `Auto` is implemented with `if constexpr` instead.
+/// And that is why there's EXACTLY ONE `Auto` in namespace ARIA.
+///
+/// So, if you want to implement another `Auto` for your own system which depends on ARIA,
+/// for example if you want to add another proxy system, follow the rules below:
+/// 1. Implement the new `Auto` in your namespace, never in namespace ARIA.
+/// 2. From then on, always use `YourNamespace::Auto` instead of `ARIA::Auto`,
+///    never write something like `use namespace ARIA;`.
+/// 3. Make sure that the proxy system you want to add is not in namespace ARIA,
+///    or ADL will make things much more weird.
+///
+/// If you are also using the ARIA property system, see `Property.h`,
+/// it is recommended to implement your own property system in order to
+/// properly handle the newly added proxy system.
+/// See `Property.h` for how to implement it.
+///
+/// \example ```cpp
+/// std::vector<bool> v(1);
+/// auto x = Auto(v[0]); // `x` is `bool`.
+///
+/// Vec3f v;
+/// auto x = Auto(v.x()); // `x` is `float`.
+/// ```
+///
+/// \see std::vector<bool>
+/// \see thrust::device_vector
+/// \see Eigen
+/// \see Property.h
+/// \see PropertyImpl.h
+template <typename T>
+ARIA_HOST_DEVICE auto Auto(const T &v) {
+  if constexpr (std::is_same_v<std::decay_t<T>,
+                               std::decay_t<decltype(std::vector<bool>()[0])>>) //! For `std::vector<bool>`.
+    return static_cast<bool>(v);
+  else if constexpr (!std::is_same_v<std::decay_t<T>, std::decay_t<decltype(thrust::raw_reference_cast(v))>>)
+    return thrust::raw_reference_cast(v);
+  else if constexpr //! For `Eigen`.
+      (requires {
+         { v.eval() };
+       })
+    return v.eval();
+  else if constexpr //! For ARIA property.
+      (property::detail::PropertyType<std::decay_t<T>>)
+    return v.value();
+  else //! By default.
+    return v;
+}
+
+//
+//
+//
+//
+//
+/// \brief A function return type wrapper to help `decltype(auto)` better deduce return types from proxy systems.
+///
+/// \example ```cpp
+/// class Object {
+/// public:
+///   ARIA_PROP(public, public, , Object&, parent);
+///   ARIA_PROP(public, public, , std::string, name);
+/// };
+///
+/// Object object = ...;
+///
+/// decltype(auto) p0 = DecltypeAuto(object.parent()); // `p0` is a reference (actually r-value) to an ARIA property.
+///                                                    // Note, getter is not called within this line.
+/// Object& p1 = object.parent();                      // This will call the getter.
+/// Object& p2 = p0;                                   // This will call the getter.
+/// p0 = ...;                                          // This will call the setter.
+/// p1 = ...;                                          //! This will not call the setter.
+/// p2 = ...;                                          //! This will not call the setter.
+///
+/// decltype(auto) n0 = DecltypeAuto(object.name());   // `n0` is a reference (actually r-value) to an ARIA property.
+///                                                    // Note, getter is not called within this line.
+/// // std::string& n1 = object.name();                // Not allowed, because return value of the getter
+///                                                    // is not declared as `std::string&`.
+/// // std::string& n2 = n0;                           // Not allowed.
+/// n0 = ...;                                          // This will call the setter.
+/// ```
+///
+/// \see Auto
+template <typename T>
+ARIA_HOST_DEVICE decltype(auto) DecltypeAuto(T &&v) {
+  if constexpr (std::is_same_v<std::decay_t<T>,
+                               std::decay_t<decltype(std::vector<bool>()[0])>>) //! For `std::vector<bool>`.
+    ARIA_STATIC_ASSERT_FALSE("Dangerous to `decltype(auto)` a `std::vector<bool>` proxy");
+  else if constexpr (!std::is_same_v<std::decay_t<T>, std::decay_t<decltype(thrust::raw_reference_cast(v))>>)
+    ARIA_STATIC_ASSERT_FALSE("Dangerous to `decltype(auto)` a `thrust` reference proxy");
+  else if constexpr //! For `Eigen`.
+      (requires {
+         { v.eval() };
+       })
+    ARIA_STATIC_ASSERT_FALSE("Dangerous to `decltype(auto)` a `Eigen` proxy");
+  else if constexpr //! For ARIA property.
+      (property::detail::PropertyType<std::decay_t<T>>)
+    return std::forward<T>(v);
+  else //! By default.
+    return std::forward<T>(v);
+}
+
+} // namespace ARIA
