@@ -1,0 +1,42 @@
+#pragma once
+
+/// \file
+/// \warning "Higher beings, these words are for you alone.
+/// Beyond this point you enter the land of ARIA.
+/// Step across this threshold and obey our laws."
+
+//
+//
+//
+#include "ARIA/detail/Macros.h"
+
+#include <cstddef>
+#include <cstdint>
+
+namespace ARIA {
+
+/// \brief Always use `uint` instead of `unsigned`.
+using uint = uint32_t;
+
+/// \brief `Real` is a universal number type defined by cmake options.
+using Real = ${aria_real_type};
+
+static_assert(sizeof(int) == sizeof(uint), "Size of signed int and unsigned int should be the same");
+
+/// \brief Use `100.0_R` to define a `Real` equals to one hundred.
+ARIA_HOST_DEVICE constexpr Real operator"" _R(long double value) {
+  return static_cast<Real>(value);
+}
+
+/// \brief Use `100_R` to define a `Real` equals to one hundred.
+ARIA_HOST_DEVICE constexpr Real operator"" _R(unsigned long long value) {
+  return static_cast<Real>(value);
+}
+
+/// \brief A commonly-used policy, means whether the class is for host use.
+struct SpaceHost {};
+
+/// \brief A commonly-used policy, means whether the class is for device use.
+struct SpaceDevice {};
+
+} // namespace ARIA
