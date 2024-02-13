@@ -2,7 +2,12 @@
 
 ARIA is a collection of foundational computer graphics infrastructure **for research**.
 
-**WARNING: ARIA is undergoing a complete rewrite, and to date, only a small portion has been rewritten. As a result, many interfaces are unstable. However, you can confidently use everything in *Core*, as it is stable.**
+**WARNING: ARIA is undergoing a complete rewrite, and to date, only a small portion has been rewritten. As a result, only the following modules are stable:**
+
+- ARIA::Core::Concurrency
+- ARIA::Core::Core
+- ARIA::Core::Coroutine
+- ARIA::Core::Math
 
 ARIA is a melting pot where you can find a plethora of interesting things, such as a C++ implementation of C# properties, multi-dimensional arrays and views, and a hierarchical object and component system similar to Unity's, with more powerful infrastructures to be added in the future.
 

@@ -67,5 +67,3 @@ if (ARIA_BUILD_TESTS)
 endif ()
 
 add_subdirectory(ARIA)
-
-add_subdirectory(ALFA)
