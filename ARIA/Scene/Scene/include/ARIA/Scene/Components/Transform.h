@@ -1,6 +1,8 @@
 #pragma once
 
+#include "ARIA/Mat.h"
 #include "ARIA/Quat.h"
+#include "ARIA/Vec.h"
 #include "ARIA/Scene/Component.h"
 #include "ARIA/Scene/Object.h"
 
@@ -222,9 +224,9 @@ public:
   //
   //
 private:
-  Vec3r localPosition_{Vec3r::zero()};
-  Quatr localRotation_{Quatr::identity()};
-  Vec3r localScale_{Vec3r::one()};
+  Vec3r localPosition_{0, 0, 0};
+  Quatr localRotation_{Quatr::Identity()};
+  Vec3r localScale_{1, 1, 1};
 
   //
   //

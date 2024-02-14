@@ -103,23 +103,6 @@ Transform &Object::ARIA_PROP_IMPL(transform)() {
 //
 //
 //
-Object::Range<Object::JoinIterator<Object>, Object::JoinIterator<Object>> Object::rangeJoined() {
-  return {JoinIterator<Object>{&*haloRoot_}, {}};
-}
-
-Object::Range<Object::JoinIterator<const Object>, Object::JoinIterator<const Object>> Object::crangeJoined() {
-  return {JoinIterator<const Object>{&*haloRoot_}, {}};
-}
-
-Object::Range<Object::JoinComponentIterator, Object::JoinComponentIterator> Object::componentRangeJoined() {
-  return {JoinComponentIterator{&*haloRoot_}, {}};
-}
-
-//
-//
-//
-//
-//
 std::unique_ptr<Object> Object::haloRoot_ = std::unique_ptr<Object>(new Object{nullptr});
 
 Object::Object(Object *parent) : parent_(parent) {

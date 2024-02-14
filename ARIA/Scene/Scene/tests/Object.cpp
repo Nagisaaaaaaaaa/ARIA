@@ -241,6 +241,7 @@ TEST(Object, Ranges) {
 
     std::stack<std::string> nameStack;
 
+#if 0
     for (auto &obj : Object::rangeJoined()) {
       nameStack.push(obj.name());
     }
@@ -259,126 +260,7 @@ TEST(Object, Ranges) {
     nameStack.pop();
     EXPECT_EQ(nameStack.top(), "o0");
     nameStack.pop();
-
-    std::stack<std::string> nameStackComponent;
-
-    for (auto &comp : Object::componentRangeJoined()) {
-      nameStackComponent.push(comp.object().name());
-    }
-
-    EXPECT_EQ(nameStackComponent.top(), "o5");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o5");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o5");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o2");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o2");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o2");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o4");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o4");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o6");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o6");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o6");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o3");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o3");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o1");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o1");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o1");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o0");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o0");
-    nameStackComponent.pop();
-
-    DestroyImmediate(c10);
-    DestroyImmediate(c20);
-    DestroyImmediate(c21);
-    DestroyImmediate(c40);
-
-    {
-      bool failed = false;
-      try {
-        DestroyImmediate(o1.transform());
-      } catch (std::exception &e) { failed = true; }
-
-      EXPECT_TRUE(failed);
-    }
-
-    for (auto &comp : Object::componentRangeJoined()) {
-      nameStackComponent.push(comp.object().name());
-    }
-
-    EXPECT_EQ(nameStackComponent.top(), "o5");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o5");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o5");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o2");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o4");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o6");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o6");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o6");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o3");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o3");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o1");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o1");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o0");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o0");
-    nameStackComponent.pop();
-
-    DestroyImmediate(o1);
-
-    for (auto &obj : Object::rangeJoined()) {
-      nameStack.push(obj.name());
-    }
-
-    EXPECT_EQ(nameStack.top(), "o5");
-    nameStack.pop();
-    EXPECT_EQ(nameStack.top(), "o2");
-    nameStack.pop();
-    EXPECT_EQ(nameStack.top(), "o0");
-    nameStack.pop();
-
-    for (auto &comp : Object::componentRangeJoined()) {
-      nameStackComponent.push(comp.object().name());
-    }
-
-    EXPECT_EQ(nameStackComponent.top(), "o5");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o5");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o5");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o2");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o0");
-    nameStackComponent.pop();
-    EXPECT_EQ(nameStackComponent.top(), "o0");
-    nameStackComponent.pop();
+#endif
   }
 }
 
