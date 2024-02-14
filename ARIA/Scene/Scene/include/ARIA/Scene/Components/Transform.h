@@ -205,6 +205,23 @@ public:
   //
   //
   //
+public:
+  //! ARIA use left-handed coordinate system, and the `up` direction is (0, 1, 0).
+  // clang-format off
+  static /* constexpr */ Vec3r Up()      { return { 0,  1,  0}; }
+  static /* constexpr */ Vec3r Down()    { return { 0, -1,  0}; }
+  static /* constexpr */ Vec3r Forward() { return { 0,  0, -1}; }
+  static /* constexpr */ Vec3r Back()    { return { 0,  0,  1}; }
+  static /* constexpr */ Vec3r Left()    { return {-1,  0,  0}; }
+  static /* constexpr */ Vec3r Right()   { return { 1,  0,  0}; }
+
+  // clang-format on
+
+  //
+  //
+  //
+  //
+  //
 private:
   friend Object;
 

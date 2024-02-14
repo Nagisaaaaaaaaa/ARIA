@@ -60,11 +60,11 @@ void Transform::ARIA_PROP_IMPL(localScale)(const Vec3r &value) {
 //
 //
 Vec3r Transform::ARIA_PROP_IMPL(localEulerAngles)() const {
-  return localRotation().eulerAngles();
+  return ToEulerAngles(localRotation());
 }
 
 void Transform::ARIA_PROP_IMPL(localEulerAngles)(const Vec3r &value) {
-  localRotation().eulerAngles() = value;
+  localRotation() = FromEulerAngles(value);
 }
 
 //
@@ -73,7 +73,7 @@ void Transform::ARIA_PROP_IMPL(localEulerAngles)(const Vec3r &value) {
 //
 //
 Vec3r Transform::ARIA_PROP_IMPL(localUp)() const {
-  return localRotation() * Vec3r::up();
+  return localRotation() * Transform::Up();
 }
 
 void Transform::ARIA_PROP_IMPL(localUp)(const Vec3r &value) {
@@ -90,7 +90,7 @@ void Transform::ARIA_PROP_IMPL(localUp)(const Vec3r &value) {
 }
 
 Vec3r Transform::ARIA_PROP_IMPL(localDown)() const {
-  return localRotation() * Vec3r::down();
+  return localRotation() * Transform::Down();
 }
 
 void Transform::ARIA_PROP_IMPL(localDown)(const Vec3r &value) {
@@ -107,7 +107,7 @@ void Transform::ARIA_PROP_IMPL(localDown)(const Vec3r &value) {
 }
 
 Vec3r Transform::ARIA_PROP_IMPL(localForward)() const {
-  return localRotation() * Vec3r::forward();
+  return localRotation() * Transform::Forward();
 }
 
 void Transform::ARIA_PROP_IMPL(localForward)(const Vec3r &value) {
@@ -124,7 +124,7 @@ void Transform::ARIA_PROP_IMPL(localForward)(const Vec3r &value) {
 }
 
 Vec3r Transform::ARIA_PROP_IMPL(localBack)() const {
-  return localRotation() * Vec3r::back();
+  return localRotation() * Transform::Back();
 }
 
 void Transform::ARIA_PROP_IMPL(localBack)(const Vec3r &value) {
@@ -141,7 +141,7 @@ void Transform::ARIA_PROP_IMPL(localBack)(const Vec3r &value) {
 }
 
 Vec3r Transform::ARIA_PROP_IMPL(localLeft)() const {
-  return localRotation() * Vec3r::left();
+  return localRotation() * Transform::Left();
 }
 
 void Transform::ARIA_PROP_IMPL(localLeft)(const Vec3r &value) {
@@ -158,7 +158,7 @@ void Transform::ARIA_PROP_IMPL(localLeft)(const Vec3r &value) {
 }
 
 Vec3r Transform::ARIA_PROP_IMPL(localRight)() const {
-  return localRotation() * Vec3r::right();
+  return localRotation() * Transform::Right();
 }
 
 void Transform::ARIA_PROP_IMPL(localRight)(const Vec3r &value) {
@@ -244,7 +244,7 @@ Vec3r Transform::ARIA_PROP_IMPL(lossyScale)() const {
 //
 //
 Vec3r Transform::ARIA_PROP_IMPL(up)() const {
-  return rotation() * Vec3r::up();
+  return rotation() * Transform::Up();
 }
 
 void Transform::ARIA_PROP_IMPL(up)(const Vec3r &value) {
@@ -261,7 +261,7 @@ void Transform::ARIA_PROP_IMPL(up)(const Vec3r &value) {
 }
 
 Vec3r Transform::ARIA_PROP_IMPL(down)() const {
-  return rotation() * Vec3r::down();
+  return rotation() * Transform::Down();
 }
 
 void Transform::ARIA_PROP_IMPL(down)(const Vec3r &value) {
@@ -278,7 +278,7 @@ void Transform::ARIA_PROP_IMPL(down)(const Vec3r &value) {
 }
 
 Vec3r Transform::ARIA_PROP_IMPL(forward)() const {
-  return rotation() * Vec3r::forward();
+  return rotation() * Transform::Forward();
 }
 
 void Transform::ARIA_PROP_IMPL(forward)(const Vec3r &value) {
@@ -295,7 +295,7 @@ void Transform::ARIA_PROP_IMPL(forward)(const Vec3r &value) {
 }
 
 Vec3r Transform::ARIA_PROP_IMPL(back)() const {
-  return rotation() * Vec3r::back();
+  return rotation() * Transform::Back();
 }
 
 void Transform::ARIA_PROP_IMPL(back)(const Vec3r &value) {
@@ -312,7 +312,7 @@ void Transform::ARIA_PROP_IMPL(back)(const Vec3r &value) {
 }
 
 Vec3r Transform::ARIA_PROP_IMPL(left)() const {
-  return rotation() * Vec3r::left();
+  return rotation() * Transform::Left();
 }
 
 void Transform::ARIA_PROP_IMPL(left)(const Vec3r &value) {
@@ -329,7 +329,7 @@ void Transform::ARIA_PROP_IMPL(left)(const Vec3r &value) {
 }
 
 Vec3r Transform::ARIA_PROP_IMPL(right)() const {
-  return rotation() * Vec3r::right();
+  return rotation() * Transform::Right();
 }
 
 void Transform::ARIA_PROP_IMPL(right)(const Vec3r &value) {
