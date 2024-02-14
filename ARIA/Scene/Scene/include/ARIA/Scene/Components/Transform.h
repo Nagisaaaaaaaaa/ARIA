@@ -2,9 +2,9 @@
 
 #include "ARIA/Mat.h"
 #include "ARIA/Quat.h"
-#include "ARIA/Vec.h"
 #include "ARIA/Scene/Component.h"
 #include "ARIA/Scene/Object.h"
+#include "ARIA/Vec.h"
 
 namespace ARIA {
 
@@ -44,7 +44,7 @@ public:
   ///
   /// So, users should not modify anything about the halo root.
   /// Or there will be undefined behaviors.
-  ARIA_PROP_BEGIN(public, public, , Transform*, parent);
+  ARIA_PROP_BEGIN(public, public, , Transform *, parent);
   ARIA_PROP_END;
 
   /// \brief Get the "root" transform of the current transform.
@@ -53,7 +53,7 @@ public:
   /// \example ```cpp
   /// Transform* root = t.root();
   /// ```
-  ARIA_PROP_BEGIN(public, public, , Transform*, root);
+  ARIA_PROP_BEGIN(public, public, , Transform *, root);
   ARIA_PROP_END;
 
   //
@@ -218,6 +218,18 @@ public:
   static /* constexpr */ Vec3r Right()   { return { 1,  0,  0}; }
 
   // clang-format on
+
+  //
+  //
+  //
+  //
+  //
+public:
+  /// \brief Two `Transform`s are defined as equal when they have exactly the same address.
+  bool operator==(const Transform &other) const noexcept { return this == &other; }
+
+  /// \brief Two `Transform`s are defined as equal when they have exactly the same address.
+  bool operator!=(const Transform &other) const noexcept { return !operator==(other); }
 
   //
   //

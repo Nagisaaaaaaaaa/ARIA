@@ -278,6 +278,16 @@ public:
   //
   //
   //
+public:
+  /// \brief Two `Object`s are defined as equal when they have exactly the same address.
+  bool operator==(const Object &other) const noexcept { return this == &other; }
+
+  /// \brief Two `Object`s are defined as equal when they have exactly the same address.
+  bool operator!=(const Object &other) const noexcept { return !operator==(other); }
+
+  //
+  //
+  //
   //
   //
   //
