@@ -543,14 +543,16 @@ public:                                                                         
                                                                                                                        \
       if constexpr (std::is_pointer_v<decltype(tmp)>) {                                                                \
         static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                 \
-                          property::detail::isReferenceOrPointer<decltype(tmp->PROP_NAME())>,                          \
+                          (property::detail::PropertyType<decltype(tmp->PROP_NAME())> ||                               \
+                           property::detail::isReferenceOrPointer<decltype(tmp->PROP_NAME())>),                        \
                       "The getter is only allowed to return reference or pointer when "                                \
                       "the specified sub-property value type is a reference or a pointer");                            \
                                                                                                                        \
         return tmp->PROP_NAME();                                                                                       \
       } else {                                                                                                         \
         static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                 \
-                          property::detail::isReferenceOrPointer<decltype(tmp.PROP_NAME())>,                           \
+                          (property::detail::PropertyType<decltype(tmp.PROP_NAME())> ||                                \
+                           property::detail::isReferenceOrPointer<decltype(tmp.PROP_NAME())>),                         \
                       "The getter is only allowed to return reference or pointer when "                                \
                       "the specified sub-property value type is a reference or a pointer");                            \
                                                                                                                        \
@@ -568,14 +570,16 @@ public:                                                                         
                                                                                                                        \
       if constexpr (std::is_pointer_v<decltype(tmp)>) {                                                                \
         static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                 \
-                          property::detail::isReferenceOrPointer<decltype(tmp->PROP_NAME())>,                          \
+                          (property::detail::PropertyType<decltype(tmp->PROP_NAME())> ||                               \
+                           property::detail::isReferenceOrPointer<decltype(tmp->PROP_NAME())>),                        \
                       "The getter is only allowed to return reference or pointer when "                                \
                       "the specified sub-property value type is a reference");                                         \
                                                                                                                        \
         return Auto(tmp->PROP_NAME());                                                                                 \
       } else {                                                                                                         \
         static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                 \
-                          property::detail::isReferenceOrPointer<decltype(tmp.PROP_NAME())>,                           \
+                          (property::detail::PropertyType<decltype(tmp.PROP_NAME())> ||                                \
+                           property::detail::isReferenceOrPointer<decltype(tmp.PROP_NAME())>),                         \
                       "The getter is only allowed to return reference or pointer when "                                \
                       "the specified sub-property value type is a reference");                                         \
                                                                                                                        \
