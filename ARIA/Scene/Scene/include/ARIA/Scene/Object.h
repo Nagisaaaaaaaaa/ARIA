@@ -1,5 +1,16 @@
 #pragma once
 
+/// \file
+/// \brief `Object` is the base class for all entities in ARIA Scenes.
+///
+/// `Object` is implemented similar to Unity `GameObject`,
+/// see https://docs.unity3d.com/ScriptReference/GameObject.html.
+
+//
+//
+//
+//
+//
 #include "ARIA/Property.h"
 
 #include <memory>
@@ -13,9 +24,12 @@ class Transform;
 //
 //
 //
+//
+//
 /// \brief Base class for all entities in ARIA Scenes.
 ///
-/// See https://docs.unity3d.com/ScriptReference/GameObject.html.
+/// `Object` is implemented similar to Unity `GameObject`,
+/// see https://docs.unity3d.com/ScriptReference/GameObject.html.
 class Object final {
 public:
   /// \brief Create a root object. Reference to this object will be returned.
