@@ -121,6 +121,14 @@ public:
   ///
   /// So, users should not modify anything about the halo root.
   /// Or there will be undefined behaviors.
+  ///
+  /// \note It is impossible to write something like `parent()->AddComponent()` because
+  /// at this moment, `Object` is an incomplete type.
+  /// It is not allowed to call member functions of incomplete types.
+  ///
+  /// Also, it is difficult to support very deep sub-properties, such as
+  /// `obj.parent()->parent()->parent()->parent()->...->parent()`.
+  /// So, depth is restricted to 3, that is, at most `obj.parent()->parent()->parent()`.
   ARIA_PROP_BEGIN(public, public, , Object *, parent);
   /**/ ARIA_SUB_PROP_BEGIN(, Object *, parent);
   /**/ /**/ ARIA_SUB_PROP(, Object *, parent);

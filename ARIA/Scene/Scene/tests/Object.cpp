@@ -589,68 +589,9 @@ TEST(Object, ParentRootAndTransform) {
   }
 }
 
-TEST(Object, Ranges) {
-  // Range.
-  {
-    Object &o0 = Object::Create();
-    o0.name() = "o0";
-    TestComp &c00 = o0.AddComponent<TestComp>();
-    Object &o1 = Object::Create();
-    o1.name() = "o1";
-    TestComp &c10 = o1.AddComponent<TestComp>();
-    TestComp &c11 = o1.AddComponent<TestComp>();
-    Object &o2 = Object::Create();
-    o2.name() = "o2";
-    TestComp &c20 = o2.AddComponent<TestComp>();
-    TestComp &c21 = o2.AddComponent<TestComp>();
-    Object &o3 = Object::Create();
-    o3.name() = "o3";
-    TestComp &c30 = o3.AddComponent<TestComp>();
-    Object &o4 = Object::Create();
-    o4.name() = "o4";
-    TestComp &c40 = o4.AddComponent<TestComp>();
-    Object &o5 = Object::Create();
-    o5.name() = "o5";
-    TestComp &c50 = o5.AddComponent<TestComp>();
-    TestComp &c51 = o5.AddComponent<TestComp>();
-    Object &o6 = Object::Create();
-    o6.name() = "o6";
-    TestComp &c60 = o6.AddComponent<TestComp>();
-    TestComp &c61 = o6.AddComponent<TestComp>();
-
-    o6.parent() = &o3;
-
-    o5.parent() = &o2;
-
-    o3.parent() = &o1;
-    o4.parent() = &o1;
-
-    o1.parent() = &o0;
-    o2.parent() = &o0;
-
-    std::stack<std::string> nameStack;
-
-#if 0
-    for (auto &obj : Object::rangeJoined()) {
-      nameStack.push(obj.name());
-    }
-
-    EXPECT_EQ(nameStack.top(), "o5");
-    nameStack.pop();
-    EXPECT_EQ(nameStack.top(), "o2");
-    nameStack.pop();
-    EXPECT_EQ(nameStack.top(), "o4");
-    nameStack.pop();
-    EXPECT_EQ(nameStack.top(), "o6");
-    nameStack.pop();
-    EXPECT_EQ(nameStack.top(), "o3");
-    nameStack.pop();
-    EXPECT_EQ(nameStack.top(), "o1");
-    nameStack.pop();
-    EXPECT_EQ(nameStack.top(), "o0");
-    nameStack.pop();
-#endif
-  }
+TEST(Object, AddAndGetComponents) {
+  // Get transform.
+  {}
 }
 
 } // namespace ARIA
