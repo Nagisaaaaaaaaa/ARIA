@@ -2,22 +2,32 @@
 
 namespace ARIA {
 
-const Transform &Transform::ARIA_PROP_IMPL(parent)() const {
-  return object().parent().transform();
+const Transform *Transform::ARIA_PROP_IMPL(parent)() const {
+  const Transform& t = object().parent()->transform();
+  return &t;
 }
 
-Transform &Transform::ARIA_PROP_IMPL(parent)() {
-  Object *p = object().parent();
-  return p->transform();
+Transform *Transform::ARIA_PROP_IMPL(parent)() {
+  Transform& t = object().parent()->transform();
+  return &t;
 }
 
-const Transform &Transform::ARIA_PROP_IMPL(root)() const {
-  return object().root().transform();
+void Transform::ARIA_PROP_IMPL(parent)(Transform *value) {
+  object().parent() = &value->object();
 }
 
-Transform &Transform::ARIA_PROP_IMPL(root)() {
-  Object *r = object().root();
-  return r->transform();
+const Transform *Transform::ARIA_PROP_IMPL(root)() const {
+  const Transform& t = object().root()->transform();
+  return &t;
+}
+
+Transform *Transform::ARIA_PROP_IMPL(root)() {
+  Transform& t = object().root()->transform();
+  return &t;
+}
+
+void Transform::ARIA_PROP_IMPL(root)(Transform *value) {
+  object().root() = &value->object();
 }
 
 //
@@ -195,15 +205,18 @@ Mat4r Transform::ARIA_PROP_IMPL(localToWorldMat)() const {
 Vec3r Transform::ARIA_PROP_IMPL(position)() const {
   if (IsRoot())
     return localPosition();
-  else
-    return parent().localToWorldAffine() * localPosition();
+  else {
+    const Transform* p = parent();
+    return p->localToWorldAffine() * localPosition();
+  }
 }
 
 void Transform::ARIA_PROP_IMPL(position)(const Vec3r &value) {
   if (IsRoot())
     localPosition() = value;
   else {
-    localPosition() = parent().localToWorldAffine().inverse() * value;
+    const Transform* p = parent();
+    localPosition() = p->localToWorldAffine().inverse() * value;
   }
 }
 
@@ -213,7 +226,7 @@ Quatr Transform::ARIA_PROP_IMPL(rotation)() const {
   Quatr res = localRotation();
 
   while (!p->IsRoot()) {
-    p = &DecltypeAuto(p->parent());
+    p = p->parent();
     res = p->localRotation() * res;
   }
 
@@ -223,8 +236,10 @@ Quatr Transform::ARIA_PROP_IMPL(rotation)() const {
 void Transform::ARIA_PROP_IMPL(rotation)(const Quatr &value) {
   if (IsRoot())
     localRotation() = value;
-  else
-    localRotation() = parent().rotation().inverse() * value;
+  else {
+    const Transform* p = parent();
+    localRotation() = p->rotation().inverse() * value;
+  }
 }
 
 Vec3r Transform::ARIA_PROP_IMPL(lossyScale)() const {
@@ -398,7 +413,8 @@ void Transform::Translate(const Vec3r &translation, Space relativeTo) {
     // because the translation in world space is affected by the scale of the parent.
     // If there is no parent, this step can be skipped.
     if (!IsRoot()) {
-      const Vec3r parentScale = parent().lossyScale();
+      const Transform* p = parent();
+      const Vec3r parentScale = p->lossyScale();
       translationParentSpace = translationParentSpace.cwiseQuotient(parentScale);
     }
 
@@ -466,7 +482,7 @@ Transform::Affine3r Transform::localToWorldAffine() const {
   Affine3r res = localToParentAffine();
 
   while (!p->IsRoot()) {
-    p = &DecltypeAuto(p->parent());
+    p = p->parent();
     res = p->localToParentAffine() * res;
   }
 

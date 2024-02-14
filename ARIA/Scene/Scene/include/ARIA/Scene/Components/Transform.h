@@ -31,7 +31,7 @@ public:
   /// \brief The parent transform of the current transform.
   ///
   /// \example ```cpp
-  /// Transform& parent = t.parent();
+  /// Transform* parent = t.parent();
   /// ```
   ///
   /// \note If the current transform is a "root" transform, that is, `IsRoot()` returns true,
@@ -44,15 +44,17 @@ public:
   ///
   /// So, users should not modify anything about the halo root.
   /// Or there will be undefined behaviors.
-  ARIA_REF_PROP(public, , parent, ARIA_PROP_IMPL(parent)());
+  ARIA_PROP_BEGIN(public, public, , Transform*, parent);
+  ARIA_PROP_END;
 
   /// \brief Get the "root" transform of the current transform.
   /// See `parent` for more details.
   ///
   /// \example ```cpp
-  /// Transform& root = t.root();
+  /// Transform* root = t.root();
   /// ```
-  ARIA_REF_PROP(public, , root, ARIA_PROP_IMPL(root)());
+  ARIA_PROP_BEGIN(public, public, , Transform*, root);
+  ARIA_PROP_END;
 
   //
   //
@@ -254,10 +256,12 @@ private:
   //
   //
   //
-  [[nodiscard]] const Transform &ARIA_PROP_IMPL(parent)() const;
-  [[nodiscard]] Transform &ARIA_PROP_IMPL(parent)();
-  [[nodiscard]] const Transform &ARIA_PROP_IMPL(root)() const;
-  [[nodiscard]] Transform &ARIA_PROP_IMPL(root)();
+  [[nodiscard]] const Transform *ARIA_PROP_IMPL(parent)() const;
+  [[nodiscard]] Transform *ARIA_PROP_IMPL(parent)();
+  void ARIA_PROP_IMPL(parent)(Transform *value);
+  [[nodiscard]] const Transform *ARIA_PROP_IMPL(root)() const;
+  [[nodiscard]] Transform *ARIA_PROP_IMPL(root)();
+  void ARIA_PROP_IMPL(root)(Transform *value);
 
   //
   [[nodiscard]] Vec3r ARIA_PROP_IMPL(localPosition)() const;

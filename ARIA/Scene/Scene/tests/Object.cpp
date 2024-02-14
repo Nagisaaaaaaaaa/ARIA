@@ -63,8 +63,8 @@ TEST(Object, Base) {
     const Object &oPare = *o.parent();
     const Object &oRoot = *o.root();
     Transform &t = o.transform();
-    Transform &tPare = t.parent();
-    Transform &tRoot = t.root();
+    Transform &tPare = *t.parent();
+    Transform &tRoot = *t.root();
     EXPECT_TRUE(t.IsRoot());
     EXPECT_TRUE(&tPare != &t);
     EXPECT_EQ(&tRoot, &t);
@@ -74,8 +74,8 @@ TEST(Object, Base) {
     const Object &o1Pare = *o1.parent();
     const Object &o1Root = *o1.root();
     Transform &t1 = o1.transform();
-    Transform &t1Pare = t1.parent();
-    Transform &t1Root = t1.root();
+    Transform &t1Pare = *t1.parent();
+    Transform &t1Root = *t1.root();
     EXPECT_FALSE(t1.IsRoot());
     EXPECT_EQ(&t1Pare, &t);
     EXPECT_EQ(&t1Root, &t);
@@ -85,8 +85,8 @@ TEST(Object, Base) {
     const Object &o2Pare = *o2.parent();
     const Object &o2Root = *o2.root();
     Transform &t2 = o2.transform();
-    Transform &t2Pare = t2.parent();
-    Transform &t2Root = t2.root();
+    Transform &t2Pare = *t2.parent();
+    Transform &t2Root = *t2.root();
     EXPECT_FALSE(t2.IsRoot());
     EXPECT_EQ(&t2Pare, &t1);
     EXPECT_EQ(&t2Root, &t);
