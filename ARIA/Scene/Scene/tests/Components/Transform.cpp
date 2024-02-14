@@ -20,7 +20,7 @@ TEST(Transform, Local) {
     EXPECT_FLOAT_EQ(float(lhs.z()), float(rhs.z()));
   };
 
-  // Position, rotation, and scale
+  // Position, rotation, and scale.
   {
     Object &o = Object::Create();
     Transform &t = o.transform();
