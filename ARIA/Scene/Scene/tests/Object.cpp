@@ -223,7 +223,6 @@ TEST(Object, ParentRootAndTransform) {
     Object &o = Object::Create();
     const Object &oPare = *o.parent();
     const Object &oRoot = *o.root();
-    EXPECT_TRUE(o.IsRoot());
     EXPECT_TRUE(oPare != o);
     EXPECT_TRUE(oRoot == o);
 
@@ -231,7 +230,6 @@ TEST(Object, ParentRootAndTransform) {
     o1.parent() = &o;
     const Object &o1Pare = *o1.parent();
     const Object &o1Root = *o1.root();
-    EXPECT_FALSE(o1.IsRoot());
     EXPECT_TRUE(o1Pare == o);
     EXPECT_TRUE(o1Root == o);
 
@@ -239,7 +237,6 @@ TEST(Object, ParentRootAndTransform) {
     o2.parent() = &o1;
     const Object &o2Pare = *o2.parent();
     const Object &o2Root = *o2.root();
-    EXPECT_FALSE(o2.IsRoot());
     EXPECT_TRUE(o2Pare == o1);
     EXPECT_TRUE(o2Root == o);
   }
@@ -251,7 +248,6 @@ TEST(Object, ParentRootAndTransform) {
     Transform &t = o.transform();
     Transform &tPare = *t.parent();
     Transform &tRoot = *t.root();
-    EXPECT_TRUE(t.IsRoot());
     EXPECT_TRUE(tPare != t);
     EXPECT_TRUE(tRoot == t);
 
@@ -262,7 +258,6 @@ TEST(Object, ParentRootAndTransform) {
     Transform &t1 = o1.transform();
     Transform &t1Pare = *t1.parent();
     Transform &t1Root = *t1.root();
-    EXPECT_FALSE(t1.IsRoot());
     EXPECT_TRUE(t1Pare == t);
     EXPECT_TRUE(t1Root == t);
 
@@ -273,7 +268,6 @@ TEST(Object, ParentRootAndTransform) {
     Transform &t2 = o2.transform();
     Transform &t2Pare = *t2.parent();
     Transform &t2Root = *t2.root();
-    EXPECT_FALSE(t2.IsRoot());
     EXPECT_TRUE(t2Pare == t1);
     EXPECT_TRUE(t2Root == t);
   }
@@ -557,6 +551,41 @@ TEST(Object, ParentRootAndTransform) {
     EXPECT_TRUE(*o3.root()->root()->parent() == *o0.parent());
     EXPECT_TRUE(*o3.root()->root()->root() == o0);
     EXPECT_TRUE(o3.root()->root()->transform() == o0.transform());
+  }
+
+  // Is root and is child of.
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    o1.parent() = &o0;
+    o2.parent() = &o1;
+    o3.parent() = &o2;
+
+    EXPECT_TRUE(o0.IsRoot());
+    EXPECT_FALSE(o1.IsRoot());
+    EXPECT_FALSE(o2.IsRoot());
+    EXPECT_FALSE(o3.IsRoot());
+
+    EXPECT_TRUE(o1.IsChildOf(o0));
+    EXPECT_TRUE(o2.IsChildOf(o0));
+    EXPECT_TRUE(o2.IsChildOf(o1));
+    EXPECT_TRUE(o3.IsChildOf(o0));
+    EXPECT_TRUE(o3.IsChildOf(o1));
+    EXPECT_TRUE(o3.IsChildOf(o2));
+
+    EXPECT_FALSE(o0.IsChildOf(o0));
+    EXPECT_FALSE(o0.IsChildOf(o1));
+    EXPECT_FALSE(o0.IsChildOf(o2));
+    EXPECT_FALSE(o0.IsChildOf(o3));
+    EXPECT_FALSE(o1.IsChildOf(o1));
+    EXPECT_FALSE(o1.IsChildOf(o2));
+    EXPECT_FALSE(o1.IsChildOf(o3));
+    EXPECT_FALSE(o2.IsChildOf(o2));
+    EXPECT_FALSE(o2.IsChildOf(o3));
+    EXPECT_FALSE(o3.IsChildOf(o3));
   }
 }
 
