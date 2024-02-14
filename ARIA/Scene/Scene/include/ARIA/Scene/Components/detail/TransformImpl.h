@@ -11,7 +11,9 @@ namespace ARIA {
                                                                                                                        \
   /* Parent. */                                                                                                        \
   ARIA_SUB_PROP_BEGIN(specifiers, Transform *, parent);                                                                \
+  /**/ /* Parent. */                                                                                                   \
   /**/ ARIA_SUB_PROP(specifiers, Transform *, parent);                                                                 \
+  /**/ /* Root. */                                                                                                     \
   /**/ ARIA_SUB_PROP(specifiers, Transform *, root);                                                                   \
   /**/ /* Local position, rotation, and scale. */                                                                      \
   /**/ ARIA_SUB_PROP_PREFAB_VEC(specifiers, Vec3r, localPosition);                                                     \
@@ -44,7 +46,9 @@ namespace ARIA {
                                                                                                                        \
   /* Root. */                                                                                                          \
   ARIA_SUB_PROP_BEGIN(specifiers, Transform *, root);                                                                  \
+  /**/ /* Parent. */                                                                                                   \
   /**/ ARIA_SUB_PROP(specifiers, Transform *, parent);                                                                 \
+  /**/ /* Root. */                                                                                                     \
   /**/ ARIA_SUB_PROP(specifiers, Transform *, root);                                                                   \
   /**/ /* Local position, rotation, and scale. */                                                                      \
   /**/ ARIA_SUB_PROP_PREFAB_VEC(specifiers, Vec3r, localPosition);                                                     \
@@ -103,8 +107,6 @@ namespace ARIA {
   ARIA_SUB_PROP_PREFAB_VEC(specifiers, Vec3r, left);                                                                   \
   ARIA_SUB_PROP_PREFAB_VEC(specifiers, Vec3r, right)
 
-//
-//
 //
 //
 //
