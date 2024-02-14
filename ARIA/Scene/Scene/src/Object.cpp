@@ -146,11 +146,11 @@ Object::Object(Object *parent) : parent_(parent) {
 //
 //
 [[nodiscard]] size_t Object::size() noexcept {
-  return Base::size();
+  return Base::size() - 1; // Skip the halo root.
 }
 
 [[nodiscard]] decltype(Object::Base::begin()) Object::begin() noexcept {
-  return Base::begin();
+  return ++Base::begin(); // Skip the halo root.
 }
 
 [[nodiscard]] decltype(Object::Base::end()) Object::end() noexcept {
@@ -158,7 +158,7 @@ Object::Object(Object *parent) : parent_(parent) {
 }
 
 [[nodiscard]] decltype(Object::Base::cbegin()) Object::cbegin() noexcept {
-  return Base::cbegin();
+  return ++Base::cbegin(); // Skip the halo root.
 }
 
 [[nodiscard]] decltype(Object::Base::cend()) Object::cend() noexcept {
@@ -166,11 +166,11 @@ Object::Object(Object *parent) : parent_(parent) {
 }
 
 [[nodiscard]] decltype(Object::Base::range()) Object::range() noexcept {
-  return Base::range();
+  return {Object::begin(), Object::end()};
 }
 
 [[nodiscard]] decltype(Object::Base::crange()) Object::crange() noexcept {
-  return Base::crange();
+  return {Object::cbegin(), Object::cend()};
 }
 
 } // namespace ARIA

@@ -27,14 +27,137 @@ public:
 } // namespace
 
 TEST(Object, Base) {
+  auto expectSize = [](size_t num) {
+    EXPECT_EQ(Object::size(), num);
+    size_t i = 0;
+    for (auto &o : Object::crange())
+      ++i;
+    EXPECT_EQ(i, num);
+  };
+
+  // Simple create, destroy immediate, and registry.
+  //! Destroy all unrelated objects.
+  while (Object::size() > 0) {
+    DestroyImmediate(*Object::begin());
+  }
+  EXPECT_EQ(Object::size(), 0);
+
+  {
+    EXPECT_EQ(Object::size(), 0);
+    {
+      int i = 0;
+      for (auto it = Object::begin(); it != Object::end(); ++it)
+        ++i;
+      EXPECT_EQ(i, 0);
+    }
+    Object &o = Object::Create();
+    EXPECT_EQ(Object::size(), 1);
+    {
+      int i = 0;
+      for (auto &o : Object::range())
+        ++i;
+      EXPECT_EQ(i, 1);
+    }
+    DestroyImmediate(o);
+    EXPECT_EQ(Object::size(), 0);
+    {
+      int i = 0;
+      for (auto &o : Object::crange())
+        ++i;
+      EXPECT_EQ(i, 0);
+    }
+  }
+
+  // Complex create, destroy immediate, and registry.
+  //! Destroy all unrelated objects.
+  {
+    expectSize(0);
+    Object &o0 = Object::Create();
+    expectSize(1);
+    Object &o1 = Object::Create();
+    expectSize(2);
+    o1.parent() = &o0;
+    expectSize(2);
+    DestroyImmediate(o0);
+    expectSize(0);
+  }
+
+  {
+    expectSize(0);
+    Object &o0 = Object::Create();
+    expectSize(1);
+    Object &o1 = Object::Create();
+    expectSize(2);
+    o1.parent() = &o0;
+    expectSize(2);
+    DestroyImmediate(o1);
+    expectSize(1);
+    DestroyImmediate(o0);
+    expectSize(0);
+  }
+
+  {
+    expectSize(0);
+    Object &o0 = Object::Create();
+    expectSize(1);
+    Object &o1 = Object::Create();
+    expectSize(2);
+    Object &o2 = Object::Create();
+    expectSize(3);
+    o1.parent() = &o0;
+    expectSize(3);
+    o2.parent() = &o1;
+    expectSize(3);
+    DestroyImmediate(o0);
+    expectSize(0);
+  }
+
+  {
+    expectSize(0);
+    Object &o0 = Object::Create();
+    expectSize(1);
+    Object &o1 = Object::Create();
+    expectSize(2);
+    Object &o2 = Object::Create();
+    expectSize(3);
+    o1.parent() = &o0;
+    expectSize(3);
+    o2.parent() = &o1;
+    expectSize(3);
+    DestroyImmediate(o1);
+    expectSize(1);
+    DestroyImmediate(o0);
+    expectSize(0);
+  }
+
+  {
+    expectSize(0);
+    Object &o0 = Object::Create();
+    expectSize(1);
+    Object &o1 = Object::Create();
+    expectSize(2);
+    Object &o2 = Object::Create();
+    expectSize(3);
+    o1.parent() = &o0;
+    expectSize(3);
+    o2.parent() = &o1;
+    expectSize(3);
+    DestroyImmediate(o2);
+    expectSize(2);
+    DestroyImmediate(o0);
+    expectSize(0);
+  }
+
   // Name.
   {
     Object &o = Object::Create();
     o.name() = "0";
     EXPECT_EQ(o.name(), "0");
   }
+}
 
-  // Parent and root.
+TEST(Object, ParentAndRoot) {
+  // Basic parents and roots.
   {
     Object &o = Object::Create();
     const Object &oPare = *o.parent();
@@ -94,7 +217,7 @@ TEST(Object, Base) {
     EXPECT_EQ(&t2Root, &t);
   }
 
-  // Change parent.
+  // Complex parents.
   {
     Object &o0 = Object::Create();
     Object &o1 = Object::Create();
@@ -207,7 +330,7 @@ TEST(Object, Base) {
     EXPECT_TRUE(failed);
   }
 
-  // Change root.
+  // Complex roots.
   {
     Object &o0 = Object::Create();
     Object &o1 = Object::Create();
