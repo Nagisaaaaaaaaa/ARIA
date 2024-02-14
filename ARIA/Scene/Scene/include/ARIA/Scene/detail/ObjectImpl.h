@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ARIA/PropertySTL.h"
 #include "ARIA/Scene/Components/detail/TransformImpl.h"
 
 namespace ARIA {
@@ -8,7 +7,7 @@ namespace ARIA {
 #define __ARIA_PROP_AND_SUB_PROP_INCOMPLETE_PREFAB_MEMBERS_OBJECT(specifiers, type)                                    \
                                                                                                                        \
   /* Name. */                                                                                                          \
-  ARIA_SUB_PROP_PREFAB_STD_STRING(specifiers, std::string, name);                                                      \
+  ARIA_SUB_PROP(specifiers, std::string, name);                                                                        \
                                                                                                                        \
   /* Parent. */                                                                                                        \
   ARIA_SUB_PROP_BEGIN(specifiers, Object *, parent);                                                                   \
@@ -43,7 +42,7 @@ namespace ARIA {
 #define __ARIA_PROP_AND_SUB_PROP_PREFAB_MEMBERS_OBJECT(specifiers, type)                                               \
                                                                                                                        \
   /* Name. */                                                                                                          \
-  ARIA_SUB_PROP_PREFAB_STD_STRING(specifiers, std::string, name);                                                      \
+  ARIA_SUB_PROP(specifiers, std::string, name);                                                                        \
                                                                                                                        \
   /* Parent. */                                                                                                        \
   ARIA_SUB_PROP_BEGIN(specifiers, Object *, parent);                                                                   \
