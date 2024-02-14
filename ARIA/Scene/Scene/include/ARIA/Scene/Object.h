@@ -122,9 +122,17 @@ public:
   /// So, users should not modify anything about the halo root.
   /// Or there will be undefined behaviors.
   ARIA_PROP_BEGIN(public, public, , Object *, parent);
-  ARIA_SUB_PROP(, Object *, parent);
-  ARIA_SUB_PROP(, Object *, root);
-  ARIA_SUB_PROP(, Transform &, transform);
+  /**/ ARIA_SUB_PROP_BEGIN(, Object *, parent);
+  /**/ /**/ ARIA_SUB_PROP(, Object *, parent);
+  /**/ /**/ ARIA_SUB_PROP(, Object *, root);
+  /**/ /**/ ARIA_SUB_PROP(, Transform &, transform);
+  /**/ ARIA_SUB_PROP_END;
+  /**/ ARIA_SUB_PROP_BEGIN(, Object *, root);
+  /**/ /**/ ARIA_SUB_PROP(, Object *, parent);
+  /**/ /**/ ARIA_SUB_PROP(, Object *, root);
+  /**/ /**/ ARIA_SUB_PROP(, Transform &, transform);
+  /**/ ARIA_SUB_PROP_END;
+  /**/ ARIA_SUB_PROP(, Transform &, transform);
   ARIA_PROP_END;
 
   /// \brief The root object of the current object.
@@ -140,9 +148,17 @@ public:
   /// \warning Similar to `parent`, cycles will be automatically detected.
   /// ```
   ARIA_PROP_BEGIN(public, public, , Object *, root);
-  ARIA_SUB_PROP(, Object *, parent);
-  ARIA_SUB_PROP(, Object *, root);
-  ARIA_SUB_PROP(, Transform &, transform);
+  /**/ ARIA_SUB_PROP_BEGIN(, Object *, parent);
+  /**/ /**/ ARIA_SUB_PROP(, Object *, parent);
+  /**/ /**/ ARIA_SUB_PROP(, Object *, root);
+  /**/ /**/ ARIA_SUB_PROP(, Transform &, transform);
+  /**/ ARIA_SUB_PROP_END;
+  /**/ ARIA_SUB_PROP_BEGIN(, Object *, root);
+  /**/ /**/ ARIA_SUB_PROP(, Object *, parent);
+  /**/ /**/ ARIA_SUB_PROP(, Object *, root);
+  /**/ /**/ ARIA_SUB_PROP(, Transform &, transform);
+  /**/ ARIA_SUB_PROP_END;
+  /**/ ARIA_SUB_PROP(, Transform &, transform);
   ARIA_PROP_END;
 
   //
