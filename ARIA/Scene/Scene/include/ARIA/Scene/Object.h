@@ -12,6 +12,7 @@
 //
 //
 #include "ARIA/Property.h"
+#include "ARIA/Registry.h"
 
 #include <memory>
 
@@ -30,7 +31,7 @@ class Transform;
 ///
 /// `Object` is implemented similar to Unity `GameObject`,
 /// see https://docs.unity3d.com/ScriptReference/GameObject.html.
-class Object final {
+class Object final : public Registry<Object> {
 public:
   /// \brief Create a root object. Reference to this object will be returned.
   ///
@@ -52,7 +53,7 @@ public:
   ///
   /// So, developers of lifecycles should implement their own `Destroy()`,
   /// for example, postpone the destruction to some time and call `DestroyImmediate()` at that time.
-  static Object &Create();
+  [[nodiscard]] static Object &Create();
 
   //
   //
@@ -197,16 +198,32 @@ public:
   ///
   /// \warning If there are multiple components with the same type, only the first one will be returned.
   template <typename TComponent>
-  inline TComponent *GetComponent();
+  [[nodiscard]] inline TComponent *GetComponent();
 
   //
   //
   //
+private:
+  using Base = Registry<Object>;
+
 public:
   ARIA_COPY_MOVE_ABILITY(Object, delete, delete);
 
   /// \brief See `Create()` and `DestroyImmediate()`.
   ~Object() = default;
+
+  //
+  //
+  //
+public:
+  [[nodiscard]] static size_t size() noexcept;
+
+  [[nodiscard]] static decltype(Base::begin()) begin() noexcept;
+  [[nodiscard]] static decltype(Base::end()) end() noexcept;
+  [[nodiscard]] static decltype(Base::cbegin()) cbegin() noexcept;
+  [[nodiscard]] static decltype(Base::cend()) cend() noexcept;
+  [[nodiscard]] static decltype(Base::range()) range() noexcept;
+  [[nodiscard]] static decltype(Base::crange()) crange() noexcept;
 
   //
   //

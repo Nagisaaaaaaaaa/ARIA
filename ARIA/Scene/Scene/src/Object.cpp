@@ -142,4 +142,35 @@ Object::Object(Object *parent) : parent_(parent) {
   AddComponentNoTransformCheck<Transform>();
 }
 
+//
+//
+//
+[[nodiscard]] size_t Object::size() noexcept {
+  return Base::size();
+}
+
+[[nodiscard]] decltype(Object::Base::begin()) Object::begin() noexcept {
+  return Base::begin();
+}
+
+[[nodiscard]] decltype(Object::Base::end()) Object::end() noexcept {
+  return Base::end();
+}
+
+[[nodiscard]] decltype(Object::Base::cbegin()) Object::cbegin() noexcept {
+  return Base::cbegin();
+}
+
+[[nodiscard]] decltype(Object::Base::cend()) Object::cend() noexcept {
+  return Base::cend();
+}
+
+[[nodiscard]] decltype(Object::Base::range()) Object::range() noexcept {
+  return Base::range();
+}
+
+[[nodiscard]] decltype(Object::Base::crange()) Object::crange() noexcept {
+  return Base::crange();
+}
+
 } // namespace ARIA
