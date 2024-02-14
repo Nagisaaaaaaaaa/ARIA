@@ -10,6 +10,35 @@ Object &Object::Create() {
 //
 //
 //
+void DestroyImmediate(Object &object) {
+  if (object.parent_) [[likely]] {
+    auto &siblings = object.parent_->children_;
+    auto it = std::find_if(siblings.begin(), siblings.end(),
+                           [&](const std::unique_ptr<Object> &child) { return child.get() == &object; });
+
+    siblings.erase(it);
+  } else {
+    throw std::runtime_error("Should not destroy the halo root object");
+  }
+}
+
+void DestroyImmediate(Component &component) {
+  if (dynamic_cast<Transform *>(&component)) [[unlikely]] {
+    throw std::runtime_error("Should not destroy the `Transform` component");
+  }
+
+  if (component.object().parent_) [[likely]] {
+    auto &components = component.object().components_;
+    auto it = std::find_if(components.begin(), components.end(),
+                           [&](const std::unique_ptr<Component> &comp) { return comp.get() == &component; });
+
+    components.erase(it);
+  } else {
+    throw std::runtime_error("Should not destroy component of the halo root object");
+  }
+}
+
+//
 //
 //
 const Object *Object::ARIA_PROP_IMPL(parent)() const {
@@ -73,6 +102,20 @@ void Object::ARIA_PROP_IMPL(root)(Object *value) {
   r->parent() = value;
 }
 
+//
+//
+//
+const Transform &Object::ARIA_PROP_IMPL(transform)() const {
+  return *static_cast<Transform *>(components_[0].get());
+}
+
+Transform &Object::ARIA_PROP_IMPL(transform)() {
+  return *static_cast<Transform *>(components_[0].get());
+}
+
+//
+//
+//
 bool Object::IsRoot() const {
   return parent() == haloRoot_.get();
 }
@@ -90,73 +133,44 @@ bool Object::IsChildOf(const Object &parent) const {
   return false;
 }
 
-const Transform &Object::ARIA_PROP_IMPL(transform)() const {
-  return *static_cast<Transform *>(components_[0].get());
-}
-
-Transform &Object::ARIA_PROP_IMPL(transform)() {
-  return *static_cast<Transform *>(components_[0].get());
-}
-
-//
-//
-//
-//
-//
-Object::Range<Object::JoinIterator<Object>, Object::JoinIterator<Object>> Object::rangeJoined() {
-  return {JoinIterator<Object>{&*haloRoot_}, {}};
-}
-
-Object::Range<Object::JoinIterator<const Object>, Object::JoinIterator<const Object>> Object::crangeJoined() {
-  return {JoinIterator<const Object>{&*haloRoot_}, {}};
-}
-
-Object::Range<Object::JoinComponentIterator, Object::JoinComponentIterator> Object::componentRangeJoined() {
-  return {JoinComponentIterator{&*haloRoot_}, {}};
-}
-
-//
-//
 //
 //
 //
 std::unique_ptr<Object> Object::haloRoot_ = std::unique_ptr<Object>(new Object{nullptr});
 
 Object::Object(Object *parent) : parent_(parent) {
-  AddComponentNoCheck<Transform>();
+  AddComponentNoTransformCheck<Transform>();
 }
 
 //
 //
 //
-//
-//
-void DestroyImmediate(Object &object) {
-  if (object.parent_) [[likely]] {
-    auto &siblings = object.parent_->children_;
-    auto it = std::find_if(siblings.begin(), siblings.end(),
-                           [&](const std::unique_ptr<Object> &child) { return child.get() == &object; });
-
-    siblings.erase(it);
-  } else {
-    throw std::runtime_error("Should not destroy the halo root object");
-  }
+[[nodiscard]] size_t Object::size() noexcept {
+  return Base::size() - 1; // Skip the halo root.
 }
 
-void DestroyImmediate(Component &component) {
-  if (dynamic_cast<Transform *>(&component)) {
-    throw std::runtime_error("Should not destroy the `Transform` component");
-  }
+[[nodiscard]] decltype(Object::Base::begin()) Object::Begin() noexcept {
+  return ++Base::begin(); // Skip the halo root.
+}
 
-  if (component.object().parent_) [[likely]] {
-    auto &components = component.object().components_;
-    auto it = std::find_if(components.begin(), components.end(),
-                           [&](const std::unique_ptr<Component> &comp) { return comp.get() == &component; });
+[[nodiscard]] decltype(Object::Base::end()) Object::End() noexcept {
+  return Base::end();
+}
 
-    components.erase(it);
-  } else {
-    throw std::runtime_error("Should not destroy component of the halo root object");
-  }
+[[nodiscard]] decltype(Object::Base::cbegin()) Object::CBegin() noexcept {
+  return ++Base::cbegin(); // Skip the halo root.
+}
+
+[[nodiscard]] decltype(Object::Base::cend()) Object::CEnd() noexcept {
+  return Base::cend();
+}
+
+[[nodiscard]] decltype(Object::Base::range()) Object::Range() noexcept {
+  return {Object::Begin(), Object::End()};
+}
+
+[[nodiscard]] decltype(Object::Base::crange()) Object::CRange() noexcept {
+  return {Object::CBegin(), Object::CEnd()};
 }
 
 } // namespace ARIA

@@ -148,12 +148,12 @@ protected:
   ///
   /// \example ```cpp
   /// size_t totalValue = 0;
-  /// for (const auto &a : A::range()) {
+  /// for (auto &a : A::range()) {
   ///   totalValue += a.value;
   /// }
   ///
   /// size_t totalValue = 0;
-  /// for (const auto &a : A::range() | std::views::take(5) | std::views::reverse) {
+  /// for (auto &a : A::range() | std::views::take(5) | std::views::reverse) {
   ///   totalValue += a.value;
   /// }
   /// ```
@@ -163,12 +163,12 @@ protected:
   ///
   /// \example ```cpp
   /// size_t totalValue = 0;
-  /// for (const auto &a : A::crange()) {
+  /// for (auto &a : A::crange()) {
   ///   totalValue += a.value;
   /// }
   ///
   /// size_t totalValue = 0;
-  /// for (const auto &a : A::crange() | std::views::take(5) | std::views::reverse) {
+  /// for (auto &a : A::crange() | std::views::take(5) | std::views::reverse) {
   ///   totalValue += a.value;
   /// }
   /// ```

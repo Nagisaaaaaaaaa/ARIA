@@ -31,9 +31,6 @@ TEST(Transform, Local) {
 
     t.localPosition() += Vec3r{1, 2, 3};
     expectV(t.localPosition(), {1, 2, 3});
-
-    t.localScale().norm() *= 2;
-    expectV(t.localScale(), {2, 2, 2});
   }
 
   // Up, down, forward, back, left, and right.
@@ -41,18 +38,18 @@ TEST(Transform, Local) {
     Object &o = Object::Create();
     Transform &t = o.transform();
 
-    t.localRotation().eulerAngles() = {Deg2Rad(Real(30)), Deg2Rad(Real(0)), Deg2Rad(Real(0))};
-    expectV(t.localEulerAngles(), static_cast<Quatr>(t.localRotation()).eulerAngles());
-    expectV(t.localEulerAngles(), t.localRotation().eulerAngles());
+    t.localRotation() = FromEulerAngles(Vec3r{30, 0, 0} * deg2Rad<Real>);
+    expectV(t.localEulerAngles(), ToEulerAngles(static_cast<Quatr>(t.localRotation())));
+    expectV(t.localEulerAngles(), ToEulerAngles(t.localRotation()));
 
     expectV(t.localUp(), {0, 0.8660254, 0.5});
     expectV(t.localDown(), {0, -0.8660254, -0.5});
 
-    t.localEulerAngles() = {Deg2Rad(Real(0)), Deg2Rad(Real(30)), Deg2Rad(Real(0))};
+    t.localEulerAngles() = {0_R, deg2Rad<Real> * 30, 0_R};
     expectV(t.localForward(), {-0.5, 0, -0.8660254});
     expectV(t.localBack(), {0.5, 0, 0.8660254});
 
-    t.localEulerAngles() = {Deg2Rad(Real(0)), Deg2Rad(Real(0)), Deg2Rad(Real(30))};
+    t.localEulerAngles() = {0_R, 0_R, deg2Rad<Real> * 30};
     expectV(t.localLeft(), {-0.8660254, -0.5, 0});
     expectV(t.localRight(), {0.8660254, 0.5, 0});
   }
@@ -251,7 +248,7 @@ TEST(Transform, World) {
       t.localRotation() = {0.31F, 0.415F, 0.9F, 0.26F};
       t.localScale() = {3.1F, 4.15F, 9.26F};
 
-      t.Rotate(Deg2Rad(30.0F), Deg2Rad(60.0F), Deg2Rad(70.0F));
+      t.Rotate(deg2Rad<float> * 30.0F, deg2Rad<float> * 60.0F, deg2Rad<float> * 70.0F);
 
       Vec3r lp = t.localPosition();
       Vec3r wp = t.position();
@@ -277,7 +274,7 @@ TEST(Transform, World) {
       t.localRotation() = {0.31F, 0.415F, 0.9F, 0.26F};
       t.localScale() = {3.1F, 4.15F, 9.26F};
 
-      t.Rotate(Deg2Rad(30.0F), Deg2Rad(60.0F), Deg2Rad(70.0F), Space::World);
+      t.Rotate(deg2Rad<float> * 30.0F, deg2Rad<float> * 60.0F, deg2Rad<float> * 70.0F, Space::World);
 
       Vec3r lp = t.localPosition();
       Vec3r wp = t.position();
@@ -303,7 +300,7 @@ TEST(Transform, World) {
       t.localRotation() = {0.31F, 0.415F, 0.9F, 0.26F};
       t.localScale() = {3.1F, 4.15F, 9.26F};
 
-      t.RotateAround({1, 2, 3}, {4, -5, 6}, Deg2Rad(15.0F));
+      t.RotateAround({1, 2, 3}, {4, -5, 6}, deg2Rad<float> * 15.0F);
 
       Vec3r lp = t.localPosition();
       Vec3r wp = t.position();

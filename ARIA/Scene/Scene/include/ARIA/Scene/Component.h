@@ -34,10 +34,7 @@ protected:
   explicit Component(Object &object) : object_(object) {}
 
 public:
-  Component(const Component &) = delete;
-  Component(Component &&) noexcept = delete;
-  Component &operator=(const Component &) = delete;
-  Component &operator=(Component &&) noexcept = delete;
+  ARIA_COPY_MOVE_ABILITY(Component, delete, delete);
   virtual ~Component() = default;
 
 private:

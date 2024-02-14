@@ -1,8 +1,10 @@
 #pragma once
 
+#include "ARIA/Mat.h"
 #include "ARIA/Quat.h"
 #include "ARIA/Scene/Component.h"
 #include "ARIA/Scene/Object.h"
+#include "ARIA/Vec.h"
 
 namespace ARIA {
 
@@ -29,7 +31,7 @@ public:
   /// \brief The parent transform of the current transform.
   ///
   /// \example ```cpp
-  /// Transform& parent = t.parent();
+  /// Transform* parent = t.parent();
   /// ```
   ///
   /// \note If the current transform is a "root" transform, that is, `IsRoot()` returns true,
@@ -42,15 +44,17 @@ public:
   ///
   /// So, users should not modify anything about the halo root.
   /// Or there will be undefined behaviors.
-  ARIA_REF_PROP(public, , parent, ARIA_PROP_IMPL(parent)());
+  ARIA_PROP_BEGIN(public, public, , Transform *, parent);
+  ARIA_PROP_END;
 
   /// \brief Get the "root" transform of the current transform.
   /// See `parent` for more details.
   ///
   /// \example ```cpp
-  /// Transform& root = t.root();
+  /// Transform* root = t.root();
   /// ```
-  ARIA_REF_PROP(public, , root, ARIA_PROP_IMPL(root)());
+  ARIA_PROP_BEGIN(public, public, , Transform *, root);
+  ARIA_PROP_END;
 
   //
   //
@@ -203,6 +207,35 @@ public:
   //
   //
   //
+public:
+  //! ARIA use left-handed coordinate system, and the `up` direction is (0, 1, 0).
+  // clang-format off
+  static /* constexpr */ Vec3r Up()      { return { 0,  1,  0}; }
+  static /* constexpr */ Vec3r Down()    { return { 0, -1,  0}; }
+  static /* constexpr */ Vec3r Forward() { return { 0,  0, -1}; }
+  static /* constexpr */ Vec3r Back()    { return { 0,  0,  1}; }
+  static /* constexpr */ Vec3r Left()    { return {-1,  0,  0}; }
+  static /* constexpr */ Vec3r Right()   { return { 1,  0,  0}; }
+
+  // clang-format on
+
+  //
+  //
+  //
+  //
+  //
+public:
+  /// \brief Two `Transform`s are defined as equal when they have exactly the same address.
+  bool operator==(const Transform &other) const noexcept { return this == &other; }
+
+  /// \brief Two `Transform`s are defined as equal when they have exactly the same address.
+  bool operator!=(const Transform &other) const noexcept { return !operator==(other); }
+
+  //
+  //
+  //
+  //
+  //
 private:
   friend Object;
 
@@ -210,10 +243,7 @@ private:
   using Base::Base;
 
 public:
-  Transform(const Transform &) = delete;
-  Transform(Transform &&) noexcept = delete;
-  Transform &operator=(const Transform &) = delete;
-  Transform &operator=(Transform &&) noexcept = delete;
+  ARIA_COPY_MOVE_ABILITY(Transform, delete, delete);
   ~Transform() final = default;
 
   //
@@ -222,9 +252,9 @@ public:
   //
   //
 private:
-  Vec3r localPosition_{Vec3r::zero()};
-  Quatr localRotation_{Quatr::identity()};
-  Vec3r localScale_{Vec3r::one()};
+  Vec3r localPosition_{0, 0, 0};
+  Quatr localRotation_{Quatr::Identity()};
+  Vec3r localScale_{1, 1, 1};
 
   //
   //
@@ -235,10 +265,12 @@ private:
   //
   //
   //
-  [[nodiscard]] const Transform &ARIA_PROP_IMPL(parent)() const;
-  [[nodiscard]] Transform &ARIA_PROP_IMPL(parent)();
-  [[nodiscard]] const Transform &ARIA_PROP_IMPL(root)() const;
-  [[nodiscard]] Transform &ARIA_PROP_IMPL(root)();
+  [[nodiscard]] const Transform *ARIA_PROP_IMPL(parent)() const;
+  [[nodiscard]] Transform *ARIA_PROP_IMPL(parent)();
+  void ARIA_PROP_IMPL(parent)(Transform *value);
+  [[nodiscard]] const Transform *ARIA_PROP_IMPL(root)() const;
+  [[nodiscard]] Transform *ARIA_PROP_IMPL(root)();
+  void ARIA_PROP_IMPL(root)(Transform *value);
 
   //
   [[nodiscard]] Vec3r ARIA_PROP_IMPL(localPosition)() const;
