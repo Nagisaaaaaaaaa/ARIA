@@ -514,11 +514,16 @@ TEST(Object, ParentRootAndTransform) {
     EXPECT_TRUE(*o2.parent()->parent() == o0);
     EXPECT_TRUE(*o2.parent()->root() == o0);
     EXPECT_TRUE(o2.parent()->transform() == o1.transform());
+    EXPECT_TRUE(*o2.root()->parent() == *o0.parent());
     EXPECT_TRUE(*o2.root()->root() == o0);
+    EXPECT_TRUE(o2.root()->transform() == o0.transform());
 
     EXPECT_TRUE(*o3.parent()->parent() == o1);
     EXPECT_TRUE(*o3.parent()->root() == o0);
+    EXPECT_TRUE(o3.parent()->transform() == o2.transform());
+    EXPECT_TRUE(*o3.root()->parent() == *o0.parent());
     EXPECT_TRUE(*o3.root()->root() == o0);
+    EXPECT_TRUE(o3.root()->transform() == o0.transform());
   }
 }
 
