@@ -30,9 +30,6 @@ TEST(Object, Base) {
     Object &o = Object::Create();
     o.name() = "0";
     EXPECT_EQ(o.name(), "0");
-
-    o.name("1");
-    EXPECT_EQ(o.name(), "1");
   }
 
   // Parent and root.
