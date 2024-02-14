@@ -43,6 +43,33 @@ public:
   //
   //
   //
+  /// \brief Destroys the object immediately.
+  ///
+  /// Please read the comments of `Object::Create()` before continue.
+  ///
+  /// \warning You should never iterate through arrays and destroy the elements you are iterating over.
+  /// This will cause serious problems (as a general programming practice, not just in ARIA and Unity).
+  ///
+  /// So, this function should be carefully handled by the lifecycle.
+  ///
+  /// \see Destroy
+  friend void DestroyImmediate(Object &object);
+
+  /// \brief Destroys the component immediately.
+  ///
+  /// Please read the comments of `Object::Create()` before continue.
+  ///
+  /// \warning You should never iterate through arrays and destroy the elements you are iterating over.
+  /// This will cause serious problems (as a general programming practice, not just in ARIA and Unity).
+  ///
+  /// So, this function should be carefully handled by the lifecycle.
+  ///
+  /// \see Destroy
+  friend void DestroyImmediate(Component &component);
+
+  //
+  //
+  //
 public:
   /// \brief Name of the object.
   ///
@@ -52,6 +79,9 @@ public:
   /// ```
   ARIA_REF_PROP(public, , name, name_);
 
+  //
+  //
+  //
   /// \brief The parent object of the current object.
   ///
   /// \example ```cpp
@@ -143,11 +173,7 @@ public:
   /// ```
   template <typename TComponent, typename... Ts>
     requires(std::derived_from<TComponent, Component>)
-  TComponent &AddComponent(Ts &&...ts) {
-    static_assert(!std::is_same_v<TComponent, Transform>, "Any object should have and exactly have one `Transform`");
-
-    return AddComponentNoTransformCheck<TComponent>(std::forward<Ts>(ts)...);
-  }
+  inline TComponent &AddComponent(Ts &&...ts);
 
   /// \brief Try to get pointer to a component of type `TComponent` on the specified `Object`.
   /// Returns `nullptr` if components with type `TComponent` not exist.
@@ -158,21 +184,15 @@ public:
   ///
   /// \warning If there are multiple components with the same type, only the first one will be returned.
   template <typename TComponent>
-  TComponent *GetComponent() {
-    static_assert(!std::is_same_v<TComponent, Transform>, "Directly call `transform()` instead, which is faster");
+  inline TComponent *GetComponent();
 
-    TComponent *t = nullptr;
-    for (const auto &c : components_) {
-      if ((t = dynamic_cast<TComponent *>(c.get())))
-        break;
-    }
-
-    return t;
-  }
-
+  //
+  //
+  //
 public:
-
   ARIA_COPY_MOVE_ABILITY(Object, delete, delete);
+
+  /// \brief See `Create()` and `DestroyImmediate()`.
   ~Object() = default;
 
   //
@@ -180,28 +200,20 @@ public:
   //
   //
   //
+  //
+  //
+  //
+  //
 private:
-  // Forward declaration.
-  template <typename TItBegin, typename TItEnd>
-  class Range;
+  static std::unique_ptr<Object> haloRoot_;
 
-  //
-  //
-  //
-  //
-  //
-private:
   std::string name_;
   Object *parent_{};
   std::vector<std::unique_ptr<Object>> children_;
   std::vector<std::unique_ptr<Component>> components_;
 
-  //
-  //
-  //
-  //
-  //
-  //
+  explicit Object(Object *parent);
+
   //
   //
   //
@@ -219,18 +231,6 @@ private:
   //
   //
   //
-  //
-  //
-private:
-  static std::unique_ptr<Object> haloRoot_;
-
-  explicit Object(Object *parent);
-
-  //
-  //
-  //
-  //
-  //
   // Add a component without checking whether the type is `Transform`.
   template <typename TComponent, typename... Ts>
     requires(std::derived_from<TComponent, Component>)
@@ -240,67 +240,36 @@ private:
 
     return *component;
   }
-
-  //
-  //
-  //
-  //
-  //
-  template <typename TItBegin, typename TItEnd>
-  class Range {
-  public:
-    Range(const TItBegin &begin, const TItEnd &end) : begin_(begin), end_(end) {}
-
-    TItBegin begin() const { return begin_; }
-
-    TItEnd end() const { return end_; }
-
-    Range(const Range &) = default;
-    Range(Range &&) noexcept = default;
-    Range &operator=(const Range &) = default;
-    Range &operator=(Range &&) noexcept = default;
-
-  private:
-    TItBegin begin_;
-    TItEnd end_;
-  };
-
-  //
-  //
-  //
-  //
-  //
-  friend void DestroyImmediate(Object &object);
-  friend void DestroyImmediate(Component &component);
 };
 
 //
 //
 //
-//
-//
-/// \brief Destroys the object immediately.
-///
-/// Please read the comments of `Object::Create()` before continue.
-///
-/// \warning You should never iterate through arrays and destroy the elements you are iterating over.
-/// This will cause serious problems (as a general programming practice, not just in ARIA and Unity).
-///
-/// So, this function should be carefully handled by the lifecycle.
-///
-/// \see Destroy
-void DestroyImmediate(Object &object);
+template <typename TComponent, typename... Ts>
+requires(std::derived_from<TComponent, Component>)
+inline TComponent &Object::AddComponent(Ts &&...ts) {
+  static_assert(!std::is_same_v<TComponent, Transform>, "Any object should have and exactly have one `Transform`");
 
-/// \brief Destroys the component immediately.
-///
-/// Please read the comments of `Object::Create()` before continue.
-///
-/// \warning You should never iterate through arrays and destroy the elements you are iterating over.
-/// This will cause serious problems (as a general programming practice, not just in ARIA and Unity).
-///
-/// So, this function should be carefully handled by the lifecycle.
-///
-/// \see Destroy
+  return AddComponentNoTransformCheck<TComponent>(std::forward<Ts>(ts)...);
+}
+
+template <typename TComponent>
+inline TComponent *Object::GetComponent() {
+  static_assert(!std::is_same_v<TComponent, Transform>, "Directly call `transform()` instead, which is faster");
+
+  TComponent *t = nullptr;
+  for (const auto &c : components_) {
+    if ((t = dynamic_cast<TComponent *>(c.get())))
+      break;
+  }
+
+  return t;
+}
+
+//
+//
+//
+void DestroyImmediate(Object &object);
 void DestroyImmediate(Component &component);
 
 } // namespace ARIA
