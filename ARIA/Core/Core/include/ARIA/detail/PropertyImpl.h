@@ -376,7 +376,7 @@ private:
     /* This function is defined `static` to handle `auto c = obj.a().b().c();`. */                                     \
     /* See comments of `ARIA_SUB_PROP_BEGIN`. */                                                                       \
     [[nodiscard]] static SPECIFIERS decltype(auto) Get(TObjectMaybeConst &object)                                      \
-      requires std::is_reference_v<Type>                                                                               \
+      requires property::detail::isReferenceOrPointer<Type>                                                            \
     {                                                                                                                  \
       static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                   \
                         property::detail::isReferenceOrPointer<decltype(object.__ARIA_PROP_IMPL(PROP_NAME)())>,        \
@@ -387,7 +387,7 @@ private:
       return object.__ARIA_PROP_IMPL(PROP_NAME)();                                                                     \
     }                                                                                                                  \
     [[nodiscard]] static SPECIFIERS Type Get(TObjectMaybeConst &object)                                                \
-      requires(!std::is_reference_v<Type>)                                                                             \
+      requires(!property::detail::isReferenceOrPointer<Type>)                                                          \
     {                                                                                                                  \
       static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                   \
                         property::detail::isReferenceOrPointer<decltype(object.__ARIA_PROP_IMPL(PROP_NAME)())>,        \
@@ -532,7 +532,7 @@ public:                                                                         
     SPECIFIERS explicit ARIA_ANON(PROP_NAME)(TObjectMaybeConst & object) : object(object) {}                           \
                                                                                                                        \
     [[nodiscard]] static SPECIFIERS decltype(auto) Get(TObjectMaybeConst &object)                                      \
-      requires std::is_reference_v<Type>                                                                               \
+      requires property::detail::isReferenceOrPointer<Type>                                                            \
     {                                                                                                                  \
       decltype(auto) tmp = TPropertyBase::Get(object);                                                                 \
                                                                                                                        \
@@ -558,7 +558,7 @@ public:                                                                         
       }                                                                                                                \
     }                                                                                                                  \
     [[nodiscard]] static SPECIFIERS Type Get(TObjectMaybeConst &object)                                                \
-      requires(!std::is_reference_v<Type>)                                                                             \
+      requires(!property::detail::isReferenceOrPointer<Type>)                                                          \
     {                                                                                                                  \
       decltype(auto) tmp = TPropertyBase::Get(object);                                                                 \
                                                                                                                        \
