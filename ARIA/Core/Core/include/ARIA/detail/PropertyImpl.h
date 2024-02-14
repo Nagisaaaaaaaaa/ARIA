@@ -145,7 +145,7 @@ public:
   __ARIA_PROP_BASE_DEFINE_PREFIX_UNARY_OPERATOR(+)
   __ARIA_PROP_BASE_DEFINE_PREFIX_UNARY_OPERATOR(-)
   // __ARIA_PROP_BASE_DEFINE_PREFIX_UNARY_OPERATOR(*)
-  ARIA_HOST_DEVICE friend decltype(auto) operator *(const TProperty &x) requires std::is_pointer_v<decltype(x.value())> {
+  ARIA_HOST_DEVICE friend decltype(auto) operator *(const TProperty &x) {
     return *x.value();
   }
   // __ARIA_PROP_BASE_DEFINE_PREFIX_UNARY_OPERATOR(/)

@@ -34,9 +34,9 @@ TEST(Object, Base) {
       ++i;
     EXPECT_EQ(i, num);
   };
-  auto expectNChildren = [] (Object& o, size_t num) {
+  auto expectNChildren = [](Object &o, size_t num) {
     size_t i = 0;
-    for (auto & child : o) {
+    for (auto &child : o) {
       std::string s = child.name(); // Indirect iterator.
       ++i;
     }
@@ -224,24 +224,24 @@ TEST(Object, ParentRootAndTransform) {
     const Object &oPare = *o.parent();
     const Object &oRoot = *o.root();
     EXPECT_TRUE(o.IsRoot());
-    EXPECT_TRUE(&oPare != &o);
-    EXPECT_EQ(&oRoot, &o);
+    EXPECT_TRUE(oPare != o);
+    EXPECT_TRUE(oRoot == o);
 
     Object &o1 = Object::Create();
     o1.parent() = &o;
     const Object &o1Pare = *o1.parent();
     const Object &o1Root = *o1.root();
     EXPECT_FALSE(o1.IsRoot());
-    EXPECT_EQ(&o1Pare, &o);
-    EXPECT_EQ(&o1Root, &o);
+    EXPECT_TRUE(o1Pare == o);
+    EXPECT_TRUE(o1Root == o);
 
     Object &o2 = Object::Create();
     o2.parent() = &o1;
     const Object &o2Pare = *o2.parent();
     const Object &o2Root = *o2.root();
     EXPECT_FALSE(o2.IsRoot());
-    EXPECT_EQ(&o2Pare, &o1);
-    EXPECT_EQ(&o2Root, &o);
+    EXPECT_TRUE(o2Pare == o1);
+    EXPECT_TRUE(o2Root == o);
   }
 
   {
@@ -252,8 +252,8 @@ TEST(Object, ParentRootAndTransform) {
     Transform &tPare = *t.parent();
     Transform &tRoot = *t.root();
     EXPECT_TRUE(t.IsRoot());
-    EXPECT_TRUE(&tPare != &t);
-    EXPECT_EQ(&tRoot, &t);
+    EXPECT_TRUE(tPare != t);
+    EXPECT_TRUE(tRoot == t);
 
     Object &o1 = Object::Create();
     o1.parent() = &o;
@@ -263,8 +263,8 @@ TEST(Object, ParentRootAndTransform) {
     Transform &t1Pare = *t1.parent();
     Transform &t1Root = *t1.root();
     EXPECT_FALSE(t1.IsRoot());
-    EXPECT_EQ(&t1Pare, &t);
-    EXPECT_EQ(&t1Root, &t);
+    EXPECT_TRUE(t1Pare == t);
+    EXPECT_TRUE(t1Root == t);
 
     Object &o2 = Object::Create();
     o2.parent() = &o1;
@@ -274,8 +274,8 @@ TEST(Object, ParentRootAndTransform) {
     Transform &t2Pare = *t2.parent();
     Transform &t2Root = *t2.root();
     EXPECT_FALSE(t2.IsRoot());
-    EXPECT_EQ(&t2Pare, &t1);
-    EXPECT_EQ(&t2Root, &t);
+    EXPECT_TRUE(t2Pare == t1);
+    EXPECT_TRUE(t2Root == t);
   }
 
   // Complex parents.
@@ -291,9 +291,9 @@ TEST(Object, ParentRootAndTransform) {
 
     o3.parent() = &o0;
 
-    EXPECT_EQ(o1.parent(), &o0);
-    EXPECT_EQ(o2.parent(), &o1);
-    EXPECT_EQ(o3.parent(), &o0);
+    EXPECT_TRUE(*o1.parent() == o0);
+    EXPECT_TRUE(*o2.parent() == o1);
+    EXPECT_TRUE(*o3.parent() == o0);
   }
 
   {
@@ -308,9 +308,9 @@ TEST(Object, ParentRootAndTransform) {
 
     o2.parent() = &o0;
 
-    EXPECT_EQ(o1.parent(), &o0);
-    EXPECT_EQ(o2.parent(), &o0);
-    EXPECT_EQ(o3.parent(), &o2);
+    EXPECT_TRUE(*o1.parent() == o0);
+    EXPECT_TRUE(*o2.parent() == o0);
+    EXPECT_TRUE(*o3.parent() == o2);
   }
 
   {
@@ -343,13 +343,13 @@ TEST(Object, ParentRootAndTransform) {
 
     o3.transform().parent() = &o0.transform();
 
-    EXPECT_EQ(o1.parent(), &o0);
-    EXPECT_EQ(o2.parent(), &o1);
-    EXPECT_EQ(o3.parent(), &o0);
+    EXPECT_TRUE(*o1.parent() == o0);
+    EXPECT_TRUE(*o2.parent() == o1);
+    EXPECT_TRUE(*o3.parent() == o0);
 
-    EXPECT_EQ(o1.transform().parent(), &o0.transform());
-    EXPECT_EQ(o2.transform().parent(), &o1.transform());
-    EXPECT_EQ(o3.transform().parent(), &o0.transform());
+    EXPECT_TRUE(*o1.transform().parent() == o0.transform());
+    EXPECT_TRUE(*o2.transform().parent() == o1.transform());
+    EXPECT_TRUE(*o3.transform().parent() == o0.transform());
   }
 
   {
@@ -364,13 +364,13 @@ TEST(Object, ParentRootAndTransform) {
 
     o2.transform().parent() = &o0.transform();
 
-    EXPECT_EQ(o1.parent(), &o0);
-    EXPECT_EQ(o2.parent(), &o0);
-    EXPECT_EQ(o3.parent(), &o2);
+    EXPECT_TRUE(*o1.parent() == o0);
+    EXPECT_TRUE(*o2.parent() == o0);
+    EXPECT_TRUE(*o3.parent() == o2);
 
-    EXPECT_EQ(o1.transform().parent(), &o0.transform());
-    EXPECT_EQ(o2.transform().parent(), &o0.transform());
-    EXPECT_EQ(o3.transform().parent(), &o2.transform());
+    EXPECT_TRUE(*o1.transform().parent() == o0.transform());
+    EXPECT_TRUE(*o2.transform().parent() == o0.transform());
+    EXPECT_TRUE(*o3.transform().parent() == o2.transform());
   }
 
   {
@@ -403,9 +403,9 @@ TEST(Object, ParentRootAndTransform) {
 
     o2.root() = &o0;
 
-    EXPECT_EQ(o1.parent(), &o0);
-    EXPECT_EQ(o2.parent(), &o0);
-    EXPECT_EQ(o3.parent(), &o2);
+    EXPECT_TRUE(*o1.parent() == o0);
+    EXPECT_TRUE(*o2.parent() == o0);
+    EXPECT_TRUE(*o3.parent() == o2);
   }
 
   {
@@ -419,9 +419,9 @@ TEST(Object, ParentRootAndTransform) {
 
     o3.root() = &o0;
 
-    EXPECT_EQ(o1.parent(), &o0);
-    EXPECT_EQ(o2.parent(), &o0);
-    EXPECT_EQ(o3.parent(), &o2);
+    EXPECT_TRUE(*o1.parent() == o0);
+    EXPECT_TRUE(*o2.parent() == o0);
+    EXPECT_TRUE(*o3.parent() == o2);
   }
 
   {
@@ -453,13 +453,13 @@ TEST(Object, ParentRootAndTransform) {
 
     o2.transform().root() = &o0.transform();
 
-    EXPECT_EQ(o1.parent(), &o0);
-    EXPECT_EQ(o2.parent(), &o0);
-    EXPECT_EQ(o3.parent(), &o2);
+    EXPECT_TRUE(*o1.parent() == o0);
+    EXPECT_TRUE(*o2.parent() == o0);
+    EXPECT_TRUE(*o3.parent() == o2);
 
-    EXPECT_EQ(o1.transform().parent(), &o0.transform());
-    EXPECT_EQ(o2.transform().parent(), &o0.transform());
-    EXPECT_EQ(o3.transform().parent(), &o2.transform());
+    EXPECT_TRUE(*o1.transform().parent() == o0.transform());
+    EXPECT_TRUE(*o2.transform().parent() == o0.transform());
+    EXPECT_TRUE(*o3.transform().parent() == o2.transform());
   }
 
   {
@@ -473,13 +473,13 @@ TEST(Object, ParentRootAndTransform) {
 
     o3.transform().root() = &o0.transform();
 
-    EXPECT_EQ(o1.parent(), &o0);
-    EXPECT_EQ(o2.parent(), &o0);
-    EXPECT_EQ(o3.parent(), &o2);
+    EXPECT_TRUE(*o1.parent() == o0);
+    EXPECT_TRUE(*o2.parent() == o0);
+    EXPECT_TRUE(*o3.parent() == o2);
 
-    EXPECT_EQ(o1.transform().parent(), &o0.transform());
-    EXPECT_EQ(o2.transform().parent(), &o0.transform());
-    EXPECT_EQ(o3.transform().parent(), &o2.transform());
+    EXPECT_TRUE(*o1.transform().parent() == o0.transform());
+    EXPECT_TRUE(*o2.transform().parent() == o0.transform());
+    EXPECT_TRUE(*o3.transform().parent() == o2.transform());
   }
 
   {
@@ -498,6 +498,27 @@ TEST(Object, ParentRootAndTransform) {
     } catch (std::exception &e) { failed = true; }
 
     EXPECT_TRUE(failed);
+  }
+
+  // Sub-properties of parent and root.
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    o1.parent() = &o0;
+    o2.parent() = &o1;
+    o3.parent() = &o2;
+
+    EXPECT_TRUE(*o2.parent()->parent() == o0);
+    EXPECT_TRUE(*o2.parent()->root() == o0);
+    EXPECT_TRUE(o2.parent()->transform() == o1.transform());
+    EXPECT_TRUE(*o2.root()->root() == o0);
+
+    EXPECT_TRUE(*o3.parent()->parent() == o1);
+    EXPECT_TRUE(*o3.parent()->root() == o0);
+    EXPECT_TRUE(*o3.root()->root() == o0);
   }
 }
 
