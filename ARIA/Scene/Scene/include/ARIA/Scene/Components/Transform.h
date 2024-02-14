@@ -231,10 +231,7 @@ private:
   using Base::Base;
 
 public:
-  Transform(const Transform &) = delete;
-  Transform(Transform &&) noexcept = delete;
-  Transform &operator=(const Transform &) = delete;
-  Transform &operator=(Transform &&) noexcept = delete;
+  ARIA_COPY_MOVE_ABILITY(Transform, delete, delete);
   ~Transform() final = default;
 
   //

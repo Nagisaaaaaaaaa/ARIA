@@ -21,10 +21,7 @@ protected:
   using Base::Base;
 
 public:
-  Behavior(const Behavior &) = delete;
-  Behavior(Behavior &&) noexcept = delete;
-  Behavior &operator=(const Behavior &) = delete;
-  Behavior &operator=(Behavior &&) noexcept = delete;
+  ARIA_COPY_MOVE_ABILITY(Behavior, delete, delete);
   ~Behavior() override = default;
 
 private:

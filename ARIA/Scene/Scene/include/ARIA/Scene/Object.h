@@ -117,10 +117,7 @@ public:
   /// \brief Create a "root" object, see `parent` for more details.
   static Object &Create();
 
-  Object(const Object &) = delete;
-  Object(Object &&) noexcept = delete;
-  Object &operator=(const Object &) = delete;
-  Object &operator=(Object &&) noexcept = delete;
+  ARIA_COPY_MOVE_ABILITY(Object, delete, delete);
   ~Object() = default;
 
   //
