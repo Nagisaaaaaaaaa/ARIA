@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Component.h"
+#include "ARIA/Scene/Component.h"
 
 namespace ARIA {
 

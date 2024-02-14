@@ -3,6 +3,8 @@
 
 #include <gtest/gtest.h>
 
+#include <stack>
+
 namespace ARIA {
 
 namespace {
@@ -316,7 +318,7 @@ TEST(Object, Base) {
 }
 
 TEST(Object, Ranges) {
-  // Joined range.
+  // Range.
   {
     Object &o0 = Object::Create();
     o0.name() = "o0";

@@ -3,7 +3,6 @@
 #include "ARIA/Property.h"
 
 #include <memory>
-#include <stack>
 
 namespace ARIA {
 
