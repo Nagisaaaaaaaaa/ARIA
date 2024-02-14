@@ -105,9 +105,9 @@ TEST(Object, Base) {
 
     o3.parent() = &o0;
 
-    EXPECT_EQ(DecltypeAuto(o1.parent()), &o0);
-    EXPECT_EQ(DecltypeAuto(o2.parent()), &o1);
-    EXPECT_EQ(DecltypeAuto(o3.parent()), &o0);
+    EXPECT_EQ(o1.parent(), &o0);
+    EXPECT_EQ(o2.parent(), &o1);
+    EXPECT_EQ(o3.parent(), &o0);
   }
 
   {
@@ -122,9 +122,9 @@ TEST(Object, Base) {
 
     o2.parent() = &o0;
 
-    EXPECT_EQ(DecltypeAuto(o1.parent()), &o0);
-    EXPECT_EQ(DecltypeAuto(o2.parent()), &o0);
-    EXPECT_EQ(DecltypeAuto(o3.parent()), &o2);
+    EXPECT_EQ(o1.parent(), &o0);
+    EXPECT_EQ(o2.parent(), &o0);
+    EXPECT_EQ(o3.parent(), &o2);
   }
 
   {
@@ -145,6 +145,66 @@ TEST(Object, Base) {
     EXPECT_TRUE(failed);
   }
 
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    o1.transform().parent() = &o0.transform();
+    o2.transform().parent() = &o1.transform();
+    o3.transform().parent() = &o2.transform();
+
+    o3.transform().parent() = &o0.transform();
+
+    EXPECT_EQ(o1.parent(), &o0);
+    EXPECT_EQ(o2.parent(), &o1);
+    EXPECT_EQ(o3.parent(), &o0);
+
+    EXPECT_EQ(o1.transform().parent(), &o0.transform());
+    EXPECT_EQ(o2.transform().parent(), &o1.transform());
+    EXPECT_EQ(o3.transform().parent(), &o0.transform());
+  }
+
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    o1.transform().parent() = &o0.transform();
+    o2.transform().parent() = &o1.transform();
+    o3.transform().parent() = &o2.transform();
+
+    o2.transform().parent() = &o0.transform();
+
+    EXPECT_EQ(o1.parent(), &o0);
+    EXPECT_EQ(o2.parent(), &o0);
+    EXPECT_EQ(o3.parent(), &o2);
+
+    EXPECT_EQ(o1.transform().parent(), &o0.transform());
+    EXPECT_EQ(o2.transform().parent(), &o0.transform());
+    EXPECT_EQ(o3.transform().parent(), &o2.transform());
+  }
+
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    o1.transform().parent() = &o0.transform();
+    o2.transform().parent() = &o1.transform();
+    o3.transform().parent() = &o2.transform();
+
+    bool failed = false;
+    try {
+      o2.transform().parent() = &o3.transform();
+    } catch (std::exception &e) { failed = true; }
+
+    EXPECT_TRUE(failed);
+  }
+
   // Change root.
   {
     Object &o0 = Object::Create();
@@ -157,9 +217,9 @@ TEST(Object, Base) {
 
     o2.root() = &o0;
 
-    EXPECT_EQ(DecltypeAuto(o1.parent()), &o0);
-    EXPECT_EQ(DecltypeAuto(o2.parent()), &o0);
-    EXPECT_EQ(DecltypeAuto(o3.parent()), &o2);
+    EXPECT_EQ(o1.parent(), &o0);
+    EXPECT_EQ(o2.parent(), &o0);
+    EXPECT_EQ(o3.parent(), &o2);
   }
 
   {
@@ -173,9 +233,9 @@ TEST(Object, Base) {
 
     o3.root() = &o0;
 
-    EXPECT_EQ(DecltypeAuto(o1.parent()), &o0);
-    EXPECT_EQ(DecltypeAuto(o2.parent()), &o0);
-    EXPECT_EQ(DecltypeAuto(o3.parent()), &o2);
+    EXPECT_EQ(o1.parent(), &o0);
+    EXPECT_EQ(o2.parent(), &o0);
+    EXPECT_EQ(o3.parent(), &o2);
   }
 
   {
@@ -191,6 +251,64 @@ TEST(Object, Base) {
     bool failed = false;
     try {
       o2.root() = &o3;
+    } catch (std::exception &e) { failed = true; }
+
+    EXPECT_TRUE(failed);
+  }
+
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    o1.transform().parent() = &o0.transform();
+    o3.transform().parent() = &o2.transform();
+
+    o2.transform().root() = &o0.transform();
+
+    EXPECT_EQ(o1.parent(), &o0);
+    EXPECT_EQ(o2.parent(), &o0);
+    EXPECT_EQ(o3.parent(), &o2);
+
+    EXPECT_EQ(o1.transform().parent(), &o0.transform());
+    EXPECT_EQ(o2.transform().parent(), &o0.transform());
+    EXPECT_EQ(o3.transform().parent(), &o2.transform());
+  }
+
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    o1.transform().parent() = &o0.transform();
+    o3.transform().parent() = &o2.transform();
+
+    o3.transform().root() = &o0.transform();
+
+    EXPECT_EQ(o1.parent(), &o0);
+    EXPECT_EQ(o2.parent(), &o0);
+    EXPECT_EQ(o3.parent(), &o2);
+
+    EXPECT_EQ(o1.transform().parent(), &o0.transform());
+    EXPECT_EQ(o2.transform().parent(), &o0.transform());
+    EXPECT_EQ(o3.transform().parent(), &o2.transform());
+  }
+
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    o1.transform().parent() = &o0.transform();
+    o2.transform().parent() = &o1.transform();
+    o3.transform().parent() = &o2.transform();
+
+    bool failed = false;
+    try {
+      o2.transform().root() = &o3.transform();
     } catch (std::exception &e) { failed = true; }
 
     EXPECT_TRUE(failed);
