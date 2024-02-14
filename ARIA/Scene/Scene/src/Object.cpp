@@ -23,7 +23,7 @@ void DestroyImmediate(Object &object) {
 }
 
 void DestroyImmediate(Component &component) {
-  if (dynamic_cast<Transform *>(&component)) {
+  if (dynamic_cast<Transform *>(&component)) [[unlikely]] {
     throw std::runtime_error("Should not destroy the `Transform` component");
   }
 

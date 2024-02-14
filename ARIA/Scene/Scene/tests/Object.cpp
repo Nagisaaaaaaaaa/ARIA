@@ -74,6 +74,13 @@ TEST(Object, Base) {
       }
       EXPECT_EQ(i, 0);
     }
+    { // Try destroying halo root.
+      bool failed = false;
+      try {
+        DestroyImmediate(*o.parent());
+      } catch (std::exception &e) { failed = true; }
+      EXPECT_TRUE(failed);
+    }
     DestroyImmediate(o);
     EXPECT_EQ(Object::size(), 0);
     {
@@ -589,9 +596,57 @@ TEST(Object, ParentRootAndTransform) {
   }
 }
 
-TEST(Object, AddAndGetComponents) {
-  // Get transform.
-  {}
+TEST(Object, AddDestroyAndGetComponents) {
+  // Transform.
+  {
+    Object& o = Object::Create();
+
+    // Get.
+    Transform* t = o.GetComponent<Transform>();
+    EXPECT_NE(t, nullptr);
+
+    // Destroy.
+    {
+      bool failed = false;
+      try {
+        DestroyImmediate(o.transform());
+      } catch (std::exception &e) { failed = true; }
+      EXPECT_TRUE(failed);
+    }
+  }
+
+  // Others.
+  {
+    Object& o = Object::Create();
+
+    // Get before add.
+    EXPECT_EQ(o.GetComponent<TestComp>(), nullptr);
+
+    // Add.
+    TestComp& test = o.AddComponent<TestComp>();
+
+    // Get.
+    EXPECT_EQ(o.GetComponent<TestComp>(), &test);
+
+    // Get transform.
+    Transform* t = o.GetComponent<Transform>();
+    EXPECT_NE(t, nullptr);
+
+    // Destroy transform.
+    {
+      bool failed = false;
+      try {
+        DestroyImmediate(o.transform());
+      } catch (std::exception &e) { failed = true; }
+      EXPECT_TRUE(failed);
+    }
+
+    // Destroy.
+    DestroyImmediate(test);
+
+    // Get after destruction.
+    EXPECT_EQ(o.GetComponent<TestComp>(), nullptr);
+  }
 }
 
 } // namespace ARIA
