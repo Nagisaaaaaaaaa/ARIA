@@ -106,7 +106,7 @@ Transform &Object::ARIA_PROP_IMPL(transform)() {
 std::unique_ptr<Object> Object::haloRoot_ = std::unique_ptr<Object>(new Object{nullptr});
 
 Object::Object(Object *parent) : parent_(parent) {
-  AddComponentNoCheck<Transform>();
+  AddComponentNoTransformCheck<Transform>();
 }
 
 //
