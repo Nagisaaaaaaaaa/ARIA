@@ -511,9 +511,11 @@ TEST(Object, ParentRootAndTransform) {
     o2.parent() = &o1;
     o3.parent() = &o2;
 
+    // Level 2.
     EXPECT_TRUE(*o2.parent()->parent() == o0);
     EXPECT_TRUE(*o2.parent()->root() == o0);
     EXPECT_TRUE(o2.parent()->transform() == o1.transform());
+
     EXPECT_TRUE(*o2.root()->parent() == *o0.parent());
     EXPECT_TRUE(*o2.root()->root() == o0);
     EXPECT_TRUE(o2.root()->transform() == o0.transform());
@@ -521,9 +523,40 @@ TEST(Object, ParentRootAndTransform) {
     EXPECT_TRUE(*o3.parent()->parent() == o1);
     EXPECT_TRUE(*o3.parent()->root() == o0);
     EXPECT_TRUE(o3.parent()->transform() == o2.transform());
+
     EXPECT_TRUE(*o3.root()->parent() == *o0.parent());
     EXPECT_TRUE(*o3.root()->root() == o0);
     EXPECT_TRUE(o3.root()->transform() == o0.transform());
+
+    // Level 3.
+    EXPECT_TRUE(*o2.parent()->parent()->parent() == *o0.parent());
+    EXPECT_TRUE(o2.parent()->parent()->transform() == o0.transform());
+
+    EXPECT_TRUE(*o2.parent()->root()->parent() == *o0.parent());
+    EXPECT_TRUE(*o2.parent()->root()->root() == o0);
+    EXPECT_TRUE(o2.parent()->root()->transform() == o0.transform());
+
+    //
+    EXPECT_TRUE(o2.root()->parent()->transform() == o0.parent().transform());
+
+    EXPECT_TRUE(*o2.root()->root()->parent() == *o0.parent());
+    EXPECT_TRUE(*o2.root()->root()->root() == o0);
+    EXPECT_TRUE(o2.root()->root()->transform() == o0.transform());
+
+    //
+    EXPECT_TRUE(*o3.parent()->parent()->parent() == o0);
+    EXPECT_TRUE(o3.parent()->parent()->transform() == o1.transform());
+
+    EXPECT_TRUE(*o3.parent()->root()->parent() == *o0.parent());
+    EXPECT_TRUE(*o3.parent()->root()->root() == o0);
+    EXPECT_TRUE(o3.parent()->root()->transform() == o0.transform());
+
+    //
+    EXPECT_TRUE(o3.root()->parent()->transform() == o0.parent().transform());
+
+    EXPECT_TRUE(*o3.root()->root()->parent() == *o0.parent());
+    EXPECT_TRUE(*o3.root()->root()->root() == o0);
+    EXPECT_TRUE(o3.root()->root()->transform() == o0.transform());
   }
 }
 
