@@ -1,10 +1,8 @@
 #pragma once
 
-#include "ARIA/Mat.h"
-#include "ARIA/Quat.h"
+#include "ARIA/Scene/Components/detail/TransformImpl.h"
 #include "ARIA/Scene/Component.h"
 #include "ARIA/Scene/Object.h"
-#include "ARIA/Vec.h"
 
 namespace ARIA {
 
@@ -44,8 +42,7 @@ public:
   ///
   /// So, users should not modify anything about the halo root.
   /// Or there will be undefined behaviors.
-  ARIA_PROP_BEGIN(public, public, , Transform *, parent);
-  ARIA_PROP_END;
+  __ARIA_PROP_INCOMPLETE_PREFAB_TRANSFORM(public, public, , Transform *, parent);
 
   /// \brief Get the "root" transform of the current transform.
   /// See `parent` for more details.
@@ -53,8 +50,7 @@ public:
   /// \example ```cpp
   /// Transform* root = t.root();
   /// ```
-  ARIA_PROP_BEGIN(public, public, , Transform *, root);
-  ARIA_PROP_END;
+  __ARIA_PROP_INCOMPLETE_PREFAB_TRANSFORM(public, public, , Transform *, root);
 
   //
   //
