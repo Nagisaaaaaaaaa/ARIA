@@ -12,8 +12,8 @@ SeparateDefinitionBlocks: Always
 AllowShortBlocksOnASingleLine: Always
 
 # Indenting macros like
-#  #define ACE_HOST    __host__
-#  #define ACE_DEVICE  __device__
+#  #define ARIA_HOST    __host__
+#  #define ARIA_DEVICE  __device__
 AlignConsecutiveMacros: Consecutive
 
 # Indenting preprocessor directives for complex PP in platform.h
