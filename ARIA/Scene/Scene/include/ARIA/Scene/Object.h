@@ -18,6 +18,32 @@ class Transform;
 /// See https://docs.unity3d.com/ScriptReference/GameObject.html.
 class Object final {
 public:
+  /// \brief Create a root object. Reference to this object will be returned.
+  ///
+  /// Please read the comments of `parent` before continue.
+  ///
+  /// \example ```
+  /// Object& obj = Object::Create();
+  /// ```
+  ///
+  /// \warning Life cycles of ARIA `Object`s are designed similar to Unity.
+  /// We create `Object`s with `Create()` and destroy them with `Destroy()` or `DestroyImmediate()`.
+  /// This design works well in game engines because you usually want to postpone the destruction.
+  /// See https://docs.unity3d.com/ScriptReference/Object.Destroy.html.
+  ///
+  /// `DestroyImmediate()` is provided in this module, while `Destroy()` is not, because
+  /// implementation of `Destroy()` depends on the specific lifecycle.
+  /// For example, there's one stage in the Unity loop which account for the destruction of
+  /// all `GameObject`s which were destroyed with `Destroy()` in the previous update stages.
+  ///
+  /// So, developers of lifecycles should implement their own `Destroy()`,
+  /// for example, postpone the destruction to some time and call `DestroyImmediate()` at that time.
+  static Object &Create();
+
+  //
+  //
+  //
+public:
   /// \brief Name of the object.
   ///
   /// \example ```cpp
@@ -73,6 +99,9 @@ public:
   ARIA_SUB_PROP(, Transform &, transform);
   ARIA_PROP_END;
 
+  //
+  //
+  //
   /// \brief Get the transform component of the current object.
   /// This property will always return a valid reference to a valid transform because
   /// any object should have and exactly have one transform.
@@ -82,6 +111,9 @@ public:
   /// ```
   ARIA_REF_PROP(public, , transform, ARIA_PROP_IMPL(transform)());
 
+  //
+  //
+  //
 public:
   /// \brief Whether the current object is a root object.
   ///
@@ -99,6 +131,9 @@ public:
   /// ```
   [[nodiscard]] bool IsChildOf(const Object &parent) const;
 
+  //
+  //
+  //
 public:
   /// \brief Add a component with the given type `TComponent` to this object.
   /// Constructor of the added component is called with arguments `ts...`.
@@ -136,27 +171,6 @@ public:
   }
 
 public:
-  /// \brief Create a root object. Reference to this object will be returned.
-  ///
-  /// Please read the comments of `parent` before continue.
-  ///
-  /// \example ```
-  /// Object& obj = Object::Create();
-  /// ```
-  ///
-  /// \warning Life cycles of ARIA `Object`s are designed similar to Unity.
-  /// We create `Object`s with `Create()` and destroy them with `Destroy()` or `DestroyImmediate()`.
-  /// This design works well in game engines because you usually want to postpone the destruction.
-  /// See https://docs.unity3d.com/ScriptReference/Object.Destroy.html.
-  ///
-  /// `DestroyImmediate()` is provided in this module, while `Destroy()` is not, because
-  /// implementation of `Destroy()` depends on the specific lifecycle.
-  /// For example, there's one stage in the Unity loop which account for the destruction of
-  /// all `GameObject`s which were destroyed with `Destroy()` in the previous update stages.
-  ///
-  /// So, developers of lifecycles should implement their own `Destroy()`,
-  /// for example, postpone the destruction to some time and call `DestroyImmediate()` at that time.
-  static Object &Create();
 
   ARIA_COPY_MOVE_ABILITY(Object, delete, delete);
   ~Object() = default;
