@@ -68,7 +68,6 @@ using Vec4r = Vec4<Real>;
 /// \example ```cpp
 /// ARIA_SUB_PROP_PREFAB_VEC(__host__ , Vec3r, position)
 /// ```
-#define ARIA_SUB_PROP_PREFAB_VEC(accessGet, accessSet, specifiers, type, propName)                                     \
-  __ARIA_SUB_PROP_PREFAB_VEC(accessGet, accessSet, specifiers, type, propName)
+#define ARIA_SUB_PROP_PREFAB_VEC(specifiers, type, propName) __ARIA_SUB_PROP_PREFAB_VEC(specifiers, type, propName)
 
 } // namespace ARIA

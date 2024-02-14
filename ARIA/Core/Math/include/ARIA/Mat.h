@@ -68,7 +68,6 @@ using Mat4r = Mat4<Real>;
 /// \example ```cpp
 /// ARIA_SUB_PROP_PREFAB_MAT(__host__, Mat3r, rotationMat)
 /// ```
-#define ARIA_SUB_PROP_PREFAB_MAT(accessGet, accessSet, specifiers, type, propName)                                     \
-  __ARIA_SUB_PROP_PREFAB_MAT(accessGet, accessSet, specifiers, type, propName)
+#define ARIA_SUB_PROP_PREFAB_MAT(specifiers, type, propName) __ARIA_SUB_PROP_PREFAB_MAT(specifiers, type, propName)
 
 } // namespace ARIA

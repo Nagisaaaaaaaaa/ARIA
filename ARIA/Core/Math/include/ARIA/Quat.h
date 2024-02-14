@@ -73,8 +73,7 @@ template <typename TInput>
 /// \example ```cpp
 /// ARIA_SUB_PROP_PREFAB_QUAT(__host__, Quatr, rotation)
 /// ```
-#define ARIA_SUB_PROP_PREFAB_QUAT(accessGet, accessSet, specifiers, type, propName)                                    \
-  __ARIA_SUB_PROP_PREFAB_QUAT(accessGet, accessSet, specifiers, type, propName)
+#define ARIA_SUB_PROP_PREFAB_QUAT(specifiers, type, propName) __ARIA_SUB_PROP_PREFAB_QUAT(specifiers, type, propName)
 
 //
 //
