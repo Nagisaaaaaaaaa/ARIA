@@ -119,7 +119,6 @@ public:
   ///
   /// Object* newRoot = ...;
   /// obj.root() = newRoot; // This will set parent of the original root object to `newRoot`.
-  ///                       // The same as `obj.root().parent() = newRoot`.
   ///
   /// \warning Similar to `parent`, cycles will be automatically detected.
   /// ```

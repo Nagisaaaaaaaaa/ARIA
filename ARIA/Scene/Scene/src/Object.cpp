@@ -10,6 +10,35 @@ Object &Object::Create() {
 //
 //
 //
+void DestroyImmediate(Object &object) {
+  if (object.parent_) [[likely]] {
+    auto &siblings = object.parent_->children_;
+    auto it = std::find_if(siblings.begin(), siblings.end(),
+                           [&](const std::unique_ptr<Object> &child) { return child.get() == &object; });
+
+    siblings.erase(it);
+  } else {
+    throw std::runtime_error("Should not destroy the halo root object");
+  }
+}
+
+void DestroyImmediate(Component &component) {
+  if (dynamic_cast<Transform *>(&component)) {
+    throw std::runtime_error("Should not destroy the `Transform` component");
+  }
+
+  if (component.object().parent_) [[likely]] {
+    auto &components = component.object().components_;
+    auto it = std::find_if(components.begin(), components.end(),
+                           [&](const std::unique_ptr<Component> &comp) { return comp.get() == &component; });
+
+    components.erase(it);
+  } else {
+    throw std::runtime_error("Should not destroy component of the halo root object");
+  }
+}
+
+//
 //
 //
 const Object *Object::ARIA_PROP_IMPL(parent)() const {
@@ -73,6 +102,20 @@ void Object::ARIA_PROP_IMPL(root)(Object *value) {
   r->parent() = value;
 }
 
+//
+//
+//
+const Transform &Object::ARIA_PROP_IMPL(transform)() const {
+  return *static_cast<Transform *>(components_[0].get());
+}
+
+Transform &Object::ARIA_PROP_IMPL(transform)() {
+  return *static_cast<Transform *>(components_[0].get());
+}
+
+//
+//
+//
 bool Object::IsRoot() const {
   return parent() == haloRoot_.get();
 }
@@ -90,16 +133,6 @@ bool Object::IsChildOf(const Object &parent) const {
   return false;
 }
 
-const Transform &Object::ARIA_PROP_IMPL(transform)() const {
-  return *static_cast<Transform *>(components_[0].get());
-}
-
-Transform &Object::ARIA_PROP_IMPL(transform)() {
-  return *static_cast<Transform *>(components_[0].get());
-}
-
-//
-//
 //
 //
 //
@@ -107,39 +140,6 @@ std::unique_ptr<Object> Object::haloRoot_ = std::unique_ptr<Object>(new Object{n
 
 Object::Object(Object *parent) : parent_(parent) {
   AddComponentNoTransformCheck<Transform>();
-}
-
-//
-//
-//
-//
-//
-void DestroyImmediate(Object &object) {
-  if (object.parent_) [[likely]] {
-    auto &siblings = object.parent_->children_;
-    auto it = std::find_if(siblings.begin(), siblings.end(),
-                           [&](const std::unique_ptr<Object> &child) { return child.get() == &object; });
-
-    siblings.erase(it);
-  } else {
-    throw std::runtime_error("Should not destroy the halo root object");
-  }
-}
-
-void DestroyImmediate(Component &component) {
-  if (dynamic_cast<Transform *>(&component)) {
-    throw std::runtime_error("Should not destroy the `Transform` component");
-  }
-
-  if (component.object().parent_) [[likely]] {
-    auto &components = component.object().components_;
-    auto it = std::find_if(components.begin(), components.end(),
-                           [&](const std::unique_ptr<Component> &comp) { return comp.get() == &component; });
-
-    components.erase(it);
-  } else {
-    throw std::runtime_error("Should not destroy component of the halo root object");
-  }
 }
 
 } // namespace ARIA
