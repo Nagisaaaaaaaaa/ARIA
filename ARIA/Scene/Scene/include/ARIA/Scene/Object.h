@@ -216,13 +216,45 @@ public:
   //
   //
 public:
+  /// \brief Get the number of existing `Object`s.
+  ///
+  /// \example ```cpp
+  /// std::cout << Object::size() << std::endl;
+  /// ```
   [[nodiscard]] static size_t size() noexcept;
 
+  /// \brief Get the non-const begin iterator of the existing `Object`s.
+  ///
+  /// \example ```cpp
+  /// for (auto it = Object::begin(); it != Object::end(); ++it) { ... }
+  /// ```
   [[nodiscard]] static decltype(Base::begin()) begin() noexcept;
+
+  /// \brief Get the non-const end iterator of the existing `Object`s.
   [[nodiscard]] static decltype(Base::end()) end() noexcept;
+
+  /// \brief Get the const begin iterator of the existing `Object`s.
+  ///
+  /// \example ```cpp
+  /// for (auto it = Object::cbegin(); it != Object::cend(); ++it) { ... }
+  /// ```
   [[nodiscard]] static decltype(Base::cbegin()) cbegin() noexcept;
+
+  /// \brief Get the const end iterator of the existing `Object`s.
   [[nodiscard]] static decltype(Base::cend()) cend() noexcept;
+
+  /// \brief Get the non-const range of the existing `Object`s.
+  ///
+  /// \example ```cpp
+  /// for (auto &a : Object::range()) { ... }
+  /// ```
   [[nodiscard]] static decltype(Base::range()) range() noexcept;
+
+  /// \brief Get the const range of the existing `Object`s.
+  ///
+  /// \example ```cpp
+  /// for (auto &a : Object::crange()) { ... }
+  /// ```
   [[nodiscard]] static decltype(Base::crange()) crange() noexcept;
 
   //
