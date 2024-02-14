@@ -14,6 +14,8 @@
 #include "ARIA/Property.h"
 #include "ARIA/Registry.h"
 
+#include <boost/iterator/indirect_iterator.hpp>
+
 #include <memory>
 
 namespace ARIA {
@@ -216,6 +218,22 @@ public:
   //
   //
 public:
+  /// \brief Get the non-const begin iterator of the children `Object`s.
+  [[nodiscard]] auto begin() { return boost::make_indirect_iterator(children_.begin()); }
+
+  /// \brief Get the non-const end iterator of the children `Object`s.
+  [[nodiscard]] auto end() { return boost::make_indirect_iterator(children_.end()); }
+
+  /// \brief Get the const begin iterator of the children `Object`s.
+  [[nodiscard]] auto cbegin() const { return boost::make_indirect_iterator(children_.cbegin()); }
+
+  /// \brief Get the const end iterator of the children `Object`s.
+  [[nodiscard]] auto cend() const { return boost::make_indirect_iterator(children_.cend()); }
+
+  //
+  //
+  //
+public:
   /// \brief Get the number of existing `Object`s.
   ///
   /// \example ```cpp
@@ -226,36 +244,36 @@ public:
   /// \brief Get the non-const begin iterator of the existing `Object`s.
   ///
   /// \example ```cpp
-  /// for (auto it = Object::begin(); it != Object::end(); ++it) { ... }
+  /// for (auto it = Object::Begin(); it != Object::End(); ++it) { ... }
   /// ```
-  [[nodiscard]] static decltype(Base::begin()) begin() noexcept;
+  [[nodiscard]] static decltype(Base::begin()) Begin() noexcept;
 
   /// \brief Get the non-const end iterator of the existing `Object`s.
-  [[nodiscard]] static decltype(Base::end()) end() noexcept;
+  [[nodiscard]] static decltype(Base::end()) End() noexcept;
 
   /// \brief Get the const begin iterator of the existing `Object`s.
   ///
   /// \example ```cpp
-  /// for (auto it = Object::cbegin(); it != Object::cend(); ++it) { ... }
+  /// for (auto it = Object::CBegin(); it != Object::CEnd(); ++it) { ... }
   /// ```
-  [[nodiscard]] static decltype(Base::cbegin()) cbegin() noexcept;
+  [[nodiscard]] static decltype(Base::cbegin()) CBegin() noexcept;
 
   /// \brief Get the const end iterator of the existing `Object`s.
-  [[nodiscard]] static decltype(Base::cend()) cend() noexcept;
+  [[nodiscard]] static decltype(Base::cend()) CEnd() noexcept;
 
   /// \brief Get the non-const range of the existing `Object`s.
   ///
   /// \example ```cpp
-  /// for (auto &a : Object::range()) { ... }
+  /// for (auto &a : Object::Range()) { ... }
   /// ```
-  [[nodiscard]] static decltype(Base::range()) range() noexcept;
+  [[nodiscard]] static decltype(Base::range()) Range() noexcept;
 
   /// \brief Get the const range of the existing `Object`s.
   ///
   /// \example ```cpp
-  /// for (auto &a : Object::crange()) { ... }
+  /// for (auto &a : Object::CRange()) { ... }
   /// ```
-  [[nodiscard]] static decltype(Base::crange()) crange() noexcept;
+  [[nodiscard]] static decltype(Base::crange()) CRange() noexcept;
 
   //
   //

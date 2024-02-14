@@ -149,28 +149,28 @@ Object::Object(Object *parent) : parent_(parent) {
   return Base::size() - 1; // Skip the halo root.
 }
 
-[[nodiscard]] decltype(Object::Base::begin()) Object::begin() noexcept {
+[[nodiscard]] decltype(Object::Base::begin()) Object::Begin() noexcept {
   return ++Base::begin(); // Skip the halo root.
 }
 
-[[nodiscard]] decltype(Object::Base::end()) Object::end() noexcept {
+[[nodiscard]] decltype(Object::Base::end()) Object::End() noexcept {
   return Base::end();
 }
 
-[[nodiscard]] decltype(Object::Base::cbegin()) Object::cbegin() noexcept {
+[[nodiscard]] decltype(Object::Base::cbegin()) Object::CBegin() noexcept {
   return ++Base::cbegin(); // Skip the halo root.
 }
 
-[[nodiscard]] decltype(Object::Base::cend()) Object::cend() noexcept {
+[[nodiscard]] decltype(Object::Base::cend()) Object::CEnd() noexcept {
   return Base::cend();
 }
 
-[[nodiscard]] decltype(Object::Base::range()) Object::range() noexcept {
-  return {Object::begin(), Object::end()};
+[[nodiscard]] decltype(Object::Base::range()) Object::Range() noexcept {
+  return {Object::Begin(), Object::End()};
 }
 
-[[nodiscard]] decltype(Object::Base::crange()) Object::crange() noexcept {
-  return {Object::cbegin(), Object::cend()};
+[[nodiscard]] decltype(Object::Base::crange()) Object::CRange() noexcept {
+  return {Object::CBegin(), Object::CEnd()};
 }
 
 } // namespace ARIA
