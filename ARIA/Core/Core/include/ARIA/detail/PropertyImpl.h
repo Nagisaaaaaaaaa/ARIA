@@ -543,20 +543,26 @@ public:                                                                         
                                                                                                                        \
       if constexpr (std::is_pointer_v<decltype(tmp)>) {                                                                \
         static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                 \
-                          (property::detail::PropertyType<decltype(tmp->PROP_NAME())> ||                               \
+                          (property::detail::PropertyType<std::decay_t<decltype(tmp->PROP_NAME())>> ||                 \
                            property::detail::isReferenceOrPointer<decltype(tmp->PROP_NAME())>),                        \
                       "The getter is only allowed to return reference or pointer when "                                \
                       "the specified sub-property value type is a reference or a pointer");                            \
                                                                                                                        \
-        return tmp->PROP_NAME();                                                                                       \
+        if constexpr (property::detail::PropertyType<std::decay_t<decltype(tmp->PROP_NAME())>>)                        \
+          return tmp->PROP_NAME().value();                                                                             \
+        else                                                                                                           \
+          return tmp->PROP_NAME();                                                                                     \
       } else {                                                                                                         \
         static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                 \
-                          (property::detail::PropertyType<decltype(tmp.PROP_NAME())> ||                                \
+                          (property::detail::PropertyType<std::decay_t<decltype(tmp.PROP_NAME())>> ||                  \
                            property::detail::isReferenceOrPointer<decltype(tmp.PROP_NAME())>),                         \
                       "The getter is only allowed to return reference or pointer when "                                \
                       "the specified sub-property value type is a reference or a pointer");                            \
                                                                                                                        \
-        return tmp.PROP_NAME();                                                                                        \
+        if constexpr (property::detail::PropertyType<std::decay_t<decltype(tmp->PROP_NAME())>>)                        \
+          return tmp->PROP_NAME().value();                                                                             \
+        else                                                                                                           \
+          return tmp->PROP_NAME();                                                                                     \
       }                                                                                                                \
     }                                                                                                                  \
     [[nodiscard]] static SPECIFIERS Type Get(TObjectMaybeConst &object)                                                \
@@ -570,7 +576,7 @@ public:                                                                         
                                                                                                                        \
       if constexpr (std::is_pointer_v<decltype(tmp)>) {                                                                \
         static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                 \
-                          (property::detail::PropertyType<decltype(tmp->PROP_NAME())> ||                               \
+                          (property::detail::PropertyType<std::decay_t<decltype(tmp->PROP_NAME())>> ||                 \
                            property::detail::isReferenceOrPointer<decltype(tmp->PROP_NAME())>),                        \
                       "The getter is only allowed to return reference or pointer when "                                \
                       "the specified sub-property value type is a reference");                                         \
@@ -578,7 +584,7 @@ public:                                                                         
         return Auto(tmp->PROP_NAME());                                                                                 \
       } else {                                                                                                         \
         static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                 \
-                          (property::detail::PropertyType<decltype(tmp.PROP_NAME())> ||                                \
+                          (property::detail::PropertyType<std::decay_t<decltype(tmp.PROP_NAME())>> ||                  \
                            property::detail::isReferenceOrPointer<decltype(tmp.PROP_NAME())>),                         \
                       "The getter is only allowed to return reference or pointer when "                                \
                       "the specified sub-property value type is a reference");                                         \
