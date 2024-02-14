@@ -13,6 +13,78 @@ ARIA is a melting pot where you can find a plethora of interesting things, such 
 
 ARIA adheres to strict coding standards, and we add as many comments as possible to each file, including the usage of interfaces and implementation details, because we do not assume that every graphics researcher is highly familiar with C++. Even if you have only a rudimentary understanding of modern C++, you can use ARIA with confidence.
 
+## Getting Started
+
+This tutorial shows how to integrate ARIA into a simple project with cmake and CPM.
+
+1. Download the latest CUDA, see https://developer.nvidia.com/cuda-downloads.
+
+   (Currently, ARIA cannot compile without CUDA. We will fix it in the future.)
+
+2. Suppose your project name is `ProjName`. create the following directories and files:
+
+   ```bash
+   ProjName/
+   ├─ cmake/
+   ├─ CMakeLists.txt
+   ├─ main.cpp
+   ```
+
+3. Copy `CPM.cmake` to `cmake/`, see https://github.com/cpm-cmake/CPM.cmake.
+
+   ```bash
+   ProjName/
+   ├─ cmake/
+   │  ├─ CPM.cmake
+   ├─ CMakeLists.txt
+   ├─ main.cpp
+   ```
+
+4. Edit `CMakeLists.txt`:
+
+   ```cmake
+   cmake_minimum_required(VERSION 3.25.2)
+   project(ProjName LANGUAGES CXX)
+   
+   list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" "${CMAKE_BINARY_DIR}")
+   
+   include(CPM)
+   
+   CPMAddPackage(
+       NAME ARIA
+       GITHUB_REPOSITORY Nagisaaaaaaaaa/ARIA
+       GIT_TAG main
+       OPTIONS "ARIA_BUILD_TESTS OFF"
+   )
+   
+   add_executable(${PROJECT_NAME} main.cpp)
+   
+   target_link_libraries(${PROJECT_NAME} PUBLIC
+       ARIA::Core::Core
+   )
+   ```
+
+5. Reload cmake.
+
+6. Edit `main.cpp`:
+
+   ```c++
+   #include <ARIA/ForEach.h>
+   
+   int main() {
+     std::string s = "Hello ARIA!";
+   
+     ARIA::ForEach(s.length(), [&](auto i) {
+       fmt::print("{}", s[i]);
+     });
+     fmt::print("\n");
+   
+     return 0;
+   }
+   ```
+
+7. Now, we are ready to compile the codes.
+
 ## Coding Guidelines
 
 1. **What is a proxy?**

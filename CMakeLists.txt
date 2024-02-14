@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.25.2)
 project(ARIA LANGUAGES CXX)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" "${CMAKE_BINARY_DIR}")
-
 # User options.
 option(ARIA_BUILD_TESTS "Build unit tests" ON)
 option(ARIA_USE_64BIT_REAL "using Real = double;" OFF)
+
+list(APPEND CMAKE_MODULE_PATH "${ARIA_SOURCE_DIR}/cmake/modules" "${CMAKE_BINARY_DIR}")
 
 #
 #

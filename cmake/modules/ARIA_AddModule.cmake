@@ -38,8 +38,8 @@ function(aria_add_module project_name module_name)
 
   # It is complex to handle interface modules on Windows.
   if (NOT DEFINED MODULE_SOURCES)
-    list(APPEND MODULE_SOURCES "${CMAKE_SOURCE_DIR}/ARIA/Core/Core/_.cpp")
-    list(APPEND sources "${CMAKE_SOURCE_DIR}/ARIA/Core/Core/_.cpp")
+    list(APPEND MODULE_SOURCES "${ARIA_SOURCE_DIR}/ARIA/Core/Core/_.cpp")
+    list(APPEND sources "${ARIA_SOURCE_DIR}/ARIA/Core/Core/_.cpp")
   endif ()
 
   aria_message(STATUS "ARIA:  Adding module: ${BoldCyan}ARIA::${project_name}::${module_name}${ColorReset}")
