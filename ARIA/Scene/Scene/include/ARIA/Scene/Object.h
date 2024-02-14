@@ -11,8 +11,8 @@
 //
 //
 //
-#include "ARIA/Property.h"
 #include "ARIA/Registry.h"
+#include "ARIA/Scene/detail/ObjectImpl.h"
 
 #include <boost/iterator/indirect_iterator.hpp>
 
@@ -129,19 +129,7 @@ public:
   /// Also, it is difficult to support very deep sub-properties, such as
   /// `obj.parent()->parent()->parent()->parent()->...->parent()`.
   /// So, depth is restricted to 3, that is, at most `obj.parent()->parent()->parent()`.
-  ARIA_PROP_BEGIN(public, public, , Object *, parent);
-  /**/ ARIA_SUB_PROP_BEGIN(, Object *, parent);
-  /**/ /**/ ARIA_SUB_PROP(, Object *, parent);
-  /**/ /**/ ARIA_SUB_PROP(, Object *, root);
-  /**/ /**/ ARIA_SUB_PROP(, Transform &, transform);
-  /**/ ARIA_SUB_PROP_END;
-  /**/ ARIA_SUB_PROP_BEGIN(, Object *, root);
-  /**/ /**/ ARIA_SUB_PROP(, Object *, parent);
-  /**/ /**/ ARIA_SUB_PROP(, Object *, root);
-  /**/ /**/ ARIA_SUB_PROP(, Transform &, transform);
-  /**/ ARIA_SUB_PROP_END;
-  /**/ ARIA_SUB_PROP(, Transform &, transform);
-  ARIA_PROP_END;
+  __ARIA_PROP_INCOMPLETE_PREFAB_OBJECT(public, public, , Object *, parent);
 
   /// \brief The root object of the current object.
   ///
@@ -155,19 +143,7 @@ public:
   ///
   /// \warning Similar to `parent`, cycles will be automatically detected.
   /// ```
-  ARIA_PROP_BEGIN(public, public, , Object *, root);
-  /**/ ARIA_SUB_PROP_BEGIN(, Object *, parent);
-  /**/ /**/ ARIA_SUB_PROP(, Object *, parent);
-  /**/ /**/ ARIA_SUB_PROP(, Object *, root);
-  /**/ /**/ ARIA_SUB_PROP(, Transform &, transform);
-  /**/ ARIA_SUB_PROP_END;
-  /**/ ARIA_SUB_PROP_BEGIN(, Object *, root);
-  /**/ /**/ ARIA_SUB_PROP(, Object *, parent);
-  /**/ /**/ ARIA_SUB_PROP(, Object *, root);
-  /**/ /**/ ARIA_SUB_PROP(, Transform &, transform);
-  /**/ ARIA_SUB_PROP_END;
-  /**/ ARIA_SUB_PROP(, Transform &, transform);
-  ARIA_PROP_END;
+  __ARIA_PROP_INCOMPLETE_PREFAB_OBJECT(public, public, , Object *, root);
 
   //
   //
