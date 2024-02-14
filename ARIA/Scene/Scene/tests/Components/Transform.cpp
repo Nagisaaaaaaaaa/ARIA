@@ -45,11 +45,11 @@ TEST(Transform, Local) {
     expectV(t.localUp(), {0, 0.8660254, 0.5});
     expectV(t.localDown(), {0, -0.8660254, -0.5});
 
-    t.localEulerAngles() = {0, deg2Rad<Real> * 30, 0)};
+    t.localEulerAngles() = {0_R, deg2Rad<Real> * 30, 0_R};
     expectV(t.localForward(), {-0.5, 0, -0.8660254});
     expectV(t.localBack(), {0.5, 0, 0.8660254});
 
-    t.localEulerAngles() = {0, 0, deg2Rad<Real> * 30)};
+    t.localEulerAngles() = {0_R, 0_R, deg2Rad<Real> * 30};
     expectV(t.localLeft(), {-0.8660254, -0.5, 0});
     expectV(t.localRight(), {0.8660254, 0.5, 0});
   }
