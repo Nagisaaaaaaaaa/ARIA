@@ -11,8 +11,8 @@
 //
 //
 //
-#include "ARIA/Property.h"
 #include "ARIA/Registry.h"
+#include "ARIA/Scene/detail/ObjectImpl.h"
 
 #include <boost/iterator/indirect_iterator.hpp>
 
@@ -33,6 +33,25 @@ class Transform;
 ///
 /// `Object` is implemented similar to Unity `GameObject`,
 /// see https://docs.unity3d.com/ScriptReference/GameObject.html.
+///
+/// \example ```
+/// Object& obj = Object::Create();
+///
+/// // Setup name and transform.
+/// obj.name() = "Hello Object!";
+/// obj.transform().localPosition() = {1_R, 2_R, 3_R};
+///
+/// // Add and get components.
+/// Camera& camera0 = obj.AddComponent<Camera>();
+/// Camera* camera1 = obj.GetComponent<Camera>();
+///
+/// // Create object hierarchies.
+/// Object& child = Object::Create();
+/// child.parent() = &obj;
+///
+/// // Destroy the object.
+/// DestroyImmediate(obj); // This will also destroy `child`.
+/// ```
 class Object final : public Registry<Object> {
 public:
   /// \brief Create a root object. Reference to this object will be returned.
@@ -64,6 +83,16 @@ public:
   ///
   /// Please read the comments of `Object::Create()` before continue.
   ///
+  /// \example ```cpp
+  /// Object& obj0 = Object::Create();
+  /// Object& obj1 = Object::Create();
+  ///
+  /// obj1.parent() = &obj0;
+  ///
+  /// DestroyImmediate(obj0); // This will recursively destroy `obj0` and all its children.
+  ///                         // So, `obj1` will also be destroyed.
+  /// ```
+  ///
   /// \warning You should never iterate through arrays and destroy the elements you are iterating over.
   /// This will cause serious problems (as a general programming practice, not just in ARIA and Unity).
   ///
@@ -75,6 +104,12 @@ public:
   /// \brief Destroys the component immediately.
   ///
   /// Please read the comments of `Object::Create()` before continue.
+  ///
+  /// \example ```cpp
+  /// Camera* camera = obj.GetComponent<Camera>();
+  /// if (camera)
+  ///   DestroyImmediate(*camera);
+  /// ```
   ///
   /// \warning You should never iterate through arrays and destroy the elements you are iterating over.
   /// This will cause serious problems (as a general programming practice, not just in ARIA and Unity).
@@ -106,7 +141,7 @@ public:
   ///
   /// Object* newParent = ...;
   /// obj.parent() = newParent; // This will change the parent.
-  /// parent = newParent;       //! WARNING, this will not work, see `Auto.h` for the details.
+  /// parent = newParent;       //! WARNING, this will not work, see `Property.h` for the details.
   /// ```
   ///
   /// \warning If `b` is a child of `a`, and one calls `a.parent() = b`,
@@ -129,19 +164,7 @@ public:
   /// Also, it is difficult to support very deep sub-properties, such as
   /// `obj.parent()->parent()->parent()->parent()->...->parent()`.
   /// So, depth is restricted to 3, that is, at most `obj.parent()->parent()->parent()`.
-  ARIA_PROP_BEGIN(public, public, , Object *, parent);
-  /**/ ARIA_SUB_PROP_BEGIN(, Object *, parent);
-  /**/ /**/ ARIA_SUB_PROP(, Object *, parent);
-  /**/ /**/ ARIA_SUB_PROP(, Object *, root);
-  /**/ /**/ ARIA_SUB_PROP(, Transform &, transform);
-  /**/ ARIA_SUB_PROP_END;
-  /**/ ARIA_SUB_PROP_BEGIN(, Object *, root);
-  /**/ /**/ ARIA_SUB_PROP(, Object *, parent);
-  /**/ /**/ ARIA_SUB_PROP(, Object *, root);
-  /**/ /**/ ARIA_SUB_PROP(, Transform &, transform);
-  /**/ ARIA_SUB_PROP_END;
-  /**/ ARIA_SUB_PROP(, Transform &, transform);
-  ARIA_PROP_END;
+  __ARIA_PROP_INCOMPLETE_PREFAB_OBJECT(public, public, , Object *, parent);
 
   /// \brief The root object of the current object.
   ///
@@ -152,22 +175,10 @@ public:
   ///
   /// Object* newRoot = ...;
   /// obj.root() = newRoot; // This will set parent of the original root object to `newRoot`.
+  /// ```
   ///
   /// \warning Similar to `parent`, cycles will be automatically detected.
-  /// ```
-  ARIA_PROP_BEGIN(public, public, , Object *, root);
-  /**/ ARIA_SUB_PROP_BEGIN(, Object *, parent);
-  /**/ /**/ ARIA_SUB_PROP(, Object *, parent);
-  /**/ /**/ ARIA_SUB_PROP(, Object *, root);
-  /**/ /**/ ARIA_SUB_PROP(, Transform &, transform);
-  /**/ ARIA_SUB_PROP_END;
-  /**/ ARIA_SUB_PROP_BEGIN(, Object *, root);
-  /**/ /**/ ARIA_SUB_PROP(, Object *, parent);
-  /**/ /**/ ARIA_SUB_PROP(, Object *, root);
-  /**/ /**/ ARIA_SUB_PROP(, Transform &, transform);
-  /**/ ARIA_SUB_PROP_END;
-  /**/ ARIA_SUB_PROP(, Transform &, transform);
-  ARIA_PROP_END;
+  __ARIA_PROP_INCOMPLETE_PREFAB_OBJECT(public, public, , Object *, root);
 
   //
   //

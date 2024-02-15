@@ -3,12 +3,12 @@
 namespace ARIA {
 
 const Transform *Transform::ARIA_PROP_IMPL(parent)() const {
-  const Transform& t = object().parent()->transform();
+  const Transform &t = object().parent()->transform();
   return &t;
 }
 
 Transform *Transform::ARIA_PROP_IMPL(parent)() {
-  Transform& t = object().parent()->transform();
+  Transform &t = object().parent()->transform();
   return &t;
 }
 
@@ -17,12 +17,12 @@ void Transform::ARIA_PROP_IMPL(parent)(Transform *value) {
 }
 
 const Transform *Transform::ARIA_PROP_IMPL(root)() const {
-  const Transform& t = object().root()->transform();
+  const Transform &t = object().root()->transform();
   return &t;
 }
 
 Transform *Transform::ARIA_PROP_IMPL(root)() {
-  Transform& t = object().root()->transform();
+  Transform &t = object().root()->transform();
   return &t;
 }
 
@@ -40,6 +40,9 @@ Vec3r Transform::ARIA_PROP_IMPL(localPosition)() const {
 }
 
 //! Only need to set `dirty` when any member variable is truly modified.
+// TODO: It is non-trivial to implement dirty flags for `Transform`,
+//       because when the parent `Transform` is set to dirty,
+//       all its children should be recursively set to dirty.
 void Transform::ARIA_PROP_IMPL(localPosition)(const Vec3r &value) {
   // dirty() = true;
   localPosition_ = value;
@@ -52,7 +55,7 @@ Quatr Transform::ARIA_PROP_IMPL(localRotation)() const {
 void Transform::ARIA_PROP_IMPL(localRotation)(const Quatr &value) {
   // dirty() = true;
   localRotation_ = value;
-  localRotation_.normalize();
+  localRotation_.normalize(); //! Local rotation is always a normalized quaternion to avoid numerical issues.
 }
 
 Vec3r Transform::ARIA_PROP_IMPL(localScale)() const {
@@ -206,7 +209,7 @@ Vec3r Transform::ARIA_PROP_IMPL(position)() const {
   if (IsRoot())
     return localPosition();
   else {
-    const Transform* p = parent();
+    const Transform *p = parent();
     return p->localToWorldAffine() * localPosition();
   }
 }
@@ -215,7 +218,7 @@ void Transform::ARIA_PROP_IMPL(position)(const Vec3r &value) {
   if (IsRoot())
     localPosition() = value;
   else {
-    const Transform* p = parent();
+    const Transform *p = parent();
     localPosition() = p->localToWorldAffine().inverse() * value;
   }
 }
@@ -237,7 +240,7 @@ void Transform::ARIA_PROP_IMPL(rotation)(const Quatr &value) {
   if (IsRoot())
     localRotation() = value;
   else {
-    const Transform* p = parent();
+    const Transform *p = parent();
     localRotation() = p->rotation().inverse() * value;
   }
 }
@@ -369,6 +372,10 @@ bool Transform::IsRoot() const {
   return object().IsRoot();
 }
 
+bool Transform::IsChildOf(const Transform &parent) const {
+  return object().IsChildOf(parent.object());
+}
+
 //
 //
 //
@@ -413,7 +420,7 @@ void Transform::Translate(const Vec3r &translation, Space relativeTo) {
     // because the translation in world space is affected by the scale of the parent.
     // If there is no parent, this step can be skipped.
     if (!IsRoot()) {
-      const Transform* p = parent();
+      const Transform *p = parent();
       const Vec3r parentScale = p->lossyScale();
       translationParentSpace = translationParentSpace.cwiseQuotient(parentScale);
     }
@@ -430,10 +437,12 @@ void Transform::Translate(const Real &x, const Real &y, const Real &z, Space rel
 }
 
 void Transform::Rotate(const Vec3r &eulers, Space relativeTo) {
+  using Eigen::AngleAxis;
+
   // Create a rotation matrix from the Euler angles.
-  const Eigen::AngleAxis<Real> rotationX(eulers.x(), Vec3r::UnitX());
-  const Eigen::AngleAxis<Real> rotationY(eulers.y(), Vec3r::UnitY());
-  const Eigen::AngleAxis<Real> rotationZ(eulers.z(), Vec3r::UnitZ());
+  const AngleAxis<Real> rotationX(eulers.x(), Vec3r::UnitX());
+  const AngleAxis<Real> rotationY(eulers.y(), Vec3r::UnitY());
+  const AngleAxis<Real> rotationZ(eulers.z(), Vec3r::UnitZ());
 
   // Combine the rotations in the proper order (Z * Y * X).
   const Quatr deltaRotation = rotationZ * rotationY * rotationX;
@@ -452,8 +461,10 @@ void Transform::Rotate(const Real &xAngle, const Real &yAngle, const Real &zAngl
 }
 
 void Transform::RotateAround(const Vec3r &point, const Vec3r &axis, const Real &angle) {
+  using Eigen::AngleAxis;
+
   // Create a rotation quaternion.
-  const Quatr q = Quatr(Eigen::AngleAxisf(angle, axis.normalized()));
+  const Quatr q = Quatr(Eigen::AngleAxis<Real>(angle, axis.normalized()));
   // Compute the relative position.
   Vec3r relativePos = position() - point;
   // Rotate the relative position.
@@ -470,10 +481,12 @@ void Transform::RotateAround(const Vec3r &point, const Vec3r &axis, const Real &
 //
 //
 Transform::Affine3r Transform::localToParentAffine() const {
+  using Eigen::Translation;
+
   const Vec3r localP = localPosition();
   const Quatr localR = localRotation();
   const Vec3r localS = localScale();
-  return Eigen::Translation3f(localP) * localR * Eigen::Scaling(localS);
+  return Translation<Real, 3>(localP) * localR * Eigen::Scaling(localS);
 }
 
 Transform::Affine3r Transform::localToWorldAffine() const {
