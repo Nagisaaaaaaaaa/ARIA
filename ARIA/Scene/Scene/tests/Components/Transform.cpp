@@ -40,10 +40,10 @@ TEST(Transform, ParentRootAndTransform) {
     Object &o2 = Object::Create();
     Object &o3 = Object::Create();
 
-    Transform& t0 = o0.transform();
-    Transform& t1 = o1.transform();
-    Transform& t2 = o2.transform();
-    Transform& t3 = o3.transform();
+    Transform &t0 = o0.transform();
+    Transform &t1 = o1.transform();
+    Transform &t2 = o2.transform();
+    Transform &t3 = o3.transform();
 
     t1.parent() = &t0;
     t2.parent() = &t1;
@@ -62,10 +62,10 @@ TEST(Transform, ParentRootAndTransform) {
     Object &o2 = Object::Create();
     Object &o3 = Object::Create();
 
-    Transform& t0 = o0.transform();
-    Transform& t1 = o1.transform();
-    Transform& t2 = o2.transform();
-    Transform& t3 = o3.transform();
+    Transform &t0 = o0.transform();
+    Transform &t1 = o1.transform();
+    Transform &t2 = o2.transform();
+    Transform &t3 = o3.transform();
 
     t1.parent() = &t0;
     t2.parent() = &t1;
@@ -84,10 +84,10 @@ TEST(Transform, ParentRootAndTransform) {
     Object &o2 = Object::Create();
     Object &o3 = Object::Create();
 
-    Transform& t0 = o0.transform();
-    Transform& t1 = o1.transform();
-    Transform& t2 = o2.transform();
-    Transform& t3 = o3.transform();
+    Transform &t0 = o0.transform();
+    Transform &t1 = o1.transform();
+    Transform &t2 = o2.transform();
+    Transform &t3 = o3.transform();
 
     t1.parent() = &t0;
     t2.parent() = &t1;
@@ -107,10 +107,10 @@ TEST(Transform, ParentRootAndTransform) {
     Object &o2 = Object::Create();
     Object &o3 = Object::Create();
 
-    Transform& t0 = o0.transform();
-    Transform& t1 = o1.transform();
-    Transform& t2 = o2.transform();
-    Transform& t3 = o3.transform();
+    Transform &t0 = o0.transform();
+    Transform &t1 = o1.transform();
+    Transform &t2 = o2.transform();
+    Transform &t3 = o3.transform();
 
     t1.transform().parent() = &t0.transform();
     t2.transform().parent() = &t1.transform();
@@ -133,10 +133,10 @@ TEST(Transform, ParentRootAndTransform) {
     Object &o2 = Object::Create();
     Object &o3 = Object::Create();
 
-    Transform& t0 = o0.transform();
-    Transform& t1 = o1.transform();
-    Transform& t2 = o2.transform();
-    Transform& t3 = o3.transform();
+    Transform &t0 = o0.transform();
+    Transform &t1 = o1.transform();
+    Transform &t2 = o2.transform();
+    Transform &t3 = o3.transform();
 
     t1.transform().parent() = &t0.transform();
     t2.transform().parent() = &t1.transform();
@@ -159,10 +159,10 @@ TEST(Transform, ParentRootAndTransform) {
     Object &o2 = Object::Create();
     Object &o3 = Object::Create();
 
-    Transform& t0 = o0.transform();
-    Transform& t1 = o1.transform();
-    Transform& t2 = o2.transform();
-    Transform& t3 = o3.transform();
+    Transform &t0 = o0.transform();
+    Transform &t1 = o1.transform();
+    Transform &t2 = o2.transform();
+    Transform &t3 = o3.transform();
 
     t1.transform().parent() = &t0.transform();
     t2.transform().parent() = &t1.transform();
@@ -183,10 +183,10 @@ TEST(Transform, ParentRootAndTransform) {
     Object &o2 = Object::Create();
     Object &o3 = Object::Create();
 
-    Transform& t0 = o0.transform();
-    Transform& t1 = o1.transform();
-    Transform& t2 = o2.transform();
-    Transform& t3 = o3.transform();
+    Transform &t0 = o0.transform();
+    Transform &t1 = o1.transform();
+    Transform &t2 = o2.transform();
+    Transform &t3 = o3.transform();
 
     t1.parent() = &t0;
     t3.parent() = &t2;
@@ -204,10 +204,10 @@ TEST(Transform, ParentRootAndTransform) {
     Object &o2 = Object::Create();
     Object &o3 = Object::Create();
 
-    Transform& t0 = o0.transform();
-    Transform& t1 = o1.transform();
-    Transform& t2 = o2.transform();
-    Transform& t3 = o3.transform();
+    Transform &t0 = o0.transform();
+    Transform &t1 = o1.transform();
+    Transform &t2 = o2.transform();
+    Transform &t3 = o3.transform();
 
     t1.parent() = &t0;
     t3.parent() = &t2;
@@ -225,10 +225,10 @@ TEST(Transform, ParentRootAndTransform) {
     Object &o2 = Object::Create();
     Object &o3 = Object::Create();
 
-    Transform& t0 = o0.transform();
-    Transform& t1 = o1.transform();
-    Transform& t2 = o2.transform();
-    Transform& t3 = o3.transform();
+    Transform &t0 = o0.transform();
+    Transform &t1 = o1.transform();
+    Transform &t2 = o2.transform();
+    Transform &t3 = o3.transform();
 
     t1.parent() = &t0;
     t2.parent() = &t1;
@@ -248,10 +248,10 @@ TEST(Transform, ParentRootAndTransform) {
     Object &o2 = Object::Create();
     Object &o3 = Object::Create();
 
-    Transform& t0 = o0.transform();
-    Transform& t1 = o1.transform();
-    Transform& t2 = o2.transform();
-    Transform& t3 = o3.transform();
+    Transform &t0 = o0.transform();
+    Transform &t1 = o1.transform();
+    Transform &t2 = o2.transform();
+    Transform &t3 = o3.transform();
 
     t1.transform().parent() = &t0.transform();
     t3.transform().parent() = &t2.transform();
@@ -273,10 +273,10 @@ TEST(Transform, ParentRootAndTransform) {
     Object &o2 = Object::Create();
     Object &o3 = Object::Create();
 
-    Transform& t0 = o0.transform();
-    Transform& t1 = o1.transform();
-    Transform& t2 = o2.transform();
-    Transform& t3 = o3.transform();
+    Transform &t0 = o0.transform();
+    Transform &t1 = o1.transform();
+    Transform &t2 = o2.transform();
+    Transform &t3 = o3.transform();
 
     t1.transform().parent() = &t0.transform();
     t3.transform().parent() = &t2.transform();
@@ -298,10 +298,10 @@ TEST(Transform, ParentRootAndTransform) {
     Object &o2 = Object::Create();
     Object &o3 = Object::Create();
 
-    Transform& t0 = o0.transform();
-    Transform& t1 = o1.transform();
-    Transform& t2 = o2.transform();
-    Transform& t3 = o3.transform();
+    Transform &t0 = o0.transform();
+    Transform &t1 = o1.transform();
+    Transform &t2 = o2.transform();
+    Transform &t3 = o3.transform();
 
     t1.transform().parent() = &t0.transform();
     t2.transform().parent() = &t1.transform();
@@ -322,10 +322,10 @@ TEST(Transform, ParentRootAndTransform) {
     Object &o2 = Object::Create();
     Object &o3 = Object::Create();
 
-    Transform& t0 = o0.transform();
-    Transform& t1 = o1.transform();
-    Transform& t2 = o2.transform();
-    Transform& t3 = o3.transform();
+    Transform &t0 = o0.transform();
+    Transform &t1 = o1.transform();
+    Transform &t2 = o2.transform();
+    Transform &t3 = o3.transform();
 
     t1.parent() = &t0;
     t2.parent() = &t1;
@@ -370,32 +370,37 @@ TEST(Transform, ParentRootAndTransform) {
     Object &o2 = Object::Create();
     Object &o3 = Object::Create();
 
-    o1.parent() = &o0;
-    o2.parent() = &o1;
-    o3.parent() = &o2;
+    Transform &t0 = o0.transform();
+    Transform &t1 = o1.transform();
+    Transform &t2 = o2.transform();
+    Transform &t3 = o3.transform();
 
-    EXPECT_TRUE(o0.IsRoot());
-    EXPECT_FALSE(o1.IsRoot());
-    EXPECT_FALSE(o2.IsRoot());
-    EXPECT_FALSE(o3.IsRoot());
+    t1.parent() = &t0;
+    t2.parent() = &t1;
+    t3.parent() = &t2;
 
-    EXPECT_TRUE(o1.IsChildOf(o0));
-    EXPECT_TRUE(o2.IsChildOf(o0));
-    EXPECT_TRUE(o2.IsChildOf(o1));
-    EXPECT_TRUE(o3.IsChildOf(o0));
-    EXPECT_TRUE(o3.IsChildOf(o1));
-    EXPECT_TRUE(o3.IsChildOf(o2));
+    EXPECT_TRUE(t0.IsRoot());
+    EXPECT_FALSE(t1.IsRoot());
+    EXPECT_FALSE(t2.IsRoot());
+    EXPECT_FALSE(t3.IsRoot());
 
-    EXPECT_FALSE(o0.IsChildOf(o0));
-    EXPECT_FALSE(o0.IsChildOf(o1));
-    EXPECT_FALSE(o0.IsChildOf(o2));
-    EXPECT_FALSE(o0.IsChildOf(o3));
-    EXPECT_FALSE(o1.IsChildOf(o1));
-    EXPECT_FALSE(o1.IsChildOf(o2));
-    EXPECT_FALSE(o1.IsChildOf(o3));
-    EXPECT_FALSE(o2.IsChildOf(o2));
-    EXPECT_FALSE(o2.IsChildOf(o3));
-    EXPECT_FALSE(o3.IsChildOf(o3));
+    EXPECT_TRUE(t1.IsChildOf(t0));
+    EXPECT_TRUE(t2.IsChildOf(t0));
+    EXPECT_TRUE(t2.IsChildOf(t1));
+    EXPECT_TRUE(t3.IsChildOf(t0));
+    EXPECT_TRUE(t3.IsChildOf(t1));
+    EXPECT_TRUE(t3.IsChildOf(t2));
+
+    EXPECT_FALSE(t0.IsChildOf(t0));
+    EXPECT_FALSE(t0.IsChildOf(t1));
+    EXPECT_FALSE(t0.IsChildOf(t2));
+    EXPECT_FALSE(t0.IsChildOf(t3));
+    EXPECT_FALSE(t1.IsChildOf(t1));
+    EXPECT_FALSE(t1.IsChildOf(t2));
+    EXPECT_FALSE(t1.IsChildOf(t3));
+    EXPECT_FALSE(t2.IsChildOf(t2));
+    EXPECT_FALSE(t2.IsChildOf(t3));
+    EXPECT_FALSE(t3.IsChildOf(t3));
   }
 }
 
