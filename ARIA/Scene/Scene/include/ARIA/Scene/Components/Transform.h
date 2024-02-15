@@ -1,14 +1,15 @@
 #pragma once
 
-#include "ARIA/Scene/Components/detail/TransformImpl.h"
 #include "ARIA/Scene/Component.h"
+#include "ARIA/Scene/Components/detail/TransformImpl.h"
 #include "ARIA/Scene/Object.h"
 
 namespace ARIA {
 
 /// \brief The coordinate space in which to operate.
 ///
-/// See https://docs.unity3d.com/ScriptReference/Space.html.
+/// `Space` has the same meaning with Unity `Space`,
+/// see https://docs.unity3d.com/ScriptReference/Space.html.
 enum class Space {
   Self,
   World,
@@ -21,93 +22,108 @@ enum class Space {
 //
 /// \brief Position, rotation and scale of an object.
 ///
-/// See https://docs.unity3d.com/ScriptReference/Transform.html.
+/// `Transform` is implemented similar to Unity `Transform`,
+/// see https://docs.unity3d.com/ScriptReference/Transform.html.
 ///
-/// \note ARIA uses radians for Euler angles, while Unity uses degrees.
+/// \warning ARIA uses radians for Euler angles, while Unity uses degrees.
 class Transform final : public Component {
 public:
   /// \brief The parent transform of the current transform.
   ///
+  /// Please read the comments of `Object::parent` before continue.
+  ///
   /// \example ```cpp
   /// Transform* parent = t.parent();
+  ///
+  /// Transform* newParent = ...;
+  /// trans.parent() = newParent; // This will change the parent.
+  /// parent = newParent;         //! WARNING, this will not work, see `Property.h` for the details.
   /// ```
-  ///
-  /// \note If the current transform is a "root" transform, that is, `IsRoot()` returns true,
-  /// this function will return reference to the transform of the "halo root" object.
-  /// The "halo root" object is the parent object of all "root" objects.
-  /// The "halo root" transform is the parent transform of all "root" transforms.
-  ///
-  /// The halo root object is introduced to make the hierarchy like a "tree".
-  /// That is, the halo root is the actual tree root of the hierarchy tree.
-  ///
-  /// So, users should not modify anything about the halo root.
-  /// Or there will be undefined behaviors.
-  __ARIA_PROP_INCOMPLETE_PREFAB_TRANSFORM(public, public, , Transform *, parent);
+  // __ARIA_PROP_INCOMPLETE_PREFAB_TRANSFORM(public, public, , Transform *, parent);
 
-  /// \brief Get the "root" transform of the current transform.
-  /// See `parent` for more details.
+  /// \brief Get the root transform of the current transform.
+  ///
+  /// Please read the comments of `Object::root` before continue.
   ///
   /// \example ```cpp
-  /// Transform* root = t.root();
+  /// Transform* root = obj.root();
+  ///
+  /// Transform* newRoot = ...;
+  /// trans.root() = newRoot; // This will set parent of the original root object to `newRoot`.
   /// ```
-  __ARIA_PROP_INCOMPLETE_PREFAB_TRANSFORM(public, public, , Transform *, root);
+  // __ARIA_PROP_INCOMPLETE_PREFAB_TRANSFORM(public, public, , Transform *, root);
 
   //
   //
   //
   /// \brief Position of the transform relative to the parent transform.
-  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localPosition);
+  ///
+  /// \example ```cpp
+  /// Vec3r p = trans.localPosition();         // Get.
+  /// trans.localPosition() = {0_R, 0_R, 0_R}; // Set.
+  /// ```
+  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localPosition);
 
   /// \brief The rotation of the transform relative to the transform rotation of the parent.
-  ARIA_PROP_PREFAB_QUAT(public, public, , Quatr, localRotation);
+  ///
+  /// \example ```cpp
+  /// Quatr r = trans.localRotation();              // Get.
+  /// trans.localRotation() = {1_R, 0_R, 0_R, 0_R}; // Set.
+  /// ```
+  // ARIA_PROP_PREFAB_QUAT(public, public, , Quatr, localRotation);
 
   /// \brief The scale of the transform relative to the object's parent.
-  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localScale);
+  ///
+  /// \example ```cpp
+  /// Vec3r p = trans.localScale();         // Get.
+  /// trans.localScale() = {1_R, 1_R, 1_R}; // Set.
+  /// ```
+  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localScale);
 
   //
   //
   //
   /// \brief The rotation as Euler angles in radians relative to the parent transform's rotation.
-  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localEulerAngles);
+  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localEulerAngles);
 
   //
   //
   //
   /// \brief The up axis of the transform in local space.
-  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localUp);
+  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localUp);
 
   /// \brief The down axis of the transform in local space.
-  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localDown);
+  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localDown);
 
   /// \brief The forward axis of the transform in local space.
-  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localForward);
+  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localForward);
 
   /// \brief The back axis of the transform in local space.
-  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localBack);
+  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localBack);
 
   /// \brief The left axis of the transform in local space.
-  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localLeft);
+  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localLeft);
 
   /// \brief The right axis of the transform in local space.
-  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localRight);
+  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localRight);
 
   //
   //
   //
   /// \brief Matrix that transforms a point from local space into parent space.
-  ARIA_PROP_PREFAB_MAT(public, private, , Mat4r, localToParentMat);
+  // ARIA_PROP_PREFAB_MAT(public, private, , Mat4r, localToParentMat);
 
   /// \brief Matrix that transforms a point from local space into world space.
-  ARIA_PROP_PREFAB_MAT(public, private, , Mat4r, localToWorldMat);
+  // ARIA_PROP_PREFAB_MAT(public, private, , Mat4r, localToWorldMat);
 
   //
   //
   //
   /// \brief The world space position of the transform.
-  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, position);
+  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, position);
 
   /// \brief A Quaternion that stores the rotation of the transform in world space.
-  ARIA_PROP_PREFAB_QUAT(public, public, , Quatr, rotation);
+  // ARIA_PROP_PREFAB_QUAT(public, public, , Quatr, rotation);
 
   /// \brief The global scale of the object.
   ///
@@ -122,44 +138,53 @@ public:
   /// ```
   ///
   /// That is way even Unity has to perform some magic approximation.
-  ARIA_PROP_PREFAB_VEC(public, private, , Vec3r, lossyScale);
+  // ARIA_PROP_PREFAB_VEC(public, private, , Vec3r, lossyScale);
 
   //
   //
   //
   /// \brief The up axis of the transform in world space.
-  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, up);
+  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, up);
 
   /// \brief The down axis of the transform in world space.
-  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, down);
+  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, down);
 
   /// \brief The forward axis of the transform in world space.
-  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, forward);
+  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, forward);
 
   /// \brief The back axis of the transform in world space.
-  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, back);
+  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, back);
 
   /// \brief The left axis of the transform in world space.
-  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, left);
+  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, left);
 
   /// \brief The right axis of the transform in world space.
-  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, right);
+  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, right);
 
+  //
+  //
+  //
 public:
-  //
-  //
-  //
-  /// \brief Whether the current transform is a "root" transform.
-  /// See `parent` for more details.
+  /// \brief Whether the current transform is a root transform.
+  ///
+  /// Please read the comments of `parent` before continue.
   ///
   /// \example ```cpp
-  /// bool isRoot = t.IsRoot();
+  /// bool isRoot = trans.IsRoot();
   /// ```
   [[nodiscard]] bool IsRoot() const;
 
+  /// \brief Is this transform a child (or a grandchild, or .etc) of `parent`?
+  ///
+  /// \example ```cpp
+  /// bool isChildOf = trans.IsChildOf(anotherTrans);
+  /// ```
+  [[nodiscard]] bool IsChildOf(const Transform &parent) const;
+
   //
   //
   //
+public:
   /// \brief Transforms position from local space to world space.
   Vec3r TransformPoint(const Vec3r &point);
 
@@ -201,8 +226,6 @@ public:
   //
   //
   //
-  //
-  //
 public:
   //! ARIA use left-handed coordinate system, and the `up` direction is (0, 1, 0).
   // clang-format off
@@ -218,6 +241,23 @@ public:
   //
   //
   //
+private:
+  friend Object;
+
+  using Base = Component;
+
+  /// \warning `Transform` is the default component of any `Object`.
+  /// You do not need to, and are not allowed to `obj.AddComponent<Transform>()`.
+  using Base::Base;
+
+public:
+  ARIA_COPY_MOVE_ABILITY(Transform, delete, delete);
+
+  /// \warning `Transform` is the must component of any `Object`.
+  /// You are not allowed to `DestroyImmediate(obj.transform())`.
+  ~Transform() final = default;
+
+  //
   //
   //
 public:
@@ -232,17 +272,6 @@ public:
   //
   //
   //
-private:
-  friend Object;
-
-  using Base = Component;
-  using Base::Base;
-
-public:
-  ARIA_COPY_MOVE_ABILITY(Transform, delete, delete);
-  ~Transform() final = default;
-
-  //
   //
   //
   //
@@ -252,12 +281,6 @@ private:
   Quatr localRotation_{Quatr::Identity()};
   Vec3r localScale_{1, 1, 1};
 
-  //
-  //
-  //
-  //
-  //
-  //
   //
   //
   //
@@ -319,7 +342,7 @@ private:
   [[nodiscard]] Vec3r ARIA_PROP_IMPL(right)() const;
   void ARIA_PROP_IMPL(right)(const Vec3r &value);
 
-  //
+  // Supporting methods.
   using Affine3r = Eigen::Transform<Real, 3, Eigen::Affine>;
   [[nodiscard]] Affine3r localToParentAffine() const;
   [[nodiscard]] Affine3r localToWorldAffine() const;
