@@ -40,7 +40,6 @@ aria_add_module(
     HEADERS ${scene_visual_headers}
     SOURCES ${scene_visual_sources}
     HARD_DEPENDENCIES
-    ARIA::Core
     ARIA::Scene::Scene
     glad_gl_core_mx_43
     glfw
