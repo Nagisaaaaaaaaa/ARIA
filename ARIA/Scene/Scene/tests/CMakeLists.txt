@@ -2,6 +2,7 @@ if (ARIA_BUILD_TESTS)
   aria_add_tests(Tests.ARIA.Scene.Scene
       SOURCES
       Components/Transform.cpp
+      Behavior.cpp
       Component.cpp
       Object.cpp
       HARD_DEPENDENCIES
