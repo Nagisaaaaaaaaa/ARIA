@@ -559,10 +559,10 @@ public:                                                                         
                       "The getter is only allowed to return reference or pointer when "                                \
                       "the specified sub-property value type is a reference or a pointer");                            \
                                                                                                                        \
-        if constexpr (property::detail::PropertyType<std::decay_t<decltype(tmp->PROP_NAME())>>)                        \
-          return tmp->PROP_NAME().value();                                                                             \
+        if constexpr (property::detail::PropertyType<std::decay_t<decltype(tmp.PROP_NAME())>>)                         \
+          return tmp.PROP_NAME().value();                                                                              \
         else                                                                                                           \
-          return tmp->PROP_NAME();                                                                                     \
+          return tmp.PROP_NAME();                                                                                      \
       }                                                                                                                \
     }                                                                                                                  \
     [[nodiscard]] static SPECIFIERS Type Get(TObjectMaybeConst &object)                                                \

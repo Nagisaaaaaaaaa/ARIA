@@ -180,7 +180,7 @@ aria_add_module(
     HEADERS ${scene_scene_headers}
     SOURCES ${scene_scene_sources}
     HARD_DEPENDENCIES
-    ARIA::Core
+    ARIA::Core::Math
     Boost::iterator
     CMAKE_SUBDIRS tests
 )
