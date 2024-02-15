@@ -130,11 +130,19 @@ private:
 //
 //
 template <typename T>
+using AABB1 = AABB<T, 1>;
+template <typename T>
 using AABB2 = AABB<T, 2>;
 template <typename T>
 using AABB3 = AABB<T, 3>;
 template <typename T>
 using AABB4 = AABB<T, 4>;
+
+using AABB1i = AABB1<int>;
+using AABB1u = AABB1<uint>;
+using AABB1f = AABB1<float>;
+using AABB1d = AABB1<double>;
+using AABB1r = AABB1<Real>;
 
 using AABB2i = AABB2<int>;
 using AABB2u = AABB2<uint>;
