@@ -106,7 +106,7 @@ public:
   ///
   /// Object* newParent = ...;
   /// obj.parent() = newParent; // This will change the parent.
-  /// parent = newParent;       //! WARNING, this will not work, see `Auto.h` for the details.
+  /// parent = newParent;       //! WARNING, this will not work, see `Property.h` for the details.
   /// ```
   ///
   /// \warning If `b` is a child of `a`, and one calls `a.parent() = b`,
@@ -140,9 +140,9 @@ public:
   ///
   /// Object* newRoot = ...;
   /// obj.root() = newRoot; // This will set parent of the original root object to `newRoot`.
+  /// ```
   ///
   /// \warning Similar to `parent`, cycles will be automatically detected.
-  /// ```
   __ARIA_PROP_INCOMPLETE_PREFAB_OBJECT(public, public, , Object *, root);
 
   //

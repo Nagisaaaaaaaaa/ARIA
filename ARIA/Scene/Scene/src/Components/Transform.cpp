@@ -369,6 +369,10 @@ bool Transform::IsRoot() const {
   return object().IsRoot();
 }
 
+bool Transform::IsChildOf(const Transform& parent) const {
+  return object().IsChildOf(parent.object());
+}
+
 //
 //
 //
