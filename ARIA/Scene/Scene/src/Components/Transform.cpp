@@ -3,12 +3,12 @@
 namespace ARIA {
 
 const Transform *Transform::ARIA_PROP_IMPL(parent)() const {
-  const Transform& t = object().parent()->transform();
+  const Transform &t = object().parent()->transform();
   return &t;
 }
 
 Transform *Transform::ARIA_PROP_IMPL(parent)() {
-  Transform& t = object().parent()->transform();
+  Transform &t = object().parent()->transform();
   return &t;
 }
 
@@ -17,12 +17,12 @@ void Transform::ARIA_PROP_IMPL(parent)(Transform *value) {
 }
 
 const Transform *Transform::ARIA_PROP_IMPL(root)() const {
-  const Transform& t = object().root()->transform();
+  const Transform &t = object().root()->transform();
   return &t;
 }
 
 Transform *Transform::ARIA_PROP_IMPL(root)() {
-  Transform& t = object().root()->transform();
+  Transform &t = object().root()->transform();
   return &t;
 }
 
@@ -40,6 +40,9 @@ Vec3r Transform::ARIA_PROP_IMPL(localPosition)() const {
 }
 
 //! Only need to set `dirty` when any member variable is truly modified.
+// TODO: It is non-trivial to implement dirty flags for `Transform`,
+//       because when the parent `Transform` is set to dirty,
+//       all its children should be recursively set to dirty.
 void Transform::ARIA_PROP_IMPL(localPosition)(const Vec3r &value) {
   // dirty() = true;
   localPosition_ = value;
@@ -206,7 +209,7 @@ Vec3r Transform::ARIA_PROP_IMPL(position)() const {
   if (IsRoot())
     return localPosition();
   else {
-    const Transform* p = parent();
+    const Transform *p = parent();
     return p->localToWorldAffine() * localPosition();
   }
 }
@@ -215,7 +218,7 @@ void Transform::ARIA_PROP_IMPL(position)(const Vec3r &value) {
   if (IsRoot())
     localPosition() = value;
   else {
-    const Transform* p = parent();
+    const Transform *p = parent();
     localPosition() = p->localToWorldAffine().inverse() * value;
   }
 }
@@ -237,7 +240,7 @@ void Transform::ARIA_PROP_IMPL(rotation)(const Quatr &value) {
   if (IsRoot())
     localRotation() = value;
   else {
-    const Transform* p = parent();
+    const Transform *p = parent();
     localRotation() = p->rotation().inverse() * value;
   }
 }
@@ -369,7 +372,7 @@ bool Transform::IsRoot() const {
   return object().IsRoot();
 }
 
-bool Transform::IsChildOf(const Transform& parent) const {
+bool Transform::IsChildOf(const Transform &parent) const {
   return object().IsChildOf(parent.object());
 }
 
@@ -417,7 +420,7 @@ void Transform::Translate(const Vec3r &translation, Space relativeTo) {
     // because the translation in world space is affected by the scale of the parent.
     // If there is no parent, this step can be skipped.
     if (!IsRoot()) {
-      const Transform* p = parent();
+      const Transform *p = parent();
       const Vec3r parentScale = p->lossyScale();
       translationParentSpace = translationParentSpace.cwiseQuotient(parentScale);
     }
