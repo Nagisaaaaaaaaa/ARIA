@@ -6,6 +6,399 @@ namespace ARIA {
 
 namespace {} // namespace
 
+TEST(Transform, ParentRootAndTransform) {
+  // Basic parents and roots.
+  {
+    Object &o = Object::Create();
+    Transform &t = o.transform();
+    const Transform &tPare = *t.parent();
+    const Transform &tRoot = *t.root();
+    EXPECT_TRUE(tPare != t);
+    EXPECT_TRUE(tRoot == t);
+
+    Object &o1 = Object::Create();
+    Transform &t1 = o1.transform();
+    t1.parent() = &t;
+    const Transform &t1Pare = *t1.parent();
+    const Transform &t1Root = *t1.root();
+    EXPECT_TRUE(t1Pare == t);
+    EXPECT_TRUE(t1Root == t);
+
+    Object &o2 = Object::Create();
+    Transform &t2 = o2.transform();
+    t2.parent() = &t1;
+    const Transform &t2Pare = *t2.parent();
+    const Transform &t2Root = *t2.root();
+    EXPECT_TRUE(t2Pare == t1);
+    EXPECT_TRUE(t2Root == t);
+  }
+
+  // Complex parents.
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    Transform& t0 = o0.transform();
+    Transform& t1 = o1.transform();
+    Transform& t2 = o2.transform();
+    Transform& t3 = o3.transform();
+
+    t1.parent() = &t0;
+    t2.parent() = &t1;
+    t3.parent() = &t2;
+
+    t3.parent() = &t0;
+
+    EXPECT_TRUE(*t1.parent() == t0);
+    EXPECT_TRUE(*t2.parent() == t1);
+    EXPECT_TRUE(*t3.parent() == t0);
+  }
+
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    Transform& t0 = o0.transform();
+    Transform& t1 = o1.transform();
+    Transform& t2 = o2.transform();
+    Transform& t3 = o3.transform();
+
+    t1.parent() = &t0;
+    t2.parent() = &t1;
+    t3.parent() = &t2;
+
+    t2.parent() = &t0;
+
+    EXPECT_TRUE(*t1.parent() == t0);
+    EXPECT_TRUE(*t2.parent() == t0);
+    EXPECT_TRUE(*t3.parent() == t2);
+  }
+
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    Transform& t0 = o0.transform();
+    Transform& t1 = o1.transform();
+    Transform& t2 = o2.transform();
+    Transform& t3 = o3.transform();
+
+    t1.parent() = &t0;
+    t2.parent() = &t1;
+    t3.parent() = &t2;
+
+    bool failed = false;
+    try {
+      t2.parent() = &t3;
+    } catch (std::exception &e) { failed = true; }
+
+    EXPECT_TRUE(failed);
+  }
+
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    Transform& t0 = o0.transform();
+    Transform& t1 = o1.transform();
+    Transform& t2 = o2.transform();
+    Transform& t3 = o3.transform();
+
+    t1.transform().parent() = &t0.transform();
+    t2.transform().parent() = &t1.transform();
+    t3.transform().parent() = &t2.transform();
+
+    t3.transform().parent() = &t0.transform();
+
+    EXPECT_TRUE(*t1.parent() == t0);
+    EXPECT_TRUE(*t2.parent() == t1);
+    EXPECT_TRUE(*t3.parent() == t0);
+
+    EXPECT_TRUE(*t1.transform().parent() == t0.transform());
+    EXPECT_TRUE(*t2.transform().parent() == t1.transform());
+    EXPECT_TRUE(*t3.transform().parent() == t0.transform());
+  }
+
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    Transform& t0 = o0.transform();
+    Transform& t1 = o1.transform();
+    Transform& t2 = o2.transform();
+    Transform& t3 = o3.transform();
+
+    t1.transform().parent() = &t0.transform();
+    t2.transform().parent() = &t1.transform();
+    t3.transform().parent() = &t2.transform();
+
+    t2.transform().parent() = &t0.transform();
+
+    EXPECT_TRUE(*t1.parent() == t0);
+    EXPECT_TRUE(*t2.parent() == t0);
+    EXPECT_TRUE(*t3.parent() == t2);
+
+    EXPECT_TRUE(*t1.transform().parent() == t0.transform());
+    EXPECT_TRUE(*t2.transform().parent() == t0.transform());
+    EXPECT_TRUE(*t3.transform().parent() == t2.transform());
+  }
+
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    Transform& t0 = o0.transform();
+    Transform& t1 = o1.transform();
+    Transform& t2 = o2.transform();
+    Transform& t3 = o3.transform();
+
+    t1.transform().parent() = &t0.transform();
+    t2.transform().parent() = &t1.transform();
+    t3.transform().parent() = &t2.transform();
+
+    bool failed = false;
+    try {
+      t2.transform().parent() = &t3.transform();
+    } catch (std::exception &e) { failed = true; }
+
+    EXPECT_TRUE(failed);
+  }
+
+  // Complex roots.
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    Transform& t0 = o0.transform();
+    Transform& t1 = o1.transform();
+    Transform& t2 = o2.transform();
+    Transform& t3 = o3.transform();
+
+    t1.parent() = &t0;
+    t3.parent() = &t2;
+
+    t2.root() = &t0;
+
+    EXPECT_TRUE(*t1.parent() == t0);
+    EXPECT_TRUE(*t2.parent() == t0);
+    EXPECT_TRUE(*t3.parent() == t2);
+  }
+
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    Transform& t0 = o0.transform();
+    Transform& t1 = o1.transform();
+    Transform& t2 = o2.transform();
+    Transform& t3 = o3.transform();
+
+    t1.parent() = &t0;
+    t3.parent() = &t2;
+
+    t3.root() = &t0;
+
+    EXPECT_TRUE(*t1.parent() == t0);
+    EXPECT_TRUE(*t2.parent() == t0);
+    EXPECT_TRUE(*t3.parent() == t2);
+  }
+
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    Transform& t0 = o0.transform();
+    Transform& t1 = o1.transform();
+    Transform& t2 = o2.transform();
+    Transform& t3 = o3.transform();
+
+    t1.parent() = &t0;
+    t2.parent() = &t1;
+    t3.parent() = &t2;
+
+    bool failed = false;
+    try {
+      t2.root() = &t3;
+    } catch (std::exception &e) { failed = true; }
+
+    EXPECT_TRUE(failed);
+  }
+
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    Transform& t0 = o0.transform();
+    Transform& t1 = o1.transform();
+    Transform& t2 = o2.transform();
+    Transform& t3 = o3.transform();
+
+    t1.transform().parent() = &t0.transform();
+    t3.transform().parent() = &t2.transform();
+
+    t2.transform().root() = &t0.transform();
+
+    EXPECT_TRUE(*t1.parent() == t0);
+    EXPECT_TRUE(*t2.parent() == t0);
+    EXPECT_TRUE(*t3.parent() == t2);
+
+    EXPECT_TRUE(*t1.transform().parent() == t0.transform());
+    EXPECT_TRUE(*t2.transform().parent() == t0.transform());
+    EXPECT_TRUE(*t3.transform().parent() == t2.transform());
+  }
+
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    Transform& t0 = o0.transform();
+    Transform& t1 = o1.transform();
+    Transform& t2 = o2.transform();
+    Transform& t3 = o3.transform();
+
+    t1.transform().parent() = &t0.transform();
+    t3.transform().parent() = &t2.transform();
+
+    t3.transform().root() = &t0.transform();
+
+    EXPECT_TRUE(*t1.parent() == t0);
+    EXPECT_TRUE(*t2.parent() == t0);
+    EXPECT_TRUE(*t3.parent() == t2);
+
+    EXPECT_TRUE(*t1.transform().parent() == t0.transform());
+    EXPECT_TRUE(*t2.transform().parent() == t0.transform());
+    EXPECT_TRUE(*t3.transform().parent() == t2.transform());
+  }
+
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    Transform& t0 = o0.transform();
+    Transform& t1 = o1.transform();
+    Transform& t2 = o2.transform();
+    Transform& t3 = o3.transform();
+
+    t1.transform().parent() = &t0.transform();
+    t2.transform().parent() = &t1.transform();
+    t3.transform().parent() = &t2.transform();
+
+    bool failed = false;
+    try {
+      t2.transform().root() = &t3.transform();
+    } catch (std::exception &e) { failed = true; }
+
+    EXPECT_TRUE(failed);
+  }
+
+  // Sub-properties of parent and root.
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    Transform& t0 = o0.transform();
+    Transform& t1 = o1.transform();
+    Transform& t2 = o2.transform();
+    Transform& t3 = o3.transform();
+
+    t1.parent() = &t0;
+    t2.parent() = &t1;
+    t3.parent() = &t2;
+
+    // Level 2.
+    EXPECT_TRUE(*t2.parent()->parent() == t0);
+    EXPECT_TRUE(*t2.parent()->root() == t0);
+
+    EXPECT_TRUE(*t2.root()->parent() == *t0.parent());
+    EXPECT_TRUE(*t2.root()->root() == t0);
+
+    EXPECT_TRUE(*t3.parent()->parent() == t1);
+    EXPECT_TRUE(*t3.parent()->root() == t0);
+
+    EXPECT_TRUE(*t3.root()->parent() == *t0.parent());
+    EXPECT_TRUE(*t3.root()->root() == t0);
+
+    // Level 3.
+    EXPECT_TRUE(*t2.parent()->parent()->parent() == *t0.parent());
+
+    EXPECT_TRUE(*t2.parent()->root()->parent() == *t0.parent());
+    EXPECT_TRUE(*t2.parent()->root()->root() == t0);
+
+    EXPECT_TRUE(*t2.root()->root()->parent() == *t0.parent());
+    EXPECT_TRUE(*t2.root()->root()->root() == t0);
+
+    //
+    EXPECT_TRUE(*t3.parent()->parent()->parent() == t0);
+
+    EXPECT_TRUE(*t3.parent()->root()->parent() == *t0.parent());
+    EXPECT_TRUE(*t3.parent()->root()->root() == t0);
+
+    EXPECT_TRUE(*t3.root()->root()->parent() == *t0.parent());
+    EXPECT_TRUE(*t3.root()->root()->root() == t0);
+  }
+
+  // Is root and is child of.
+  {
+    Object &o0 = Object::Create();
+    Object &o1 = Object::Create();
+    Object &o2 = Object::Create();
+    Object &o3 = Object::Create();
+
+    o1.parent() = &o0;
+    o2.parent() = &o1;
+    o3.parent() = &o2;
+
+    EXPECT_TRUE(o0.IsRoot());
+    EXPECT_FALSE(o1.IsRoot());
+    EXPECT_FALSE(o2.IsRoot());
+    EXPECT_FALSE(o3.IsRoot());
+
+    EXPECT_TRUE(o1.IsChildOf(o0));
+    EXPECT_TRUE(o2.IsChildOf(o0));
+    EXPECT_TRUE(o2.IsChildOf(o1));
+    EXPECT_TRUE(o3.IsChildOf(o0));
+    EXPECT_TRUE(o3.IsChildOf(o1));
+    EXPECT_TRUE(o3.IsChildOf(o2));
+
+    EXPECT_FALSE(o0.IsChildOf(o0));
+    EXPECT_FALSE(o0.IsChildOf(o1));
+    EXPECT_FALSE(o0.IsChildOf(o2));
+    EXPECT_FALSE(o0.IsChildOf(o3));
+    EXPECT_FALSE(o1.IsChildOf(o1));
+    EXPECT_FALSE(o1.IsChildOf(o2));
+    EXPECT_FALSE(o1.IsChildOf(o3));
+    EXPECT_FALSE(o2.IsChildOf(o2));
+    EXPECT_FALSE(o2.IsChildOf(o3));
+    EXPECT_FALSE(o3.IsChildOf(o3));
+  }
+}
+
 TEST(Transform, Local) {
   auto expectV = [](const Vec3r &lhs, const Vec3r &rhs) {
     EXPECT_FLOAT_EQ(float(lhs.x()), float(rhs.x()));
