@@ -63,7 +63,7 @@ public:
   /// trans.parent() = newParent; // This will change the parent.
   /// parent = newParent;         //! WARNING, this will not work, see `Property.h` for the details.
   /// ```
-  // __ARIA_PROP_INCOMPLETE_PREFAB_TRANSFORM(public, public, , Transform *, parent);
+  __ARIA_PROP_INCOMPLETE_PREFAB_TRANSFORM(public, public, , Transform *, parent);
 
   /// \brief Get the root transform of the current transform.
   ///
@@ -75,7 +75,7 @@ public:
   /// Transform* newRoot = ...;
   /// trans.root() = newRoot; // This will set parent of the original root object to `newRoot`.
   /// ```
-  // __ARIA_PROP_INCOMPLETE_PREFAB_TRANSFORM(public, public, , Transform *, root);
+  __ARIA_PROP_INCOMPLETE_PREFAB_TRANSFORM(public, public, , Transform *, root);
 
   //
   //
@@ -86,7 +86,7 @@ public:
   /// Vec3r p = trans.localPosition();         // Get.
   /// trans.localPosition() = {0_R, 0_R, 0_R}; // Set.
   /// ```
-  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localPosition);
+  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localPosition);
 
   /// \brief The rotation of the transform relative to the transform rotation of the parent.
   ///
@@ -94,7 +94,7 @@ public:
   /// Quatr r = trans.localRotation();              // Get.
   /// trans.localRotation() = {1_R, 0_R, 0_R, 0_R}; // Set.
   /// ```
-  // ARIA_PROP_PREFAB_QUAT(public, public, , Quatr, localRotation);
+  ARIA_PROP_PREFAB_QUAT(public, public, , Quatr, localRotation);
 
   /// \brief The scale of the transform relative to the object's parent.
   ///
@@ -102,52 +102,52 @@ public:
   /// Vec3r p = trans.localScale();         // Get.
   /// trans.localScale() = {1_R, 1_R, 1_R}; // Set.
   /// ```
-  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localScale);
+  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localScale);
 
   //
   //
   //
   /// \brief The rotation as Euler angles in radians relative to the parent transform's rotation.
-  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localEulerAngles);
+  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localEulerAngles);
 
   //
   //
   //
   /// \brief The up axis of the transform in local space.
-  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localUp);
+  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localUp);
 
   /// \brief The down axis of the transform in local space.
-  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localDown);
+  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localDown);
 
   /// \brief The forward axis of the transform in local space.
-  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localForward);
+  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localForward);
 
   /// \brief The back axis of the transform in local space.
-  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localBack);
+  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localBack);
 
   /// \brief The left axis of the transform in local space.
-  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localLeft);
+  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localLeft);
 
   /// \brief The right axis of the transform in local space.
-  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localRight);
+  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, localRight);
 
   //
   //
   //
   /// \brief Matrix that transforms a point from local space into parent space.
-  // ARIA_PROP_PREFAB_MAT(public, private, , Mat4r, localToParentMat);
+  ARIA_PROP_PREFAB_MAT(public, private, , Mat4r, localToParentMat);
 
   /// \brief Matrix that transforms a point from local space into world space.
-  // ARIA_PROP_PREFAB_MAT(public, private, , Mat4r, localToWorldMat);
+  ARIA_PROP_PREFAB_MAT(public, private, , Mat4r, localToWorldMat);
 
   //
   //
   //
   /// \brief The world space position of the transform.
-  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, position);
+  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, position);
 
   /// \brief A Quaternion that stores the rotation of the transform in world space.
-  // ARIA_PROP_PREFAB_QUAT(public, public, , Quatr, rotation);
+  ARIA_PROP_PREFAB_QUAT(public, public, , Quatr, rotation);
 
   /// \brief The global scale of the object.
   ///
@@ -162,28 +162,28 @@ public:
   /// ```
   ///
   /// That is way even Unity has to perform some magic approximation.
-  // ARIA_PROP_PREFAB_VEC(public, private, , Vec3r, lossyScale);
+  ARIA_PROP_PREFAB_VEC(public, private, , Vec3r, lossyScale);
 
   //
   //
   //
   /// \brief The up axis of the transform in world space.
-  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, up);
+  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, up);
 
   /// \brief The down axis of the transform in world space.
-  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, down);
+  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, down);
 
   /// \brief The forward axis of the transform in world space.
-  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, forward);
+  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, forward);
 
   /// \brief The back axis of the transform in world space.
-  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, back);
+  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, back);
 
   /// \brief The left axis of the transform in world space.
-  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, left);
+  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, left);
 
   /// \brief The right axis of the transform in world space.
-  // ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, right);
+  ARIA_PROP_PREFAB_VEC(public, public, , Vec3r, right);
 
   //
   //

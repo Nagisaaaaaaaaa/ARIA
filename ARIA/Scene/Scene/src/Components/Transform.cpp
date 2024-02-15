@@ -55,7 +55,7 @@ Quatr Transform::ARIA_PROP_IMPL(localRotation)() const {
 void Transform::ARIA_PROP_IMPL(localRotation)(const Quatr &value) {
   // dirty() = true;
   localRotation_ = value;
-  localRotation_.normalize();
+  localRotation_.normalize(); //! Local rotation is always a normalized quaternion to avoid numerical issues.
 }
 
 Vec3r Transform::ARIA_PROP_IMPL(localScale)() const {
@@ -437,10 +437,12 @@ void Transform::Translate(const Real &x, const Real &y, const Real &z, Space rel
 }
 
 void Transform::Rotate(const Vec3r &eulers, Space relativeTo) {
+  using Eigen::AngleAxis;
+
   // Create a rotation matrix from the Euler angles.
-  const Eigen::AngleAxis<Real> rotationX(eulers.x(), Vec3r::UnitX());
-  const Eigen::AngleAxis<Real> rotationY(eulers.y(), Vec3r::UnitY());
-  const Eigen::AngleAxis<Real> rotationZ(eulers.z(), Vec3r::UnitZ());
+  const AngleAxis<Real> rotationX(eulers.x(), Vec3r::UnitX());
+  const AngleAxis<Real> rotationY(eulers.y(), Vec3r::UnitY());
+  const AngleAxis<Real> rotationZ(eulers.z(), Vec3r::UnitZ());
 
   // Combine the rotations in the proper order (Z * Y * X).
   const Quatr deltaRotation = rotationZ * rotationY * rotationX;
@@ -459,8 +461,10 @@ void Transform::Rotate(const Real &xAngle, const Real &yAngle, const Real &zAngl
 }
 
 void Transform::RotateAround(const Vec3r &point, const Vec3r &axis, const Real &angle) {
+  using Eigen::AngleAxis;
+
   // Create a rotation quaternion.
-  const Quatr q = Quatr(Eigen::AngleAxisf(angle, axis.normalized()));
+  const Quatr q = Quatr(Eigen::AngleAxis<Real>(angle, axis.normalized()));
   // Compute the relative position.
   Vec3r relativePos = position() - point;
   // Rotate the relative position.
@@ -477,10 +481,12 @@ void Transform::RotateAround(const Vec3r &point, const Vec3r &axis, const Real &
 //
 //
 Transform::Affine3r Transform::localToParentAffine() const {
+  using Eigen::Translation;
+
   const Vec3r localP = localPosition();
   const Quatr localR = localRotation();
   const Vec3r localS = localScale();
-  return Eigen::Translation3f(localP) * localR * Eigen::Scaling(localS);
+  return Translation<Real, 3>(localP) * localR * Eigen::Scaling(localS);
 }
 
 Transform::Affine3r Transform::localToWorldAffine() const {
