@@ -599,10 +599,10 @@ TEST(Object, ParentRootAndTransform) {
 TEST(Object, AddDestroyAndGetComponents) {
   // Transform.
   {
-    Object& o = Object::Create();
+    Object &o = Object::Create();
 
     // Get.
-    Transform* t = o.GetComponent<Transform>();
+    Transform *t = o.GetComponent<Transform>();
     EXPECT_NE(t, nullptr);
 
     // Destroy.
@@ -617,19 +617,19 @@ TEST(Object, AddDestroyAndGetComponents) {
 
   // Others.
   {
-    Object& o = Object::Create();
+    Object &o = Object::Create();
 
     // Get before add.
     EXPECT_EQ(o.GetComponent<TestComp>(), nullptr);
 
     // Add.
-    TestComp& test = o.AddComponent<TestComp>();
+    TestComp &test = o.AddComponent<TestComp>();
 
     // Get.
     EXPECT_EQ(o.GetComponent<TestComp>(), &test);
 
     // Get transform.
-    Transform* t = o.GetComponent<Transform>();
+    Transform *t = o.GetComponent<Transform>();
     EXPECT_NE(t, nullptr);
 
     // Destroy transform.
