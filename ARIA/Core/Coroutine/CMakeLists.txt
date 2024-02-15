@@ -4,7 +4,29 @@ CPMAddPackage(
     NAME cppcoro
     GIT_TAG main
     GITHUB_REPOSITORY andreasbuhr/cppcoro
+    # The provided cmake configuration does not work with NVCC.
+    DOWNLOAD_ONLY YES
 )
+
+# Manually get the headers and sources.
+file(GLOB cppcoro_HEADERS "${cppcoro_SOURCE_DIR}/include/cppcoro/*.hpp")
+file(GLOB cppcoro_SOURCES "${cppcoro_SOURCE_DIR}/lib/*.cpp")
+
+# Exclude `linux.cpp` on Windows and `win32.cpp` on Linux.
+if (MSVC)
+  list(REMOVE_ITEM cppcoro_SOURCES "${cppcoro_SOURCE_DIR}/lib/linux.cpp")
+else ()
+  list(REMOVE_ITEM cppcoro_SOURCES "${cppcoro_SOURCE_DIR}/lib/win32.cpp")
+endif ()
+
+# Add and setup library.
+add_library(cppcoro STATIC ${cppcoro_HEADERS} ${cppcoro_SOURCES})
+target_include_directories(cppcoro PUBLIC "${cppcoro_SOURCE_DIR}/include")
+if (MSVC)
+  target_compile_options(cppcoro PRIVATE /std:c++latest)
+  target_link_libraries(cppcoro PUBLIC synchronization.lib)
+  #  target_compile_options(cppcoro PUBLIC /await) # Does not work with NVCC.
+endif ()
 
 set(core_coroutine_headers
     ARIA/Coroutine/AsyncTask.h
