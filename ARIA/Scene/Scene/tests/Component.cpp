@@ -14,19 +14,19 @@ TEST(Component, Base) {
     Transform &t = o.transform();
     {
       Object &to = t.object();
-      EXPECT_EQ(&o, &to);
+      EXPECT_EQ(o, to);
     }
     {
       Object &toto = t.object().transform().object();
-      EXPECT_EQ(&o, &toto);
+      EXPECT_EQ(o, toto);
     }
     {
       Transform &ott = o.transform().transform();
-      EXPECT_EQ(&t, &ott);
+      EXPECT_EQ(t, ott);
     }
     {
       Transform &otot = o.transform().object().transform();
-      EXPECT_EQ(&t, &otot);
+      EXPECT_EQ(t, otot);
     }
   }
 }
