@@ -7,9 +7,10 @@ ARIA is a collection of foundational computer graphics infrastructure **for rese
 - `ARIA::Core::Concurrency`,
 - `ARIA::Core::Core`,
 - `ARIA::Core::Coroutine`,
-- `ARIA::Core::Math`.
+- `ARIA::Core::Math`,
+- `ARIA::Scene::Scene`.
 
-ARIA is a melting pot where you can find a plethora of interesting things, such as a C++ implementation of C# properties, multi-dimensional arrays and views, and a hierarchical object and component system similar to Unity's, with more powerful infrastructures to be added in the future.
+ARIA is a melting pot where you can find a plethora of interesting things, such as a C++ implementation of C# properties (in `ARIA::Core::Core`), multidimensional arrays and views (in `ARIA::Core::Core`), and a hierarchical object and component system similar to Unity's (in `ARIA::Scene::Scene`), with more powerful infrastructures to be added in the future.
 
 ARIA adheres to strict coding standards, and we add as many comments as possible to each file, including the usage of interfaces and implementation details, because we do not assume that every graphics researcher is highly familiar with C++. Even if you have only a rudimentary understanding of modern C++, you can use ARIA with confidence.
 
@@ -160,7 +161,6 @@ This tutorial shows how to integrate ARIA into a simple project with cmake and C
    ```
    
    These two functions, `Auto()` and `DecltypeAuto()`, help better deduce the types from all proxy systems used in ARIA, which makes our codes safe. Read the comments in `Auto.h` and `Property.h` to see how to use them.
-
 
 5. **Coding standards.**
 
