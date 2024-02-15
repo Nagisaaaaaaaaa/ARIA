@@ -1,5 +1,15 @@
 #pragma once
 
+/// \file
+/// \brief `Transform` is the position, rotation and scale of an `Object`.
+///
+/// `Transform` is implemented similar to Unity `Transform`,
+/// see https://docs.unity3d.com/ScriptReference/Transform.html.
+//
+//
+//
+//
+//
 #include "ARIA/Scene/Component.h"
 #include "ARIA/Scene/Components/detail/TransformImpl.h"
 #include "ARIA/Scene/Object.h"
@@ -20,7 +30,7 @@ enum class Space {
 //
 //
 //
-/// \brief Position, rotation and scale of an object.
+/// \brief Position, rotation and scale of an `Object`.
 ///
 /// `Transform` is implemented similar to Unity `Transform`,
 /// see https://docs.unity3d.com/ScriptReference/Transform.html.
