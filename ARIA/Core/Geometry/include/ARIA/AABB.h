@@ -75,7 +75,7 @@ public:
       AABB res = t0;
 
       auto unionizeOne = [&](const auto &b) { res = unionizedOne(res, b); };
-      (unionizedOne(ts), ...);
+      (unionizeOne(ts), ...);
 
       return res;
     }, [&]<typename... Ts>(const Vec<T, s> &t0, Ts &&...ts) { // If the first argument is a `Vec`.
@@ -84,7 +84,7 @@ public:
       res.pMax() = t0;
 
       auto unionizeOne = [&](const auto &b) { res = unionizedOne(res, b); };
-      (unionizedOne(ts), ...);
+      (unionizeOne(ts), ...);
 
       return res;
     }};
