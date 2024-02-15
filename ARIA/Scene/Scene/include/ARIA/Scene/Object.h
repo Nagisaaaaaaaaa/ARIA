@@ -33,6 +33,25 @@ class Transform;
 ///
 /// `Object` is implemented similar to Unity `GameObject`,
 /// see https://docs.unity3d.com/ScriptReference/GameObject.html.
+///
+/// \example ```
+/// Object& obj = Object::Create();
+///
+/// // Setup name and transform.
+/// obj.name() = "Hello Object!";
+/// obj.transform().position() = {1_R, 2_R, 3_R};
+///
+/// // Add and get components.
+/// Camera& camera0 = obj.AddComponent<Camera>();
+/// Camera* camera1 = obj.GetComponent<Camera>();
+///
+/// // Create object hierarchies.
+/// Object& child = Object::Create();
+/// child.parent() = &obj;
+///
+/// // Destroy the object.
+/// DestroyImmediate(obj); // This will also destroy `child`.
+/// ```
 class Object final : public Registry<Object> {
 public:
   /// \brief Create a root object. Reference to this object will be returned.
@@ -64,6 +83,16 @@ public:
   ///
   /// Please read the comments of `Object::Create()` before continue.
   ///
+  /// \example ```cpp
+  /// Object& obj0 = Object::Create();
+  /// Object& obj1 = Object::Create();
+  ///
+  /// obj1.parent() = &obj0;
+  ///
+  /// DestroyImmediate(obj0); // This will recursively destroy `obj0` and all its children.
+  ///                         // So, `obj1` will also be destroyed.
+  /// ```
+  ///
   /// \warning You should never iterate through arrays and destroy the elements you are iterating over.
   /// This will cause serious problems (as a general programming practice, not just in ARIA and Unity).
   ///
@@ -75,6 +104,12 @@ public:
   /// \brief Destroys the component immediately.
   ///
   /// Please read the comments of `Object::Create()` before continue.
+  ///
+  /// \example ```cpp
+  /// Camera* camera = obj.GetComponent<Camera>();
+  /// if (camera)
+  ///   DestroyImmediate(*camera);
+  /// ```
   ///
   /// \warning You should never iterate through arrays and destroy the elements you are iterating over.
   /// This will cause serious problems (as a general programming practice, not just in ARIA and Unity).
