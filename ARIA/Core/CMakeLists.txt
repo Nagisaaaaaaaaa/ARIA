@@ -2,6 +2,7 @@ set(_aria_core_modules
     Concurrency
     Core
     Coroutine
+    Geometry
     Math
     SanitizerGTestMain
 )
