@@ -39,7 +39,7 @@ class Transform;
 ///
 /// // Setup name and transform.
 /// obj.name() = "Hello Object!";
-/// obj.transform().position() = {1_R, 2_R, 3_R};
+/// obj.transform().localPosition() = {1_R, 2_R, 3_R};
 ///
 /// // Add and get components.
 /// Camera& camera0 = obj.AddComponent<Camera>();

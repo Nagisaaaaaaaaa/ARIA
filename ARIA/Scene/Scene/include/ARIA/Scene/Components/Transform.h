@@ -25,6 +25,20 @@ enum class Space {
 /// `Transform` is implemented similar to Unity `Transform`,
 /// see https://docs.unity3d.com/ScriptReference/Transform.html.
 ///
+/// \example ```
+/// Object& obj = Object::Create();
+///
+/// // Setup transform, there are plenty of properties, similar to Unity.
+/// obj.transform().localPosition() = {1_R, 2_R, 3_R};
+/// obj.transform().localRotation() = {1_R, 0_R, 0_R, 0_R};
+/// obj.transform().localScale() = {1_R, 1_R, 1_R};
+/// ```
+///
+/// \note `Transform` is a default and must component of any `Object`.
+/// It is automatically added when the `Object` is created.
+/// So, you do not need to, and are not allowed to
+/// `obj.AddComponent<Transform>()` or `DestroyImmediate(obj.transform())`.
+///
 /// \warning ARIA uses radians for Euler angles, while Unity uses degrees.
 class Transform final : public Component {
 public:
@@ -246,14 +260,15 @@ private:
 
   using Base = Component;
 
-  /// \warning `Transform` is the default component of any `Object`.
-  /// You do not need to, and are not allowed to `obj.AddComponent<Transform>()`.
+  /// \warning `Transform` is a default component of any `Object`.
+  /// It is automatically added when the `Object` is created.
+  /// So, you do not need to, and are not allowed to `obj.AddComponent<Transform>()`.
   using Base::Base;
 
 public:
   ARIA_COPY_MOVE_ABILITY(Transform, delete, delete);
 
-  /// \warning `Transform` is the must component of any `Object`.
+  /// \warning `Transform` is a must component of any `Object`.
   /// You are not allowed to `DestroyImmediate(obj.transform())`.
   ~Transform() final = default;
 
