@@ -33,6 +33,25 @@ ARIA_HOST_DEVICE constexpr Real operator"" _R(unsigned long long value) {
   return static_cast<Real>(value);
 }
 
+/// \brief Overload the lambda functions.
+///
+/// \example ```cpp
+/// std::visit(
+///   Overload{[](auto arg) { std::cout << arg << std::endl; },
+///            [](double arg) { std::cout << std::fixed << arg << std::endl; },
+///            [](const std::string &arg) { std::cout << std::quoted(arg) << std::endl; }},
+///   v);
+/// ```
+///
+/// \details This implementation is based on https://en.cppreference.com/w/cpp/utility/variant/visit.
+template <class... Ts>
+struct Overload : Ts... {
+  using Ts::operator()...;
+};
+
+template <class... Ts>
+Overload(Ts...) -> Overload<Ts...>;
+
 /// \brief A commonly-used policy, means whether the class is for host use.
 struct SpaceHost {};
 
