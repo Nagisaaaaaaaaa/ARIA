@@ -22,10 +22,21 @@ public:
   ARIA_COPY_MOVE_ABILITY(AABB, default, default);
   ~AABB() = default;
 
+  //
+  //
+  //
 public:
   ARIA_REF_PROP(public, ARIA_HOST_DEVICE, inf, infAndSup_[0]);
   ARIA_REF_PROP(public, ARIA_HOST_DEVICE, sup, infAndSup_[1]);
 
+public:
+  ARIA_HOST_DEVICE inline /*constexpr*/ const Vec<T, d> &operator[](uint i) const;
+
+  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> &operator[](uint i);
+
+  //
+  //
+  //
 public:
   /// \warning If the `AABB` is constructed with only one point,
   /// it is also considered as non-empty.
@@ -37,20 +48,25 @@ public:
   template <typename... Args>
   ARIA_HOST_DEVICE inline /*constexpr*/ void Unionize(Args &&...args);
 
+  //
+  //
+  //
+public:
   ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> center() const;
 
   ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> offset(const Vec<T, d> &p) const;
 
   ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> diagonal() const;
 
-  ARIA_HOST_DEVICE inline /*constexpr*/ const Vec<T, d> &operator[](uint i) const;
-
-  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> &operator[](uint i);
-
+  //
+  //
+  //
 private:
   std::array<Vec<T, d>, 2> infAndSup_;
 };
 
+//
+//
 //
 //
 //
@@ -89,4 +105,9 @@ using AABB4r = AABB4<Real>;
 
 } // namespace ARIA
 
+//
+//
+//
+//
+//
 #include "ARIA/detail/AABB.inc"

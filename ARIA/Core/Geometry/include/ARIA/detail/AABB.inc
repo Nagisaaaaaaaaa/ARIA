@@ -4,7 +4,8 @@ namespace ARIA {
 
 namespace aabb::detail {
 
-template <typename T, auto d, uint n, typename U, typename... Us>
+// See the comments below.
+template <typename T, auto d, auto n, typename U, typename... Us>
 static decltype(auto) ConstructVecWithNEqualedValuesImpl(const U &v, Us &&...vs) {
   if constexpr (n == 0)
     return Vec<T, d>(std::forward<Us>(vs)...);
@@ -30,6 +31,26 @@ ARIA_HOST_DEVICE inline /*constexpr*/ AABB<T, d>::AABB()
     : infAndSup_{aabb::detail::ConstructVecWithNEqualedValues<T, d>(infinity<T>),
                  aabb::detail::ConstructVecWithNEqualedValues<T, d>(-infinity<T>)} {}
 
+//
+//
+//
+//
+//
+template <typename T, auto d>
+ARIA_HOST_DEVICE inline /*constexpr*/ const Vec<T, d> &AABB<T, d>::operator[](uint i) const {
+  return infAndSup_[i];
+}
+
+template <typename T, auto d>
+ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> &AABB<T, d>::operator[](uint i) {
+  return infAndSup_[i];
+}
+
+//
+//
+//
+//
+//
 template <typename T, auto d>
 ARIA_HOST_DEVICE inline /*constexpr*/ bool AABB<T, d>::empty() const {
   bool res = false;
@@ -47,7 +68,7 @@ ARIA_HOST_DEVICE inline /*constexpr*/ bool AABB<T, d>::empty() const {
 
 template <typename T, auto d>
 template <typename... Args>
-ARIA_HOST_DEVICE static inline /*constexpr*/ AABB<T, d> AABB<T, d>::unionized(Args &&...args) {
+ARIA_HOST_DEVICE inline /*constexpr*/ AABB<T, d> AABB<T, d>::unionized(Args &&...args) {
   // Union an `AABB` with another `AABB` or a `Vec`.
   auto unionizedOne = Overload{[](const AABB &a, const AABB &b) {
     AABB res;
@@ -104,6 +125,11 @@ ARIA_HOST_DEVICE inline /*constexpr*/ void AABB<T, d>::Unionize(Args &&...args) 
   *this = unionized(*this, std::forward<Args>(args)...);
 }
 
+//
+//
+//
+//
+//
 template <typename T, auto d>
 ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::center() const {
   return (sup() + inf()) / T{2};
@@ -119,16 +145,6 @@ ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::offset(const Vec<T, 
 template <typename T, auto d>
 ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::diagonal() const {
   return sup() - inf();
-}
-
-template <typename T, auto d>
-ARIA_HOST_DEVICE inline /*constexpr*/ const Vec<T, d> &AABB<T, d>::operator[](uint i) const {
-  return infAndSup_[i];
-}
-
-template <typename T, auto d>
-ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> &AABB<T, d>::operator[](uint i) {
-  return infAndSup_[i];
 }
 
 } // namespace ARIA
