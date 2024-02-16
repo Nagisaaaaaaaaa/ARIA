@@ -76,7 +76,7 @@ class BezierCurve<T, dim, DegreeDynamic, RationalOrNot> {
 public:
   constexpr bool IsInDomain(const T &t) const { return T{0} <= t && t <= T{1}; }
 
-  const Vec<T, dim> &operator()(const T &t) const {
+  Vec<T, dim> operator()(const T &t) const {
     ARIA_ASSERT(IsInDomain(t));
     // TODO: Implement this.
   }
