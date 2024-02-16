@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ARIA/Constant.h"
+#include "ARIA/ForEach.h"
 #include "ARIA/MovingPoint.h"
 
 namespace ARIA {
@@ -23,31 +24,60 @@ class BezierCurve;
 //
 //
 //
-template <typename T, auto dim, typename RationalOrNot>
-class BezierCurve<T, dim, DegreeDynamic, RationalOrNot> {
+template <typename T, auto dim, uint degree, typename RationalOrNot>
+class BezierCurve<T, dim, Degree<degree>, RationalOrNot> {
+private:
+  static constexpr uint nCPs = degree + 1;
+  static constexpr bool rational = std::is_same_v<RationalOrNot, Rational>;
+  using VecDim = Vec<T, dim>;
+  using VecCP = std::conditional_t<rational, Vec<T, dim + 1>, Vec<T, dim>>;
+
 public:
-  bool IsInDomain(const T &t) const {
-    // TODO: Implement this.
+  BezierCurve() {
+    ForEach<nCPs>([&]<auto i>() { controlPoints()[i] = VecCP::Zero(); });
   }
 
-  const Vec<T, dim> &operator()(const T &t) const {
-    // TODO: Implement this.
+public:
+  ARIA_REF_PROP(public, , controlPoints, controlPoints_);
+
+public:
+  constexpr bool IsInDomain(const T &t) const { return T{0} <= t && t <= T{1}; }
+
+  VecDim operator()(const T &t) const {
+    ARIA_ASSERT(IsInDomain(t));
+
+    // Apply the deCasteljau algorithm, 1997, The NURBS Book, 24.
+
+    std::array<VecCP, nCPs> temp;
+
+    for (uint i = 0; i < nCPs; ++i)
+      temp[i] = controlPoints()[i];
+    for (uint round = 1; round <= degree; ++round)
+      for (uint i = 0; i <= degree - round; ++i)
+        temp[i] = Lerp(temp[i], temp[i + 1], t);
+
+    if constexpr (rational) {
+      VecDim position = temp[0].block<dim, 1>(0, 0) / temp[0][dim];
+      return position;
+    } else {
+      return temp[0];
+    }
   }
 
 private:
+  std::array<VecCP, nCPs> controlPoints_;
 };
 
 //
 //
 //
-template <typename T, auto dim, uint degree, typename RationalOrNot>
-class BezierCurve<T, dim, Degree<degree>, RationalOrNot> {
+template <typename T, auto dim, typename RationalOrNot>
+class BezierCurve<T, dim, DegreeDynamic, RationalOrNot> {
 public:
-  bool IsInDomain(const T &t) const {
-    // TODO: Implement this.
-  }
+  constexpr bool IsInDomain(const T &t) const { return T{0} <= t && t <= T{1}; }
 
   const Vec<T, dim> &operator()(const T &t) const {
+    ARIA_ASSERT(IsInDomain(t));
     // TODO: Implement this.
   }
 
