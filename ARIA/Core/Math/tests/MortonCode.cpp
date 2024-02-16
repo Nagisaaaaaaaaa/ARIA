@@ -156,6 +156,9 @@ void TestMortonEncode3D() {
 
 } // namespace
 
+//
+//
+//
 TEST(MortonCode, Base) {
   TestMortonEncode2D<int>();
   TestMortonEncode2D<uint>();
