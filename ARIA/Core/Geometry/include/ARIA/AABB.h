@@ -104,13 +104,41 @@ public:
 
   ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> center() const { return (sup() + inf()) / T{2}; }
 
-  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> offset(const Vec<T, d> &p) const {
+  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> weight(const Vec<T, d> &p) const {
     Vec<T, d> o;
     ForEach<d>([&]<auto i>() { o[i] = (p[i] - inf()[i]) / (sup()[i] - inf()[i]); });
     return o;
   }
 
   ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> diagonal() const { return sup() - inf(); }
+
+  template <std::integral TIdx>
+  ARIA_HOST_DEVICE inline /*constexpr*/ const Vec<T, d> &operator[](const TIdx &i) const {
+    // Check index.
+    if constexpr (ConstantIntegral<TIdx>) {
+      static_assert(static_cast<int>(i) == 0 || static_cast<int>(i) == 1,
+                    "The given index to `AABB` should be either 0 or 1");
+    } else {
+      ARIA_ASSERT(static_cast<int>(i) == 0 || static_cast<int>(i) == 1,
+                  "The given index to `AABB` should be either 0 or 1");
+    }
+
+    return infAndSup_[i];
+  }
+
+  template <std::integral TIdx>
+  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> &operator[](const TIdx &i) {
+    // Check index.
+    if constexpr (ConstantIntegral<TIdx>) {
+      static_assert(static_cast<int>(i) == 0 || static_cast<int>(i) == 1,
+                    "The given index to `AABB` should be either 0 or 1");
+    } else {
+      ARIA_ASSERT(static_cast<int>(i) == 0 || static_cast<int>(i) == 1,
+                  "The given index to `AABB` should be either 0 or 1");
+    }
+
+    return infAndSup_[i];
+  }
 
 private:
   std::array<Vec<T, d>, 2> infAndSup_;
