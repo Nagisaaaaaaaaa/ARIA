@@ -75,7 +75,7 @@ public:
   /// uint code2 = Code::Encode(2); //         2.
   /// ```
   template <std::integral I>
-  [[nodiscard]] static ARIA_HOST_DEVICE /*constexpr*/ I Encode(const I &coord) {
+  [[nodiscard]] static ARIA_HOST_DEVICE constexpr I Encode(const I &coord) {
     return coord;
   }
 };
@@ -98,7 +98,7 @@ public:
   /// uint code3 = Code::Encode(Vec2u{1, 1}); //         3.
   /// ```
   template <std::integral I>
-  [[nodiscard]] static ARIA_HOST_DEVICE inline /*constexpr*/ I Encode(const Vec2<I> &coord);
+  [[nodiscard]] static ARIA_HOST_DEVICE inline constexpr I Encode(const Vec2<I> &coord);
 };
 
 //
@@ -123,7 +123,7 @@ public:
   /// uint code7 = Code::Encode(Vec3u{1, 1, 1}); //         7.
   /// ```
   template <std::integral I>
-  [[nodiscard]] static ARIA_HOST_DEVICE inline /*constexpr*/ I Encode(const Vec3<I> &coord);
+  [[nodiscard]] static ARIA_HOST_DEVICE inline constexpr I Encode(const Vec3<I> &coord);
 };
 
 } // namespace ARIA

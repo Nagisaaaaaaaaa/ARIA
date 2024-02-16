@@ -7,6 +7,22 @@ namespace ARIA {
 namespace {
 
 template <typename I>
+void TestMortonEncode1D() {
+  using Code = MortonCode<1>;
+  using V = I;
+
+  EXPECT_EQ(Code::Encode(V{0}), 0);
+  EXPECT_EQ(Code::Encode(V{1}), 1);
+  EXPECT_EQ(Code::Encode(V{2}), 2);
+  EXPECT_EQ(Code::Encode(V{3}), 3);
+
+  EXPECT_EQ(Code::Encode(V{4}), 4);
+  EXPECT_EQ(Code::Encode(V{5}), 5);
+  EXPECT_EQ(Code::Encode(V{6}), 6);
+  EXPECT_EQ(Code::Encode(V{7}), 7);
+}
+
+template <typename I>
 void TestMortonEncode2D() {
   using Code = MortonCode<2>;
   using V = Vec2<I>;
@@ -160,6 +176,11 @@ void TestMortonEncode3D() {
 //
 //
 TEST(MortonCode, Base) {
+  TestMortonEncode1D<int>();
+  TestMortonEncode1D<uint>();
+  TestMortonEncode1D<int64>();
+  TestMortonEncode1D<uint64>();
+
   TestMortonEncode2D<int>();
   TestMortonEncode2D<uint>();
   TestMortonEncode2D<int64>();
