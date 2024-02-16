@@ -34,12 +34,14 @@ private:
   using VecCP = std::conditional_t<rational, Vec<T, dim + 1>, VecDim>;
 
 public:
-  BezierCurve() {
+  ARIA_HOST_DEVICE BezierCurve() {
     ForEach<nCPs>([&]<auto i>() { controlPoints()[i] = VecCP::Zero(); });
   }
 
+  ARIA_COPY_MOVE_ABILITY(BezierCurve, default, default);
+
 public:
-  ARIA_REF_PROP(public, , controlPoints, controlPoints_);
+  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, controlPoints, controlPoints_);
 
 public:
   [[nodiscard]] ARIA_HOST_DEVICE constexpr bool IsInDomain(const T &t) const { return T{0} <= t && t <= T{1}; }
@@ -74,9 +76,9 @@ private:
 template <typename T, auto dim, typename RationalOrNot>
 class BezierCurve<T, dim, DegreeDynamic, RationalOrNot> {
 public:
-  [[nodiscard]] ARIA_HOST_DEVICE constexpr bool IsInDomain(const T &t) const { return T{0} <= t && t <= T{1}; }
+  [[nodiscard]] constexpr bool IsInDomain(const T &t) const { return T{0} <= t && t <= T{1}; }
 
-  [[nodiscard]] ARIA_HOST_DEVICE Vec<T, dim> operator()(const T &t) const {
+  [[nodiscard]] Vec<T, dim> operator()(const T &t) const {
     ARIA_ASSERT(IsInDomain(t));
     // TODO: Implement this.
   }
