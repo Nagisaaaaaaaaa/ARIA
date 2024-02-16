@@ -1,6 +1,7 @@
 if (ARIA_BUILD_TESTS)
   aria_add_tests(Tests.ARIA.Core.Math
       SOURCES
+      BezierCurve.cpp
       Mat.cpp
       Math.cpp
       MortonCode.cpp
