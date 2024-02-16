@@ -11,13 +11,25 @@
 namespace ARIA {
 
 /// \example ```cpp
-/// using Code = MortonCode;
+/// using Code2D = MortonCode<2>;
+/// using Code3D = MortonCode<3>;
 ///
-/// uint code = Code::Encode(Vec2u{5, 6});
-/// uint code = Code::Encode(Vec3u{5, 6, 7});
+/// uint code = Code2D::Encode(Vec2u{5, 6});
+/// uint code = Code3D::Encode(Vec3u{5, 6, 7});
 /// ```
-class MortonCode {
+template <uint d>
+class MortonCode;
+
+template <>
+class MortonCode<2> {
 public:
+  /// \brief 2D Morton code encoding function.
+  ///
+  /// \example ```cpp
+  /// using Code = MortonCode<2>;
+  ///
+  /// uint code = Code::Encode(Vec2u{5, 6});
+  /// ```
   template <std::integral I>
   [[nodiscard]] static ARIA_HOST_DEVICE /*constexpr*/ I Encode(const Vec2<I> &coord) {
     if constexpr (sizeof(I) == 4) {
@@ -44,7 +56,18 @@ public:
     } else
       ARIA_STATIC_ASSERT_FALSE("Type of the coord elements to be encoded is currently not supported");
   }
+};
 
+template <>
+class MortonCode<3> {
+public:
+  /// \brief 3D Morton code encoding function.
+  ///
+  /// \example ```cpp
+  /// using Code = MortonCode<3>;
+  ///
+  /// uint code = Code::Encode(Vec3u{5, 6, 7});
+  /// ```
   template <std::integral I>
   [[nodiscard]] static ARIA_HOST_DEVICE /*constexpr*/ I Encode(const Vec3<I> &coord) {
     if constexpr (sizeof(I) == 4) {
@@ -68,19 +91,19 @@ public:
         return x;
       };
       return shift(coord.x()) | (shift(coord.y()) << 1) | (shift(coord.z()) << 2);
-    } /* else if constexpr (sizeof(I) == 16) {
-       auto shift = [](I x) {
-         x &= I{0X3FFFFFFFFFFLLLU};
-         x = (x | x << 64) & I{0x3FF0000000000000000FFFFFFFFLLLU};
-         x = (x | x << 32) & I{0x3FF00000000FFFF00000000FFFFLLLU};
-         x = (x | x << 16) & I{0x30000FF0000FF0000FF0000FF0000FFLLLU};
-         x = (x | x << 8) & I{0x300F00F00F00F00F00F00F00F00F00FLLLU};
-         x = (x | x << 4) & I{0x30C30C30C30C30C30C30C30C30C30C3LLLU};
-         x = (x | x << 2) & I{0x9249249249249249249249249249249LLLU};
-         return x;
-       };
-       return shift(coord.x()) | (shift(coord.y()) << 1) | (shift(coord.z()) << 2);
-     }*/
+    } /*else if constexpr (sizeof(I) == 16) {
+      auto shift = [](I x) {
+        x &= I{0X3FFFFFFFFFFLLLU};
+        x = (x | x << 64) & I{0x3FF0000000000000000FFFFFFFFLLLU};
+        x = (x | x << 32) & I{0x3FF00000000FFFF00000000FFFFLLLU};
+        x = (x | x << 16) & I{0x30000FF0000FF0000FF0000FF0000FFLLLU};
+        x = (x | x << 8) & I{0x300F00F00F00F00F00F00F00F00F00FLLLU};
+        x = (x | x << 4) & I{0x30C30C30C30C30C30C30C30C30C30C3LLLU};
+        x = (x | x << 2) & I{0x9249249249249249249249249249249LLLU};
+        return x;
+      };
+      return shift(coord.x()) | (shift(coord.y()) << 1) | (shift(coord.z()) << 2);
+    }*/
     else
       ARIA_STATIC_ASSERT_FALSE("Type of the coord elements to be encoded is currently not supported");
   }
