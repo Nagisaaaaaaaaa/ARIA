@@ -7,6 +7,7 @@ ARIA is a collection of foundational computer graphics infrastructure **for rese
 - `ARIA::Core::Concurrency`,
 - `ARIA::Core::Core`,
 - `ARIA::Core::Coroutine`,
+- `ARIA::Core::Geometry`,
 - `ARIA::Core::Math`,
 - `ARIA::Scene::Scene`.
 
