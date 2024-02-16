@@ -53,6 +53,13 @@ void TestMortonEncode2D() {
   }
 }
 
+template <typename I>
+void TestMortonEncode3D() {
+  using V = Vec3<I>;
+
+  EXPECT_EQ(MortonCode::Encode(V{0, 0, 0}), 0);
+}
+
 } // namespace
 
 TEST(MortonCode, Base) {
@@ -60,6 +67,11 @@ TEST(MortonCode, Base) {
   TestMortonEncode2D<uint>();
   TestMortonEncode2D<int64>();
   TestMortonEncode2D<uint64>();
+
+  TestMortonEncode3D<int>();
+  TestMortonEncode3D<uint>();
+  TestMortonEncode3D<int64>();
+  TestMortonEncode3D<uint64>();
 }
 
 } // namespace ARIA
