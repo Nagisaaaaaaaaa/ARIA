@@ -53,7 +53,7 @@ namespace ARIA {
 /// uint code6 = Code::Encode(Vec3u{0, 1, 1}); //         6.
 /// uint code7 = Code::Encode(Vec3u{1, 1, 1}); //         7.
 /// ```
-template <uint d>
+template <auto d>
 class MortonCode;
 
 //
