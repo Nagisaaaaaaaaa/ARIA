@@ -145,6 +145,13 @@ void TestMortonEncode3D() {
   EXPECT_EQ(Code::Encode(V{5, 0, 1}), 69);
   EXPECT_EQ(Code::Encode(V{4, 1, 1}), 70);
   EXPECT_EQ(Code::Encode(V{5, 1, 1}), 71);
+
+  //
+  //
+  //
+  EXPECT_EQ(Code::Encode(V{0x3FF, 0x3FF, 0x3FF}), 0x3FFFFFFF);
+  if constexpr (sizeof(I) == 8)
+    EXPECT_EQ(Code::Encode(V{0x1FFFFF, 0x1FFFFF, 0x1FFFFF}), 0x7FFFFFFFFFFFFFFFLLU);
 }
 
 } // namespace
