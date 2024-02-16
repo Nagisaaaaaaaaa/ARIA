@@ -2,11 +2,17 @@
 
 /// \file
 /// \brief This file introduces the `MovingPoint` concept.
-/// A moving point is defined as a callable variable.
-/// Given any `t` satisfying `IsInDomain(t)`,
-/// its `operator()(t)` returns the position at `t`.
+/// A moving point is defined as a function $f$ (in code, a callable variable `f`).
+/// Given any function parameter $t$ (in code, variable `t`) which is
+/// in the domain of $f$ (in code, `f.IsInDomain(t)` returns `true`),
+/// $f(t)$ is the position of the point at $t$ (in code, `Vec<...> position = f(t)`).
 ///
-/// `MovingPoint` the most basic concept satisfied by all the ARIA built-in curves.
+/// It is named as "moving" point because $f(t)$ is moving by $t$.
+/// For example, a Bezier curve is a point moving from $t = 0$ to $t = 1$.
+/// When `0 <= t && t <= 1`, `bezier.IsInDomain(t)` returns `true`, and
+/// `bezier(t)` returns the position of the curve at `t`.
+///
+/// `MovingPoint` is the most basic concept satisfied by all ARIA built-in curves.
 //
 //
 //
@@ -16,9 +22,17 @@
 
 namespace ARIA {
 
-/// \brief A moving point is defined as a callable variable.
-/// Given any `t` satisfying `IsInDomain(t)`,
-/// its `operator()(t)` returns the position at `t`.
+/// \brief A moving point is defined as a function $f$ (in code, a callable variable `f`).
+/// Given any function parameter $t$ (in code, variable `t`) which is
+/// in the domain of $f$ (in code, `f.IsInDomain(t)` returns `true`),
+/// $f(t)$ is the position of the point at $t$ (in code, `Vec<...> position = f(t)`).
+///
+/// It is named as "moving" point because $f(t)$ is moving by $t$.
+/// For example, a Bezier curve is a point moving from $t = 0$ to $t = 1$.
+/// When `0 <= t && t <= 1`, `bezier.IsInDomain(t)` returns `true`, and
+/// `bezier(t)` returns the position of the curve at `t`.
+///
+/// `MovingPoint` is the most basic concept satisfied by all ARIA built-in curves.
 ///
 /// \tparam TMovingPoint A template, whose template parameters will
 /// be substituted with `TValue`, `dim`, and `TOthers...`.
