@@ -12,7 +12,7 @@ template <typename T, auto d>
 class AABB final {
 public:
   ARIA_HOST_DEVICE inline /*constexpr*/ AABB()
-      : inf_(ConstructVecWithNEqualedValues(infinity<T>)), sup_(ConstructVecWithNEqualedValues(-infinity<T>)) {}
+      : infAndSup_{ConstructVecWithNEqualedValues(infinity<T>), ConstructVecWithNEqualedValues(-infinity<T>)} {}
 
   template <typename... Args>
     requires(sizeof...(Args) > 0 &&  // Size `> 0` to avoid conflict with the default constructor.
