@@ -21,7 +21,7 @@ TEST(AABB, Base) {
     EXPECT_FLOAT_EQ(aabb.sup().z(), sup.z());
   };
 
-  // 2D.
+  // 2D constructors, unionized, and unionize.
   {
     // Default constructor.
     AABB2f aabb0;
@@ -78,9 +78,16 @@ TEST(AABB, Base) {
       AABB2f aabb{point, point, point};
       expectAABB2(aabb, {0.001F, 0.001F}, {0.001F, 0.001F});
     }
+
+    AABB2f aabb6 = aabb2;
+    aabb6.Unionize(Vec2f{0.05F, 0.05F}, Vec2f{0.01F, 0.01F});
+    expectAABB2(aabb6, {0.01F, 0.01F}, {0.1F, 0.1F});
+
+    AABB2f aabb7 = AABB2f::unionized(Vec2f{0.05F, 0.05F}, Vec2f{0.01F, 0.01F}, aabb2);
+    expectAABB2(aabb7, {0.01F, 0.01F}, {0.1F, 0.1F});
   }
 
-  // 3D.
+  // 3D constructors, unionized, and unionize.
   {
     // Default constructor.
     AABB3f aabb0;
@@ -139,6 +146,13 @@ TEST(AABB, Base) {
       AABB3f aabb{point, point, point};
       expectAABB3(aabb, {0.001F, 0.001F, 0.001F}, {0.001F, 0.001F, 0.001F});
     }
+
+    AABB3f aabb6 = aabb2;
+    aabb6.Unionize(Vec3f{0.05F, 0.05F, 0.05F}, Vec3f{0.01F, 0.01F, 0.01F});
+    expectAABB3(aabb6, {0.01F, 0.01F, 0.01F}, {0.1F, 0.1F, 0.1F});
+
+    AABB3f aabb7 = AABB3f::unionized(Vec3f{0.05F, 0.05F, 0.05F}, Vec3f{0.01F, 0.01F, 0.01F}, aabb2);
+    expectAABB3(aabb7, {0.01F, 0.01F, 0.01F}, {0.1F, 0.1F, 0.1F});
   }
 }
 
