@@ -112,29 +112,9 @@ public:
 
   ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> diagonal() const { return sup() - inf(); }
 
-  template <typename TIdx>
-    requires(ConstantIntegral<TIdx> || std::integral<TIdx>)
-  ARIA_HOST_DEVICE inline /*constexpr*/ const Vec<T, d> &operator[](const TIdx &i) const {
-    // Check index.
-    if constexpr (ConstantIntegral<TIdx>)
-      static_assert(TIdx::value == 0 || TIdx::value == 1, "The given index to `AABB` should be either 0 or 1");
-    else
-      ARIA_ASSERT(i == 0 || i == 1, "The given index to `AABB` should be either 0 or 1");
+  ARIA_HOST_DEVICE inline /*constexpr*/ const Vec<T, d> &operator[](uint i) const { return infAndSup_[i]; }
 
-    return infAndSup_[i];
-  }
-
-  template <typename TIdx>
-    requires(ConstantIntegral<TIdx> || std::integral<TIdx>)
-  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> &operator[](const TIdx &i) {
-    // Check index.
-    if constexpr (ConstantIntegral<TIdx>)
-      static_assert(TIdx::value == 0 || TIdx::value == 1, "The given index to `AABB` should be either 0 or 1");
-    else
-      ARIA_ASSERT(i == 0 || i == 1, "The given index to `AABB` should be either 0 or 1");
-
-    return infAndSup_[i];
-  }
+  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> &operator[](uint i) { return infAndSup_[i]; }
 
 private:
   std::array<Vec<T, d>, 2> infAndSup_;
