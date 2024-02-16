@@ -15,6 +15,8 @@ TEST(BezierCurve, Base) {
 
   BezierCurve<float, 2, Degree<2>, NonRational> b0;
   BezierCurve<float, 2, Degree<2>, Rational> b1;
+  BezierCurve<float, 2, DegreeDynamic, NonRational> b2;
+  BezierCurve<float, 2, DegreeDynamic, Rational> b3;
 }
 
 } // namespace ARIA

@@ -75,15 +75,53 @@ private:
 //
 template <typename T, auto dim, typename RationalOrNot>
 class BezierCurve<T, dim, DegreeDynamic, RationalOrNot> {
+private:
+  // `CP` is an abbreviation of "control point".
+  static constexpr bool rational = std::is_same_v<RationalOrNot, Rational>;
+  using VecDim = Vec<T, dim>;
+  using VecCP = std::conditional_t<rational, Vec<T, dim + 1>, VecDim>;
+
+public:
+  BezierCurve() {}
+
+  ARIA_COPY_MOVE_ABILITY(BezierCurve, default, default);
+
+public:
+  ARIA_REF_PROP(public, , controlPoints, controlPoints_);
+
 public:
   [[nodiscard]] constexpr bool IsInDomain(const T &t) const { return T{0} <= t && t <= T{1}; }
 
-  [[nodiscard]] Vec<T, dim> operator()(const T &t) const {
+  [[nodiscard]] VecDim operator()(const T &t) const {
     ARIA_ASSERT(IsInDomain(t));
-    // TODO: Implement this.
+
+    if (controlPoints().empty()) {
+      return VecDim::Zero();
+    }
+
+    const uint nCPs = controlPoints().size();
+    const uint degree = nCPs - 1;
+
+    // Apply the deCasteljau algorithm, 1997, The NURBS Book, 24.
+    // TODO: Optimize here.
+    std::vector<VecCP> temp(nCPs);
+
+    for (uint i = 0; i < nCPs; ++i)
+      temp[i] = controlPoints()[i];
+    for (uint round = 1; round <= degree; ++round)
+      for (uint i = 0; i <= degree - round; ++i)
+        temp[i] = Lerp(temp[i], temp[i + 1], t);
+
+    VecDim position;
+    if constexpr (rational)
+      position = temp[0].block<dim, 1>(0, 0) / temp[0][dim];
+    else
+      position = temp[0];
+    return position;
   }
 
 private:
+  std::vector<VecCP> controlPoints_;
 };
 
 //
