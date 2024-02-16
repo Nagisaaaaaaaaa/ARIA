@@ -10,27 +10,47 @@ struct DegreeDynamic {};
 template <uint v>
 using Degree = C<v>;
 
+struct NonRational {};
+
+struct Rational {};
+
 //
 //
 //
-template <typename T, auto dim, typename TDegree>
+template <typename T, auto dim, typename TDegree, typename RationalOrNot>
 class BezierCurve;
 
 //
 //
 //
-template <typename T, auto dim>
-class BezierCurve<T, dim, DegreeDynamic> {
+template <typename T, auto dim, typename RationalOrNot>
+class BezierCurve<T, dim, DegreeDynamic, RationalOrNot> {
 public:
+  bool IsInDomain(const T &t) const {
+    // TODO: Implement this.
+  }
+
+  const Vec<T, dim> &operator()(const T &t) const {
+    // TODO: Implement this.
+  }
+
 private:
 };
 
 //
 //
 //
-template <typename T, auto dim, uint degree>
-class BezierCurve<T, dim, Degree<degree>> {
+template <typename T, auto dim, uint degree, typename RationalOrNot>
+class BezierCurve<T, dim, Degree<degree>, RationalOrNot> {
 public:
+  bool IsInDomain(const T &t) const {
+    // TODO: Implement this.
+  }
+
+  const Vec<T, dim> &operator()(const T &t) const {
+    // TODO: Implement this.
+  }
+
 private:
 };
 
