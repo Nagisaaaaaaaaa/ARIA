@@ -124,6 +124,10 @@ public:
   //
   //
 public:
+  /// \brief `diagonal` of an `AABB` is defined as
+  /// `sup() - inf()`.
+  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> diagonal() const;
+
   /// \brief `center` of an `AABB` is defined as
   /// `(inf() + sup()) / 2`.
   ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> center() const;
@@ -132,10 +136,8 @@ public:
   /// `(p - inf()).cwiseQuotient(sup() - inf())`.
   ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> offset(const Vec<T, d> &p) const;
 
-  /// \brief `diagonal` of an `AABB` is defined as
-  /// `sup() - inf()`.
-  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> diagonal() const;
-
+  //
+  //
   //
   //
   //

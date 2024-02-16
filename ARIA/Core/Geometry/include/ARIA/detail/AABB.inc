@@ -78,6 +78,11 @@ ARIA_HOST_DEVICE inline /*constexpr*/ void AABB<T, d>::Unionize(Args &&...args) 
 //
 //
 template <typename T, auto d>
+ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::diagonal() const {
+  return sup() - inf();
+}
+
+template <typename T, auto d>
 ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::center() const {
   return (sup() + inf()) / T{2};
 }
@@ -85,11 +90,6 @@ ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::center() const {
 template <typename T, auto d>
 ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::offset(const Vec<T, d> &p) const {
   return (p - inf()).cwiseQuotient(sup() - inf());
-}
-
-template <typename T, auto d>
-ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::diagonal() const {
-  return sup() - inf();
 }
 
 //
