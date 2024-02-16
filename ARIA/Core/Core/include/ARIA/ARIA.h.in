@@ -18,10 +18,17 @@ namespace ARIA {
 /// \brief Always use `uint` instead of `unsigned`.
 using uint = uint32_t;
 
+/// \brief Always use `int64` instead of `int64_t`.
+using int64 = int64_t;
+
+/// \brief Always use `uint64` instead of `uint64_t`.
+using uint64 = uint64_t;
+
+static_assert(sizeof(int) == sizeof(uint), "Size of `int` and `uint` should be the same");
+static_assert(sizeof(int64) == sizeof(uint64), "Size of `int64` and `uint64` should be the same");
+
 /// \brief `Real` is a universal number type defined by cmake options.
 using Real = ${aria_real_type};
-
-static_assert(sizeof(int) == sizeof(uint), "Size of signed int and unsigned int should be the same");
 
 /// \brief Use `100.0_R` to define a `Real` equals to one hundred.
 ARIA_HOST_DEVICE constexpr Real operator"" _R(long double value) {
