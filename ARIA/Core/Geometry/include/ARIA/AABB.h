@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ARIA/ForEach.h"
+#include "ARIA/Math.h"
 #include "ARIA/Vec.h"
 
 namespace ARIA {
@@ -10,9 +11,8 @@ namespace ARIA {
 template <typename T, auto s>
 class AABB final {
 public:
-  // TODO: Define infinity, max, min, and suprime at Math.h.
   ARIA_HOST_DEVICE inline /*constexpr*/ AABB()
-      : pMin_(ConstructVecWithNEqualedValues(10000)), pMax_(ConstructVecWithNEqualedValues(-10000)) {}
+      : inf_(ConstructVecWithNEqualedValues(infinity<T>)), sup_(ConstructVecWithNEqualedValues(-infinity<T>)) {}
 
   template <typename... Args>
     requires(sizeof...(Args) > 0 &&  // Size `> 0` to avoid conflict with the default constructor.
@@ -26,10 +26,12 @@ public:
   ~AABB() = default;
 
 public:
-  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, pMin, pMin_);
-  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, pMax, pMax_);
+  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, inf, inf_);
+  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, sup, sup_);
 
 public:
+  /// \warning If the `AABB` is constructed with only one point,
+  /// it is considered as non-empty.
   ARIA_HOST_DEVICE inline /*constexpr*/ bool empty() const {
     bool res = false;
 
@@ -37,7 +39,7 @@ public:
       if (res)
         return;
 
-      if (pMin()[i] > pMax()[i])
+      if (inf()[i] > sup()[i])
         res = true;
     });
 
@@ -49,13 +51,13 @@ public:
     // Union an `AABB` with another `AABB` or a `Vec`.
     auto unionizedOne = Overload{[](const AABB &a, const AABB &b) {
       AABB res;
-      ForEach<s>([&]<auto i>() { res.pMin()[i] = std::min(a.pMin()[i], b.pMin()[i]); });
-      ForEach<s>([&]<auto i>() { res.pMax()[i] = std::max(a.pMax()[i], b.pMax()[i]); });
+      ForEach<s>([&]<auto i>() { res.inf()[i] = std::min(a.inf()[i], b.inf()[i]); });
+      ForEach<s>([&]<auto i>() { res.sup()[i] = std::max(a.sup()[i], b.sup()[i]); });
       return res;
     }, [](const AABB &a, const Vec<T, s> &b) {
       AABB res;
-      ForEach<s>([&]<auto i>() { res.pMin()[i] = std::min(a.pMin()[i], b[i]); });
-      ForEach<s>([&]<auto i>() { res.pMax()[i] = std::max(a.pMax()[i], b[i]); });
+      ForEach<s>([&]<auto i>() { res.inf()[i] = std::min(a.inf()[i], b[i]); });
+      ForEach<s>([&]<auto i>() { res.sup()[i] = std::max(a.sup()[i], b[i]); });
       return res;
     }};
 
@@ -65,7 +67,7 @@ public:
     //! 1. If the first argument is an `AABB`,
     //!    directly set it to `res`, and call `unionizedOne` with the remaining arguments.
     //! 2. If the first argument is a `Vec`,
-    //!    directly set `pMin` and `pMax` of `res` to the `Vec`, and call `unionizedOne` with the remaining arguments.
+    //!    directly set `inf` and `sup` of `res` to the `Vec`, and call `unionizedOne` with the remaining arguments.
     //!
     //! This optimization is important, because for example,
     //! if this method is called with one `AABB` or one `Vec`,
@@ -80,8 +82,8 @@ public:
       return res;
     }, [&]<typename... Ts>(const Vec<T, s> &t0, Ts &&...ts) { // If the first argument is a `Vec`.
       AABB res;
-      res.pMin() = t0;
-      res.pMax() = t0;
+      res.inf() = t0;
+      res.sup() = t0;
 
       auto unionizeOne = [&](const auto &b) { res = unionizedOne(res, b); };
       (unionizeOne(ts), ...);
@@ -98,19 +100,19 @@ public:
     *this = unionized(*this, std::forward<Args>(args)...);
   }
 
-  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, s> center() const { return (pMax() + pMin()) / T{2}; }
+  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, s> center() const { return (sup() + inf()) / T{2}; }
 
   ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, s> offset(const Vec<T, s> &p) const {
     Vec<T, s> o;
-    ForEach<s>([&]<auto i>() { o[i] = (p[i] - pMin()[i]) / (pMax()[i] - pMin()[i]); });
+    ForEach<s>([&]<auto i>() { o[i] = (p[i] - inf()[i]) / (sup()[i] - inf()[i]); });
     return o;
   }
 
-  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, s> diagonal() const { return pMax() - pMin(); }
+  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, s> diagonal() const { return sup() - inf(); }
 
 private:
-  Vec<T, s> pMin_;
-  Vec<T, s> pMax_;
+  Vec<T, s> inf_;
+  Vec<T, s> sup_;
 
   // A function wrapper which calls the constructor of `Vec<T, s>` with `s` equaled values.
   static decltype(auto) ConstructVecWithNEqualedValues(const T &value) {
