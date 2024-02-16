@@ -24,8 +24,8 @@ public:
   ~AABB() = default;
 
 public:
-  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, inf, inf_);
-  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, sup, sup_);
+  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, inf, ARIA_PROP_IMPL(inf)());
+  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, sup, ARIA_PROP_IMPL(sup)());
 
 public:
   /// \warning If the `AABB` is constructed with only one point,
@@ -113,8 +113,15 @@ public:
   ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> diagonal() const { return sup() - inf(); }
 
 private:
-  Vec<T, d> inf_;
-  Vec<T, d> sup_;
+  std::array<Vec<T, d>, 2> infAndSup_;
+
+  const Vec<T, d> &ARIA_PROP_IMPL(inf)() const { return infAndSup_[0]; }
+
+  Vec<T, d> &ARIA_PROP_IMPL(inf)() { return infAndSup_[0]; }
+
+  const Vec<T, d> &ARIA_PROP_IMPL(sup)() const { return infAndSup_[1]; }
+
+  Vec<T, d> &ARIA_PROP_IMPL(sup)() { return infAndSup_[1]; }
 
   // A function wrapper which calls the constructor of `Vec<T, d>` with `d` equaled values.
   static decltype(auto) ConstructVecWithNEqualedValues(const T &value) {
