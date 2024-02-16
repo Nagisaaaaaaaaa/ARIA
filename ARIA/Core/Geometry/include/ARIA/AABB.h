@@ -92,7 +92,7 @@ public:
   /// Vec3r& inf0 = aabb[0]; // Get the `inf`.
   /// Vec3r& sup0 = aabb[1]; // Get the `sup`.
   /// ```
-  ARIA_HOST_DEVICE inline /*constexpr*/ const Vec<T, d> &operator[](uint i) const;
+  [[nodiscard]] ARIA_HOST_DEVICE inline /*constexpr*/ const Vec<T, d> &operator[](uint i) const;
 
   /// \brief Access the infimum or the supremum of the `AABB` with an index.
   /// Infimum is returned if `i == 0`, supremum is returned if `i == 1`.
@@ -102,7 +102,7 @@ public:
   /// Vec3r& inf0 = aabb[0]; // Get the `inf`.
   /// Vec3r& sup0 = aabb[1]; // Get the `sup`.
   /// ```
-  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> &operator[](uint i);
+  [[nodiscard]] ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> &operator[](uint i);
 
   //
   //
@@ -113,7 +113,7 @@ public:
   ///
   /// \warning If the `AABB` is constructed with only one point,
   /// by definition, it is also considered as non-empty.
-  ARIA_HOST_DEVICE inline /*constexpr*/ bool empty() const;
+  [[nodiscard]] ARIA_HOST_DEVICE inline /*constexpr*/ bool empty() const;
 
   /// \brief Unionize this `AABB` with the given `args`.
   /// Equivalent to `thisAABB = AABB{thisAABB, ... /* Args here. */};
@@ -126,15 +126,15 @@ public:
 public:
   /// \brief `diagonal` of an `AABB` is defined as
   /// `sup() - inf()`.
-  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> diagonal() const;
+  [[nodiscard]] ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> diagonal() const;
 
   /// \brief `center` of an `AABB` is defined as
   /// `(inf() + sup()) / 2`.
-  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> center() const;
+  [[nodiscard]] ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> center() const;
 
   /// \brief `offset` of a given point in an `AABB` is defined as
   /// `(p - inf()).cwiseQuotient(sup() - inf())`.
-  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> offset(const Vec<T, d> &p) const;
+  [[nodiscard]] ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> offset(const Vec<T, d> &p) const;
 
   //
   //
@@ -146,7 +146,7 @@ private:
 
   // A supporting function to help implement the constructor and `Unionize()`.
   template <typename... Args>
-  ARIA_HOST_DEVICE static inline /*constexpr*/ AABB unionized(Args &&...args);
+  [[nodiscard]] ARIA_HOST_DEVICE static inline /*constexpr*/ AABB unionized(Args &&...args);
 };
 
 //
