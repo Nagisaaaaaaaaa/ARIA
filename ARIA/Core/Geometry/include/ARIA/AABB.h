@@ -116,9 +116,6 @@ public:
   ARIA_HOST_DEVICE inline /*constexpr*/ bool empty() const;
 
   template <typename... Args>
-  ARIA_HOST_DEVICE static inline /*constexpr*/ AABB unionized(Args &&...args);
-
-  template <typename... Args>
   ARIA_HOST_DEVICE inline /*constexpr*/ void Unionize(Args &&...args);
 
   //
@@ -136,6 +133,10 @@ public:
   //
 private:
   std::array<Vec<T, d>, 2> infAndSup_;
+
+  // A supporting function to help implement the constructor and `Unionize()`.
+  template <typename... Args>
+  ARIA_HOST_DEVICE static inline /*constexpr*/ AABB unionized(Args &&...args);
 };
 
 //

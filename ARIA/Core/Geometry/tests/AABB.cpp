@@ -21,7 +21,7 @@ TEST(AABB, Base) {
     EXPECT_FLOAT_EQ(aabb.sup().z(), sup.z());
   };
 
-  // 2D constructors, unionized, unionize, inf, sup, and empty.
+  // 2D constructors, unionize, inf, sup, and empty.
   {
     // Default constructor.
     AABB2f aabb0;
@@ -88,9 +88,6 @@ TEST(AABB, Base) {
     aabb6.Unionize(Vec2f{0.05F, 0.05F}, Vec2f{0.01F, 0.01F});
     expectAABB2(aabb6, {0.01F, 0.01F}, {0.1F, 0.1F});
 
-    AABB2f aabb7 = AABB2f::unionized(Vec2f{0.05F, 0.05F}, Vec2f{0.01F, 0.01F}, aabb2);
-    expectAABB2(aabb7, {0.01F, 0.01F}, {0.1F, 0.1F});
-
     // Complex Empty.
     {
       AABB2f aabb;
@@ -121,7 +118,7 @@ TEST(AABB, Base) {
     }
   }
 
-  // 3D constructors, unionized, unionize, inf, sup, and empty.
+  // 3D constructors, unionize, inf, sup, and empty.
   {
     // Default constructor.
     AABB3f aabb0;
@@ -189,9 +186,6 @@ TEST(AABB, Base) {
     AABB3f aabb6 = aabb2;
     aabb6.Unionize(Vec3f{0.05F, 0.05F, 0.05F}, Vec3f{0.01F, 0.01F, 0.01F});
     expectAABB3(aabb6, {0.01F, 0.01F, 0.01F}, {0.1F, 0.1F, 0.1F});
-
-    AABB3f aabb7 = AABB3f::unionized(Vec3f{0.05F, 0.05F, 0.05F}, Vec3f{0.01F, 0.01F, 0.01F}, aabb2);
-    expectAABB3(aabb7, {0.01F, 0.01F, 0.01F}, {0.1F, 0.1F, 0.1F});
 
     // Complex Empty.
     {

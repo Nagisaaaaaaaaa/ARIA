@@ -68,6 +68,39 @@ ARIA_HOST_DEVICE inline /*constexpr*/ bool AABB<T, d>::empty() const {
 
 template <typename T, auto d>
 template <typename... Args>
+ARIA_HOST_DEVICE inline /*constexpr*/ void AABB<T, d>::Unionize(Args &&...args) {
+  *this = unionized(*this, std::forward<Args>(args)...);
+}
+
+//
+//
+//
+//
+//
+template <typename T, auto d>
+ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::center() const {
+  return (sup() + inf()) / T{2};
+}
+
+template <typename T, auto d>
+ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::offset(const Vec<T, d> &p) const {
+  Vec<T, d> o;
+  ForEach<d>([&]<auto i>() { o[i] = (p[i] - inf()[i]) / (sup()[i] - inf()[i]); });
+  return o;
+}
+
+template <typename T, auto d>
+ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::diagonal() const {
+  return sup() - inf();
+}
+
+//
+//
+//
+//
+//
+template <typename T, auto d>
+template <typename... Args>
 ARIA_HOST_DEVICE inline /*constexpr*/ AABB<T, d> AABB<T, d>::unionized(Args &&...args) {
   // Union an `AABB` with another `AABB` or a `Vec`.
   auto unionizedOne = Overload{[](const AABB &a, const AABB &b) {
@@ -117,34 +150,6 @@ ARIA_HOST_DEVICE inline /*constexpr*/ AABB<T, d> AABB<T, d>::unionized(Args &&..
 
   // Finally, we call the overloaded `unionizedImpl` with `args`.
   return unionizedImpl(std::forward<Args>(args)...);
-}
-
-template <typename T, auto d>
-template <typename... Args>
-ARIA_HOST_DEVICE inline /*constexpr*/ void AABB<T, d>::Unionize(Args &&...args) {
-  *this = unionized(*this, std::forward<Args>(args)...);
-}
-
-//
-//
-//
-//
-//
-template <typename T, auto d>
-ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::center() const {
-  return (sup() + inf()) / T{2};
-}
-
-template <typename T, auto d>
-ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::offset(const Vec<T, d> &p) const {
-  Vec<T, d> o;
-  ForEach<d>([&]<auto i>() { o[i] = (p[i] - inf()[i]) / (sup()[i] - inf()[i]); });
-  return o;
-}
-
-template <typename T, auto d>
-ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::diagonal() const {
-  return sup() - inf();
 }
 
 } // namespace ARIA
