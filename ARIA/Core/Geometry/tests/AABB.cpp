@@ -21,7 +21,7 @@ TEST(AABB, Base) {
     EXPECT_FLOAT_EQ(aabb.sup().z(), sup.z());
   };
 
-  // 2D constructors, unionized, unionize, and empty.
+  // 2D constructors, unionized, unionize, inf, sup, and empty.
   {
     // Default constructor.
     AABB2f aabb0;
@@ -121,7 +121,7 @@ TEST(AABB, Base) {
     }
   }
 
-  // 3D constructors, unionized, unionize, and empty.
+  // 3D constructors, unionized, unionize, inf, sup, and empty.
   {
     // Default constructor.
     AABB3f aabb0;
@@ -249,6 +249,53 @@ TEST(AABB, Base) {
       aabb.sup() = {0.1F, 0.2F, 0.3F};
       EXPECT_TRUE(aabb.empty());
     }
+  }
+}
+
+TEST(AABB, Methods) {
+  auto expectV2 = [](const Vec2r &lhs, const Vec2r &rhs) {
+    EXPECT_FLOAT_EQ(float(lhs.x()), float(rhs.x()));
+    EXPECT_FLOAT_EQ(float(lhs.y()), float(rhs.y()));
+  };
+
+  auto expectV3 = [](const Vec3r &lhs, const Vec3r &rhs) {
+    EXPECT_FLOAT_EQ(float(lhs.x()), float(rhs.x()));
+    EXPECT_FLOAT_EQ(float(lhs.y()), float(rhs.y()));
+    EXPECT_FLOAT_EQ(float(lhs.z()), float(rhs.z()));
+  };
+
+  // 2D other methods.
+  {
+    AABB2f aabb;
+    aabb.inf() = {0.1F, 0.2F};
+    aabb.sup() = {0.3F, 0.5F};
+
+    expectV2(aabb.center(), {0.2F, 0.35F});
+    expectV2(aabb.offset({0.25F, 0.4F}), {0.75F, 0.666666666666667F});
+    expectV2(aabb.diagonal(), {0.2F, 0.3F});
+
+    expectV2(aabb[0], {0.1F, 0.2F});
+    expectV2(aabb[1], {0.3F, 0.5F});
+
+    expectV2(aabb[C<0>{}], {0.1F, 0.2F});
+    expectV2(aabb[C<1>{}], {0.3F, 0.5F});
+  }
+
+  // 3D other methods.
+  {
+    AABB3f aabb;
+    aabb.inf() = {0.1F, 0.2F, 0.3F};
+    aabb.sup() = {0.4F, 0.6F, 0.9F};
+
+    expectV3(aabb.center(), {0.25F, 0.4F, 0.6F});
+    expectV3(aabb.offset({0.25F, 0.5F, 0.8F}), {0.5F, 0.75F, 0.833333333333333F});
+    expectV3(aabb.diagonal(), {0.3F, 0.4F, 0.6F});
+
+    expectV3(aabb[0], {0.1F, 0.2F, 0.3F});
+    expectV3(aabb[1], {0.4F, 0.6F, 0.9F});
+
+    expectV3(aabb[C<0>{}], {0.1F, 0.2F, 0.3F});
+    expectV3(aabb[C<1>{}], {0.4F, 0.6F, 0.9F});
   }
 }
 
