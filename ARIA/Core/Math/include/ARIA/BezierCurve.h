@@ -18,14 +18,14 @@ struct Rational {};
 //
 //
 //
-template <typename T, auto dim, typename TDegree, typename RationalOrNot>
+template <typename T, auto dim, typename RationalOrNot, typename TDegree>
 class BezierCurve;
 
 //
 //
 //
-template <typename T, auto dim, uint degree, typename RationalOrNot>
-class BezierCurve<T, dim, Degree<degree>, RationalOrNot> {
+template <typename T, auto dim, typename RationalOrNot, uint degree>
+class BezierCurve<T, dim, RationalOrNot, Degree<degree>> {
 public:
   static constexpr bool rational = std::is_same_v<RationalOrNot, Rational>;
 
@@ -77,7 +77,7 @@ private:
 //
 //
 template <typename T, auto dim, typename RationalOrNot>
-class BezierCurve<T, dim, DegreeDynamic, RationalOrNot> {
+class BezierCurve<T, dim, RationalOrNot, DegreeDynamic> {
 public:
   static constexpr bool rational = std::is_same_v<RationalOrNot, Rational>;
 

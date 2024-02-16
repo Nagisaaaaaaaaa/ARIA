@@ -5,18 +5,18 @@
 namespace ARIA {
 
 TEST(BezierCurve, Base) {
-  static_assert(MovingPoint<BezierCurve, float, 1, DegreeDynamic, NonRational>);
-  static_assert(MovingPoint<BezierCurve, double, 1, DegreeDynamic, NonRational>);
-  static_assert(MovingPoint<BezierCurve, Real, 1, DegreeDynamic, NonRational>);
+  static_assert(MovingPoint<BezierCurve, float, 1, NonRational, DegreeDynamic>);
+  static_assert(MovingPoint<BezierCurve, double, 1, NonRational, DegreeDynamic>);
+  static_assert(MovingPoint<BezierCurve, Real, 1, NonRational, DegreeDynamic>);
 
-  static_assert(MovingPoint<BezierCurve, float, 1, Degree<2>, NonRational>);
-  static_assert(MovingPoint<BezierCurve, double, 1, Degree<2>, NonRational>);
-  static_assert(MovingPoint<BezierCurve, Real, 1, Degree<2>, NonRational>);
+  static_assert(MovingPoint<BezierCurve, float, 1, NonRational, Degree<2>>);
+  static_assert(MovingPoint<BezierCurve, double, 1, NonRational, Degree<2>>);
+  static_assert(MovingPoint<BezierCurve, Real, 1, NonRational, Degree<2>>);
 
-  BezierCurve<float, 2, Degree<2>, NonRational> b0;
-  BezierCurve<float, 2, Degree<2>, Rational> b1;
-  BezierCurve<float, 2, DegreeDynamic, NonRational> b2;
-  BezierCurve<float, 2, DegreeDynamic, Rational> b3;
+  BezierCurve<float, 2, NonRational, Degree<2>> b0;
+  BezierCurve<float, 2, Rational, Degree<2>> b1;
+  BezierCurve<float, 2, NonRational, DegreeDynamic> b2;
+  BezierCurve<float, 2, Rational, DegreeDynamic> b3;
 }
 
 } // namespace ARIA
