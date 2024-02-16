@@ -26,10 +26,11 @@ class BezierCurve;
 //
 template <typename T, auto dim, uint degree, typename RationalOrNot>
 class BezierCurve<T, dim, Degree<degree>, RationalOrNot> {
+public:
+  static constexpr bool rational = std::is_same_v<RationalOrNot, Rational>;
+
 private:
   // `CP` is an abbreviation of "control point".
-  static constexpr uint nCPs = degree + 1;
-  static constexpr bool rational = std::is_same_v<RationalOrNot, Rational>;
   using VecDim = Vec<T, dim>;
   using VecCP = std::conditional_t<rational, Vec<T, dim + 1>, VecDim>;
 
@@ -67,6 +68,8 @@ public:
   }
 
 private:
+  static constexpr uint nCPs = degree + 1;
+
   std::array<VecCP, nCPs> controlPoints_;
 };
 
@@ -75,9 +78,11 @@ private:
 //
 template <typename T, auto dim, typename RationalOrNot>
 class BezierCurve<T, dim, DegreeDynamic, RationalOrNot> {
+public:
+  static constexpr bool rational = std::is_same_v<RationalOrNot, Rational>;
+
 private:
   // `CP` is an abbreviation of "control point".
-  static constexpr bool rational = std::is_same_v<RationalOrNot, Rational>;
   using VecDim = Vec<T, dim>;
   using VecCP = std::conditional_t<rational, Vec<T, dim + 1>, VecDim>;
 
