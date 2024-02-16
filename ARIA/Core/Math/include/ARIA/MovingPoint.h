@@ -12,6 +12,9 @@
 /// When `0 <= t && t <= 1`, `bezier.IsInDomain(t)` returns `true`, and
 /// `bezier(t)` returns the position of the curve at `t`.
 ///
+/// Also, it is named as `MovingPoint` instead of `Curve` because
+/// we don't require that it should be continuous or smooth or not.
+///
 /// `MovingPoint` is the most basic concept satisfied by all ARIA built-in curves.
 //
 //
