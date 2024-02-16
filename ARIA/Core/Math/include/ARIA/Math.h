@@ -14,6 +14,40 @@
 
 namespace ARIA {
 
+/// \brief Get the positive infinity of the given universal number type.
+template <typename T>
+  requires(!std::integral<T>) //! Should not be `std::floating_point` here to support tailored universal number types.
+static constexpr T infinity = std::numeric_limits<T>::infinity();
+
+/// \brief Get the maximum value of the given type.
+///
+/// \warning For universal number types such as `float` and `double`,
+/// `maximum` will return the largest finite value, not `infinity`.
+template <typename T>
+static constexpr T maximum = std::numeric_limits<T>::max();
+
+/// \brief Get the minimum value of the given type.
+///
+/// \warning For universal number types such as `float` and `double`,
+/// `minimum` will return the smallest finite value, not `-infinity`.
+template <typename T>
+static constexpr T minimum = std::numeric_limits<T>::min();
+
+/// \brief `supremum` is mathematically defined as https://en.wikipedia.org/wiki/Infimum_and_supremum.
+/// For `integral` types, returns `maximum`; for universal number types, returns `infinity`.
+template <typename T>
+static constexpr T supremum = std::integral<T> ? maximum<T> : std::numeric_limits<T>::infinity();
+
+/// \brief `infimum` is mathematically defined as https://en.wikipedia.org/wiki/Infimum_and_supremum.
+/// For `integral` types, returns `minimum`; for universal number types, returns `-infinity`.
+template <typename T>
+static constexpr T infimum = std::integral<T> ? minimum<T> : -std::numeric_limits<T>::infinity();
+
+//
+//
+//
+//
+//
 /// \brief 3.1415926...
 template <typename T>
 static constexpr T pi = std::numbers::pi_v<T>;

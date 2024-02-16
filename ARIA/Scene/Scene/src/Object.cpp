@@ -18,13 +18,13 @@ void DestroyImmediate(Object &object) {
 
     siblings.erase(it);
   } else {
-    throw std::runtime_error("Should not destroy the halo root object");
+    ARIA_THROW(std::runtime_error, "Should not destroy the halo root object");
   }
 }
 
 void DestroyImmediate(Component &component) {
   if (dynamic_cast<Transform *>(&component)) [[unlikely]] {
-    throw std::runtime_error("Should not destroy the `Transform` component");
+    ARIA_THROW(std::runtime_error, "Should not destroy the `Transform` component");
   }
 
   if (component.object().parent_) [[likely]] {
@@ -34,7 +34,7 @@ void DestroyImmediate(Component &component) {
 
     components.erase(it);
   } else {
-    throw std::runtime_error("Should not destroy component of the halo root object");
+    ARIA_THROW(std::runtime_error, "Should not destroy component of the halo root object");
   }
 }
 
@@ -51,7 +51,7 @@ Object *Object::ARIA_PROP_IMPL(parent)() {
 
 void Object::ARIA_PROP_IMPL(parent)(Object *value) {
   if (value->IsChildOf(*this)) {
-    throw std::exception{};
+    ARIA_THROW(std::runtime_error, "The given parent should not be a child of the current `Object`");
   }
 
   if (parent_ == value) [[unlikely]] {
@@ -92,7 +92,7 @@ Object *Object::ARIA_PROP_IMPL(root)() {
 
 void Object::ARIA_PROP_IMPL(root)(Object *value) {
   if (value->IsChildOf(*this)) {
-    throw std::exception{};
+    ARIA_THROW(std::runtime_error, "The given parent should not be a child of the current `Object`");
   }
 
   //! Should not write `root()->parent() = value`,
