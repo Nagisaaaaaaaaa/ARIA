@@ -28,8 +28,8 @@ static decltype(auto) ConstructVecWithNEqualedValues(const T &value) {
 //
 template <typename T, auto d>
 ARIA_HOST_DEVICE inline /*constexpr*/ AABB<T, d>::AABB()
-    : infAndSup_{aabb::detail::ConstructVecWithNEqualedValues<T, d>(infinity<T>),
-                 aabb::detail::ConstructVecWithNEqualedValues<T, d>(-infinity<T>)} {}
+    : infAndSup_{aabb::detail::ConstructVecWithNEqualedValues<T, d>(supremum<T>),
+                 aabb::detail::ConstructVecWithNEqualedValues<T, d>(infimum<T>)} {}
 
 //
 //

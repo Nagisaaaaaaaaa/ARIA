@@ -11,15 +11,37 @@ namespace ARIA {
 template <typename T, auto d>
 class AABB final {
 public:
+  /// \brief Construct an empty `AABB`, whose each dimension `i`,
+  /// `inf()[i]` equals to `supremum<T>`, while `sup()[i]` equals to `infimum<T>`.
+  ///
+  /// \example ```cpp
+  /// AABB3r aabb;
+  /// ```
   ARIA_HOST_DEVICE inline /*constexpr*/ AABB();
 
+  /// \brief Construct a non-empty `AABB` with the given `args`.
+  /// `args` can be a combination of `AABB`s and `Vec`s, where `Vec`s indicates solo points.
+  /// Then, this `AABB` is constructed with the union of all the `args`.
+  ///
+  /// \example ```cpp
+  /// AABB3r anotherAABB = ...;
+  /// Vec3r point{1, 2, 3};
+  ///
+  /// AABB3r aabb0{anotherAABB, point};
+  /// AABB3r aabb1{point, anotherAABB}; // The same.
+  /// ```
+  ///
+  /// \warning Please read the comments of `empty`.
+  /// Any `AABB` constructed with this constructor is guaranteed to be non-empty.
   template <typename... Args>
     requires(sizeof...(Args) > 0 &&  // Size `> 0` to avoid conflict with the default constructor.
              (sizeof...(Args) > 1 || // If size `> 1`, safe. If size `== 1`, may conflict with the copy constructor.
               (!std::is_same_v<std::decay_t<Args>, AABB> && ...))) // So, requires that the argument type is not AABB.
   ARIA_HOST_DEVICE /*constexpr*/ explicit AABB(Args &&...args) : AABB(unionized(std::forward<Args>(args)...)) {}
 
+  /// \brief `AABB` allows copy and move.
   ARIA_COPY_MOVE_ABILITY(AABB, default, default);
+
   ~AABB() = default;
 
   //
@@ -38,8 +60,11 @@ public:
   //
   //
 public:
+  /// \brief An `AABB` is defined as empty if there exist one dimension `i`,
+  /// such that `inf()[i] > sup()[i]`.
+  ///
   /// \warning If the `AABB` is constructed with only one point,
-  /// it is also considered as non-empty.
+  /// by definition, it is also considered as non-empty.
   ARIA_HOST_DEVICE inline /*constexpr*/ bool empty() const;
 
   template <typename... Args>
