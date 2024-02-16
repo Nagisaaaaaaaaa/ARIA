@@ -4,6 +4,7 @@ if (ARIA_BUILD_TESTS)
       Mat.cpp
       Math.cpp
       MortonCode.cpp
+      MovingPoint.cpp
       Quat.cpp
       Vec.cpp
       HARD_DEPENDENCIES
