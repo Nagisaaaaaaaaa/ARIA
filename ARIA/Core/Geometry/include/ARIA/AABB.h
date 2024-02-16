@@ -13,6 +13,7 @@ class AABB final {
 public:
   /// \brief Construct an empty `AABB`, whose each dimension `i`,
   /// `inf()[i]` equals to `supremum<T>`, while `sup()[i]` equals to `infimum<T>`.
+  /// See `Math.h` for the definition of `supremum` and `infimum`.
   ///
   /// \example ```cpp
   /// AABB3r aabb;
@@ -48,12 +49,59 @@ public:
   //
   //
 public:
+  /// \brief The infimum of the `AABB`.
+  /// You may imagine that `inf` is the position of the "left-bottom" corner of the `AABB`.
+  ///
+  /// \example ```cpp
+  /// AABB3r aabb;
+  /// Vec3r& inf = aabb.inf();      // Get the `inf`.
+  /// aabb.inf() = {1_R, 2_R, 3_R}; // Set the `inf`.
+  /// ```
+  ///
+  /// \warning You are allowed to directly set the `inf`,
+  /// if some dimension of the new `inf` is larger than the `sup`,
+  /// the `AABB` will become an `empty` `AABB`.
+  /// So, pay attention if you want to directly set `inf`.
+  ///
+  /// You may use `Unionize()` if you always want a non-empty `AABB`.
   ARIA_REF_PROP(public, ARIA_HOST_DEVICE, inf, infAndSup_[0]);
+
+  /// \brief The supremum of the `AABB`.
+  /// You may imagine that `sup` is the position of the "right-top" corner of the `AABB`.
+  ///
+  /// \example ```cpp
+  /// AABB3r aabb;
+  /// Vec3r& sup = aabb.sup();      // Get the `sup`.
+  /// aabb.sup() = {1_R, 2_R, 3_R}; // Set the `sup`.
+  /// ```
+  ///
+  /// \warning You are allowed to directly set the `sup`,
+  /// if some dimension of the new `sup` is smaller than the `inf`,
+  /// the `AABB` will become an `empty` `AABB`.
+  /// So, pay attention if you want to directly set `sup`.
+  ///
+  /// You may use `Unionize()` if you always want a non-empty `AABB`.
   ARIA_REF_PROP(public, ARIA_HOST_DEVICE, sup, infAndSup_[1]);
 
 public:
+  /// \brief Access the infimum or the supremum of the `AABB` with an index.
+  /// Infimum is returned if `i == 0`, supremum is returned if `i == 1`.
+  /// Indices besides 0 or 1 are invalid.
+  ///
+  /// \example ```cpp
+  /// Vec3r& inf0 = aabb[0]; // Get the `inf`.
+  /// Vec3r& sup0 = aabb[1]; // Get the `sup`.
+  /// ```
   ARIA_HOST_DEVICE inline /*constexpr*/ const Vec<T, d> &operator[](uint i) const;
 
+  /// \brief Access the infimum or the supremum of the `AABB` with an index.
+  /// Infimum is returned if `i == 0`, supremum is returned if `i == 1`.
+  /// Indices besides 0 or 1 are invalid.
+  ///
+  /// \example ```cpp
+  /// Vec3r& inf0 = aabb[0]; // Get the `inf`.
+  /// Vec3r& sup0 = aabb[1]; // Get the `sup`.
+  /// ```
   ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> &operator[](uint i);
 
   //
