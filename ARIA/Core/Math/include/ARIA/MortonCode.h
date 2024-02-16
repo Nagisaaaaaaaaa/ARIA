@@ -10,8 +10,10 @@
 
 namespace ARIA {
 
+namespace MortonCode {
+
 template <std::integral I>
-[[nodiscard]] ARIA_HOST_DEVICE /*constexpr*/ I MortonEncode(const Vec2<I> &coord) {
+[[nodiscard]] ARIA_HOST_DEVICE /*constexpr*/ I Encode(const Vec2<I> &coord) {
   if constexpr (sizeof(I) == 4) {
     auto shift = [](I x) {
       x &= I{0xFFFFU};
@@ -38,7 +40,7 @@ template <std::integral I>
 }
 
 template <std::integral I>
-[[nodiscard]] ARIA_HOST_DEVICE /*constexpr*/ I MortonEncode(const Vec3<I> &coord) {
+[[nodiscard]] ARIA_HOST_DEVICE /*constexpr*/ I Encode(const Vec3<I> &coord) {
   if constexpr (sizeof(I) == 4) {
     auto shift = [](I x) {
       x &= I{0x3FFU};
@@ -76,5 +78,7 @@ template <std::integral I>
   else
     ARIA_STATIC_ASSERT_FALSE("Type of the coord elements to be encoded is currently not supported");
 }
+
+} // namespace MortonCode
 
 } // namespace ARIA
