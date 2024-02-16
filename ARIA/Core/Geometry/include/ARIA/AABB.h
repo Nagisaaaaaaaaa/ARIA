@@ -112,30 +112,26 @@ public:
 
   ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> diagonal() const { return sup() - inf(); }
 
-  template <std::integral TIdx>
+  template <typename TIdx>
+    requires(ConstantIntegral<TIdx> || std::integral<TIdx>)
   ARIA_HOST_DEVICE inline /*constexpr*/ const Vec<T, d> &operator[](const TIdx &i) const {
     // Check index.
-    if constexpr (ConstantIntegral<TIdx>) {
-      static_assert(static_cast<int>(i) == 0 || static_cast<int>(i) == 1,
-                    "The given index to `AABB` should be either 0 or 1");
-    } else {
-      ARIA_ASSERT(static_cast<int>(i) == 0 || static_cast<int>(i) == 1,
-                  "The given index to `AABB` should be either 0 or 1");
-    }
+    if constexpr (ConstantIntegral<TIdx>)
+      static_assert(TIdx::value == 0 || TIdx::value == 1, "The given index to `AABB` should be either 0 or 1");
+    else
+      ARIA_ASSERT(i == 0 || i == 1, "The given index to `AABB` should be either 0 or 1");
 
     return infAndSup_[i];
   }
 
-  template <std::integral TIdx>
+  template <typename TIdx>
+    requires(ConstantIntegral<TIdx> || std::integral<TIdx>)
   ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> &operator[](const TIdx &i) {
     // Check index.
-    if constexpr (ConstantIntegral<TIdx>) {
-      static_assert(static_cast<int>(i) == 0 || static_cast<int>(i) == 1,
-                    "The given index to `AABB` should be either 0 or 1");
-    } else {
-      ARIA_ASSERT(static_cast<int>(i) == 0 || static_cast<int>(i) == 1,
-                  "The given index to `AABB` should be either 0 or 1");
-    }
+    if constexpr (ConstantIntegral<TIdx>)
+      static_assert(TIdx::value == 0 || TIdx::value == 1, "The given index to `AABB` should be either 0 or 1");
+    else
+      ARIA_ASSERT(i == 0 || i == 1, "The given index to `AABB` should be either 0 or 1");
 
     return infAndSup_[i];
   }
