@@ -226,7 +226,7 @@ TEST(AABB, Base) {
       AABB3f aabb;
       aabb.inf() = {0.4F, 0.2F, 0.3F};
       aabb.sup() = {0.1F, 0.5F, 0.6F};
-      EXPECT_FALSE(aabb.empty());
+      EXPECT_TRUE(aabb.empty());
     }
 
     {
