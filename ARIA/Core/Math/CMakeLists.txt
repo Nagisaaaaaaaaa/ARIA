@@ -20,6 +20,7 @@ endif ()
 set(core_math_headers
     ARIA/Mat.h
     ARIA/Math.h
+    ARIA/MortonCode.h
     ARIA/Quat.h
     ARIA/Vec.h
 )

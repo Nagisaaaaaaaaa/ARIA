@@ -3,6 +3,7 @@ if (ARIA_BUILD_TESTS)
       SOURCES
       Mat.cpp
       Math.cpp
+      MortonCode.cpp
       Quat.cpp
       Vec.cpp
       HARD_DEPENDENCIES
