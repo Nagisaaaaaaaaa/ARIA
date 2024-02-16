@@ -73,6 +73,7 @@ public:
   /// uint code0 = Code::Encode(0); // Will be 0.
   /// uint code1 = Code::Encode(1); //         1.
   /// uint code2 = Code::Encode(2); //         2.
+  /// uint code3 = Code::Encode(3); //         3.
   /// ```
   template <std::integral I>
   [[nodiscard]] static ARIA_HOST_DEVICE constexpr I Encode(const I &coord) {
