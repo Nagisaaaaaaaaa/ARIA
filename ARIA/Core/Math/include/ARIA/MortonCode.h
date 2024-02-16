@@ -25,14 +25,24 @@ namespace ARIA {
 /// \tparam d Dimension.
 ///
 /// \example ```cpp
-/// using Code = MortonCode<2>; // 2D.
+/// // 1D.
+/// using Code = MortonCode<1>;
+///
+/// uint code0 = Code::Encode(0); // Will be 0.
+/// uint code1 = Code::Encode(1); //         1.
+/// uint code2 = Code::Encode(2); //         2.
+/// uint code2 = Code::Encode(3); //         3.
+///
+/// // 2D.
+/// using Code = MortonCode<2>;
 ///
 /// uint code0 = Code::Encode(Vec2u{0, 0}); // Will be 0.
 /// uint code1 = Code::Encode(Vec2u{1, 0}); //         1.
 /// uint code2 = Code::Encode(Vec2u{0, 1}); //         2.
 /// uint code3 = Code::Encode(Vec2u{1, 1}); //         3.
 ///
-/// using Code = MortonCode<3>; // 3D.
+/// // 3D.
+/// using Code = MortonCode<3>;
 ///
 /// uint code0 = Code::Encode(Vec3u{0, 0, 0}); // Will be 0.
 /// uint code1 = Code::Encode(Vec3u{1, 0, 0}); //         1.
@@ -51,6 +61,28 @@ class MortonCode;
 //
 //
 //
+// 1D specialization.
+template <>
+class MortonCode<1> {
+public:
+  /// \brief Encode a 1D coordinate to Morton code.
+  ///
+  /// \example ```cpp
+  /// using Code = MortonCode<1>; // 1D.
+  ///
+  /// uint code0 = Code::Encode(0); // Will be 0.
+  /// uint code1 = Code::Encode(1); //         1.
+  /// uint code2 = Code::Encode(2); //         2.
+  /// ```
+  template <std::integral I>
+  [[nodiscard]] static ARIA_HOST_DEVICE /*constexpr*/ I Encode(const I &coord) {
+    return coord;
+  }
+};
+
+//
+//
+//
 // 2D specialization.
 template <>
 class MortonCode<2> {
@@ -66,7 +98,7 @@ public:
   /// uint code3 = Code::Encode(Vec2u{1, 1}); //         3.
   /// ```
   template <std::integral I>
-  [[nodiscard]] static ARIA_HOST_DEVICE /*constexpr*/ I Encode(const Vec2<I> &coord);
+  [[nodiscard]] static ARIA_HOST_DEVICE inline /*constexpr*/ I Encode(const Vec2<I> &coord);
 };
 
 //
@@ -91,7 +123,7 @@ public:
   /// uint code7 = Code::Encode(Vec3u{1, 1, 1}); //         7.
   /// ```
   template <std::integral I>
-  [[nodiscard]] static ARIA_HOST_DEVICE /*constexpr*/ I Encode(const Vec3<I> &coord);
+  [[nodiscard]] static ARIA_HOST_DEVICE inline /*constexpr*/ I Encode(const Vec3<I> &coord);
 };
 
 } // namespace ARIA
