@@ -104,7 +104,7 @@ public:
 
   ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> center() const { return (sup() + inf()) / T{2}; }
 
-  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> weight(const Vec<T, d> &p) const {
+  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> offset(const Vec<T, d> &p) const {
     Vec<T, d> o;
     ForEach<d>([&]<auto i>() { o[i] = (p[i] - inf()[i]) / (sup()[i] - inf()[i]); });
     return o;
