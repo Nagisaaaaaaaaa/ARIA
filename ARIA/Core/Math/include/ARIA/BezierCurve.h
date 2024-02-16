@@ -103,8 +103,7 @@ public:
     const uint degree = nCPs - 1;
 
     // Apply the deCasteljau algorithm, 1997, The NURBS Book, 24.
-    // TODO: Optimize here.
-    std::vector<VecCP> temp(nCPs);
+    std::vector<VecCP> temp(nCPs); // TODO: Optimize this line.
 
     for (uint i = 0; i < nCPs; ++i)
       temp[i] = controlPoints()[i];
