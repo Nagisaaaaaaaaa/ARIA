@@ -23,121 +23,32 @@ public:
   ~AABB() = default;
 
 public:
-  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, inf, ARIA_PROP_IMPL(inf)());
-  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, sup, ARIA_PROP_IMPL(sup)());
+  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, inf, infAndSup_[0]);
+  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, sup, infAndSup_[1]);
 
 public:
   /// \warning If the `AABB` is constructed with only one point,
   /// it is also considered as non-empty.
-  ARIA_HOST_DEVICE inline /*constexpr*/ bool empty() const {
-    bool res = false;
-
-    ForEach<d>([&]<auto i>() {
-      if (res)
-        return;
-
-      if (inf()[i] > sup()[i])
-        res = true;
-    });
-
-    return res;
-  }
+  ARIA_HOST_DEVICE inline /*constexpr*/ bool empty() const;
 
   template <typename... Args>
-  ARIA_HOST_DEVICE static inline /*constexpr*/ AABB unionized(Args &&...args) {
-    // Union an `AABB` with another `AABB` or a `Vec`.
-    auto unionizedOne = Overload{[](const AABB &a, const AABB &b) {
-      AABB res;
-      ForEach<d>([&]<auto i>() { res.inf()[i] = std::min(a.inf()[i], b.inf()[i]); });
-      ForEach<d>([&]<auto i>() { res.sup()[i] = std::max(a.sup()[i], b.sup()[i]); });
-      return res;
-    }, [](const AABB &a, const Vec<T, d> &b) {
-      AABB res;
-      ForEach<d>([&]<auto i>() { res.inf()[i] = std::min(a.inf()[i], b[i]); });
-      ForEach<d>([&]<auto i>() { res.sup()[i] = std::max(a.sup()[i], b[i]); });
-      return res;
-    }};
-
-    //! Then, we want to call `unionizedOne` with `args`.
-    //!
-    //! Here, it is important to optimize for the first argument.
-    //! 1. If the first argument is an `AABB`,
-    //!    directly set `res` to it, and call `unionizedOne` with the remaining arguments.
-    //! 2. If the first argument is a `Vec`,
-    //!    directly set `inf` and `sup` of `res` to the `Vec`, and call `unionizedOne` with the remaining arguments.
-    //!
-    //! This optimization is important, because for example,
-    //! if this method is called with one `AABB` or one `Vec`,
-    //! no computation will be performed.
-    auto unionizedImpl =
-        Overload{[&]<typename... Ts>(const AABB &t0, Ts &&...ts) { // If the first argument is an `AABB`.
-      // Directly set `res` to it.
-      AABB res = t0;
-
-      // Call `unionizedOne` with the remaining arguments.
-      auto unionizeOne = [&](const auto &b) { res = unionizedOne(res, b); };
-      (unionizeOne(ts), ...);
-
-      return res;
-    }, [&]<typename... Ts>(const Vec<T, d> &t0, Ts &&...ts) { // If the first argument is a `Vec`.
-      // Directly set `inf` and `sup` of `res` to the `Vec`.
-      AABB res;
-      res.inf() = t0;
-      res.sup() = t0;
-
-      // Call `unionizedOne` with the remaining arguments.
-      auto unionizeOne = [&](const auto &b) { res = unionizedOne(res, b); };
-      (unionizeOne(ts), ...);
-
-      return res;
-    }};
-
-    // Finally, we call the overloaded `unionizedImpl` with `args`.
-    return unionizedImpl(std::forward<Args>(args)...);
-  }
+  ARIA_HOST_DEVICE static inline /*constexpr*/ AABB unionized(Args &&...args);
 
   template <typename... Args>
-  ARIA_HOST_DEVICE inline /*constexpr*/ void Unionize(Args &&...args) {
-    *this = unionized(*this, std::forward<Args>(args)...);
-  }
+  ARIA_HOST_DEVICE inline /*constexpr*/ void Unionize(Args &&...args);
 
-  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> center() const { return (sup() + inf()) / T{2}; }
+  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> center() const;
 
-  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> offset(const Vec<T, d> &p) const {
-    Vec<T, d> o;
-    ForEach<d>([&]<auto i>() { o[i] = (p[i] - inf()[i]) / (sup()[i] - inf()[i]); });
-    return o;
-  }
+  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> offset(const Vec<T, d> &p) const;
 
-  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> diagonal() const { return sup() - inf(); }
+  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> diagonal() const;
 
-  ARIA_HOST_DEVICE inline /*constexpr*/ const Vec<T, d> &operator[](uint i) const { return infAndSup_[i]; }
+  ARIA_HOST_DEVICE inline /*constexpr*/ const Vec<T, d> &operator[](uint i) const;
 
-  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> &operator[](uint i) { return infAndSup_[i]; }
+  ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> &operator[](uint i);
 
 private:
   std::array<Vec<T, d>, 2> infAndSup_;
-
-  const Vec<T, d> &ARIA_PROP_IMPL(inf)() const { return infAndSup_[0]; }
-
-  Vec<T, d> &ARIA_PROP_IMPL(inf)() { return infAndSup_[0]; }
-
-  const Vec<T, d> &ARIA_PROP_IMPL(sup)() const { return infAndSup_[1]; }
-
-  Vec<T, d> &ARIA_PROP_IMPL(sup)() { return infAndSup_[1]; }
-
-  // A function wrapper which calls the constructor of `Vec<T, d>` with `d` equaled values.
-  static decltype(auto) ConstructVecWithNEqualedValues(const T &value) {
-    return ConstructVecWithNEqualedValuesImpl<d>(value);
-  }
-
-  template <uint n, typename U, typename... Us>
-  static decltype(auto) ConstructVecWithNEqualedValuesImpl(const U &v, Us &&...vs) {
-    if constexpr (n == 0)
-      return Vec<T, d>(std::forward<Us>(vs)...);
-    else
-      return ConstructVecWithNEqualedValuesImpl<n - 1>(v, v, std::forward<Us>(vs)...);
-  }
 };
 
 //
