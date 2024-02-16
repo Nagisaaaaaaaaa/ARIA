@@ -12,6 +12,15 @@ TEST(AABB, Base) {
     EXPECT_FLOAT_EQ(aabb.sup().y(), sup.y());
   };
 
+  auto expectAABB3 = [](const AABB3f &aabb, const Vec3f &inf, const Vec3f &sup) {
+    EXPECT_FLOAT_EQ(aabb.inf().x(), inf.x());
+    EXPECT_FLOAT_EQ(aabb.inf().y(), inf.y());
+    EXPECT_FLOAT_EQ(aabb.inf().z(), inf.z());
+    EXPECT_FLOAT_EQ(aabb.sup().x(), sup.x());
+    EXPECT_FLOAT_EQ(aabb.sup().y(), sup.y());
+    EXPECT_FLOAT_EQ(aabb.sup().z(), sup.z());
+  };
+
   // 2D.
   {
     // Default constructor.
@@ -44,58 +53,30 @@ TEST(AABB, Base) {
   {
     // Default constructor.
     AABB3f aabb0;
-    EXPECT_FLOAT_EQ(aabb0.inf().x(), infinity<float>);
-    EXPECT_FLOAT_EQ(aabb0.inf().y(), infinity<float>);
-    EXPECT_FLOAT_EQ(aabb0.inf().z(), infinity<float>);
-    EXPECT_FLOAT_EQ(aabb0.sup().x(), -infinity<float>);
-    EXPECT_FLOAT_EQ(aabb0.sup().y(), -infinity<float>);
-    EXPECT_FLOAT_EQ(aabb0.sup().z(), -infinity<float>);
+    expectAABB3(aabb0, {infinity<float>, infinity<float>, infinity<float>},
+                {-infinity<float>, -infinity<float>, -infinity<float>});
 
     // Copy constructor.
     AABB3f aabb1 = aabb0;
-    EXPECT_FLOAT_EQ(aabb1.inf().x(), infinity<float>);
-    EXPECT_FLOAT_EQ(aabb1.inf().y(), infinity<float>);
-    EXPECT_FLOAT_EQ(aabb1.inf().z(), infinity<float>);
-    EXPECT_FLOAT_EQ(aabb1.sup().x(), -infinity<float>);
-    EXPECT_FLOAT_EQ(aabb1.sup().y(), -infinity<float>);
-    EXPECT_FLOAT_EQ(aabb1.sup().z(), -infinity<float>);
+    expectAABB3(aabb1, {infinity<float>, infinity<float>, infinity<float>},
+                {-infinity<float>, -infinity<float>, -infinity<float>});
 
     // Construct from 1 point.
     AABB3f aabb2{Vec3f{0.1F, 0.1F, 0.1F}};
-    EXPECT_FLOAT_EQ(aabb2.inf().x(), 0.1F);
-    EXPECT_FLOAT_EQ(aabb2.inf().y(), 0.1F);
-    EXPECT_FLOAT_EQ(aabb2.inf().z(), 0.1F);
-    EXPECT_FLOAT_EQ(aabb2.sup().x(), 0.1F);
-    EXPECT_FLOAT_EQ(aabb2.sup().y(), 0.1F);
-    EXPECT_FLOAT_EQ(aabb2.sup().z(), 0.1F);
+    expectAABB3(aabb2, {0.1F, 0.1F, 0.1F}, {0.1F, 0.1F, 0.1F});
 
     // Construct from 2 AABBs.
     AABB3f aabb3{Vec3f{0.01F, 0.01F, 0.01F}};
     AABB3f aabb4{aabb2, aabb3};
-    EXPECT_FLOAT_EQ(aabb4.inf().x(), 0.01F);
-    EXPECT_FLOAT_EQ(aabb4.inf().y(), 0.01F);
-    EXPECT_FLOAT_EQ(aabb4.inf().z(), 0.01F);
-    EXPECT_FLOAT_EQ(aabb4.sup().x(), 0.1F);
-    EXPECT_FLOAT_EQ(aabb4.sup().y(), 0.1F);
-    EXPECT_FLOAT_EQ(aabb4.sup().z(), 0.1F);
+    expectAABB3(aabb4, {0.01F, 0.01F, 0.01F}, {0.1F, 0.1F, 0.1F});
 
     // Construct from 1 AABB + 1 point.
     AABB3f aabb5{aabb4, Vec3f{0.001F, 0.001F, 0.001F}};
-    EXPECT_FLOAT_EQ(aabb5.inf().x(), 0.001F);
-    EXPECT_FLOAT_EQ(aabb5.inf().y(), 0.001F);
-    EXPECT_FLOAT_EQ(aabb5.inf().z(), 0.001F);
-    EXPECT_FLOAT_EQ(aabb5.sup().x(), 0.1F);
-    EXPECT_FLOAT_EQ(aabb5.sup().y(), 0.1F);
-    EXPECT_FLOAT_EQ(aabb5.sup().z(), 0.1F);
+    expectAABB3(aabb5, {0.001F, 0.001F, 0.001F}, {0.1F, 0.1F, 0.1F});
 
     // Construct from 3 AABBs.
     AABB3f aabb6{aabb5, aabb4, aabb3};
-    EXPECT_FLOAT_EQ(aabb6.inf().x(), 0.001F);
-    EXPECT_FLOAT_EQ(aabb6.inf().y(), 0.001F);
-    EXPECT_FLOAT_EQ(aabb6.inf().z(), 0.001F);
-    EXPECT_FLOAT_EQ(aabb6.sup().x(), 0.1F);
-    EXPECT_FLOAT_EQ(aabb6.sup().y(), 0.1F);
-    EXPECT_FLOAT_EQ(aabb6.sup().z(), 0.1F);
+    expectAABB3(aabb6, {0.001F, 0.001F, 0.001F}, {0.1F, 0.1F, 0.1F});
   }
 }
 
