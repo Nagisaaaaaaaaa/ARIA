@@ -1,11 +1,35 @@
 #pragma once
 
+/// \file
+/// \brief An axis-aligned bounding box (AABB) implementation.
+///
+/// `AABB` is implemented generically in dimension, thus can support
+/// physics systems with any dimensions, 1D, 2D, 3D, 4D, ...
+//
+//
+//
+//
+//
 #include "ARIA/ForEach.h"
 #include "ARIA/Math.h"
 #include "ARIA/Vec.h"
 
 namespace ARIA {
 
+/// \brief An axis-aligned bounding box (AABB) implementation.
+///
+/// \tparam d Dimension.
+///
+/// \example ```cpp
+/// // Create an `AABB`.
+/// AABB3r aabb{Vec3r{0, 4, 2}, Vec3r{3, 1, 5}};
+///
+/// // Get the infimum and supremum of the `AABB`.
+/// // See `Math.h` for the definition of `supremum` and `infimum`.
+/// Vec3r inf = aabb.inf();
+/// Vec3r sup = aabb.sup();
+/// ```
+///
 /// \note `AABB` is implemented with `Vec`, which internally uses `Eigen::Vector`.
 /// So, all functions are currently not `constexpr`.
 template <typename T, auto d>
@@ -54,7 +78,7 @@ public:
   ///
   /// \example ```cpp
   /// AABB3r aabb;
-  /// Vec3r& inf = aabb.inf();      // Get the `inf`.
+  /// Vec3r inf = aabb.inf();       // Get the `inf`.
   /// aabb.inf() = {1_R, 2_R, 3_R}; // Set the `inf`.
   /// ```
   ///
@@ -71,7 +95,7 @@ public:
   ///
   /// \example ```cpp
   /// AABB3r aabb;
-  /// Vec3r& sup = aabb.sup();      // Get the `sup`.
+  /// Vec3r sup = aabb.sup();       // Get the `sup`.
   /// aabb.sup() = {1_R, 2_R, 3_R}; // Set the `sup`.
   /// ```
   ///
@@ -89,8 +113,8 @@ public:
   /// Indices besides 0 or 1 are invalid.
   ///
   /// \example ```cpp
-  /// Vec3r& inf0 = aabb[0]; // Get the `inf`.
-  /// Vec3r& sup0 = aabb[1]; // Get the `sup`.
+  /// Vec3r inf0 = aabb[0]; // Get the `inf`.
+  /// Vec3r sup0 = aabb[1]; // Get the `sup`.
   /// ```
   [[nodiscard]] ARIA_HOST_DEVICE inline /*constexpr*/ const Vec<T, d> &operator[](uint i) const;
 
@@ -99,8 +123,8 @@ public:
   /// Indices besides 0 or 1 are invalid.
   ///
   /// \example ```cpp
-  /// Vec3r& inf0 = aabb[0]; // Get the `inf`.
-  /// Vec3r& sup0 = aabb[1]; // Get the `sup`.
+  /// Vec3r inf0 = aabb[0]; // Get the `inf`.
+  /// Vec3r sup0 = aabb[1]; // Get the `sup`.
   /// ```
   [[nodiscard]] ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> &operator[](uint i);
 
