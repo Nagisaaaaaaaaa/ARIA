@@ -11,14 +11,13 @@ namespace ARIA {
 template <typename T, auto d>
 class AABB final {
 public:
-  ARIA_HOST_DEVICE inline /*constexpr*/ AABB()
-      : infAndSup_{ConstructVecWithNEqualedValues(infinity<T>), ConstructVecWithNEqualedValues(-infinity<T>)} {}
+  ARIA_HOST_DEVICE inline /*constexpr*/ AABB();
 
   template <typename... Args>
     requires(sizeof...(Args) > 0 &&  // Size `> 0` to avoid conflict with the default constructor.
              (sizeof...(Args) > 1 || // If size `> 1`, safe. If size `== 1`, may conflict with the copy constructor.
               (!std::is_same_v<std::decay_t<Args>, AABB> && ...))) // So, requires that the argument type is not AABB.
-  ARIA_HOST_DEVICE inline /*constexpr*/ explicit AABB(Args &&...args) : AABB(unionized(std::forward<Args>(args)...)) {}
+  ARIA_HOST_DEVICE /*constexpr*/ explicit AABB(Args &&...args) : AABB(unionized(std::forward<Args>(args)...)) {}
 
   ARIA_COPY_MOVE_ABILITY(AABB, default, default);
   ~AABB() = default;
@@ -178,3 +177,5 @@ using AABB4d = AABB4<double>;
 using AABB4r = AABB4<Real>;
 
 } // namespace ARIA
+
+#include "ARIA/detail/AABB.inc"
