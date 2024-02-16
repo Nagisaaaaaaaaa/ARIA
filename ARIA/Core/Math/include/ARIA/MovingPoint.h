@@ -28,7 +28,7 @@ namespace ARIA {
 /// \tparam TOthers Other template parameters which have no relation with this concept.
 ///
 /// \example ```cpp
-/// template <typename T, auto dim, typename degree>
+/// template <typename T, auto dim, typename TDegree>
 /// class BezierCurve {
 /// public:
 ///   bool IsInDomain(const T &t) const { ... }
