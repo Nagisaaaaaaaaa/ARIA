@@ -6,6 +6,24 @@
 namespace ARIA {
 
 TEST(Math, Base) {
+  // Infinity, maximum, minimum, supremum, and infimum.
+  static_assert(infinity<float> == std::numeric_limits<float>::infinity());
+  static_assert(-infinity<float> == -std::numeric_limits<float>::infinity());
+
+  static_assert(maximum<float> == std::numeric_limits<float>::max());
+  static_assert(maximum<float> != infinity<float>);
+  static_assert(maximum<int> == std::numeric_limits<int>::max());
+
+  static_assert(minimum<float> == std::numeric_limits<float>::min());
+  static_assert(minimum<float> != -infinity<float>);
+  static_assert(minimum<int> == std::numeric_limits<int>::min());
+
+  static_assert(supremum<float> == infinity<float>);
+  static_assert(supremum<int> == maximum<int>);
+
+  static_assert(infimum<float> == -infinity<float>);
+  static_assert(infimum<int> == minimum<int>);
+
   // Constants.
   EXPECT_FLOAT_EQ(pi<float>, 3.14159265F);
   EXPECT_FLOAT_EQ(piInv<float>, 1.0F / 3.14159265F);
