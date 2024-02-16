@@ -84,9 +84,7 @@ ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::center() const {
 
 template <typename T, auto d>
 ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::offset(const Vec<T, d> &p) const {
-  Vec<T, d> o;
-  ForEach<d>([&]<auto i>() { o[i] = (p[i] - inf()[i]) / (sup()[i] - inf()[i]); });
-  return o;
+  return (p - inf()).cwiseQuotient(sup() - inf());
 }
 
 template <typename T, auto d>

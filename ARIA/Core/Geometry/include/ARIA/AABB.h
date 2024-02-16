@@ -115,6 +115,8 @@ public:
   /// by definition, it is also considered as non-empty.
   ARIA_HOST_DEVICE inline /*constexpr*/ bool empty() const;
 
+  /// \brief Unionize this `AABB` with the given `args`.
+  /// Equivalent to `thisAABB = AABB{thisAABB, ... /* Args here. */};
   template <typename... Args>
   ARIA_HOST_DEVICE inline /*constexpr*/ void Unionize(Args &&...args);
 
@@ -122,10 +124,16 @@ public:
   //
   //
 public:
+  /// \brief `center` of an `AABB` is defined as
+  /// `(inf() + sup()) / 2`.
   ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> center() const;
 
+  /// \brief `offset` of a given point in an `AABB` is defined as
+  /// `(p - inf()).cwiseQuotient(sup() - inf())`.
   ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> offset(const Vec<T, d> &p) const;
 
+  /// \brief `diagonal` of an `AABB` is defined as
+  /// `sup() - inf()`.
   ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> diagonal() const;
 
   //
