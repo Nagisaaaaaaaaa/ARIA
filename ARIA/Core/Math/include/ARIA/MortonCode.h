@@ -11,14 +11,14 @@
 namespace ARIA {
 
 template <std::integral I>
-[[nodiscard]] ARIA_HOST_DEVICE I MortonEncode(const Vec2<I> &coord) {
+[[nodiscard]] ARIA_HOST_DEVICE /*constexpr*/ I MortonEncode(const Vec2<I> &coord) {
   if constexpr (sizeof(I) == 4) {
     auto shift = [](I x) {
-      x &= I{0xFFFF};
-      x = (x | (x << 8)) & I{0x00FF00FF};
-      x = (x | (x << 4)) & I{0x0F0F0F0F};
-      x = (x | (x << 2)) & I{0x33333333};
-      x = (x | (x << 1)) & I{0x55555555};
+      x &= I{0xFFFFU};
+      x = (x | (x << 8)) & I{0x00FF00FFU};
+      x = (x | (x << 4)) & I{0x0F0F0F0FU};
+      x = (x | (x << 2)) & I{0x33333333U};
+      x = (x | (x << 1)) & I{0x55555555U};
       return x;
     };
     return shift(coord.x()) | (shift(coord.y()) << 1);
@@ -34,18 +34,18 @@ template <std::integral I>
     };
     return shift(coord.x()) | (shift(coord.y()) << 1);
   } else
-    ARIA_STATIC_ASSERT_FALSE("Type of the coord to be encoded is currently not supported");
+    ARIA_STATIC_ASSERT_FALSE("Type of the coord elements to be encoded is currently not supported");
 }
 
 template <std::integral I>
-[[nodiscard]] ARIA_HOST_DEVICE I MortonEncode(const Vec3<I> &coord) {
+[[nodiscard]] ARIA_HOST_DEVICE /*constexpr*/ I MortonEncode(const Vec3<I> &coord) {
   if constexpr (sizeof(I) == 4) {
     auto shift = [](I x) {
-      x &= I{0x3FF};
-      x = (x | x << 16) & I{0x30000FF};
-      x = (x | x << 8) & I{0x300F00F};
-      x = (x | x << 4) & I{0x30C30C3};
-      x = (x | x << 2) & I{0x9249249};
+      x &= I{0x3FFU};
+      x = (x | x << 16) & I{0x30000FFU};
+      x = (x | x << 8) & I{0x300F00FU};
+      x = (x | x << 4) & I{0x30C30C3U};
+      x = (x | x << 2) & I{0x9249249U};
       return x;
     };
     return shift(coord.x()) | (shift(coord.y()) << 1) | (shift(coord.z()) << 2);
@@ -62,19 +62,19 @@ template <std::integral I>
     return shift(coord.x()) | (shift(coord.y()) << 1) | (shift(coord.z()) << 2);
   } /* else if constexpr (sizeof(I) == 16) {
      auto shift = [](I x) {
-       x &= I{0X3FFFFFFFFFFLLU};
-       x = (x | x << 64) & I{0x3FF0000000000000000FFFFFFFFLLU};
-       x = (x | x << 32) & I{0x3FF00000000FFFF00000000FFFFLLU};
-       x = (x | x << 16) & I{0x30000FF0000FF0000FF0000FF0000FFLLU};
-       x = (x | x << 8) & I{0x300F00F00F00F00F00F00F00F00F00FLLU};
-       x = (x | x << 4) & I{0x30C30C30C30C30C30C30C30C30C30C3LLU};
-       x = (x | x << 2) & I{0x9249249249249249249249249249249LLU};
+       x &= I{0X3FFFFFFFFFFLLLU};
+       x = (x | x << 64) & I{0x3FF0000000000000000FFFFFFFFLLLU};
+       x = (x | x << 32) & I{0x3FF00000000FFFF00000000FFFFLLLU};
+       x = (x | x << 16) & I{0x30000FF0000FF0000FF0000FF0000FFLLLU};
+       x = (x | x << 8) & I{0x300F00F00F00F00F00F00F00F00F00FLLLU};
+       x = (x | x << 4) & I{0x30C30C30C30C30C30C30C30C30C30C3LLLU};
+       x = (x | x << 2) & I{0x9249249249249249249249249249249LLLU};
        return x;
      };
      return shift(coord.x()) | (shift(coord.y()) << 1) | (shift(coord.z()) << 2);
    }*/
   else
-    ARIA_STATIC_ASSERT_FALSE("Type of the coord to be encoded is currently not supported");
+    ARIA_STATIC_ASSERT_FALSE("Type of the coord elements to be encoded is currently not supported");
 }
 
 } // namespace ARIA
