@@ -44,9 +44,40 @@ TEST(AABB, Base) {
     AABB2f aabb5{aabb4, Vec2f{0.001F, 0.001F}};
     expectAABB2(aabb5, {0.001F, 0.001F}, {0.1F, 0.1F});
 
-    // Construct from 3 AABBs.
-    AABB2f aabb6{aabb5, aabb4, aabb3};
-    expectAABB2(aabb6, {0.001F, 0.001F}, {0.1F, 0.1F});
+    // Construct from 3 items.
+    Vec2f point{0.001F, 0.001F};
+    {
+      AABB2f aabb{aabb5, aabb4, aabb3};
+      expectAABB2(aabb, {0.001F, 0.001F}, {0.1F, 0.1F});
+    }
+    {
+      AABB2f aabb{aabb5, aabb4, point};
+      expectAABB2(aabb, {0.001F, 0.001F}, {0.1F, 0.1F});
+    }
+    {
+      AABB2f aabb{aabb5, point, aabb3};
+      expectAABB2(aabb, {0.001F, 0.001F}, {0.1F, 0.1F});
+    }
+    {
+      AABB2f aabb{aabb5, point, point};
+      expectAABB2(aabb, {0.001F, 0.001F}, {0.1F, 0.1F});
+    }
+    {
+      AABB2f aabb{point, aabb4, aabb3};
+      expectAABB2(aabb, {0.001F, 0.001F}, {0.1F, 0.1F});
+    }
+    {
+      AABB2f aabb{point, aabb4, point};
+      expectAABB2(aabb, {0.001F, 0.001F}, {0.1F, 0.1F});
+    }
+    {
+      AABB2f aabb{point, point, aabb3};
+      expectAABB2(aabb, {0.001F, 0.001F}, {0.01F, 0.01F});
+    }
+    {
+      AABB2f aabb{point, point, point};
+      expectAABB2(aabb, {0.001F, 0.001F}, {0.001F, 0.001F});
+    }
   }
 
   // 3D.
@@ -74,9 +105,40 @@ TEST(AABB, Base) {
     AABB3f aabb5{aabb4, Vec3f{0.001F, 0.001F, 0.001F}};
     expectAABB3(aabb5, {0.001F, 0.001F, 0.001F}, {0.1F, 0.1F, 0.1F});
 
-    // Construct from 3 AABBs.
-    AABB3f aabb6{aabb5, aabb4, aabb3};
-    expectAABB3(aabb6, {0.001F, 0.001F, 0.001F}, {0.1F, 0.1F, 0.1F});
+    // Construct from 3 items.
+    Vec3f point{0.001F, 0.001F, 0.001F};
+    {
+      AABB3f aabb{aabb5, aabb4, aabb3};
+      expectAABB3(aabb, {0.001F, 0.001F, 0.001F}, {0.1F, 0.1F, 0.1F});
+    }
+    {
+      AABB3f aabb{aabb5, aabb4, point};
+      expectAABB3(aabb, {0.001F, 0.001F, 0.001F}, {0.1F, 0.1F, 0.1F});
+    }
+    {
+      AABB3f aabb{aabb5, point, aabb3};
+      expectAABB3(aabb, {0.001F, 0.001F, 0.001F}, {0.1F, 0.1F, 0.1F});
+    }
+    {
+      AABB3f aabb{aabb5, point, point};
+      expectAABB3(aabb, {0.001F, 0.001F, 0.001F}, {0.1F, 0.1F, 0.1F});
+    }
+    {
+      AABB3f aabb{point, aabb4, aabb3};
+      expectAABB3(aabb, {0.001F, 0.001F, 0.001F}, {0.1F, 0.1F, 0.1F});
+    }
+    {
+      AABB3f aabb{point, aabb4, point};
+      expectAABB3(aabb, {0.001F, 0.001F, 0.001F}, {0.1F, 0.1F, 0.1F});
+    }
+    {
+      AABB3f aabb{point, point, aabb3};
+      expectAABB3(aabb, {0.001F, 0.001F, 0.001F}, {0.01F, 0.01F, 0.01F});
+    }
+    {
+      AABB3f aabb{point, point, point};
+      expectAABB3(aabb, {0.001F, 0.001F, 0.001F}, {0.001F, 0.001F, 0.001F});
+    }
   }
 }
 
