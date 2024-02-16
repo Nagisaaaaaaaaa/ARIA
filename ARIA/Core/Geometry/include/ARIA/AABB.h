@@ -8,6 +8,7 @@ namespace ARIA {
 
 /// \note `AABB` is implemented with `Vec`, which internally uses `Eigen::Vector`.
 /// So, all functions are currently not `constexpr`.
+// TODO: change s to d.
 template <typename T, auto s>
 class AABB final {
 public:
@@ -18,9 +19,7 @@ public:
     requires(sizeof...(Args) > 0 &&  // Size `> 0` to avoid conflict with the default constructor.
              (sizeof...(Args) > 1 || // If size `> 1`, safe. If size `== 1`, may conflict with the copy constructor.
               (!std::is_same_v<std::decay_t<Args>, AABB> && ...))) // So, requires that the argument type is not AABB.
-  ARIA_HOST_DEVICE inline /*constexpr*/ explicit AABB(Args &&...args) : AABB() {
-    Unionize(std::forward<Args>(args)...);
-  }
+  ARIA_HOST_DEVICE inline /*constexpr*/ explicit AABB(Args &&...args) : AABB(unionized(std::forward<Args>(args)...)) {}
 
   ARIA_COPY_MOVE_ABILITY(AABB, default, default);
   ~AABB() = default;
@@ -31,7 +30,7 @@ public:
 
 public:
   /// \warning If the `AABB` is constructed with only one point,
-  /// it is considered as non-empty.
+  /// it is also considered as non-empty.
   ARIA_HOST_DEVICE inline /*constexpr*/ bool empty() const {
     bool res = false;
 
@@ -65,7 +64,7 @@ public:
     //!
     //! Here, it is important to optimize for the first argument.
     //! 1. If the first argument is an `AABB`,
-    //!    directly set it to `res`, and call `unionizedOne` with the remaining arguments.
+    //!    directly set `res` to it, and call `unionizedOne` with the remaining arguments.
     //! 2. If the first argument is a `Vec`,
     //!    directly set `inf` and `sup` of `res` to the `Vec`, and call `unionizedOne` with the remaining arguments.
     //!
@@ -74,17 +73,21 @@ public:
     //! no computation will be performed.
     auto unionizedImpl =
         Overload{[&]<typename... Ts>(const AABB &t0, Ts &&...ts) { // If the first argument is an `AABB`.
+      // Directly set `res` to it.
       AABB res = t0;
 
+      // Call `unionizedOne` with the remaining arguments.
       auto unionizeOne = [&](const auto &b) { res = unionizedOne(res, b); };
       (unionizeOne(ts), ...);
 
       return res;
     }, [&]<typename... Ts>(const Vec<T, s> &t0, Ts &&...ts) { // If the first argument is a `Vec`.
+      // Directly set `inf` and `sup` of `res` to the `Vec`.
       AABB res;
       res.inf() = t0;
       res.sup() = t0;
 
+      // Call `unionizedOne` with the remaining arguments.
       auto unionizeOne = [&](const auto &b) { res = unionizedOne(res, b); };
       (unionizeOne(ts), ...);
 
