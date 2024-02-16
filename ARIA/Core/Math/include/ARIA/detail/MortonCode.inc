@@ -15,7 +15,7 @@ namespace ARIA {
 //
 //
 template <std::integral I>
-[[nodiscard]] static ARIA_HOST_DEVICE /*constexpr*/ I MortonCode<2>::Encode(const Vec2<I> &coord) {
+[[nodiscard]] static ARIA_HOST_DEVICE inline constexpr I MortonCode<2>::Encode(const Vec2<I> &coord) {
   if constexpr (sizeof(I) == 4) {
     auto shift = [](I x) {
       x &= I{0xFFFFU};
@@ -47,7 +47,7 @@ template <std::integral I>
 //
 //
 template <std::integral I>
-[[nodiscard]] static ARIA_HOST_DEVICE /*constexpr*/ I MortonCode<3>::Encode(const Vec3<I> &coord) {
+[[nodiscard]] static ARIA_HOST_DEVICE inline constexpr I MortonCode<3>::Encode(const Vec3<I> &coord) {
   if constexpr (sizeof(I) == 4) {
     auto shift = [](I x) {
       x &= I{0x3FFU};
