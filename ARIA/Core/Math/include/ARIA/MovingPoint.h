@@ -43,8 +43,6 @@ namespace ARIA {
 /// \tparam TMovingPoint A template, whose template parameters will
 /// be substituted with `TValue`, `dim`, and `TOthers...`.
 /// \tparam dim Dimension of the moving point.
-/// Note that if homogeneous coordinate is used, for example, (x, y, z, w).
-/// `dim` should still be `3` at this time.
 /// \tparam TOthers Other template parameters which have no relation with this concept.
 ///
 /// \example ```cpp
