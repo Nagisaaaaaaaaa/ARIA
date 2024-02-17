@@ -373,9 +373,9 @@ public:
 public:
   [[nodiscard]] constexpr TStaticLayout layout() const { return {}; }
 
-  [[nodiscard]] constexpr const auto &tensor() const { return tensor_; }
+  [[nodiscard]] constexpr decltype(auto) tensor() const { return cute::make_tensor(tensor_.data(), layout()); }
 
-  [[nodiscard]] constexpr auto &tensor() { return tensor_; }
+  [[nodiscard]] constexpr decltype(auto) tensor() { return cute::make_tensor(tensor_.data(), layout()); }
 
 private:
   Tensor tensor_;
