@@ -111,7 +111,7 @@ public:
     };
 
     const uint degree = nCPs - 1;
-    VecDim pos = VecCP::Zero();
+    VecDim pos = VecDim::Zero();
 
     // Directly compute the Bernstein polynomials.
     for (uint i = 0; i < nCPs; ++i) {
