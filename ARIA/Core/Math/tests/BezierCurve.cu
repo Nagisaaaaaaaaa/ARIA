@@ -1,10 +1,50 @@
 #include "ARIA/BezierCurve.h"
+#include "ARIA/Launcher.h"
 #include "ARIA/TensorVector.h"
 
 #include <gtest/gtest.h>
 #include <span>
 
 namespace ARIA {
+
+namespace {
+
+template <typename TBezier>
+void ExpectSphereCUDA3D(const TBezier &bezier) {
+  thrust::device_vector<int> successD(1);
+  successD[0] = 1;
+
+  Launcher(100, [=, success = successD.data()] ARIA_DEVICE(int i) {
+    float t = static_cast<float>(i) / static_cast<float>(99);
+    Vec3f pHomo = bezier(t);
+    Vec2f p = Vec2f(pHomo.x(), pHomo.y()) / pHomo.z();
+    if (std::abs(p.norm() - 1) > 0.0001F)
+      success[0] = 0;
+  }).Launch();
+
+  cuda::device::current::get().synchronize();
+
+  EXPECT_TRUE(successD[0] == 1);
+}
+
+template <typename TBezier>
+void ExpectSphereCUDA2D(const TBezier &bezier) {
+  thrust::device_vector<int> successD(1);
+  successD[0] = 1;
+
+  Launcher(100, [=, success = successD.data()] ARIA_DEVICE(int i) {
+    float t = static_cast<float>(i) / static_cast<float>(99);
+    Vec2f p = bezier(t);
+    if (std::abs(p.norm() - 1) > 0.0001F)
+      success[0] = 0;
+  }).Launch();
+
+  cuda::device::current::get().synchronize();
+
+  EXPECT_TRUE(successD[0] == 1);
+}
+
+} // namespace
 
 TEST(BezierCurve, Base) {
   static_assert(MovingPoint<BezierCurve, float, 1, NonRational, DegreeDynamic, std::vector<Vec1f>>);
@@ -115,6 +155,7 @@ TEST(BezierCurve, NonRational3D) {
       BezierCurve<float, 3, NonRational, Degree<2>, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
           controlPoints.tensor()};
       expectSphere(bezier1);
+      ExpectSphereCUDA3D(bezier1);
     }
 
     // Device + dynamic.
@@ -128,6 +169,7 @@ TEST(BezierCurve, NonRational3D) {
       BezierCurve<float, 3, NonRational, Degree<2>, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
           controlPoints.tensor()};
       expectSphere(bezier1);
+      ExpectSphereCUDA3D(bezier1);
     }
   }
 
@@ -205,6 +247,7 @@ TEST(BezierCurve, NonRational3D) {
       BezierCurve<float, 3, NonRational, DegreeDynamic, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
           controlPoints.tensor()};
       expectSphere(bezier1);
+      ExpectSphereCUDA3D(bezier1);
     }
 
     // Device + dynamic.
@@ -218,6 +261,7 @@ TEST(BezierCurve, NonRational3D) {
       BezierCurve<float, 3, NonRational, DegreeDynamic, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
           controlPoints.tensor()};
       expectSphere(bezier1);
+      ExpectSphereCUDA3D(bezier1);
     }
   }
 }
@@ -304,6 +348,7 @@ TEST(BezierCurve, Rational2D) {
       BezierCurve<float, 2, Rational, Degree<2>, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
           controlPoints.tensor()};
       expectSphere(bezier1);
+      ExpectSphereCUDA2D(bezier1);
     }
 
     // Device + dynamic.
@@ -317,6 +362,7 @@ TEST(BezierCurve, Rational2D) {
       BezierCurve<float, 2, Rational, Degree<2>, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
           controlPoints.tensor()};
       expectSphere(bezier1);
+      ExpectSphereCUDA2D(bezier1);
     }
   }
 
@@ -394,6 +440,7 @@ TEST(BezierCurve, Rational2D) {
       BezierCurve<float, 2, Rational, DegreeDynamic, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
           controlPoints.tensor()};
       expectSphere(bezier1);
+      ExpectSphereCUDA2D(bezier1);
     }
 
     // Device + dynamic.
@@ -407,6 +454,7 @@ TEST(BezierCurve, Rational2D) {
       BezierCurve<float, 2, Rational, DegreeDynamic, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
           controlPoints.tensor()};
       expectSphere(bezier1);
+      ExpectSphereCUDA2D(bezier1);
     }
   }
 }
