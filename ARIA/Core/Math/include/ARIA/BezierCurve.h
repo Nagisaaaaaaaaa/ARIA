@@ -9,26 +9,25 @@
 //
 //
 //
-#include "ARIA/Constant.h"
+#include "ARIA/Curve.h"
 #include "ARIA/ForEach.h"
 #include "ARIA/Math.h"
-#include "ARIA/MovingPoint.h"
 #include "ARIA/SmallVector.h"
 
 namespace ARIA {
 
-struct DegreeDynamic {};
-
-template <uint v>
-using Degree = C<v>;
-
-struct NonRational {};
-
-struct Rational {};
-
-//
-//
-//
+/// \brief A policy-based Bezier curve implementation.
+///
+/// \tparam T Type to discretize the curve, you may want to use `float`, `double`, or `Real`.
+/// \tparam dim Dimension of the `BezierCurve`.
+/// Note that if homogeneous coordinate is used, for example, (x, y, z, w).
+/// `dim` should still be `3` at this time.
+/// \tparam RationalOrNot Whether the `BezierCurve` is rational or not.
+/// For example `dim` equals to `3` and this parameter is set to `Rational`,
+/// then homogeneous coordinate (x, y, z, w) will be used.
+/// \tparam TDegree Degree of the curve, can to be determined at compile-time or at runtime.
+/// \tparam TControlPoints Type of the control points used to define the `BezierCurve`.
+/// Define an owning `BezierCurve` by entering `std::vector`, `std::array`.
 template <typename T, auto dim, typename RationalOrNot, typename TDegree, typename TControlPoints>
 class BezierCurve;
 
@@ -170,5 +169,14 @@ public:
 private:
   TControlPoints controlPoints_;
 };
+
+//
+//
+//
+template <typename T, auto dim, typename TDegree, typename TControlPoints>
+using BezierCurveNonRational = BezierCurve<T, dim, NonRational, TDegree, TControlPoints>;
+
+template <typename T, auto dim, typename TDegree, typename TControlPoints>
+using BezierCurveRational = BezierCurve<T, dim, Rational, TDegree, TControlPoints>;
 
 } // namespace ARIA
