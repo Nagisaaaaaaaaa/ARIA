@@ -119,7 +119,7 @@ public:
 
 #if ARIA_IS_HOST_CODE
     // Apply the deCasteljau algorithm, 1997, The NURBS Book, 24.
-    SmallVector<VecCP, 10> temp(nCPs);
+    small_vector<VecCP, 8> temp(nCPs); //! Local buffer optimization for degrees <= 7.
 
     for (uint i = 0; i < nCPs; ++i)
       temp[i] = controlPoints()[i];
