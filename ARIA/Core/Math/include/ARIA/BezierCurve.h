@@ -63,7 +63,37 @@ namespace ARIA {
 /// bool isInDomain = bezier.IsInDomain(t);
 ///
 /// // Get position of the curve at `t`.
-/// Vec3f position = bezier(t);
+/// Vec3r position = bezier(t);
+/// ```
+///
+/// ```cpp
+/// // Define type of the control points.
+/// using ControlPoints = std::vector<Vec3r>;
+///
+/// // Define type of the Bezier curve:
+/// // 1. Use `Real` to discrete the curve.
+/// // 2. Dimension equals to 2.
+/// // 3. Rational.
+/// // 4. Degree is determined at runtime.
+/// // 5. Specify type of the control points.
+/// using Bezier = BezierCurve<Real, 2, Rational, DegreeDynamic, ControlPoints>;
+///
+/// // Create control points and the Bezier curve.
+/// // Note, since the curve is defined as rational,
+/// // The following control points are in homogeneous coordinate.
+/// ControlPoints controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+/// Bezier bezier{controlPoints};
+///
+/// // We are to evaluate the curve at `t`.
+/// Real t = 0.1_R;
+///
+/// // Whether `t` is in the domain of the curve (For any Bezier curves, in [0, 1]).
+/// bool isInDomain = bezier.IsInDomain(t);
+///
+/// // Get position of the curve at `t`.
+/// // Note, since the curve is defined as 2D,
+/// // the evaluation result is `Vec2r`.
+/// Vec2r position = bezier(t);
 /// ```
 template <typename T, auto dim, typename RationalOrNot, typename TDegree, typename TControlPoints>
 class BezierCurve;
