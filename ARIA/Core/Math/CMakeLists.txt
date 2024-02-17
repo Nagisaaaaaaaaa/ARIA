@@ -18,6 +18,7 @@ if (Eigen_ADDED)
 endif ()
 
 set(core_math_headers
+    ARIA/BezierCurve.h
     ARIA/Mat.h
     ARIA/Math.h
     ARIA/MortonCode.h

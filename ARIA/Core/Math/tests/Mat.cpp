@@ -15,6 +15,12 @@ public:
 
 TEST(Mat, Base) {
   {
+    static_assert(sizeof(Mat1i) == 1 * 1 * sizeof(int));
+    static_assert(sizeof(Mat1u) == 1 * 1 * sizeof(uint));
+    static_assert(sizeof(Mat1f) == 1 * 1 * sizeof(float));
+    static_assert(sizeof(Mat1d) == 1 * 1 * sizeof(double));
+    static_assert(sizeof(Mat1r) == 1 * 1 * sizeof(Real));
+
     static_assert(sizeof(Mat2i) == 2 * 2 * sizeof(int));
     static_assert(sizeof(Mat2u) == 2 * 2 * sizeof(uint));
     static_assert(sizeof(Mat2f) == 2 * 2 * sizeof(float));

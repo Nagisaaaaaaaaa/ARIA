@@ -24,11 +24,19 @@ using Mat = mat::detail::Mat<T, row, col>;
 //
 //
 template <typename T>
+using Mat1 = Mat<T, 1, 1>;
+template <typename T>
 using Mat2 = Mat<T, 2, 2>;
 template <typename T>
 using Mat3 = Mat<T, 3, 3>;
 template <typename T>
 using Mat4 = Mat<T, 4, 4>;
+
+using Mat1i = Mat1<int>;
+using Mat1u = Mat1<uint>;
+using Mat1f = Mat1<float>;
+using Mat1d = Mat1<double>;
+using Mat1r = Mat1<Real>;
 
 using Mat2i = Mat2<int>;
 using Mat2u = Mat2<uint>;

@@ -9,7 +9,7 @@ namespace {
 template <typename I>
 void TestMortonEncode1D() {
   using Code = MortonCode<1>;
-  using V = I;
+  using V = Vec1<I>;
 
   EXPECT_EQ(Code::Encode(V{0}), 0);
   EXPECT_EQ(Code::Encode(V{1}), 1);
