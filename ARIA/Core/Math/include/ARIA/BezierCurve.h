@@ -33,6 +33,8 @@ private:
   // `CP` is an abbreviation of "control point".
   using VecDim = Vec<T, dim>;
   using VecCP = std::conditional_t<rational, Vec<T, dim + 1>, VecDim>;
+  static_assert(std::is_same_v<VecCP, std::decay_t<decltype(std::declval<TControlPoints>()[0])>>,
+                "Type of control points does not match the dimension and rationality");
 
 public:
   ARIA_HOST_DEVICE explicit BezierCurve(const TControlPoints &controlPoints) : controlPoints_(controlPoints) {}
@@ -83,6 +85,8 @@ private:
   // `CP` is an abbreviation of "control point".
   using VecDim = Vec<T, dim>;
   using VecCP = std::conditional_t<rational, Vec<T, dim + 1>, VecDim>;
+  static_assert(std::is_same_v<VecCP, std::decay_t<decltype(std::declval<TControlPoints>()[0])>>,
+                "Type of control points does not match the dimension and rationality");
 
 public:
   ARIA_HOST_DEVICE explicit BezierCurve(const TControlPoints &controlPoints) : controlPoints_(controlPoints) {}
