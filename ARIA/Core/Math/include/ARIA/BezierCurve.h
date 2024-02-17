@@ -57,12 +57,12 @@ public:
       ForEach<degree - round + 1>([&]<auto i>() { temp[i] = Lerp(temp[i], temp[i + 1], t); });
     });
 
-    VecDim position;
+    VecDim pos;
     if constexpr (rational)
-      position = temp[0].block<dim, 1>(0, 0) / temp[0][dim];
+      pos = temp[0].block<dim, 1>(0, 0) / temp[0][dim];
     else
-      position = temp[0];
-    return position;
+      pos = temp[0];
+    return pos;
   }
 
 private:
@@ -96,11 +96,8 @@ public:
   [[nodiscard]] ARIA_HOST_DEVICE constexpr bool IsInDomain(const T &t) const { return T{0} <= t && t <= T{1}; }
 
   [[nodiscard]] ARIA_HOST_DEVICE VecDim operator()(const T &t) const {
+#if ARIA_IS_HOST_CODE
     ARIA_ASSERT(IsInDomain(t));
-
-    if (controlPoints().empty()) {
-      return VecDim::Zero();
-    }
 
     const uint nCPs = controlPoints().size();
     const uint degree = nCPs - 1;
@@ -114,14 +111,36 @@ public:
       for (uint i = 0; i <= degree - round; ++i)
         temp[i] = Lerp(temp[i], temp[i + 1], t);
 
-    VecDim position;
+    VecDim pos;
     if constexpr (rational)
-      position = temp[0].block<dim, 1>(0, 0) / temp[0][dim];
+      pos = temp[0].block<dim, 1>(0, 0) / temp[0][dim];
     else
-      position = temp[0];
-    return position;
+      pos = temp[0];
+    return pos;
+#else
+    VecCP posHomo = VecCP::Zero();
 
-    // TODO: Implement a GPU version.
+    for (uint i = 0; i <= degree; ++i) {
+      T blend = T{1};
+      T oneMinusT = T{1} - t;
+
+      for (uint j = 0; j < i; ++j) {
+        blend *= oneMinusT;
+      }
+      for (uint j = i + 1; j <= degree; ++j) {
+        blend *= t;
+      }
+
+      posHomo += controlPoints()[i] * blend;
+    }
+
+    VecDim pos;
+    if constexpr (rational)
+      pos = posHomo.block<dim, 1>(0, 0) / posHomo[dim];
+    else
+      pos = posHomo;
+    return pos;
+#endif
   }
 
 private:
