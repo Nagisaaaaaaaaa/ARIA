@@ -14,6 +14,8 @@
 #include "ARIA/Math.h"
 #include "ARIA/MovingPoint.h"
 
+#include <SmallVector.h>
+
 namespace ARIA {
 
 struct DegreeDynamic {};
@@ -118,7 +120,7 @@ public:
 
 #if ARIA_IS_HOST_CODE
     // Apply the deCasteljau algorithm, 1997, The NURBS Book, 24.
-    std::vector<VecCP> temp(nCPs); // TODO: Optimize this line.
+    llvm_vecsmall::SmallVector<VecCP, 10> temp(nCPs);
 
     for (uint i = 0; i < nCPs; ++i)
       temp[i] = controlPoints()[i];

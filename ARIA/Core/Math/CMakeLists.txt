@@ -17,6 +17,15 @@ if (Eigen_ADDED)
   set(EIGEN3_INCLUDE_DIR "${Eigen_SOURCE_DIR}/Eigen/Eigen")
 endif ()
 
+CPMAddPackage(
+    NAME SmallVector
+    GITHUB_REPOSITORY thelink2012/SmallVector
+    GIT_TAG master
+    DOWNLOAD_ONLY YES
+)
+add_library(SmallVector INTERFACE IMPORTED)
+target_include_directories(SmallVector INTERFACE ${SmallVector_SOURCE_DIR})
+
 set(core_math_headers
     ARIA/BezierCurve.h
     ARIA/Mat.h
@@ -37,5 +46,6 @@ aria_add_module(
     HARD_DEPENDENCIES
     ARIA::Core::Core
     Eigen3::Eigen
+    SmallVector
     CMAKE_SUBDIRS tests
 )
