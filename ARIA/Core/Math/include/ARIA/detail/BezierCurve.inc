@@ -96,6 +96,7 @@ public:
 
     // `CP` is an abbreviation of "control point".
     const uint nCPs = controlPoints().size();
+    ARIA_ASSERT(nCPs > 0, "Number of control points should not equal to 0");
 
 #if ARIA_IS_HOST_CODE
     // Apply the deCasteljau algorithm, 1997, The NURBS Book, 24.
