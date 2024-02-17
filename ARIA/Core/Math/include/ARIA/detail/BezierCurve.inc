@@ -2,11 +2,13 @@
 
 namespace ARIA {
 
+// Specialization for compile-time degrees.
 template <typename T, auto dim, typename RationalOrNot, uint degree, typename TControlPoints>
 class BezierCurve<T, dim, RationalOrNot, Degree<degree>, TControlPoints> {
 public:
   using value_type = T;
 
+  /// \brief Whether the `BezierCurve` is rational.
   static constexpr bool rational = std::is_same_v<RationalOrNot, Rational>;
 
 private:
@@ -57,11 +59,13 @@ private:
 //
 //
 //
+// Specialization for runtime degrees.
 template <typename T, auto dim, typename RationalOrNot, typename TControlPoints>
 class BezierCurve<T, dim, RationalOrNot, DegreeDynamic, TControlPoints> {
 public:
   using value_type = T;
 
+  /// \brief Whether the `BezierCurve` is rational.
   static constexpr bool rational = std::is_same_v<RationalOrNot, Rational>;
 
 private:
