@@ -57,7 +57,7 @@ public:
     ForEach<nCPs>([&]<auto i>() { temp[i] = controlPoints()[i]; });
     ForEach<degree>([&]<auto _r>() {
       constexpr auto round = _r + 1;
-      ForEach<degree - round + 1>([&]<auto i>() { temp[i] = Lerp(temp[i], temp[i + 1], t); });
+      ForEach<nCPs - round>([&]<auto i>() { temp[i] = Lerp(temp[i], temp[i + 1], t); });
     });
 
     VecDim pos;
@@ -104,7 +104,6 @@ public:
     ARIA_ASSERT(IsInDomain(t));
 
     const uint nCPs = controlPoints().size();
-    const uint degree = nCPs - 1;
 
 #if ARIA_IS_HOST_CODE
     // Apply the deCasteljau algorithm, 1997, The NURBS Book, 24.
@@ -112,8 +111,8 @@ public:
 
     for (uint i = 0; i < nCPs; ++i)
       temp[i] = controlPoints()[i];
-    for (uint round = 1; round <= degree; ++round)
-      for (uint i = 0; i <= degree - round; ++i)
+    for (uint round = 1; round < nCPs; ++round)
+      for (uint i = 0; i < nCPs - round; ++i)
         temp[i] = Lerp(temp[i], temp[i + 1], t);
 
     VecDim pos;
@@ -123,20 +122,26 @@ public:
       pos = temp[0];
     return pos;
 #else
+    // Compute the combinations.
+    // See https://stackoverflow.com/questions/11809502/which-is-better-way-to-calculate-ncr.
+    auto nCr = [](uint n, uint r) {
+      if (r > n - r)
+        r = n - r; // Because C(n, r) == C(n, n - r).
+
+      uint res = 1;
+      for (uint i = 1; i <= r; i++) {
+        res *= n - r + i;
+        res /= i;
+      }
+
+      return res;
+    };
+
+    const uint degree = nCPs - 1;
     VecCP posHomo = VecCP::Zero();
 
-    for (uint i = 0; i <= degree; ++i) {
-      T blend = T{1};
-      T oneMinusT = T{1} - t;
-
-      for (uint j = 0; j < i; ++j) {
-        blend *= oneMinusT;
-      }
-      for (uint j = i + 1; j <= degree; ++j) {
-        blend *= t;
-      }
-
-      posHomo += controlPoints()[i] * blend;
+    for (uint i = 0; i < nCPs; ++i) {
+      posHomo += controlPoints()[i] * nCr(degree, i) * pow(1 - t, degree - i) * pow(t, i);
     }
 
     VecDim pos;
