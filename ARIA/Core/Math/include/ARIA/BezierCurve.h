@@ -2,6 +2,7 @@
 
 #include "ARIA/Constant.h"
 #include "ARIA/ForEach.h"
+#include "ARIA/Math.h"
 #include "ARIA/MovingPoint.h"
 
 namespace ARIA {
@@ -55,7 +56,7 @@ public:
 
     ForEach<nCPs>([&]<auto i>() { temp[i] = controlPoints()[i]; });
     ForEach<degree>([&]<auto _r>() {
-      auto round = _r + 1;
+      constexpr auto round = _r + 1;
       ForEach<degree - round + 1>([&]<auto i>() { temp[i] = Lerp(temp[i], temp[i + 1], t); });
     });
 
