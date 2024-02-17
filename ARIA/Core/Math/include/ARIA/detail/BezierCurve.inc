@@ -59,6 +59,8 @@ private:
 //
 //
 //
+//
+//
 // Specialization for runtime degrees.
 template <typename T, auto dim, typename TControlPoints>
 class BezierCurve<T, dim, DegreeDynamic, TControlPoints> {
