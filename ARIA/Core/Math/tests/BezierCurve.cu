@@ -70,6 +70,16 @@ TEST(BezierCurve, Base) {
   static_assert(MovingPoint<BezierCurve, float, 1, Rational, Degree<3>, std::vector<Vec2f>>);
   static_assert(MovingPoint<BezierCurve, float, 2, Rational, Degree<3>, std::vector<Vec3f>>);
   static_assert(MovingPoint<BezierCurve, float, 3, Rational, Degree<3>, std::vector<Vec4f>>);
+
+  std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+  BezierCurve<float, 3, NonRational, Degree<2>, std::vector<Vec3f>> bezier{controlPoints};
+
+  static_assert(bezier.IsInDomain(0));
+  static_assert(bezier.IsInDomain(1));
+  static_assert(bezier.IsInDomain(0.1));
+  static_assert(bezier.IsInDomain(0.9));
+  static_assert(!bezier.IsInDomain(1.0001));
+  static_assert(!bezier.IsInDomain(-0.0001));
 }
 
 TEST(BezierCurve, NonRational3D) {
