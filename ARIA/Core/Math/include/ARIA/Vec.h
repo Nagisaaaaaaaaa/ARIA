@@ -24,11 +24,19 @@ using Vec = Eigen::Vector<T, s>;
 //
 //
 template <typename T>
+using Vec1 = Vec<T, 1>;
+template <typename T>
 using Vec2 = Vec<T, 2>;
 template <typename T>
 using Vec3 = Vec<T, 3>;
 template <typename T>
 using Vec4 = Vec<T, 4>;
+
+using Vec1i = Vec1<int>;
+using Vec1u = Vec1<uint>;
+using Vec1f = Vec1<float>;
+using Vec1d = Vec1<double>;
+using Vec1r = Vec1<Real>;
 
 using Vec2i = Vec2<int>;
 using Vec2u = Vec2<uint>;

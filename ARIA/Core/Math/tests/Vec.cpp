@@ -15,6 +15,12 @@ public:
 
 TEST(Vec, Base) {
   {
+    static_assert(sizeof(Vec1i) == 1 * sizeof(int));
+    static_assert(sizeof(Vec1u) == 1 * sizeof(uint));
+    static_assert(sizeof(Vec1f) == 1 * sizeof(float));
+    static_assert(sizeof(Vec1d) == 1 * sizeof(double));
+    static_assert(sizeof(Vec1r) == 1 * sizeof(Real));
+
     static_assert(sizeof(Vec2i) == 2 * sizeof(int));
     static_assert(sizeof(Vec2u) == 2 * sizeof(uint));
     static_assert(sizeof(Vec2f) == 2 * sizeof(float));
