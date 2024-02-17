@@ -48,6 +48,8 @@ namespace ARIA {
 /// using Bezier = BezierCurve<Real, 3, Degree<2>, ControlPoints>;
 ///
 /// // Create control points and the Bezier curve.
+/// // You can also default construct and later set the control points with
+/// // `bezier.controlPoints() = controlPoints`.
 /// ControlPoints controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
 /// Bezier bezier{controlPoints};
 ///
