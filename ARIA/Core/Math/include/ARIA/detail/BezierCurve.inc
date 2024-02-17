@@ -3,26 +3,23 @@
 namespace ARIA {
 
 // Specialization for compile-time degrees.
-template <typename T, auto dim, typename RationalOrNot, uint degree, typename TControlPoints>
-class BezierCurve<T, dim, RationalOrNot, Degree<degree>, TControlPoints> {
+template <typename T, auto dim, uint degree, typename TControlPoints>
+class BezierCurve<T, dim, Degree<degree>, TControlPoints> {
 public:
   using value_type = T;
 
-  /// \brief Whether the `BezierCurve` is rational.
-  static constexpr bool rational = std::is_same_v<RationalOrNot, Rational>;
-
 private:
-  // `CP` is an abbreviation of "control point".
   using VecDim = Vec<T, dim>;
-  using VecCP = std::conditional_t<rational, Vec<T, dim + 1>, VecDim>;
-  static_assert(std::is_same_v<VecCP, typename TControlPoints::value_type>,
-                "Type of control points does not match the dimension and rationality");
+  static_assert(std::is_same_v<VecDim, typename TControlPoints::value_type>,
+                "Type of control points does not match the dimension");
   //! Should not use `std::decay_t<decltype(std::declval<TControlPoints>()[0])>` in order to support proxy systems.
 
 public:
+  BezierCurve() = default;
+
   ARIA_HOST_DEVICE explicit BezierCurve(const TControlPoints &controlPoints) : controlPoints_(controlPoints) {}
 
-  ARIA_COPY_MOVE_ABILITY(BezierCurve, default, default);
+  ARIA_COPY_MOVE_ABILITY(BezierCurve, default, default); //! Let `TControlPoints` decide.
 
 public:
   ARIA_REF_PROP(public, ARIA_HOST_DEVICE, controlPoints, controlPoints_);
@@ -34,7 +31,7 @@ public:
     ARIA_ASSERT(IsInDomain(t));
 
     // Apply the deCasteljau algorithm, 1997, The NURBS Book, 24.
-    std::array<VecCP, nCPs> temp;
+    std::array<VecDim, nCPs> temp;
 
     ForEach<nCPs>([&]<auto i>() { temp[i] = controlPoints()[i]; });
     ForEach<degree>([&]<auto _r>() {
@@ -42,15 +39,11 @@ public:
       ForEach<nCPs - round>([&]<auto i>() { temp[i] = Lerp(temp[i], temp[i + 1], t); });
     });
 
-    VecDim pos;
-    if constexpr (rational)
-      pos = temp[0].head(dim) / temp[0][dim];
-    else
-      pos = temp[0];
-    return pos;
+    return temp[0];
   }
 
 private:
+  // `CP` is an abbreviation of "control point".
   static constexpr uint nCPs = degree + 1;
 
   TControlPoints controlPoints_;
@@ -60,26 +53,23 @@ private:
 //
 //
 // Specialization for runtime degrees.
-template <typename T, auto dim, typename RationalOrNot, typename TControlPoints>
-class BezierCurve<T, dim, RationalOrNot, DegreeDynamic, TControlPoints> {
+template <typename T, auto dim, typename TControlPoints>
+class BezierCurve<T, dim, DegreeDynamic, TControlPoints> {
 public:
   using value_type = T;
 
-  /// \brief Whether the `BezierCurve` is rational.
-  static constexpr bool rational = std::is_same_v<RationalOrNot, Rational>;
-
 private:
-  // `CP` is an abbreviation of "control point".
   using VecDim = Vec<T, dim>;
-  using VecCP = std::conditional_t<rational, Vec<T, dim + 1>, VecDim>;
-  static_assert(std::is_same_v<VecCP, typename TControlPoints::value_type>,
-                "Type of control points does not match the dimension and rationality");
+  static_assert(std::is_same_v<VecDim, typename TControlPoints::value_type>,
+                "Type of control points does not match the dimension");
   //! Should not use `std::decay_t<decltype(std::declval<TControlPoints>()[0])>` in order to support proxy systems.
 
 public:
+  BezierCurve() = default;
+
   ARIA_HOST_DEVICE explicit BezierCurve(const TControlPoints &controlPoints) : controlPoints_(controlPoints) {}
 
-  ARIA_COPY_MOVE_ABILITY(BezierCurve, default, default);
+  ARIA_COPY_MOVE_ABILITY(BezierCurve, default, default); //! Let `TControlPoints` decide.
 
 public:
   ARIA_REF_PROP(public, ARIA_HOST_DEVICE, controlPoints, controlPoints_);
@@ -90,11 +80,12 @@ public:
   [[nodiscard]] ARIA_HOST_DEVICE VecDim operator()(const T &t) const {
     ARIA_ASSERT(IsInDomain(t));
 
+    // `CP` is an abbreviation of "control point".
     const uint nCPs = controlPoints().size();
 
 #if ARIA_IS_HOST_CODE
     // Apply the deCasteljau algorithm, 1997, The NURBS Book, 24.
-    small_vector<VecCP, 8> temp(nCPs); //! Local buffer optimization for degrees <= 7.
+    small_vector<VecDim, 8> temp(nCPs); //! Local buffer optimization for degrees <= 7.
 
     for (uint i = 0; i < nCPs; ++i)
       temp[i] = controlPoints()[i];
@@ -102,12 +93,7 @@ public:
       for (uint i = 0; i < nCPs - round; ++i)
         temp[i] = Lerp(temp[i], temp[i + 1], t);
 
-    VecDim pos;
-    if constexpr (rational)
-      pos = temp[0].head(dim) / temp[0][dim];
-    else
-      pos = temp[0];
-    return pos;
+    return temp[0];
 #else
     // Compute the combinations.
     // See https://stackoverflow.com/questions/11809502/which-is-better-way-to-calculate-ncr.
@@ -125,19 +111,14 @@ public:
     };
 
     const uint degree = nCPs - 1;
-    VecCP posHomo = VecCP::Zero();
+    VecDim pos = VecCP::Zero();
 
     // Directly compute the Bernstein polynomials.
     for (uint i = 0; i < nCPs; ++i) {
-      VecCP cp = controlPoints()[i];
-      posHomo += cp * nCr(degree, i) * pow(1 - t, degree - i) * pow(t, i);
+      VecDim cp = controlPoints()[i];
+      pos += cp * nCr(degree, i) * pow(1 - t, degree - i) * pow(t, i);
     }
 
-    VecDim pos;
-    if constexpr (rational)
-      pos = posHomo.head(dim) / posHomo[dim];
-    else
-      pos = posHomo;
     return pos;
 #endif
   }
