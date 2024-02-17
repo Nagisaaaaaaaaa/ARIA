@@ -1,4 +1,5 @@
 #include "ARIA/BezierCurve.h"
+#include "ARIA/TensorVector.h"
 
 #include <gtest/gtest.h>
 #include <span>
@@ -61,6 +62,20 @@ TEST(BezierCurve, NonRational3D) {
     expectSphere(bezier);
   }
 
+  // Static degree + thrust::host_vector.
+  {
+    thrust::host_vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+    BezierCurve<float, 3, NonRational, Degree<2>, thrust::host_vector<Vec3f>> bezier{controlPoints};
+    expectSphere(bezier);
+  }
+
+  // Static degree + thrust::device_vector.
+  {
+    thrust::device_vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+    BezierCurve<float, 3, NonRational, Degree<2>, thrust::device_vector<Vec3f>> bezier{controlPoints};
+    expectSphere(bezier);
+  }
+
   // Dynamic degree + std::vector
   {
     std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
@@ -79,6 +94,20 @@ TEST(BezierCurve, NonRational3D) {
   {
     std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
     BezierCurve<float, 3, NonRational, DegreeDynamic, std::span<Vec3f>> bezier{controlPoints};
+    expectSphere(bezier);
+  }
+
+  // Dynamic degree + thrust::host_vector.
+  {
+    thrust::host_vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+    BezierCurve<float, 3, NonRational, DegreeDynamic, thrust::host_vector<Vec3f>> bezier{controlPoints};
+    expectSphere(bezier);
+  }
+
+  // Dynamic degree + thrust::device_vector.
+  {
+    thrust::device_vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+    BezierCurve<float, 3, NonRational, DegreeDynamic, thrust::device_vector<Vec3f>> bezier{controlPoints};
     expectSphere(bezier);
   }
 }
@@ -112,6 +141,20 @@ TEST(BezierCurve, Rational2D) {
     expectSphere(bezier);
   }
 
+  // Static degree + thrust::host_vector.
+  {
+    thrust::host_vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+    BezierCurve<float, 2, Rational, Degree<2>, thrust::host_vector<Vec3f>> bezier{controlPoints};
+    expectSphere(bezier);
+  }
+
+  // Static degree + thrust::device_vector.
+  {
+    thrust::device_vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+    BezierCurve<float, 2, Rational, Degree<2>, thrust::device_vector<Vec3f>> bezier{controlPoints};
+    expectSphere(bezier);
+  }
+
   // Dynamic degree + std::vector
   {
     std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
@@ -130,6 +173,20 @@ TEST(BezierCurve, Rational2D) {
   {
     std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
     BezierCurve<float, 2, Rational, DegreeDynamic, std::span<Vec3f>> bezier{controlPoints};
+    expectSphere(bezier);
+  }
+
+  // Dynamic degree + thrust::host_vector
+  {
+    thrust::host_vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+    BezierCurve<float, 2, Rational, DegreeDynamic, thrust::host_vector<Vec3f>> bezier{controlPoints};
+    expectSphere(bezier);
+  }
+
+  // Dynamic degree + thrust::device_vector
+  {
+    thrust::device_vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+    BezierCurve<float, 2, Rational, DegreeDynamic, thrust::device_vector<Vec3f>> bezier{controlPoints};
     expectSphere(bezier);
   }
 }

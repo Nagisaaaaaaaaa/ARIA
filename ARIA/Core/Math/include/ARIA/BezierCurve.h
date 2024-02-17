@@ -144,7 +144,8 @@ public:
 
     // Directly compute the Bernstein polynomials.
     for (uint i = 0; i < nCPs; ++i) {
-      posHomo += controlPoints()[i] * nCr(degree, i) * pow(1 - t, degree - i) * pow(t, i);
+      VecCP cp = controlPoints()[i];
+      posHomo += cp * nCr(degree, i) * pow(1 - t, degree - i) * pow(t, i);
     }
 
     VecDim pos;
