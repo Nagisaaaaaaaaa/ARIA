@@ -13,6 +13,25 @@
 
 namespace ARIA {
 
+/// \brief Whether the curve is non-rational.
+///
+/// \example ```cpp
+/// // Define a non-rational `BezierCurve`.
+/// BezierCurve<..., NonRational, ...> bezierCurve;
+/// ```
+struct NonRational {};
+
+/// \brief Whether the curve is rational.
+///
+/// \example ```cpp
+/// // Define a rational `BezierCurve`.
+/// BezierCurve<..., Rational, ...> bezierCurve;
+/// ```
+struct Rational {};
+
+//
+//
+//
 /// \brief Degree of the curve, used to define curves whose
 /// degree is determined at compile-time.
 ///
@@ -31,24 +50,5 @@ using Degree = C<v>;
 /// BezierCurve<..., DegreeDynamic, ...> bezierCurve;
 /// ```
 struct DegreeDynamic {};
-
-//
-//
-//
-/// \brief Whether the curve is non-rational.
-///
-/// \example ```cpp
-/// // Define a non-rational `BezierCurve`.
-/// BezierCurve<..., NonRational, ...> bezierCurve;
-/// ```
-struct NonRational {};
-
-/// \brief Whether the curve is rational.
-///
-/// \example ```cpp
-/// // Define a rational `BezierCurve`.
-/// BezierCurve<..., Rational, ...> bezierCurve;
-/// ```
-struct Rational {};
 
 } // namespace ARIA
