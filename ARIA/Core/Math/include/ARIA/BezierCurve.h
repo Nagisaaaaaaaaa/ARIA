@@ -62,7 +62,7 @@ public:
 
     VecDim pos;
     if constexpr (rational)
-      pos = temp[0].block<dim, 1>(0, 0) / temp[0][dim];
+      pos = temp[0].head(dim) / temp[0][dim];
     else
       pos = temp[0];
     return pos;
@@ -117,7 +117,7 @@ public:
 
     VecDim pos;
     if constexpr (rational)
-      pos = temp[0].block<dim, 1>(0, 0) / temp[0][dim];
+      pos = temp[0].head(dim) / temp[0][dim];
     else
       pos = temp[0];
     return pos;
@@ -147,7 +147,7 @@ public:
 
     VecDim pos;
     if constexpr (rational)
-      pos = posHomo.block<dim, 1>(0, 0) / posHomo[dim];
+      pos = posHomo.head(dim) / posHomo[dim];
     else
       pos = posHomo;
     return pos;
