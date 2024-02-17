@@ -43,6 +43,7 @@ namespace ARIA {
 /// // 1. Use `Real` to discrete the curve.
 /// // 2. Dimension equals to 3.
 /// // 3. Degree is determined at compile-time, equals to 2.
+/// //    Use `DegreeDynamic` for runtime determined degrees.
 /// // 4. Specify type of the control points.
 /// using Bezier = BezierCurve<Real, 3, Degree<2>, ControlPoints>;
 ///
