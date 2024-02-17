@@ -13,6 +13,12 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
+    NAME small_vector
+    GITHUB_REPOSITORY gharveymn/small_vector
+    GIT_TAG main
+)
+
+CPMAddPackage(
     NAME spdlog
     GITHUB_REPOSITORY gabime/spdlog
     VERSION "1.12.0"
@@ -47,6 +53,7 @@ set(core_core_headers
     ARIA/Property.h
     ARIA/PropertySTL.h
     ARIA/Registry.h
+    ARIA/SmallVector.h
     ARIA/TensorVector.h
     ARIA/TypeArray.h
 )
@@ -63,6 +70,7 @@ aria_add_module(
     HARD_DEPENDENCIES
     CUDA::cudart
     fmt::fmt
+    small_vector
     spdlog::spdlog
     cuda-api-wrappers::runtime-and-driver
     CUTLASS
