@@ -28,14 +28,16 @@ void ExpectSphereCUDA3D(const TBezier &bezier) {
 }
 
 template <typename TBezier>
-void ExpectSphereCUDA2D(const TBezier &bezier) {
+void ExpectEQCUDA2D(const TBezier &bezier) {
   thrust::device_vector<int> successD(1);
   successD[0] = 1;
 
   Launcher(100, [=, success = successD.data()] ARIA_DEVICE(int i) {
     float t = static_cast<float>(i) / static_cast<float>(99);
     Vec2f p = bezier(t);
-    if (std::abs(p.norm() - 1) > 0.0001F)
+    if (std::abs(p.x() - 1.1F) > 0.00001F)
+      success[0] = 0;
+    if (std::abs(p.y() - 2.2F) > 0.00001F)
       success[0] = 0;
   }).Launch();
 
@@ -268,6 +270,50 @@ TEST(BezierCurve, NonRational3D) {
       expectSphere(bezier1);
       ExpectSphereCUDA3D(bezier1);
     }
+  }
+}
+
+TEST(BezierCurve, ZeroDegree) {
+  // Static degree + CPU.
+  {
+    BezierCurve<float, 2, Degree<0>, std::vector<Vec2f>> bezier;
+    bezier.controlPoints() = {{1.1F, 2.2F}};
+
+    for (float t = 0; t <= 1; t += 0.01) {
+      Vec2f p = bezier(t);
+      EXPECT_FLOAT_EQ(p.x(), 1.1F);
+      EXPECT_FLOAT_EQ(p.y(), 2.2F);
+    }
+  }
+
+  // Dynamic degree + CPU.
+  {
+    BezierCurve<float, 2, DegreeDynamic, std::vector<Vec2f>> bezier;
+    bezier.controlPoints() = {{1.1F, 2.2F}};
+
+    for (float t = 0; t <= 1; t += 0.01) {
+      Vec2f p = bezier(t);
+      EXPECT_FLOAT_EQ(p.x(), 1.1F);
+      EXPECT_FLOAT_EQ(p.y(), 2.2F);
+    }
+  }
+
+  // Static degree + CUDA.
+  {
+    auto controlPoints = make_tensor_vector<Vec2f, SpaceDevice>(make_layout_major(1));
+    controlPoints[0] = {1.1F, 2.2F};
+    BezierCurve<float, 2, Degree<0>, std::decay_t<decltype(controlPoints.tensor())>> bezier;
+    bezier.controlPoints() = controlPoints.tensor();
+    ExpectEQCUDA2D(bezier);
+  }
+
+  // Dynamic degree + CUDA.
+  {
+    auto controlPoints = make_tensor_vector<Vec2f, SpaceDevice>(make_layout_major(C<1>{}));
+    controlPoints[0] = {1.1F, 2.2F};
+    BezierCurve<float, 2, DegreeDynamic, std::decay_t<decltype(controlPoints.tensor())>> bezier;
+    bezier.controlPoints() = controlPoints.tensor();
+    ExpectEQCUDA2D(bezier);
   }
 }
 
