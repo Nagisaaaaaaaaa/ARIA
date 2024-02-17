@@ -76,6 +76,61 @@ TEST(BezierCurve, NonRational3D) {
     expectSphere(bezier);
   }
 
+  // Static degree + TensorVector / Tensor.
+  {
+    // Host + static.
+    {
+      auto controlPoints = make_tensor_vector<Vec3f, SpaceHost>(make_layout_major(C<3>{}));
+      controlPoints[0] = {1, 0, 1};
+      controlPoints[1] = {1, 1, 1};
+      controlPoints[2] = {0, 2, 2};
+      BezierCurve<float, 3, NonRational, Degree<2>, decltype(controlPoints)> bezier0{controlPoints};
+      expectSphere(bezier0);
+      BezierCurve<float, 3, NonRational, Degree<2>, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
+          controlPoints.tensor()};
+      expectSphere(bezier1);
+    }
+
+    // Host + dynamic.
+    {
+      auto controlPoints = make_tensor_vector<Vec3f, SpaceHost>(make_layout_major(3));
+      controlPoints[0] = {1, 0, 1};
+      controlPoints[1] = {1, 1, 1};
+      controlPoints[2] = {0, 2, 2};
+      BezierCurve<float, 3, NonRational, Degree<2>, decltype(controlPoints)> bezier0{controlPoints};
+      expectSphere(bezier0);
+      BezierCurve<float, 3, NonRational, Degree<2>, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
+          controlPoints.tensor()};
+      expectSphere(bezier1);
+    }
+
+    // Device + static.
+    {
+      auto controlPoints = make_tensor_vector<Vec3f, SpaceDevice>(make_layout_major(C<3>{}));
+      controlPoints[0] = {1, 0, 1};
+      controlPoints[1] = {1, 1, 1};
+      controlPoints[2] = {0, 2, 2};
+      BezierCurve<float, 3, NonRational, Degree<2>, decltype(controlPoints)> bezier0{controlPoints};
+      expectSphere(bezier0);
+      BezierCurve<float, 3, NonRational, Degree<2>, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
+          controlPoints.tensor()};
+      expectSphere(bezier1);
+    }
+
+    // Device + dynamic.
+    {
+      auto controlPoints = make_tensor_vector<Vec3f, SpaceDevice>(make_layout_major(3));
+      controlPoints[0] = {1, 0, 1};
+      controlPoints[1] = {1, 1, 1};
+      controlPoints[2] = {0, 2, 2};
+      BezierCurve<float, 3, NonRational, Degree<2>, decltype(controlPoints)> bezier0{controlPoints};
+      expectSphere(bezier0);
+      BezierCurve<float, 3, NonRational, Degree<2>, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
+          controlPoints.tensor()};
+      expectSphere(bezier1);
+    }
+  }
+
   // Dynamic degree + std::vector
   {
     std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
@@ -109,6 +164,61 @@ TEST(BezierCurve, NonRational3D) {
     thrust::device_vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
     BezierCurve<float, 3, NonRational, DegreeDynamic, thrust::device_vector<Vec3f>> bezier{controlPoints};
     expectSphere(bezier);
+  }
+
+  // Dynamic degree + TensorVector / Tensor.
+  {
+    // Host + static.
+    {
+      auto controlPoints = make_tensor_vector<Vec3f, SpaceHost>(make_layout_major(C<3>{}));
+      controlPoints[0] = {1, 0, 1};
+      controlPoints[1] = {1, 1, 1};
+      controlPoints[2] = {0, 2, 2};
+      BezierCurve<float, 3, NonRational, DegreeDynamic, decltype(controlPoints)> bezier0{controlPoints};
+      expectSphere(bezier0);
+      BezierCurve<float, 3, NonRational, DegreeDynamic, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
+          controlPoints.tensor()};
+      expectSphere(bezier1);
+    }
+
+    // Host + dynamic.
+    {
+      auto controlPoints = make_tensor_vector<Vec3f, SpaceHost>(make_layout_major(3));
+      controlPoints[0] = {1, 0, 1};
+      controlPoints[1] = {1, 1, 1};
+      controlPoints[2] = {0, 2, 2};
+      BezierCurve<float, 3, NonRational, DegreeDynamic, decltype(controlPoints)> bezier0{controlPoints};
+      expectSphere(bezier0);
+      BezierCurve<float, 3, NonRational, DegreeDynamic, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
+          controlPoints.tensor()};
+      expectSphere(bezier1);
+    }
+
+    // Device + static.
+    {
+      auto controlPoints = make_tensor_vector<Vec3f, SpaceDevice>(make_layout_major(C<3>{}));
+      controlPoints[0] = {1, 0, 1};
+      controlPoints[1] = {1, 1, 1};
+      controlPoints[2] = {0, 2, 2};
+      BezierCurve<float, 3, NonRational, DegreeDynamic, decltype(controlPoints)> bezier0{controlPoints};
+      expectSphere(bezier0);
+      BezierCurve<float, 3, NonRational, DegreeDynamic, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
+          controlPoints.tensor()};
+      expectSphere(bezier1);
+    }
+
+    // Device + dynamic.
+    {
+      auto controlPoints = make_tensor_vector<Vec3f, SpaceDevice>(make_layout_major(3));
+      controlPoints[0] = {1, 0, 1};
+      controlPoints[1] = {1, 1, 1};
+      controlPoints[2] = {0, 2, 2};
+      BezierCurve<float, 3, NonRational, DegreeDynamic, decltype(controlPoints)> bezier0{controlPoints};
+      expectSphere(bezier0);
+      BezierCurve<float, 3, NonRational, DegreeDynamic, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
+          controlPoints.tensor()};
+      expectSphere(bezier1);
+    }
   }
 }
 
@@ -155,6 +265,61 @@ TEST(BezierCurve, Rational2D) {
     expectSphere(bezier);
   }
 
+  // Static degree + TensorVector / Tensor.
+  {
+    // Host + static.
+    {
+      auto controlPoints = make_tensor_vector<Vec3f, SpaceHost>(make_layout_major(C<3>{}));
+      controlPoints[0] = {1, 0, 1};
+      controlPoints[1] = {1, 1, 1};
+      controlPoints[2] = {0, 2, 2};
+      BezierCurve<float, 2, Rational, Degree<2>, decltype(controlPoints)> bezier0{controlPoints};
+      expectSphere(bezier0);
+      BezierCurve<float, 2, Rational, Degree<2>, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
+          controlPoints.tensor()};
+      expectSphere(bezier1);
+    }
+
+    // Host + dynamic.
+    {
+      auto controlPoints = make_tensor_vector<Vec3f, SpaceHost>(make_layout_major(3));
+      controlPoints[0] = {1, 0, 1};
+      controlPoints[1] = {1, 1, 1};
+      controlPoints[2] = {0, 2, 2};
+      BezierCurve<float, 2, Rational, Degree<2>, decltype(controlPoints)> bezier0{controlPoints};
+      expectSphere(bezier0);
+      BezierCurve<float, 2, Rational, Degree<2>, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
+          controlPoints.tensor()};
+      expectSphere(bezier1);
+    }
+
+    // Device + static.
+    {
+      auto controlPoints = make_tensor_vector<Vec3f, SpaceDevice>(make_layout_major(C<3>{}));
+      controlPoints[0] = {1, 0, 1};
+      controlPoints[1] = {1, 1, 1};
+      controlPoints[2] = {0, 2, 2};
+      BezierCurve<float, 2, Rational, Degree<2>, decltype(controlPoints)> bezier0{controlPoints};
+      expectSphere(bezier0);
+      BezierCurve<float, 2, Rational, Degree<2>, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
+          controlPoints.tensor()};
+      expectSphere(bezier1);
+    }
+
+    // Device + dynamic.
+    {
+      auto controlPoints = make_tensor_vector<Vec3f, SpaceDevice>(make_layout_major(3));
+      controlPoints[0] = {1, 0, 1};
+      controlPoints[1] = {1, 1, 1};
+      controlPoints[2] = {0, 2, 2};
+      BezierCurve<float, 2, Rational, Degree<2>, decltype(controlPoints)> bezier0{controlPoints};
+      expectSphere(bezier0);
+      BezierCurve<float, 2, Rational, Degree<2>, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
+          controlPoints.tensor()};
+      expectSphere(bezier1);
+    }
+  }
+
   // Dynamic degree + std::vector
   {
     std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
@@ -188,6 +353,61 @@ TEST(BezierCurve, Rational2D) {
     thrust::device_vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
     BezierCurve<float, 2, Rational, DegreeDynamic, thrust::device_vector<Vec3f>> bezier{controlPoints};
     expectSphere(bezier);
+  }
+
+  // Dynamic degree + TensorVector / Tensor.
+  {
+    // Host + static.
+    {
+      auto controlPoints = make_tensor_vector<Vec3f, SpaceHost>(make_layout_major(C<3>{}));
+      controlPoints[0] = {1, 0, 1};
+      controlPoints[1] = {1, 1, 1};
+      controlPoints[2] = {0, 2, 2};
+      BezierCurve<float, 2, Rational, DegreeDynamic, decltype(controlPoints)> bezier0{controlPoints};
+      expectSphere(bezier0);
+      BezierCurve<float, 2, Rational, DegreeDynamic, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
+          controlPoints.tensor()};
+      expectSphere(bezier1);
+    }
+
+    // Host + dynamic.
+    {
+      auto controlPoints = make_tensor_vector<Vec3f, SpaceHost>(make_layout_major(3));
+      controlPoints[0] = {1, 0, 1};
+      controlPoints[1] = {1, 1, 1};
+      controlPoints[2] = {0, 2, 2};
+      BezierCurve<float, 2, Rational, DegreeDynamic, decltype(controlPoints)> bezier0{controlPoints};
+      expectSphere(bezier0);
+      BezierCurve<float, 2, Rational, DegreeDynamic, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
+          controlPoints.tensor()};
+      expectSphere(bezier1);
+    }
+
+    // Device + static.
+    {
+      auto controlPoints = make_tensor_vector<Vec3f, SpaceDevice>(make_layout_major(C<3>{}));
+      controlPoints[0] = {1, 0, 1};
+      controlPoints[1] = {1, 1, 1};
+      controlPoints[2] = {0, 2, 2};
+      BezierCurve<float, 2, Rational, DegreeDynamic, decltype(controlPoints)> bezier0{controlPoints};
+      expectSphere(bezier0);
+      BezierCurve<float, 2, Rational, DegreeDynamic, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
+          controlPoints.tensor()};
+      expectSphere(bezier1);
+    }
+
+    // Device + dynamic.
+    {
+      auto controlPoints = make_tensor_vector<Vec3f, SpaceDevice>(make_layout_major(3));
+      controlPoints[0] = {1, 0, 1};
+      controlPoints[1] = {1, 1, 1};
+      controlPoints[2] = {0, 2, 2};
+      BezierCurve<float, 2, Rational, DegreeDynamic, decltype(controlPoints)> bezier0{controlPoints};
+      expectSphere(bezier0);
+      BezierCurve<float, 2, Rational, DegreeDynamic, std::decay_t<decltype(controlPoints.tensor())>> bezier1{
+          controlPoints.tensor()};
+      expectSphere(bezier1);
+    }
   }
 }
 
