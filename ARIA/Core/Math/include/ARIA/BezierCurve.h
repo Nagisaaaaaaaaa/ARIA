@@ -13,8 +13,7 @@
 #include "ARIA/ForEach.h"
 #include "ARIA/Math.h"
 #include "ARIA/MovingPoint.h"
-
-#include <SmallVector.h>
+#include "ARIA/SmallVector.h"
 
 namespace ARIA {
 
@@ -120,7 +119,7 @@ public:
 
 #if ARIA_IS_HOST_CODE
     // Apply the deCasteljau algorithm, 1997, The NURBS Book, 24.
-    llvm_vecsmall::SmallVector<VecCP, 10> temp(nCPs);
+    SmallVector<VecCP, 10> temp(nCPs);
 
     for (uint i = 0; i < nCPs; ++i)
       temp[i] = controlPoints()[i];

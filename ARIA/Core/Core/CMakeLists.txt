@@ -13,6 +13,15 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
+    NAME SmallVector
+    GITHUB_REPOSITORY thelink2012/SmallVector
+    GIT_TAG master
+    DOWNLOAD_ONLY YES
+)
+add_library(SmallVector INTERFACE IMPORTED)
+target_include_directories(SmallVector INTERFACE ${SmallVector_SOURCE_DIR})
+
+CPMAddPackage(
     NAME spdlog
     GITHUB_REPOSITORY gabime/spdlog
     VERSION "1.12.0"
@@ -47,6 +56,7 @@ set(core_core_headers
     ARIA/Property.h
     ARIA/PropertySTL.h
     ARIA/Registry.h
+    ARIA/SmallVector.h
     ARIA/TensorVector.h
     ARIA/TypeArray.h
 )
@@ -63,6 +73,7 @@ aria_add_module(
     HARD_DEPENDENCIES
     CUDA::cudart
     fmt::fmt
+    SmallVector
     spdlog::spdlog
     cuda-api-wrappers::runtime-and-driver
     CUTLASS
