@@ -1,5 +1,14 @@
 #pragma once
 
+/// \file
+/// \warning This file is undergoing refinement,
+/// interfaces are very unstable for now.
+
+//
+//
+//
+//
+//
 #include "ARIA/Constant.h"
 #include "ARIA/ForEach.h"
 #include "ARIA/Math.h"
