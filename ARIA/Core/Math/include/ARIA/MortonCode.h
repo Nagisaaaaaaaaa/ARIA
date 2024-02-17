@@ -28,10 +28,10 @@ namespace ARIA {
 /// // 1D.
 /// using Code = MortonCode<1>;
 ///
-/// uint code0 = Code::Encode(0); // Will be 0.
-/// uint code1 = Code::Encode(1); //         1.
-/// uint code2 = Code::Encode(2); //         2.
-/// uint code2 = Code::Encode(3); //         3.
+/// uint code0 = Code::Encode(Vec1u{0}); // Will be 0.
+/// uint code1 = Code::Encode(Vec1u{1}); //         1.
+/// uint code2 = Code::Encode(Vec1u{2}); //         2.
+/// uint code2 = Code::Encode(Vec1u{3}); //         3.
 ///
 /// // 2D.
 /// using Code = MortonCode<2>;
@@ -70,14 +70,14 @@ public:
   /// \example ```cpp
   /// using Code = MortonCode<1>; // 1D.
   ///
-  /// uint code0 = Code::Encode(0); // Will be 0.
-  /// uint code1 = Code::Encode(1); //         1.
-  /// uint code2 = Code::Encode(2); //         2.
-  /// uint code3 = Code::Encode(3); //         3.
+  /// uint code0 = Code::Encode(Vec1u{0}); // Will be 0.
+  /// uint code1 = Code::Encode(Vec1u{1}); //         1.
+  /// uint code2 = Code::Encode(Vec1u{2}); //         2.
+  /// uint code3 = Code::Encode(Vec1u{3}); //         3.
   /// ```
   template <std::integral I>
-  [[nodiscard]] static ARIA_HOST_DEVICE constexpr I Encode(const I &coord) {
-    return coord;
+  [[nodiscard]] static ARIA_HOST_DEVICE constexpr I Encode(const Vec1<I> &coord) {
+    return coord.x();
   }
 };
 
