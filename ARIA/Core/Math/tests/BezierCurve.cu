@@ -59,9 +59,20 @@ TEST(BezierCurve, Base) {
   static_assert(MovingPoint<BezierCurve, float, 2, Degree<3>, std::vector<Vec2f>>);
   static_assert(MovingPoint<BezierCurve, float, 3, Degree<3>, std::vector<Vec3f>>);
 
-  std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
-  BezierCurve<float, 3, Degree<2>, std::vector<Vec3f>> bezier{controlPoints};
+  // Constructors.
+  {
+    std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+    BezierCurve<float, 3, Degree<2>, std::vector<Vec3f>> bezier{controlPoints};
+  }
 
+  {
+    std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+    BezierCurve<float, 3, Degree<2>, std::vector<Vec3f>> bezier;
+    bezier.controlPoints() = controlPoints;
+  }
+
+  // Is in domain.
+  BezierCurve<float, 3, Degree<2>, std::vector<Vec3f>> bezier;
   static_assert(bezier.IsInDomain(0));
   static_assert(bezier.IsInDomain(1));
   static_assert(bezier.IsInDomain(0.1));
