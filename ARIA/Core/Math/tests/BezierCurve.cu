@@ -469,4 +469,12 @@ TEST(BezierCurve, Rational2D) {
   }
 }
 
+TEST(BezierCurve, Alias) {
+  static_assert(std::is_same_v<BezierCurve<float, 2, NonRational, DegreeDynamic, std::vector<Vec2f>>,
+                               BezierCurveNonRational<float, 2, DegreeDynamic, std::vector<Vec2f>>>);
+
+  static_assert(std::is_same_v<BezierCurve<float, 2, Rational, DegreeDynamic, std::vector<Vec2f>>,
+                               BezierCurveRational<float, 2, DegreeDynamic, std::vector<Vec2f>>>);
+}
+
 } // namespace ARIA

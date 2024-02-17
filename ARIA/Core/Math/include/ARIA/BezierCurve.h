@@ -71,6 +71,27 @@ class BezierCurve;
 //
 //
 //
+/// \brief Alias for non-rational `BezierCurve`s.
+///
+/// \example ```cpp
+/// using ControlPoints = std::vector<Vec3r>;
+/// using Bezier = BezierCurveNonRational<Real, 3, Degree<2>, ControlPoints>;
+/// ```
+template <typename T, auto dim, typename TDegree, typename TControlPoints>
+using BezierCurveNonRational = BezierCurve<T, dim, NonRational, TDegree, TControlPoints>;
+
+/// \brief Alias for rational `BezierCurve`s.
+///
+/// \example ```cpp
+/// using ControlPoints = std::vector<Vec3r>;
+/// using Bezier = BezierCurveRational<Real, 3, Degree<2>, ControlPoints>;
+/// ```
+template <typename T, auto dim, typename TDegree, typename TControlPoints>
+using BezierCurveRational = BezierCurve<T, dim, Rational, TDegree, TControlPoints>;
+
+//
+//
+//
 template <typename T, auto dim, typename RationalOrNot, uint degree, typename TControlPoints>
 class BezierCurve<T, dim, RationalOrNot, Degree<degree>, TControlPoints> {
 public:
@@ -210,14 +231,5 @@ public:
 private:
   TControlPoints controlPoints_;
 };
-
-//
-//
-//
-template <typename T, auto dim, typename TDegree, typename TControlPoints>
-using BezierCurveNonRational = BezierCurve<T, dim, NonRational, TDegree, TControlPoints>;
-
-template <typename T, auto dim, typename TDegree, typename TControlPoints>
-using BezierCurveRational = BezierCurve<T, dim, Rational, TDegree, TControlPoints>;
 
 } // namespace ARIA
