@@ -62,6 +62,9 @@ namespace ARIA {
 /// // Get position of the curve at `t`.
 /// Vec3r position = bezier(t);
 /// ```
+///
+/// \note Rational Bezier curves are not explicitly taken into account, because
+/// a 2D rational Bezier curve is just a subset of a 3D non-rational Bezier curve.
 template <typename T, auto dim, typename TDegree, typename TControlPoints>
 class BezierCurve;
 
