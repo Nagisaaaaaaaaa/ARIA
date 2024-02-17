@@ -140,6 +140,7 @@ public:
     const uint degree = nCPs - 1;
     VecCP posHomo = VecCP::Zero();
 
+    // Directly compute the Bernstein polynomials.
     for (uint i = 0; i < nCPs; ++i) {
       posHomo += controlPoints()[i] * nCr(degree, i) * pow(1 - t, degree - i) * pow(t, i);
     }
