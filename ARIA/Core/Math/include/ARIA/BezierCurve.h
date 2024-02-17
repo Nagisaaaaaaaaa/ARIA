@@ -18,14 +18,14 @@ struct Rational {};
 //
 //
 //
-template <typename T, auto dim, typename RationalOrNot, typename TDegree>
+template <typename T, auto dim, typename RationalOrNot, typename TDegree, typename TControlPoints>
 class BezierCurve;
 
 //
 //
 //
-template <typename T, auto dim, typename RationalOrNot, uint degree>
-class BezierCurve<T, dim, RationalOrNot, Degree<degree>> {
+template <typename T, auto dim, typename RationalOrNot, uint degree, typename TControlPoints>
+class BezierCurve<T, dim, RationalOrNot, Degree<degree>, TControlPoints> {
 public:
   static constexpr bool rational = std::is_same_v<RationalOrNot, Rational>;
 
@@ -35,9 +35,7 @@ private:
   using VecCP = std::conditional_t<rational, Vec<T, dim + 1>, VecDim>;
 
 public:
-  ARIA_HOST_DEVICE BezierCurve() {
-    ForEach<nCPs>([&]<auto i>() { controlPoints()[i] = VecCP::Zero(); });
-  }
+  ARIA_HOST_DEVICE explicit BezierCurve(const TControlPoints &controlPoints) : controlPoints_(controlPoints) {}
 
   ARIA_COPY_MOVE_ABILITY(BezierCurve, default, default);
 
@@ -70,14 +68,14 @@ public:
 private:
   static constexpr uint nCPs = degree + 1;
 
-  std::array<VecCP, nCPs> controlPoints_;
+  TControlPoints controlPoints_;
 };
 
 //
 //
 //
-template <typename T, auto dim, typename RationalOrNot>
-class BezierCurve<T, dim, RationalOrNot, DegreeDynamic> {
+template <typename T, auto dim, typename RationalOrNot, typename TControlPoints>
+class BezierCurve<T, dim, RationalOrNot, DegreeDynamic, TControlPoints> {
 public:
   static constexpr bool rational = std::is_same_v<RationalOrNot, Rational>;
 
@@ -87,17 +85,17 @@ private:
   using VecCP = std::conditional_t<rational, Vec<T, dim + 1>, VecDim>;
 
 public:
-  BezierCurve() {}
+  ARIA_HOST_DEVICE explicit BezierCurve(const TControlPoints &controlPoints) : controlPoints_(controlPoints) {}
 
   ARIA_COPY_MOVE_ABILITY(BezierCurve, default, default);
 
 public:
-  ARIA_REF_PROP(public, , controlPoints, controlPoints_);
+  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, controlPoints, controlPoints_);
 
 public:
-  [[nodiscard]] constexpr bool IsInDomain(const T &t) const { return T{0} <= t && t <= T{1}; }
+  [[nodiscard]] ARIA_HOST_DEVICE constexpr bool IsInDomain(const T &t) const { return T{0} <= t && t <= T{1}; }
 
-  [[nodiscard]] VecDim operator()(const T &t) const {
+  [[nodiscard]] ARIA_HOST_DEVICE VecDim operator()(const T &t) const {
     ARIA_ASSERT(IsInDomain(t));
 
     if (controlPoints().empty()) {
@@ -122,10 +120,12 @@ public:
     else
       position = temp[0];
     return position;
+
+    // TODO: Implement a GPU version.
   }
 
 private:
-  std::vector<VecCP> controlPoints_;
+  TControlPoints controlPoints_;
 };
 
 } // namespace ARIA
