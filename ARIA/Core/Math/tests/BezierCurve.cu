@@ -1,6 +1,7 @@
 #include "ARIA/BezierCurve.h"
 
 #include <gtest/gtest.h>
+#include <span>
 
 namespace ARIA {
 
@@ -53,6 +54,13 @@ TEST(BezierCurve, NonRational3D) {
     expectSphere(bezier);
   }
 
+  // Static degree + std::span.
+  {
+    std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+    BezierCurve<float, 3, NonRational, Degree<2>, std::span<Vec3f>> bezier{controlPoints};
+    expectSphere(bezier);
+  }
+
   // Dynamic degree + std::vector
   {
     std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
@@ -64,6 +72,13 @@ TEST(BezierCurve, NonRational3D) {
   {
     std::array<Vec3f, 3> controlPoints = {Vec3f{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
     BezierCurve<float, 3, NonRational, DegreeDynamic, std::array<Vec3f, 3>> bezier{controlPoints};
+    expectSphere(bezier);
+  }
+
+  // Dynamic degree + std::span
+  {
+    std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+    BezierCurve<float, 3, NonRational, DegreeDynamic, std::span<Vec3f>> bezier{controlPoints};
     expectSphere(bezier);
   }
 }
@@ -90,6 +105,13 @@ TEST(BezierCurve, Rational2D) {
     expectSphere(bezier);
   }
 
+  // Static degree + std::span.
+  {
+    std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+    BezierCurve<float, 2, Rational, Degree<2>, std::span<Vec3f>> bezier{controlPoints};
+    expectSphere(bezier);
+  }
+
   // Dynamic degree + std::vector
   {
     std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
@@ -101,6 +123,13 @@ TEST(BezierCurve, Rational2D) {
   {
     std::array<Vec3f, 3> controlPoints = {Vec3f{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
     BezierCurve<float, 2, Rational, DegreeDynamic, std::array<Vec3f, 3>> bezier{controlPoints};
+    expectSphere(bezier);
+  }
+
+  // Dynamic degree + std::span
+  {
+    std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+    BezierCurve<float, 2, Rational, DegreeDynamic, std::span<Vec3f>> bezier{controlPoints};
     expectSphere(bezier);
   }
 }
