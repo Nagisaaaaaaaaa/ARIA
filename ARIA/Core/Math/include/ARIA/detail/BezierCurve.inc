@@ -22,9 +22,16 @@ public:
   ARIA_COPY_MOVE_ABILITY(BezierCurve, default, default); //! Let `TControlPoints` decide.
 
 public:
+  /// \brief Get or set the control points.
+  ///
+  /// \example ```cpp
+  /// bezier.controlPoints() = ...;
+  /// bezier.controlPoints()[i] = ...;
+  /// ```
   ARIA_REF_PROP(public, ARIA_HOST_DEVICE, controlPoints, controlPoints_);
 
 public:
+  /// \brief Whether `t` is in the domain of the curve (For any Bezier curves, in [0, 1]).
   [[nodiscard]] ARIA_HOST_DEVICE constexpr bool IsInDomain(const T &t) const { return T{0} <= t && t <= T{1}; }
 
   [[nodiscard]] ARIA_HOST_DEVICE VecDim operator()(const T &t) const {
@@ -72,9 +79,16 @@ public:
   ARIA_COPY_MOVE_ABILITY(BezierCurve, default, default); //! Let `TControlPoints` decide.
 
 public:
+  /// \brief Get or set the control points.
+  ///
+  /// \example ```cpp
+  /// bezier.controlPoints() = ...;
+  /// bezier.controlPoints()[i] = ...;
+  /// ```
   ARIA_REF_PROP(public, ARIA_HOST_DEVICE, controlPoints, controlPoints_);
 
 public:
+  /// \brief Whether `t` is in the domain of the curve (For any Bezier curves, in [0, 1]).
   [[nodiscard]] ARIA_HOST_DEVICE constexpr bool IsInDomain(const T &t) const { return T{0} <= t && t <= T{1}; }
 
   [[nodiscard]] ARIA_HOST_DEVICE VecDim operator()(const T &t) const {
