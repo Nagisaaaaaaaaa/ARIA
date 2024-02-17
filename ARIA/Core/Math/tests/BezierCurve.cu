@@ -39,10 +39,31 @@ TEST(BezierCurve, NonRational3D) {
     }
   };
 
-  // Static degree.
+  // Static degree + std::vector.
   {
     std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
     BezierCurve<float, 3, NonRational, Degree<2>, std::vector<Vec3f>> bezier{controlPoints};
+    expectSphere(bezier);
+  }
+
+  // Static degree + std::array.
+  {
+    std::array<Vec3f, 3> controlPoints = {Vec3f{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+    BezierCurve<float, 3, NonRational, Degree<2>, std::array<Vec3f, 3>> bezier{controlPoints};
+    expectSphere(bezier);
+  }
+
+  // Dynamic degree + std::vector
+  {
+    std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+    BezierCurve<float, 3, NonRational, DegreeDynamic, std::vector<Vec3f>> bezier{controlPoints};
+    expectSphere(bezier);
+  }
+
+  // Dynamic degree + std::array
+  {
+    std::array<Vec3f, 3> controlPoints = {Vec3f{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+    BezierCurve<float, 3, NonRational, DegreeDynamic, std::array<Vec3f, 3>> bezier{controlPoints};
     expectSphere(bezier);
   }
 }

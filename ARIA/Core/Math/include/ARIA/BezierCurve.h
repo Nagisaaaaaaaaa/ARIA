@@ -101,12 +101,12 @@ public:
   [[nodiscard]] ARIA_HOST_DEVICE constexpr bool IsInDomain(const T &t) const { return T{0} <= t && t <= T{1}; }
 
   [[nodiscard]] ARIA_HOST_DEVICE VecDim operator()(const T &t) const {
-#if ARIA_IS_HOST_CODE
     ARIA_ASSERT(IsInDomain(t));
 
     const uint nCPs = controlPoints().size();
     const uint degree = nCPs - 1;
 
+#if ARIA_IS_HOST_CODE
     // Apply the deCasteljau algorithm, 1997, The NURBS Book, 24.
     std::vector<VecCP> temp(nCPs); // TODO: Optimize this line.
 
