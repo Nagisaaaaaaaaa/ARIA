@@ -4,6 +4,8 @@
 
 namespace ARIA {
 
-TEST(DisjointSet, Base) {}
+TEST(DisjointSet, Base) {
+  DisjointSet<ThreadSafe, std::vector<int>> disjointSet;
+}
 
 } // namespace ARIA

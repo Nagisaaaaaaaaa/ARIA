@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ARIA/ARIA.h"
+#include "ARIA/Property.h"
 
 #include <cuda/std/atomic>
 
@@ -11,20 +11,33 @@ class DisjointSet;
 
 template <typename TLabels>
 class DisjointSet<ThreadSafe, TLabels> {
+private:
+  using TLabel = TLabels::value_type;
+  static_assert(std::integral<TLabel>, "Type of labels should be integral");
+  //! Should not use `std::decay_t<decltype(std::declval<TLabels>()[0])>` in order to support proxy systems.
+
 public:
   DisjointSet() = default;
 
   explicit DisjointSet(const TLabels &labels) : labels_(labels) {}
 
 public:
-  template <typename Coord>
-  static decltype(auto) Find(const Coord &coord) {}
+  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, labels, labels_);
 
-  template <typename Coord>
-  static decltype(auto) FindAndCompress(const Coord &coord) {}
+public:
+  TLabel Find(const TLabel &i) const {
+    TLabel new_i;
 
-  template <typename Coord>
-  static decltype(auto) Union(const Coord &coord0, const Coord &coord1) {}
+    while ((new_i = labels()[i]) != i) {
+      i = new_i;
+    }
+
+    return i;
+  }
+
+  TLabel FindAndCompress(const TLabel &i) {}
+
+  TLabel Union(const TLabel &i0, const TLabel &i1) {}
 
 private:
   TLabels labels_;
