@@ -9,9 +9,9 @@ namespace {
 
 enum Flag : int { G = 0, I = 1, L = 2 };
 
-template <typename TThreadUnsafeOrSafe>
+template <typename TThreadUnsafeOrSafe, typename SpaceHostOrDevice>
 void TestCPU() {
-  using Volume = TensorVector<int, C<2>, SpaceHost>;
+  using Volume = TensorVector<int, C<2>, SpaceHostOrDevice>;
 
   // Test case:
   //   1 2 2 2 2 x
@@ -37,6 +37,7 @@ void TestCPU() {
 
   // Supporting functions.
   auto crd2Idx = [&](auto x, auto y) { return flags.layout()(x, y); };
+#if 0
   auto printLabels = [&]() {
     for (int y = 0; y < disjointSet.labels().size<1>(); ++y) {
       for (int x = 0; x < disjointSet.labels().size<0>(); ++x) {
@@ -45,6 +46,7 @@ void TestCPU() {
       fmt::print("\n");
     }
   };
+#endif
   auto expectLabel = [&](auto x, auto y, auto label) {
     EXPECT_EQ(disjointSet.FindAndCompress(crd2Idx(x, y)), label);
     EXPECT_EQ(disjointSet.Find(crd2Idx(x, y)), label);
@@ -161,8 +163,10 @@ void TestCPU() {
 } // namespace
 
 TEST(DisjointSet, Base) {
-  TestCPU<ThreadUnsafe>();
-  TestCPU<ThreadSafe>();
+  TestCPU<ThreadUnsafe, SpaceHost>();
+  TestCPU<ThreadUnsafe, SpaceDevice>();
+  TestCPU<ThreadSafe, SpaceHost>();
+  // TestCPU<ThreadSafe, SpaceDevice>(); // Should not compile.
 }
 
 } // namespace ARIA
