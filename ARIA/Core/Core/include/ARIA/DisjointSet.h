@@ -25,7 +25,7 @@ public:
   ARIA_REF_PROP(public, ARIA_HOST_DEVICE, labels, labels_);
 
 public:
-  TLabel Find(const TLabel &i) const {
+  ARIA_HOST_DEVICE TLabel Find(const TLabel &i) const {
     TLabel new_i;
 
     while ((new_i = labels()[i]) != i) {
@@ -35,66 +35,44 @@ public:
     return i;
   }
 
-  TLabel FindAndCompress(const TLabel &i) {}
+  ARIA_HOST_DEVICE TLabel FindAndCompress(const TLabel &i) {
+    TLabel i_c = i;
 
-  TLabel Union(const TLabel &i0, const TLabel &i1) {}
+    size_t new_i;
+
+    while ((new_i = labels()[i]) != i) {
+      i = new_i;
+      labels()[i_c] = i;
+    }
+
+    return i;
+  }
+
+  ARIA_HOST_DEVICE TLabel Union(const TLabel &i0, const TLabel &i1) {
+    bool done;
+
+    do {
+      i0 = Find(i0);
+      i1 = Find(i1);
+
+      if (i1 < i0) {
+        using std::swap;
+        swap(i0, i1);
+      }
+
+      if (i0 < i1) {
+        cuda::atomic_ref label1{labels()[i1]};
+        auto old = label1.fetch_min(i0);
+        done = (old == i1);
+        i1 = old;
+      } else { // i0 == i1.
+        done = true;
+      }
+    } while (!done);
+  }
 
 private:
   TLabels labels_;
 };
 
 } // namespace ARIA
-
-#if 0
-DEV static ALWAYS_INLINE size_t CCLFind(
-    const std::span<size_t>& ccl,
-    size_t i) {
-  size_t new_i;
-
-  while ((new_i = ccl[i]) != i) {
-    i = new_i;
-  }
-
-  return i;
-}
-
-DEV static ALWAYS_INLINE size_t CCLFindAndCompress(
-    std::span<size_t>& ccl,
-    size_t i) {
-  auto i_c = i;
-
-  size_t new_i;
-
-  while ((new_i = ccl[i]) != i) {
-    i = new_i;
-    ccl[i_c] = i;
-  }
-
-  return i;
-}
-
-DEV static ALWAYS_INLINE void CCLUnion(
-    std::span<size_t>& ccl,
-    size_t i0, size_t i1) {
-  bool done;
-
-  do {
-    i0 = CCLFind(ccl, i0);
-    i1 = CCLFind(ccl, i1);
-
-    if (i0 < i1) {
-      auto old = atomicMin(&ccl[i1], i0);
-      done = (old == i1);
-      i1 = old;
-    }
-    else if (i1 < i0) {
-      auto old = atomicMin(&ccl[i0], i1);
-      done = (old == i0);
-      i0 = old;
-    }
-    else {
-      done = true;
-    }
-  } while (!done);
-}
-#endif
