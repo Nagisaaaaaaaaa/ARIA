@@ -29,67 +29,21 @@ public:
   ARIA_REF_PROP(public, ARIA_HOST_DEVICE, labels, labels_);
 
 public:
-  [[nodiscard]] ARIA_HOST_DEVICE value_type Find(value_type i) const {
-    value_type iNew;
+  [[nodiscard]] ARIA_HOST_DEVICE value_type Find(value_type i) const;
 
-    while ((iNew = labels()[i]) != i) {
-      i = iNew;
-    }
+  ARIA_HOST_DEVICE value_type FindAndCompress(value_type i);
 
-    return i;
-  }
-
-  ARIA_HOST_DEVICE value_type FindAndCompress(value_type i) {
-    value_type iCpy = i;
-
-    size_t iNew;
-
-    while ((iNew = labels()[i]) != i) {
-      i = iNew;
-      labels()[iCpy] = i;
-    }
-
-    return i;
-  }
-
-  ARIA_HOST_DEVICE void Union(value_type i0, value_type i1) {
-    if constexpr (threadSafe) {
-      bool done;
-
-      do {
-        i0 = Find(i0);
-        i1 = Find(i1);
-
-        if (i1 < i0) {
-          using std::swap;
-          swap(i0, i1);
-        }
-
-        if (i0 < i1) {
-          cuda::atomic_ref label1{labels()[i1]};
-          auto old = label1.fetch_min(i0);
-          done = (old == i1);
-          i1 = old;
-        } else { // i0 == i1.
-          done = true;
-        }
-      } while (!done);
-    } else {
-      i0 = Find(i0);
-      i1 = Find(i1);
-
-      if (i1 < i0) {
-        using std::swap;
-        swap(i0, i1);
-      }
-
-      if (i0 < i1)
-        labels()[i1] = i0;
-    }
-  }
+  ARIA_HOST_DEVICE void Union(value_type i0, value_type i1);
 
 private:
   TLabels labels_;
 };
 
 } // namespace ARIA
+
+//
+//
+//
+//
+//
+#include "ARIA/detail/DisjointSet.inc"
