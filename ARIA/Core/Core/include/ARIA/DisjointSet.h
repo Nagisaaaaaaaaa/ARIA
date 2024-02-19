@@ -9,10 +9,9 @@ namespace ARIA {
 template <typename TThreadUnsafeOrSafe, typename TLabels>
 class DisjointSet {
 public:
-  using value_type = std::decay_t<decltype(std::declval<TLabels>()[0])>;
+  using value_type = TLabels::value_type;
   static_assert(std::integral<value_type>, "Type of `TLabels` elements should be integral");
-  static_assert(std::is_reference_v<decltype(std::declval<TLabels>()[0])>,
-                "Return type of `TLabels::operator[]` should be a reference");
+  //! Should not use `std::decay_t<decltype(std::declval<TLabels>()[0])>` in order to support proxy systems.
 
 private:
   static_assert(std::is_same_v<TThreadUnsafeOrSafe, ThreadUnsafe> || std::is_same_v<TThreadUnsafeOrSafe, ThreadSafe>,
@@ -29,6 +28,12 @@ public:
   ARIA_COPY_MOVE_ABILITY(DisjointSet, default, default); //! Let `TLabels` decide.
 
 public:
+  /// \brief Get or set the labels.
+  ///
+  /// \example ```cpp
+  /// disjointSet.labels() = ...;
+  /// disjointSet.labels()[i] = ...;
+  /// ```
   ARIA_REF_PROP(public, ARIA_HOST_DEVICE, labels, labels_);
 
 public:
