@@ -8,6 +8,8 @@
 //
 //
 //
+//
+//
 #include "ARIA/detail/Macros.h"
 
 #include <cstddef>
@@ -27,6 +29,9 @@ using uint64 = uint64_t;
 static_assert(sizeof(int) == sizeof(uint), "Size of `int` and `uint` should be the same");
 static_assert(sizeof(int64) == sizeof(uint64), "Size of `int64` and `uint64` should be the same");
 
+//
+//
+//
 /// \brief `Real` is a universal number type defined by cmake options.
 using Real = ${aria_real_type};
 
@@ -40,6 +45,9 @@ ARIA_HOST_DEVICE constexpr Real operator"" _R(unsigned long long value) {
   return static_cast<Real>(value);
 }
 
+//
+//
+//
 /// \brief Overload the lambda functions.
 ///
 /// \example ```cpp
@@ -59,10 +67,19 @@ struct Overload : Ts... {
 template <class... Ts>
 Overload(Ts...) -> Overload<Ts...>;
 
+//
+//
+//
 /// \brief A commonly-used policy, means whether the class is for host use.
 struct SpaceHost {};
 
 /// \brief A commonly-used policy, means whether the class is for device use.
 struct SpaceDevice {};
+
+/// \brief A commonly-used policy, means whether the class is thread-unsafe.
+struct ThreadUnsafe {};
+
+/// \brief A commonly-used policy, means whether the class is thread-safe.
+struct ThreadSafe {};
 
 } // namespace ARIA

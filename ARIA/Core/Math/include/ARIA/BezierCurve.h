@@ -32,7 +32,7 @@ namespace ARIA {
 /// \tparam TControlPoints Type of the control points used to define the `BezierCurve`.
 /// You can define owning `BezierCurve`s by entering:
 /// `std::vector`, `std::array`, `thrust::host_vector`, `thrust::device_vector`, `TensorVector`, .etc.
-/// You can also define non owning `BezierCurve` by entering:
+/// You can also define non-owning `BezierCurve` by entering:
 /// `std::span`, `Tensor`, .etc.
 ///
 /// \example ```cpp
