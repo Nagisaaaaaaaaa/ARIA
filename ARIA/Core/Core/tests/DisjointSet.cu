@@ -1,4 +1,5 @@
 #include "ARIA/DisjointSet.h"
+#include "ARIA/Launcher.h"
 #include "ARIA/TensorVector.h"
 
 #include <gtest/gtest.h>
@@ -7,11 +8,11 @@ namespace ARIA {
 
 namespace {
 
-enum Flag : int { G = 0, I = 1, L = 2 };
-
 template <typename TThreadUnsafeOrSafe, typename SpaceHostOrDevice>
 void TestCPU() {
   using Volume = TensorVector<int, C<2>, SpaceHostOrDevice>;
+
+  enum Flag : int { G = 0, I = 1, L = 2 };
 
   // Test case:
   //   1 2 2 2 2 x
@@ -160,6 +161,34 @@ void TestCPU() {
                0, 0, 0, 0, 0);
 }
 
+void TestCUDA() {
+  using Volume = TensorVector<int, SpaceDevice>;
+
+  // Initialize.
+  Volume volume{make_layout_major(1000)};
+  auto tensor = cute::make_tensor(volume.tensor().data().get(), volume.layout());
+  DisjointSet<ThreadSafe, decltype(tensor)> disjointSet(tensor);
+  for (int x = 0; x < disjointSet.labels().size(); ++x)
+    volume(x) = x;
+
+  // Parallel union.
+  Launcher(volume.size() - 1, [=] ARIA_DEVICE(int x) mutable { disjointSet.Union(x + 1, x); }).Launch();
+
+  Launcher(volume.size(), [=] ARIA_DEVICE(int x) mutable { disjointSet.FindAndCompress(x); }).Launch();
+
+  cuda::device::current::get().synchronize();
+
+  // Check
+  Volume::Mirrored<SpaceHost> volumeH{volume.layout()};
+  copy(volumeH, volume);
+
+  cuda::device::current::get().synchronize();
+
+  for (int x = 0; x < volumeH.size(); ++x) {
+    EXPECT_EQ(volumeH(x), 0);
+  }
+}
+
 } // namespace
 
 TEST(DisjointSet, Base) {
@@ -167,6 +196,8 @@ TEST(DisjointSet, Base) {
   TestCPU<ThreadUnsafe, SpaceDevice>();
   TestCPU<ThreadSafe, SpaceHost>();
   // TestCPU<ThreadSafe, SpaceDevice>(); // Should not compile.
+
+  TestCUDA();
 }
 
 } // namespace ARIA
