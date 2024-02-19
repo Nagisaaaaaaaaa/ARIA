@@ -6,6 +6,20 @@
 
 namespace ARIA {
 
+/// \brief A policy-based disjoint set implementation.
+///
+/// In computer science, a disjoint-set data structure, also called
+/// a union–find data structure or merge–find set, is a data structure that
+/// stores a collection of disjoint (non-overlapping) sets.
+/// Equivalently, it stores a partition of a set into disjoint subsets.
+/// It provides operations for merging sets (see `Union()`), and
+/// finding a representative member of a set (see `Find()` and `FindAndCompress()`).
+/// The last operation makes it possible to find out efficiently if
+/// any two elements are in the same or different sets.
+///
+/// \tparam TThreadUnsafeOrSafe A policy controls whether `Union()` is thread-safe or not.
+/// `ThreadUnsafe` or `ThreadSafe` should be substituted here.
+/// \tparam TLabels
 template <typename TThreadUnsafeOrSafe, typename TLabels>
 class DisjointSet {
 public:
