@@ -143,6 +143,20 @@ TEST(DisjointSet, Base) {
                10, 0, 1, 1, 1, //
                10, 0, 0, 1, 1, //
                10, 10, 0, 0, 0);
+
+  disjointSet.Union(crd2Idx(1, 2), crd2Idx(0, 4));
+  expectLabels(0, 1, 1, 1, 1, //
+               0, 0, 1, 1, 1, //
+               0, 0, 1, 1, 1, //
+               0, 0, 0, 1, 1, //
+               0, 0, 0, 0, 0);
+
+  disjointSet.Union(crd2Idx(1, 4), crd2Idx(3, 1));
+  expectLabels(0, 0, 0, 0, 0, //
+               0, 0, 0, 0, 0, //
+               0, 0, 0, 0, 0, //
+               0, 0, 0, 0, 0, //
+               0, 0, 0, 0, 0);
 }
 
 } // namespace ARIA
