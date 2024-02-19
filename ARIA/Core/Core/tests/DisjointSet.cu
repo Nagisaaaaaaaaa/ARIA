@@ -62,6 +62,19 @@ TEST(DisjointSet, Base) {
   // clang-format on
 
   // Union.
+  expectLabels(0, 1, 2, 3, 4,      //
+               5, 6, 7, 8, 9,      //
+               10, 11, 12, 13, 14, //
+               15, 16, 17, 18, 19, //
+               20, 20, 22, 23, 24);
+
+  disjointSet.Union(crd2Idx(0, 4), crd2Idx(0, 4));
+  expectLabels(0, 1, 2, 3, 4,      //
+               5, 6, 7, 8, 9,      //
+               10, 11, 12, 13, 14, //
+               15, 16, 17, 18, 19, //
+               20, 21, 22, 23, 24);
+
   disjointSet.Union(crd2Idx(0, 4), crd2Idx(1, 4));
   expectLabels(0, 1, 2, 3, 4,      //
                5, 6, 7, 8, 9,      //
@@ -81,6 +94,13 @@ TEST(DisjointSet, Base) {
   disjointSet.FindAndCompress(crd2Idx(0, 3));
   disjointSet.FindAndCompress(crd2Idx(0, 4));
   disjointSet.FindAndCompress(crd2Idx(1, 4));
+  expectLabels(0, 1, 2, 3, 4,      //
+               5, 6, 7, 8, 9,      //
+               10, 11, 12, 13, 14, //
+               10, 16, 17, 18, 19, //
+               10, 10, 22, 23, 24);
+
+  disjointSet.Union(crd2Idx(1, 4), crd2Idx(1, 4));
   expectLabels(0, 1, 2, 3, 4,      //
                5, 6, 7, 8, 9,      //
                10, 11, 12, 13, 14, //
