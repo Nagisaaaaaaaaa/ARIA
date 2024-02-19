@@ -29,50 +29,54 @@ public:
   ARIA_REF_PROP(public, ARIA_HOST_DEVICE, labels, labels_);
 
 public:
-  ARIA_HOST_DEVICE value_type Find(const value_type &i) const {
-    value_type new_i;
+  ARIA_HOST_DEVICE value_type Find(value_type i) const {
+    value_type iNew;
 
-    while ((new_i = labels()[i]) != i) {
-      i = new_i;
+    while ((iNew = labels()[i]) != i) {
+      i = iNew;
     }
 
     return i;
   }
 
-  ARIA_HOST_DEVICE value_type FindAndCompress(const value_type &i) {
-    value_type i_c = i;
+  ARIA_HOST_DEVICE value_type FindAndCompress(value_type i) {
+    value_type iCpy = i;
 
-    size_t new_i;
+    size_t iNew;
 
-    while ((new_i = labels()[i]) != i) {
-      i = new_i;
-      labels()[i_c] = i;
+    while ((iNew = labels()[i]) != i) {
+      i = iNew;
+      labels()[iCpy] = i;
     }
 
     return i;
   }
 
-  ARIA_HOST_DEVICE value_type Union(const value_type &i0, const value_type &i1) {
-    bool done;
+  ARIA_HOST_DEVICE value_type Union(value_type i0, value_type i1) {
+    if constexpr (threadSafe) {
+      bool done;
 
-    do {
-      i0 = Find(i0);
-      i1 = Find(i1);
+      do {
+        i0 = Find(i0);
+        i1 = Find(i1);
 
-      if (i1 < i0) {
-        using std::swap;
-        swap(i0, i1);
-      }
+        if (i1 < i0) {
+          using std::swap;
+          swap(i0, i1);
+        }
 
-      if (i0 < i1) {
-        cuda::atomic_ref label1{labels()[i1]};
-        auto old = label1.fetch_min(i0);
-        done = (old == i1);
-        i1 = old;
-      } else { // i0 == i1.
-        done = true;
-      }
-    } while (!done);
+        if (i0 < i1) {
+          cuda::atomic_ref label1{labels()[i1]};
+          auto old = label1.fetch_min(i0);
+          done = (old == i1);
+          i1 = old;
+        } else { // i0 == i1.
+          done = true;
+        }
+      } while (!done);
+    } else {
+      // TODO: Implement this.
+    }
   }
 
 private:
