@@ -42,6 +42,9 @@ namespace ARIA {
 /// or a non-owning view, such as `std::span`, `Tensor`, .etc.
 ///
 /// \example ```cpp
+/// using VolumeHost = TensorVectorHost<Real, C<3>>;
+/// using DisjointSetHost = DisjointSet<ThreadSafe, VolumeHost>;
+/// DisjointSetHost disjointSet{VolumeHost{make_layout_major(100, 200, 400)}};
 /// ```
 template <typename TThreadUnsafeOrSafe, typename TNodes>
 class DisjointSet {

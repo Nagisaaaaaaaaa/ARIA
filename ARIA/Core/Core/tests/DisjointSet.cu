@@ -166,7 +166,7 @@ void TestCUDA() {
 
   // Initialize.
   Volume volume{make_layout_major(1000)};
-  auto tensor = cute::make_tensor(volume.tensor().data().get(), volume.layout());
+  auto tensor = make_tensor(raw_pointer_cast(volume.tensor().data()), volume.layout());
   DisjointSet<ThreadSafe, decltype(tensor)> disjointSet(tensor);
   for (int x = 0; x < disjointSet.nodes().size(); ++x)
     volume(x) = x;

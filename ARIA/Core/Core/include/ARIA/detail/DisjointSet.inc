@@ -3,7 +3,7 @@
 namespace ARIA {
 
 //! This implementation is based on
-//! 2018, Stefano Allegretti, .etc, Optimizing GPU-Based Connected Components Labeling Algorithms.
+//! 2018, Stefano Allegretti, .etc, Optimizing GPU-Based Connected Components Labelling Algorithms.
 //!
 //! Since the paper has explained the algorithms in detail, this file is not documented.
 //! Please read the paper if you want to understand the codes.
