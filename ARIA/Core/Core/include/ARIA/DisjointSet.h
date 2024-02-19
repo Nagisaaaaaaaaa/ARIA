@@ -9,13 +9,14 @@ namespace ARIA {
 template <typename TThreadUnsafeOrSafe, typename TLabels>
 class DisjointSet {
 public:
-  using value_type = TLabels::value_type;
+  using value_type = std::decay_t<decltype(std::declval<TLabels>()[0])>;
   static_assert(std::integral<value_type>, "Type of `TLabels` elements should be integral");
-  //! Should not use `std::decay_t<decltype(std::declval<TLabels>()[0])>` in order to support proxy systems.
+  static_assert(std::is_reference_v<decltype(std::declval<TLabels>()[0])>,
+                "Return type of `TLabels::operator[]` should be a reference");
 
 private:
   static_assert(std::is_same_v<TThreadUnsafeOrSafe, ThreadUnsafe> || std::is_same_v<TThreadUnsafeOrSafe, ThreadSafe>,
-                "Type of `TThreadUnsafeOrSafe` should be either `ThreadUnsafe` or `ThreadSafe`");
+                "`TThreadUnsafeOrSafe` should be substituted with either `ThreadUnsafe` or `ThreadSafe`");
   static constexpr bool threadSafe = std::is_same_v<TThreadUnsafeOrSafe, ThreadSafe>;
 
 public:
