@@ -2,6 +2,12 @@
 
 namespace ARIA {
 
+//! This implementation is based on
+//! 2018, Stefano Allegretti, .etc, Optimizing GPU-Based Connected Components Labeling Algorithms.
+//!
+//! Since the paper has explained the algorithms in detail, this file is not documented.
+//! Please read the paper if you want to understand the codes.
+
 template <typename U0, typename U1>
 ARIA_HOST_DEVICE DisjointSet<U0, U1>::value_type DisjointSet<U0, U1>::Find(DisjointSet<U0, U1>::value_type i) const {
   value_type iNew;
