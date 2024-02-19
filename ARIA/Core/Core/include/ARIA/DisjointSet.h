@@ -1,5 +1,21 @@
 #pragma once
 
+/// \file
+/// \brief A policy-based disjoint set implementation.
+///
+/// In computer science, a disjoint-set data structure, also called
+/// a union–find data structure or merge–find set, is a data structure that
+/// stores a collection of disjoint (non-overlapping) sets.
+/// Equivalently, it stores a partition of a set into disjoint subsets.
+/// It provides operations for merging sets (see `Union()`), and
+/// finding a representative member of a set (see `Find()` and `FindAndCompress()`).
+/// The last operation makes it possible to find out efficiently if
+/// any two elements are in the same or different sets.
+//
+//
+//
+//
+//
 #include "ARIA/Property.h"
 
 #include <cuda/std/atomic>
@@ -19,7 +35,14 @@ namespace ARIA {
 ///
 /// \tparam TThreadUnsafeOrSafe A policy controls whether `Union()` is thread-safe or not.
 /// `ThreadUnsafe` or `ThreadSafe` should be substituted here.
-/// \tparam TNodes
+/// \tparam TNodes A "node" is the context which a disjoint set element contains,
+/// "nodes" is the container of all the disjoint set elements, and `TNodes` is type of this container.
+/// For this disjoint set implementation, `TNodes` can be an owning container, such as
+/// `std::vector`, `std::array`, `thrust::host_vector`, `thrust::device_vector`, `TensorVector`, .etc.
+/// or a non-owning view, such as `std::span`, `Tensor`, .etc.
+///
+/// \example ```cpp
+/// ```
 template <typename TThreadUnsafeOrSafe, typename TNodes>
 class DisjointSet {
 public:
