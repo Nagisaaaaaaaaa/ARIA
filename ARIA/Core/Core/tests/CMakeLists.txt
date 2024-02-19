@@ -4,6 +4,7 @@ if (ARIA_BUILD_TESTS)
       detail/Macros.cpp
       Auto.cpp
       Constant.cpp
+      DisjointSet.cu
       ForEach.cpp
       Launcher.cu
       Layout.cu
