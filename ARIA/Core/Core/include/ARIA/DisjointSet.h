@@ -29,7 +29,7 @@ public:
   ARIA_REF_PROP(public, ARIA_HOST_DEVICE, labels, labels_);
 
 public:
-  ARIA_HOST_DEVICE value_type Find(value_type i) const {
+  [[nodiscard]] ARIA_HOST_DEVICE value_type Find(value_type i) const {
     value_type iNew;
 
     while ((iNew = labels()[i]) != i) {
@@ -52,7 +52,7 @@ public:
     return i;
   }
 
-  ARIA_HOST_DEVICE value_type Union(value_type i0, value_type i1) {
+  ARIA_HOST_DEVICE void Union(value_type i0, value_type i1) {
     if constexpr (threadSafe) {
       bool done;
 
@@ -75,7 +75,16 @@ public:
         }
       } while (!done);
     } else {
-      // TODO: Implement this.
+      i0 = Find(i0);
+      i1 = Find(i1);
+
+      if (i1 < i0) {
+        using std::swap;
+        swap(i0, i1);
+      }
+
+      if (i0 < i1)
+        labels()[i1] = i0;
     }
   }
 
