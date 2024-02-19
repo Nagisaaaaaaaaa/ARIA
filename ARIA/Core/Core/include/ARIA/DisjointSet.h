@@ -7,26 +7,30 @@
 namespace ARIA {
 
 template <typename TThreadUnsafeOrSafe, typename TLabels>
-class DisjointSet;
-
-template <typename TLabels>
-class DisjointSet<ThreadSafe, TLabels> {
-private:
-  using TLabel = TLabels::value_type;
-  static_assert(std::integral<TLabel>, "Type of labels should be integral");
+class DisjointSet {
+public:
+  using value_type = TLabels::value_type;
+  static_assert(std::integral<value_type>, "Type of `TLabels` elements should be integral");
   //! Should not use `std::decay_t<decltype(std::declval<TLabels>()[0])>` in order to support proxy systems.
+
+private:
+  static_assert(std::is_same_v<TThreadUnsafeOrSafe, ThreadUnsafe> || std::is_same_v<TThreadUnsafeOrSafe, ThreadSafe>,
+                "Type of `TThreadUnsafeOrSafe` should be either `ThreadUnsafe` or `ThreadSafe`");
+  static constexpr bool threadSafe = std::is_same_v<TThreadUnsafeOrSafe, ThreadSafe>;
 
 public:
   DisjointSet() = default;
 
-  explicit DisjointSet(const TLabels &labels) : labels_(labels) {}
+  ARIA_HOST_DEVICE explicit DisjointSet(const TLabels &labels) : labels_(labels) {}
+
+  ARIA_COPY_MOVE_ABILITY(DisjointSet, default, default); //! Let `TLabels` decide.
 
 public:
   ARIA_REF_PROP(public, ARIA_HOST_DEVICE, labels, labels_);
 
 public:
-  ARIA_HOST_DEVICE TLabel Find(const TLabel &i) const {
-    TLabel new_i;
+  ARIA_HOST_DEVICE value_type Find(const value_type &i) const {
+    value_type new_i;
 
     while ((new_i = labels()[i]) != i) {
       i = new_i;
@@ -35,8 +39,8 @@ public:
     return i;
   }
 
-  ARIA_HOST_DEVICE TLabel FindAndCompress(const TLabel &i) {
-    TLabel i_c = i;
+  ARIA_HOST_DEVICE value_type FindAndCompress(const value_type &i) {
+    value_type i_c = i;
 
     size_t new_i;
 
@@ -48,7 +52,7 @@ public:
     return i;
   }
 
-  ARIA_HOST_DEVICE TLabel Union(const TLabel &i0, const TLabel &i1) {
+  ARIA_HOST_DEVICE value_type Union(const value_type &i0, const value_type &i1) {
     bool done;
 
     do {
