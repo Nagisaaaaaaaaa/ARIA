@@ -9,9 +9,8 @@ namespace {
 
 enum Flag : int { G = 0, I = 1, L = 2 };
 
-} // namespace
-
-TEST(DisjointSet, Base) {
+template <typename TThreadUnsafeOrSafe>
+void TestCPU() {
   using Volume = TensorVector<int, C<2>, SpaceHost>;
 
   // Test case:
@@ -31,7 +30,7 @@ TEST(DisjointSet, Base) {
   // clang-format on
 
   // Initialize.
-  DisjointSet<ThreadSafe, Volume> disjointSet(Volume{make_layout_major(5, 5)});
+  DisjointSet<TThreadUnsafeOrSafe, Volume> disjointSet(Volume{make_layout_major(5, 5)});
   for (int y = 0; y < disjointSet.labels().size<1>(); ++y)
     for (int x = 0; x < disjointSet.labels().size<0>(); ++x)
       disjointSet.labels()(x, y) = disjointSet.labels().layout()(x, y);
@@ -157,6 +156,13 @@ TEST(DisjointSet, Base) {
                0, 0, 0, 0, 0, //
                0, 0, 0, 0, 0, //
                0, 0, 0, 0, 0);
+}
+
+} // namespace
+
+TEST(DisjointSet, Base) {
+  TestCPU<ThreadUnsafe>();
+  TestCPU<ThreadSafe>();
 }
 
 } // namespace ARIA
