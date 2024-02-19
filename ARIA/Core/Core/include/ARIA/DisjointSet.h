@@ -19,13 +19,13 @@ namespace ARIA {
 ///
 /// \tparam TThreadUnsafeOrSafe A policy controls whether `Union()` is thread-safe or not.
 /// `ThreadUnsafe` or `ThreadSafe` should be substituted here.
-/// \tparam TLabels
-template <typename TThreadUnsafeOrSafe, typename TLabels>
+/// \tparam TNodes
+template <typename TThreadUnsafeOrSafe, typename TNodes>
 class DisjointSet {
 public:
-  using value_type = TLabels::value_type;
-  static_assert(std::integral<value_type>, "Type of `TLabels` elements should be integral");
-  //! Should not use `std::decay_t<decltype(std::declval<TLabels>()[0])>` in order to support proxy systems.
+  using value_type = TNodes::value_type;
+  static_assert(std::integral<value_type>, "Type of `TNodes` elements should be integral");
+  //! Should not use `std::decay_t<decltype(std::declval<TNodes>()[0])>` in order to support proxy systems.
 
 private:
   static_assert(std::is_same_v<TThreadUnsafeOrSafe, ThreadUnsafe> || std::is_same_v<TThreadUnsafeOrSafe, ThreadSafe>,
@@ -38,23 +38,23 @@ private:
 public:
   DisjointSet() = default;
 
-  ARIA_HOST_DEVICE explicit DisjointSet(const TLabels &labels) : labels_(labels) {}
+  ARIA_HOST_DEVICE explicit DisjointSet(const TNodes &nodes) : nodes_(nodes) {}
 
-  ARIA_HOST_DEVICE explicit DisjointSet(TLabels &&labels) : labels_(std::move(labels)) {}
+  ARIA_HOST_DEVICE explicit DisjointSet(TNodes &&nodes) : nodes_(std::move(nodes)) {}
 
-  ARIA_COPY_MOVE_ABILITY(DisjointSet, default, default); //! Let `TLabels` decide.
+  ARIA_COPY_MOVE_ABILITY(DisjointSet, default, default); //! Let `TNodes` decide.
 
   //
   //
   //
 public:
-  /// \brief Get or set the labels.
+  /// \brief Get or set the nodes.
   ///
   /// \example ```cpp
-  /// disjointSet.labels() = ...;
-  /// disjointSet.labels()[i] = ...;
+  /// disjointSet.nodes() = ...;
+  /// disjointSet.nodes()[i] = ...;
   /// ```
-  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, labels, labels_);
+  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, nodes, nodes_);
 
   //
   //
@@ -99,7 +99,7 @@ public:
   //
   //
 private:
-  TLabels labels_;
+  TNodes nodes_;
 };
 
 } // namespace ARIA
