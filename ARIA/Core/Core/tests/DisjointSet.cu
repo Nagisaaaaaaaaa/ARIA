@@ -106,6 +106,24 @@ TEST(DisjointSet, Base) {
                10, 11, 12, 13, 14, //
                10, 16, 17, 18, 19, //
                10, 10, 22, 23, 24);
+
+  for (int y = 0; y < disjointSet.labels().size<1>(); ++y)
+    for (int x = 0; x < disjointSet.labels().size<0>(); ++x)
+      if (flags(x, y) == L) {
+        if (x - 1 >= 0 && flags(x - 1, y) == L)
+          disjointSet.Union(crd2Idx(x - 1, y), crd2Idx(x, y));
+        if (x + 1 < disjointSet.labels().size<0>() && flags(x + 1, y) == L)
+          disjointSet.Union(crd2Idx(x + 1, y), crd2Idx(x, y));
+        if (y - 1 >= 0 && flags(x, y - 1) == L)
+          disjointSet.Union(crd2Idx(x, y - 1), crd2Idx(x, y));
+        if (y + 1 < disjointSet.labels().size<1>() && flags(x, y + 1) == L)
+          disjointSet.Union(crd2Idx(x, y + 1), crd2Idx(x, y));
+      }
+  expectLabels(0, 1, 1, 1, 1,    //
+               5, 6, 1, 1, 1,    //
+               10, 11, 1, 1, 1,  //
+               10, 16, 17, 1, 1, //
+               10, 10, 22, 23, 24);
 }
 
 } // namespace ARIA
