@@ -24,6 +24,8 @@ public:
 
   ARIA_HOST_DEVICE explicit DisjointSet(const TLabels &labels) : labels_(labels) {}
 
+  ARIA_HOST_DEVICE explicit DisjointSet(TLabels &&labels) : labels_(std::move(labels)) {}
+
   ARIA_COPY_MOVE_ABILITY(DisjointSet, default, default); //! Let `TLabels` decide.
 
 public:

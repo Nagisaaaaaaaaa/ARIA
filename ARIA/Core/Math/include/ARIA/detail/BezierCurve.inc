@@ -19,6 +19,8 @@ public:
 
   ARIA_HOST_DEVICE explicit BezierCurve(const TControlPoints &controlPoints) : controlPoints_(controlPoints) {}
 
+  ARIA_HOST_DEVICE explicit BezierCurve(TControlPoints &&controlPoints) : controlPoints_(std::move(controlPoints)) {}
+
   ARIA_COPY_MOVE_ABILITY(BezierCurve, default, default); //! Let `TControlPoints` decide.
 
 public:
@@ -77,6 +79,8 @@ public:
   BezierCurve() = default;
 
   ARIA_HOST_DEVICE explicit BezierCurve(const TControlPoints &controlPoints) : controlPoints_(controlPoints) {}
+
+  ARIA_HOST_DEVICE explicit BezierCurve(TControlPoints &&controlPoints) : controlPoints_(std::move(controlPoints)) {}
 
   ARIA_COPY_MOVE_ABILITY(BezierCurve, default, default); //! Let `TControlPoints` decide.
 
