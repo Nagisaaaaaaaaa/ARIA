@@ -46,7 +46,11 @@ TEST(DisjointSet, Base) {
       fmt::print("\n");
     }
   };
-  auto expectLabel = [&](auto x, auto y, auto label) { EXPECT_EQ(disjointSet.labels()(x, y), label); };
+  auto expectLabel = [&](auto x, auto y, auto label) {
+    EXPECT_EQ(disjointSet.FindAndCompress(crd2Idx(x, y)), label);
+    EXPECT_EQ(disjointSet.Find(crd2Idx(x, y)), label);
+    EXPECT_EQ(disjointSet.labels()(x, y), label);
+  };
   // clang-format off
   auto expectLabels = [&](auto v00, auto v10, auto v20, auto v30, auto v40,
                           auto v01, auto v11, auto v21, auto v31, auto v41,
@@ -61,7 +65,7 @@ TEST(DisjointSet, Base) {
   };
   // clang-format on
 
-  // Union.
+  // Simple union.
   expectLabels(0, 1, 2, 3, 4,      //
                5, 6, 7, 8, 9,      //
                10, 11, 12, 13, 14, //
@@ -90,10 +94,6 @@ TEST(DisjointSet, Base) {
                20, 20, 22, 23, 24);
 
   disjointSet.Union(crd2Idx(1, 4), crd2Idx(0, 2));
-  disjointSet.FindAndCompress(crd2Idx(0, 2));
-  disjointSet.FindAndCompress(crd2Idx(0, 3));
-  disjointSet.FindAndCompress(crd2Idx(0, 4));
-  disjointSet.FindAndCompress(crd2Idx(1, 4));
   expectLabels(0, 1, 2, 3, 4,      //
                5, 6, 7, 8, 9,      //
                10, 11, 12, 13, 14, //
@@ -107,6 +107,7 @@ TEST(DisjointSet, Base) {
                10, 16, 17, 18, 19, //
                10, 10, 22, 23, 24);
 
+  // Complex union.
   for (int y = 0; y < disjointSet.labels().size<1>(); ++y)
     for (int x = 0; x < disjointSet.labels().size<0>(); ++x)
       if (flags(x, y) == L) {
@@ -124,6 +125,24 @@ TEST(DisjointSet, Base) {
                10, 11, 1, 1, 1,  //
                10, 16, 17, 1, 1, //
                10, 10, 22, 23, 24);
+
+  for (int y = 0; y < disjointSet.labels().size<1>(); ++y)
+    for (int x = 0; x < disjointSet.labels().size<0>(); ++x)
+      if (flags(x, y) == I) {
+        if (x - 1 >= 0 && flags(x - 1, y) == I)
+          disjointSet.Union(crd2Idx(x - 1, y), crd2Idx(x, y));
+        if (x + 1 < disjointSet.labels().size<0>() && flags(x + 1, y) == I)
+          disjointSet.Union(crd2Idx(x + 1, y), crd2Idx(x, y));
+        if (y - 1 >= 0 && flags(x, y - 1) == I)
+          disjointSet.Union(crd2Idx(x, y - 1), crd2Idx(x, y));
+        if (y + 1 < disjointSet.labels().size<1>() && flags(x, y + 1) == I)
+          disjointSet.Union(crd2Idx(x, y + 1), crd2Idx(x, y));
+      }
+  expectLabels(0, 1, 1, 1, 1,  //
+               0, 0, 1, 1, 1,  //
+               10, 0, 1, 1, 1, //
+               10, 0, 0, 1, 1, //
+               10, 10, 0, 0, 0);
 }
 
 } // namespace ARIA
