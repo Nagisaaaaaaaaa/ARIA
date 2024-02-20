@@ -42,9 +42,16 @@ namespace ARIA {
 /// or a non-owning view, such as `std::span`, `Tensor`, .etc.
 ///
 /// \example ```cpp
+/// // An owning host disjoint set.
 /// using VolumeHost = TensorVectorHost<Real, C<3>>;
 /// using DisjointSetHost = DisjointSet<ThreadSafe, VolumeHost>;
 /// DisjointSetHost disjointSet{VolumeHost{make_layout_major(100, 200, 400)}};
+///
+/// // A non-owning device disjoint set.
+/// using VolumeDevice = TensorVectorDevice<Real, C<3>>;
+/// using DisjointSetDevice = DisjointSet<ThreadSafe, VolumeDevice::RawTensor>;
+/// VolumeDevice volumeDevice{make_layout_major(100, 200, 400)};
+/// DisjointSetDevice disjointSet{volumeDevice.rawTensor()};
 /// ```
 template <typename TThreadUnsafeOrSafe, typename TNodes>
 class DisjointSet {
@@ -79,6 +86,7 @@ public:
   /// \example ```cpp
   /// disjointSet.nodes() = ...;
   /// disjointSet.nodes()[i] = ...;
+  /// disjointSet.nodes()(x, y, z) = ...;
   /// ```
   ARIA_REF_PROP(public, ARIA_HOST_DEVICE, nodes, nodes_);
 
@@ -89,7 +97,8 @@ public:
   /// \brief Takes a node of a tree as input and returns its root as output.
   ///
   /// \example ```cpp
-  /// int root = disjointSet.Find(100);
+  /// int root0 = disjointSet.Find(100);
+  /// int root1 = disjointSet.Find(x, y, z);
   /// ```
   template <typename... Coords>
   [[nodiscard]] ARIA_HOST_DEVICE inline value_type Find(Coords &&...coords) const;
@@ -99,7 +108,8 @@ public:
   /// compress the tree to accelerate later accesses.
   ///
   /// \example ```cpp
-  /// int root = disjointSet.FindAndCompress(100);
+  /// int root0 = disjointSet.FindAndCompress(100);
+  /// int root1 = disjointSet.FindAndCompress(x, y, z);
   /// ```
   template <typename... Coords>
   ARIA_HOST_DEVICE inline value_type FindAndCompress(Coords &&...coords);
@@ -109,9 +119,10 @@ public:
   ///
   /// \example ```cpp
   /// disjointSet.Union(100, 50);
+  /// disjointSet.Union(..., ...);
   /// ```
   ///
-  /// \warning In detail, suppose `r0` is the root of `i0` and `r1` is the root of `i1`,
+  /// \warning In detail, suppose `r0` is the root of `coords0` and `r1` is the root of `coords1`,
   /// If `r0 < r1`, `r0` is set as the father of `r1`.
   /// If `r1 < r0`, `r1` is set as the father of `r0`.
   /// That is, "the smaller, the father".
