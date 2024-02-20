@@ -53,6 +53,11 @@ TEST(TensorVector, HostStatic) {
   auto tensor = tv.tensor();
   static_assert(std::is_same_v<decltype(tensor.layout()), decltype(layout)>);
   EXPECT_TRUE(tensor.layout() == layout);
+
+  auto rawTensor = tv.rawTensor();
+  static_assert(std::is_same_v<decltype(rawTensor.layout()), decltype(layout)>);
+  EXPECT_TRUE(rawTensor.layout() == layout);
+  static_assert(std::is_same_v<decltype(rawTensor), decltype(tensor)>);
 }
 
 TEST(TensorVector, HostDynamic) {
@@ -75,6 +80,10 @@ TEST(TensorVector, HostDynamic) {
 
   auto tensor = tv.tensor();
   EXPECT_TRUE(tensor.layout() == layout);
+
+  auto rawTensor = tv.rawTensor();
+  EXPECT_TRUE(rawTensor.layout() == layout);
+  static_assert(std::is_same_v<decltype(rawTensor), decltype(tensor)>);
 }
 
 TEST(TensorVector, DeviceStatic) {
@@ -99,6 +108,11 @@ TEST(TensorVector, DeviceStatic) {
   auto tensor = tv.tensor();
   static_assert(std::is_same_v<decltype(tensor.layout()), decltype(layout)>);
   EXPECT_TRUE(tensor.layout() == layout);
+
+  auto rawTensor = tv.rawTensor();
+  static_assert(std::is_same_v<decltype(rawTensor.layout()), decltype(layout)>);
+  EXPECT_TRUE(rawTensor.layout() == layout);
+  static_assert(std::is_same_v<decltype(rawTensor), decltype(cute::make_tensor(tensor.data().get(), layout))>);
 }
 
 TEST(TensorVector, DeviceDynamic) {
@@ -121,6 +135,10 @@ TEST(TensorVector, DeviceDynamic) {
 
   auto tensor = tv.tensor();
   EXPECT_TRUE(tensor.layout() == layout);
+
+  auto rawTensor = tv.rawTensor();
+  EXPECT_TRUE(rawTensor.layout() == layout);
+  static_assert(std::is_same_v<decltype(rawTensor), decltype(cute::make_tensor(tensor.data().get(), layout))>);
 }
 
 TEST(TensorVector, Major) {

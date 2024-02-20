@@ -362,6 +362,7 @@ class TensorVectorReduced<T, TypeArray<cute::C<TStaticLayout::rank>, SpaceHost, 
 public:
   using Layout = TStaticLayout;
   using Tensor = cute::Tensor<cute::ArrayEngine<T, cosize_safe_v<TStaticLayout>>, TStaticLayout>;
+  using RawTensor = Tensor;
 
 public:
   TensorVectorReduced() = default;
@@ -376,6 +377,10 @@ public:
   [[nodiscard]] constexpr decltype(auto) tensor() const { return cute::make_tensor(tensor_.data(), layout()); }
 
   [[nodiscard]] constexpr decltype(auto) tensor() { return cute::make_tensor(tensor_.data(), layout()); }
+
+  [[nodiscard]] constexpr decltype(auto) rawTensor() const { return tensor(); }
+
+  [[nodiscard]] constexpr decltype(auto) rawTensor() { return tensor(); }
 
 private:
   Tensor tensor_;
@@ -393,6 +398,7 @@ public:
   using Layout = TDynLayout;
   using Tensor = std::decay_t<decltype(cute::make_tensor(std::declval<thrust::host_vector<T>>().data(),
                                                          std::declval<TDynLayout>()))>;
+  using RawTensor = Tensor;
 
 public:
   TensorVectorReduced() = default;
@@ -407,6 +413,10 @@ public:
   [[nodiscard]] constexpr decltype(auto) tensor() const { return cute::make_tensor(engine_.data(), layout()); }
 
   [[nodiscard]] constexpr decltype(auto) tensor() { return cute::make_tensor(engine_.data(), layout()); }
+
+  [[nodiscard]] constexpr decltype(auto) rawTensor() const { return tensor(); }
+
+  [[nodiscard]] constexpr decltype(auto) rawTensor() { return tensor(); }
 
 private:
   thrust::host_vector<T> engine_;
@@ -425,8 +435,8 @@ public:
   using Layout = TStaticLayout;
   using Tensor = std::decay_t<decltype(cute::make_tensor(std::declval<thrust::device_vector<T>>().data(),
                                                          std::declval<TStaticLayout>()))>;
-  using DeviceTensor = std::decay_t<decltype(cute::make_tensor(std::declval<thrust::device_vector<T>>().data().get(),
-                                                               std::declval<TStaticLayout>()))>;
+  using RawTensor = std::decay_t<decltype(cute::make_tensor(
+      thrust::raw_pointer_cast(std::declval<thrust::device_vector<T>>().data()), std::declval<TStaticLayout>()))>;
 
 public:
   TensorVectorReduced() = default;
@@ -441,6 +451,14 @@ public:
   [[nodiscard]] constexpr decltype(auto) tensor() const { return cute::make_tensor(engine_.data(), layout()); }
 
   [[nodiscard]] constexpr decltype(auto) tensor() { return cute::make_tensor(engine_.data(), layout()); }
+
+  [[nodiscard]] constexpr decltype(auto) rawTensor() const {
+    return cute::make_tensor(thrust::raw_pointer_cast(engine_.data()), layout());
+  }
+
+  [[nodiscard]] constexpr decltype(auto) rawTensor() {
+    return cute::make_tensor(thrust::raw_pointer_cast(engine_.data()), layout());
+  }
 
 private:
   thrust::device_vector<T> engine_;
@@ -458,8 +476,8 @@ public:
   using Layout = TDynLayout;
   using Tensor = std::decay_t<decltype(cute::make_tensor(std::declval<thrust::device_vector<T>>().data(),
                                                          std::declval<TDynLayout>()))>;
-  using DeviceTensor = std::decay_t<decltype(cute::make_tensor(std::declval<thrust::device_vector<T>>().data().get(),
-                                                               std::declval<TDynLayout>()))>;
+  using RawTensor = std::decay_t<decltype(cute::make_tensor(
+      thrust::raw_pointer_cast(std::declval<thrust::device_vector<T>>().data()), std::declval<TDynLayout>()))>;
 
 public:
   TensorVectorReduced() = default;
@@ -474,6 +492,14 @@ public:
   [[nodiscard]] constexpr decltype(auto) tensor() const { return cute::make_tensor(engine_.data(), layout()); }
 
   [[nodiscard]] constexpr decltype(auto) tensor() { return cute::make_tensor(engine_.data(), layout()); }
+
+  [[nodiscard]] constexpr decltype(auto) rawTensor() const {
+    return cute::make_tensor(thrust::raw_pointer_cast(engine_.data()), layout());
+  }
+
+  [[nodiscard]] constexpr decltype(auto) rawTensor() {
+    return cute::make_tensor(thrust::raw_pointer_cast(engine_.data()), layout());
+  }
 
 private:
   thrust::device_vector<T> engine_;
