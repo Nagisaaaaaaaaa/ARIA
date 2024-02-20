@@ -42,12 +42,12 @@ namespace ARIA {
 /// or a non-owning view, such as `std::span`, `Tensor`, .etc.
 ///
 /// \example ```cpp
-/// // An owning host disjoint set.
+/// // A thread-unsafe owning host disjoint set.
 /// using VolumeHost = TensorVectorHost<Real, C<3>>;
-/// using DisjointSetHost = DisjointSet<ThreadSafe, VolumeHost>;
+/// using DisjointSetHost = DisjointSet<ThreadUnsafe, VolumeHost>;
 /// DisjointSetHost disjointSet{VolumeHost{make_layout_major(100, 200, 400)}};
 ///
-/// // A non-owning device disjoint set.
+/// // A thread-safe non-owning device disjoint set.
 /// using VolumeDevice = TensorVectorDevice<Real, C<3>>;
 /// using DisjointSetDevice = DisjointSet<ThreadSafe, VolumeDevice::RawTensor>;
 /// VolumeDevice volumeDevice{make_layout_major(100, 200, 400)};
