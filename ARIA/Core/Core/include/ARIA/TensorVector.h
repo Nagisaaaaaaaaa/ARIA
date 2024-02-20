@@ -108,6 +108,11 @@ namespace ARIA {
 ///               // For device `TensorVector`s, it is able to access elements at BOTH host and device side.
 ///
 /// SomeKernel<<<1, 1>>>(dst.tensor());
+///
+/// // Raw tensor.
+/// dst.rawTensor(); // Generate a non-owning "raw" tensor.
+///                  // This tensor is unable to access elements at host side,
+///                  // but able to access elements at device side.
 /// ```
 ///
 /// \warning CuTe only support `int` as indices, so does `TensorVector`.

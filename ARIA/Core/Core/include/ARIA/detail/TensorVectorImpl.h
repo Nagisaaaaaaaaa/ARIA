@@ -377,6 +377,10 @@ public:
 
   [[nodiscard]] constexpr decltype(auto) tensor() { return cute::make_tensor(tensor_.data(), layout()); }
 
+  [[nodiscard]] constexpr decltype(auto) rawTensor() const { return tensor(); }
+
+  [[nodiscard]] constexpr decltype(auto) rawTensor() { return tensor(); }
+
 private:
   Tensor tensor_;
 };
@@ -407,6 +411,10 @@ public:
   [[nodiscard]] constexpr decltype(auto) tensor() const { return cute::make_tensor(engine_.data(), layout()); }
 
   [[nodiscard]] constexpr decltype(auto) tensor() { return cute::make_tensor(engine_.data(), layout()); }
+
+  [[nodiscard]] constexpr decltype(auto) rawTensor() const { return tensor(); }
+
+  [[nodiscard]] constexpr decltype(auto) rawTensor() { return tensor(); }
 
 private:
   thrust::host_vector<T> engine_;
@@ -442,6 +450,14 @@ public:
 
   [[nodiscard]] constexpr decltype(auto) tensor() { return cute::make_tensor(engine_.data(), layout()); }
 
+  [[nodiscard]] constexpr decltype(auto) rawTensor() const {
+    return cute::make_tensor(thrust::raw_pointer_cast(engine_.data()), layout());
+  }
+
+  [[nodiscard]] constexpr decltype(auto) rawTensor() {
+    return cute::make_tensor(thrust::raw_pointer_cast(engine_.data()), layout());
+  }
+
 private:
   thrust::device_vector<T> engine_;
 };
@@ -474,6 +490,14 @@ public:
   [[nodiscard]] constexpr decltype(auto) tensor() const { return cute::make_tensor(engine_.data(), layout()); }
 
   [[nodiscard]] constexpr decltype(auto) tensor() { return cute::make_tensor(engine_.data(), layout()); }
+
+  [[nodiscard]] constexpr decltype(auto) rawTensor() const {
+    return cute::make_tensor(thrust::raw_pointer_cast(engine_.data()), layout());
+  }
+
+  [[nodiscard]] constexpr decltype(auto) rawTensor() {
+    return cute::make_tensor(thrust::raw_pointer_cast(engine_.data()), layout());
+  }
 
 private:
   thrust::device_vector<T> engine_;
