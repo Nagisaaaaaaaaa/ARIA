@@ -91,7 +91,8 @@ public:
   /// \example ```cpp
   /// int root = disjointSet.Find(100);
   /// ```
-  [[nodiscard]] ARIA_HOST_DEVICE value_type Find(value_type i) const;
+  template <typename... Coords>
+  [[nodiscard]] ARIA_HOST_DEVICE inline value_type Find(Coords &&...coords) const;
 
   /// \brief Takes a node of a tree as input and returns its root as output.
   /// This method differs from `Find` in that it will usually
@@ -100,7 +101,8 @@ public:
   /// \example ```cpp
   /// int root = disjointSet.FindAndCompress(100);
   /// ```
-  ARIA_HOST_DEVICE value_type FindAndCompress(value_type i);
+  template <typename... Coords>
+  ARIA_HOST_DEVICE inline value_type FindAndCompress(Coords &&...coords);
 
   /// \brief Takes two nodes as inputs and joins together the trees they belong to, by
   /// setting one tree root as the father of the other one.
@@ -117,7 +119,12 @@ public:
   /// This restriction is introduced to support thread-safe disjoint sets.
   /// Also, to make behavior of the codes consistent,
   /// thread-unsafe disjoint sets also follow this rule.
-  ARIA_HOST_DEVICE void Union(value_type i0, value_type i1);
+  template <typename Coords>
+  ARIA_HOST_DEVICE inline void Union(const Coords &coords0, const Coords &coords1);
+
+  template <typename... Coords>
+    requires(sizeof...(Coords) > 1)
+  ARIA_HOST_DEVICE inline void Union(Coords &&...coords0, Coords &&...coords1);
 
   //
   //

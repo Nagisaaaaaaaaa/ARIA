@@ -9,7 +9,17 @@ namespace ARIA {
 //! Please read the paper if you want to understand the codes.
 
 template <typename U0, typename U1>
-ARIA_HOST_DEVICE DisjointSet<U0, U1>::value_type DisjointSet<U0, U1>::Find(DisjointSet<U0, U1>::value_type i) const {
+template <typename... Coords>
+ARIA_HOST_DEVICE inline DisjointSet<U0, U1>::value_type DisjointSet<U0, U1>::Find(Coords &&...coords) const {
+  value_type i;
+
+  if constexpr (sizeof...(Coords) == 1 && (std::convertible_to<Coords, value_type> && ...))
+    i = static_cast<value_type>(std::get<0>(std::forward_as_tuple(std::forward<Coords>(coords)...)));
+  else if constexpr (sizeof...(Coords) == 1)
+    i = nodes()[std::get<0>(std::forward_as_tuple(std::forward<Coords>(coords)...))];
+  else
+    i = nodes()(std::forward<Coords>(coords)...);
+
   value_type iNew;
 
   while ((iNew = nodes()[i]) != i) {
@@ -20,23 +30,45 @@ ARIA_HOST_DEVICE DisjointSet<U0, U1>::value_type DisjointSet<U0, U1>::Find(Disjo
 }
 
 template <typename U0, typename U1>
-ARIA_HOST_DEVICE DisjointSet<U0, U1>::value_type
-DisjointSet<U0, U1>::FindAndCompress(DisjointSet<U0, U1>::value_type i) {
-  value_type iCpy = i;
+template <typename... Coords>
+ARIA_HOST_DEVICE inline DisjointSet<U0, U1>::value_type DisjointSet<U0, U1>::FindAndCompress(Coords &&...coords) {
+  value_type i;
+
+  if constexpr (sizeof...(Coords) == 1 && (std::convertible_to<Coords, value_type> && ...))
+    i = static_cast<value_type>(std::get<0>(std::forward_as_tuple(std::forward<Coords>(coords)...)));
+  else if constexpr (sizeof...(Coords) == 1)
+    i = nodes()[std::get<0>(std::forward_as_tuple(std::forward<Coords>(coords)...))];
+  else
+    i = nodes()(std::forward<Coords>(coords)...);
 
   size_t iNew;
 
   while ((iNew = nodes()[i]) != i) {
     i = iNew;
-    nodes()[iCpy] = i;
+
+    // Pseudocode: `nodes()[i] = i`.
+    if constexpr (sizeof...(Coords) == 1)
+      nodes()[std::get<0>(std::forward_as_tuple(std::forward<Coords>(coords)...))] = i;
+    else
+      nodes()(std::forward<Coords>(coords)...) = i;
   }
 
   return i;
 }
 
 template <typename U0, typename TNodes>
-ARIA_HOST_DEVICE void DisjointSet<U0, TNodes>::Union(DisjointSet<U0, TNodes>::value_type i0,
-                                                     DisjointSet<U0, TNodes>::value_type i1) {
+template <typename Coords>
+ARIA_HOST_DEVICE inline void DisjointSet<U0, TNodes>::Union(const Coords &coords0, const Coords &coords1) {
+  value_type i0, i1;
+
+  if constexpr (std::convertible_to<Coords, value_type>) {
+    i0 = static_cast<value_type>(coords0);
+    i1 = static_cast<value_type>(coords1);
+  } else {
+    i0 = nodes()[coords0];
+    i1 = nodes()[coords1];
+  }
+
   if constexpr (threadSafe) {
     bool done;
 
@@ -76,6 +108,13 @@ ARIA_HOST_DEVICE void DisjointSet<U0, TNodes>::Union(DisjointSet<U0, TNodes>::va
     if (i0 < i1)
       nodes()[i1] = i0;
   }
+}
+
+template <typename U0, typename U1>
+template <typename... Coords>
+  requires(sizeof...(Coords) > 1)
+ARIA_HOST_DEVICE inline void DisjointSet<U0, U1>::Union(Coords &&...coords0, Coords &&...coords1) {
+  return Union(nodes()(std::forward<Coords>(coords0)...), nodes()(std::forward<Coords>(coords1)...));
 }
 
 } // namespace ARIA
