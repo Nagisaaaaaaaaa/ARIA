@@ -82,8 +82,6 @@ ARIA_HOST_DEVICE inline void DisjointSet<U0, TNodes>::Union(const Coords &coords
       }
 
       if (i0 < i1) {
-        static_assert(std::is_same_v<value_type, decltype(Auto(std::declval<TNodes>()[0]))>,
-                      "Return type of `TNodes::operator[]` should represents the same type with `value_type`");
         static_assert(std::is_reference_v<decltype(std::declval<TNodes>()[0])>,
                       "Return type of `TNodes::operator[]` should be a reference");
         //! Proxy systems are not allowed here because constructors of `atomic_ref` only accept references.

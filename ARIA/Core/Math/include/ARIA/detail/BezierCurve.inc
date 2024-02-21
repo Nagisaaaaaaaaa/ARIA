@@ -10,9 +10,8 @@ public:
 
 private:
   using VecDim = Vec<T, dim>;
-  static_assert(std::is_same_v<VecDim, typename TControlPoints::value_type>,
+  static_assert(std::is_same_v<VecDim, decltype(Auto(std::declval<TControlPoints>()[0]))>,
                 "Type of control points does not match the dimension");
-  //! Should not use `std::decay_t<decltype(std::declval<TControlPoints>()[0])>` in order to support proxy systems.
 
 public:
   BezierCurve() = default;
@@ -71,9 +70,8 @@ public:
 
 private:
   using VecDim = Vec<T, dim>;
-  static_assert(std::is_same_v<VecDim, typename TControlPoints::value_type>,
+  static_assert(std::is_same_v<VecDim, decltype(Auto(std::declval<TControlPoints>()[0]))>,
                 "Type of control points does not match the dimension");
-  //! Should not use `std::decay_t<decltype(std::declval<TControlPoints>()[0])>` in order to support proxy systems.
 
 public:
   BezierCurve() = default;

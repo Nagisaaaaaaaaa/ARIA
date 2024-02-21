@@ -56,9 +56,8 @@ namespace ARIA {
 template <typename TThreadUnsafeOrSafe, typename TNodes>
 class DisjointSet {
 public:
-  using value_type = TNodes::value_type;
+  using value_type = decltype(Auto(std::declval<TNodes>()[0]));
   static_assert(std::integral<value_type>, "Type of `TNodes` elements should be integral");
-  //! Should not use `std::decay_t<decltype(std::declval<TNodes>()[0])>` in order to support proxy systems.
 
 private:
   static_assert(std::is_same_v<TThreadUnsafeOrSafe, ThreadUnsafe> || std::is_same_v<TThreadUnsafeOrSafe, ThreadSafe>,
