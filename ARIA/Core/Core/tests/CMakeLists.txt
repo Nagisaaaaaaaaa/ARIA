@@ -3,7 +3,6 @@ if (ARIA_BUILD_TESTS)
       SOURCES
       detail/Macros.cpp
       Auto.cpp
-      Concepts.cpp
       Constant.cpp
       DisjointSet.cu
       ForEach.cpp
@@ -14,6 +13,7 @@ if (ARIA_BUILD_TESTS)
       Registry.cpp
       TensorVector.cu
       TypeArray.cpp
+      TypeTraits.cpp
       HARD_DEPENDENCIES
       ARIA::Core::Core
   )
