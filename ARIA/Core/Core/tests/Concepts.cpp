@@ -6,30 +6,35 @@ namespace ARIA {
 
 namespace {
 
+class Float {
+public:
+  explicit operator float() const { return 0.0F; }
+};
+
 class CallByParentheses {
 public:
-  int operator()(int v) {}
+  Float operator()(int v) {}
 };
 
 class CallByBrackets {
 public:
-  int operator[](int v) {}
+  Float operator[](int v) {}
 };
 
 class CallByBoth {
 public:
-  int operator()(int v) {}
+  Float operator()(int v) {}
 
-  int operator[](int v) {}
+  Float operator[](int v) {}
 };
 
 } // namespace
 
 TEST(Concepts, Base) {
   // Is invocable with brackets.
-  static_assert(is_invocable_with_brackets_v<std::vector<int>, int>);
-  static_assert(is_invocable_with_brackets_v<std::vector<int>, uint64>);
-  static_assert(is_invocable_with_brackets_v<std::vector<int>, double>);
+  static_assert(is_invocable_with_brackets_v<std::vector<std::string>, int>);
+  static_assert(is_invocable_with_brackets_v<std::vector<std::string>, uint64>);
+  static_assert(is_invocable_with_brackets_v<std::vector<std::string>, double>);
 
   static_assert(is_invocable_with_brackets_v<CallByBrackets, int>);
   static_assert(is_invocable_with_brackets_v<CallByBrackets, uint64>);
@@ -42,26 +47,41 @@ TEST(Concepts, Base) {
   static_assert(!is_invocable_with_brackets_v<CallByBrackets, int, int>);
   static_assert(!is_invocable_with_brackets_v<CallByParentheses, int>);
 
+  // Invocable with brackets.
+  static_assert(invocable_with_brackets<std::vector<std::string>, int>);
+  static_assert(invocable_with_brackets<std::vector<std::string>, uint64>);
+  static_assert(invocable_with_brackets<std::vector<std::string>, double>);
+
+  static_assert(invocable_with_brackets<CallByBrackets, int>);
+  static_assert(invocable_with_brackets<CallByBrackets, uint64>);
+  static_assert(invocable_with_brackets<CallByBrackets, double>);
+
+  static_assert(invocable_with_brackets<CallByBoth, int>);
+  static_assert(invocable_with_brackets<CallByBoth, uint64>);
+  static_assert(invocable_with_brackets<CallByBoth, double>);
+
+  static_assert(!invocable_with_brackets<CallByBrackets, int, int>);
+  static_assert(!invocable_with_brackets<CallByParentheses, int>);
+
   // Is invocable with brackets (r).
-  static_assert(std::is_invocable_r_v<int, CallByParentheses, int>);
-  static_assert(std::is_invocable_r_v<float, CallByParentheses, int>);
-  static_assert(std::is_invocable_r_v<uint64, CallByParentheses, int>);
+  static_assert(is_invocable_with_brackets_r_v<std::string, std::vector<std::string>, int>);
+  static_assert(is_invocable_with_brackets_r_v<int, std::vector<float>, int>);
+  static_assert(is_invocable_with_brackets_r_v<double, std::vector<float>, uint64>);
+  static_assert(is_invocable_with_brackets_r_v<uint64, std::vector<float>, double>);
 
-  static_assert(is_invocable_with_brackets_r_v<int, std::vector<int>, int>);
-  static_assert(is_invocable_with_brackets_r_v<double, std::vector<int>, uint64>);
-  static_assert(is_invocable_with_brackets_r_v<uint64, std::vector<int>, double>);
+  static_assert(std::is_invocable_r_v<Float, CallByParentheses, int>);
+  static_assert(!std::is_invocable_r_v<float, CallByParentheses, int>);
 
-  static_assert(is_invocable_with_brackets_r_v<int, CallByBrackets, int>);
-  static_assert(is_invocable_with_brackets_r_v<double, CallByBrackets, uint64>);
-  static_assert(is_invocable_with_brackets_r_v<uint64, CallByBrackets, double>);
+  static_assert(is_invocable_with_brackets_r_v<Float, CallByBrackets, int>);
+  static_assert(!is_invocable_with_brackets_r_v<float, CallByBrackets, double>);
+  static_assert(!is_invocable_with_brackets_r_v<std::string, CallByBrackets, int>);
 
-  static_assert(is_invocable_with_brackets_r_v<int, CallByBoth, int>);
-  static_assert(is_invocable_with_brackets_r_v<double, CallByBoth, uint64>);
-  static_assert(is_invocable_with_brackets_r_v<uint64, CallByBoth, double>);
+  static_assert(is_invocable_with_brackets_r_v<Float, CallByBoth, int>);
+  static_assert(!is_invocable_with_brackets_r_v<float, CallByBoth, double>);
+  static_assert(!is_invocable_with_brackets_r_v<std::string, CallByBoth, double>);
 
   static_assert(!is_invocable_with_brackets_r_v<int, CallByBrackets, int, int>);
   static_assert(!is_invocable_with_brackets_r_v<int, CallByParentheses, int>);
-  static_assert(!is_invocable_with_brackets_r_v<std::string, CallByBrackets, int>);
 }
 
 } // namespace ARIA
