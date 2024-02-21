@@ -2,7 +2,7 @@
 
 #include "ARIA/ARIA.h"
 
-#include <type_traits>
+#include <concepts>
 
 namespace ARIA {
 

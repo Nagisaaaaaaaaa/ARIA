@@ -46,6 +46,7 @@ target_include_directories(CUTLASS INTERFACE ${cutlass_SOURCE_DIR}/include)
 set(core_core_headers
     ARIA/ARIA.h
     ARIA/Auto.h
+    ARIA/Concepts.h
     ARIA/Constant.h
     ARIA/DisjointSet.h
     ARIA/ForEach.h
@@ -56,7 +57,6 @@ set(core_core_headers
     ARIA/Registry.h
     ARIA/SmallVector.h
     ARIA/TensorVector.h
-    ARIA/TypeTraits.h
     ARIA/TypeArray.h
 )
 
