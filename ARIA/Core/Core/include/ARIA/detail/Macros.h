@@ -1,8 +1,7 @@
 #pragma once
 
 /// \file
-/// \brief A collection of commonly used macros.
-
+/// \brief This file introduces a collection of commonly used macros.
 //
 //
 //

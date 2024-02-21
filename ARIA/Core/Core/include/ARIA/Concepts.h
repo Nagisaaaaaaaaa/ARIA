@@ -1,5 +1,12 @@
 #pragma once
 
+/// \file
+/// \brief This file introduces a collection of commonly used type traits and concepts.
+//
+//
+//
+//
+//
 #include "ARIA/ARIA.h"
 
 #include <concepts>
