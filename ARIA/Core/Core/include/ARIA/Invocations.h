@@ -183,6 +183,33 @@ ARIA_HOST_DEVICE constexpr decltype(auto) invoke_with_brackets_or_parentheses(T 
 //
 //
 //
+namespace invocations::detail {
+
+template <typename T, typename TTuple, std::size_t... I>
+ARIA_HOST_DEVICE constexpr decltype(auto) apply_with_brackets_impl(T &&t, TTuple &&tuple, std::index_sequence<I...>) {
+  //! Use `get` instead of `std::get` to support tuple types different from `std::tuple`,
+  //! for example, `cuda::std::tuple`.
+  //! Let ADL decides which `get` to call.
+  return invoke_with_brackets(std::forward<T>(t), get<I>(std::forward<TTuple>(tuple))...);
+}
+
+template <typename T, typename TTuple, std::size_t... I>
+ARIA_HOST_DEVICE constexpr decltype(auto)
+apply_with_parentheses_or_brackets_impl(T &&t, TTuple &&tuple, std::index_sequence<I...>) {
+  return invoke_with_parentheses_or_brackets(std::forward<T>(t), get<I>(std::forward<TTuple>(tuple))...);
+}
+
+template <typename T, typename TTuple, std::size_t... I>
+ARIA_HOST_DEVICE constexpr decltype(auto)
+apply_with_brackets_or_parentheses_impl(T &&t, TTuple &&tuple, std::index_sequence<I...>) {
+  return invoke_with_brackets_or_parentheses(std::forward<T>(t), get<I>(std::forward<TTuple>(tuple))...);
+}
+
+} // namespace invocations::detail
+
+//
+//
+//
 /// \brief Calls `t[get<0>(tuple), get<1>(tuple), ...]` and gets the return value if exists.
 ///
 /// \example ```cpp
@@ -190,10 +217,9 @@ ARIA_HOST_DEVICE constexpr decltype(auto) invoke_with_brackets_or_parentheses(T 
 /// ```
 template <typename T, typename TTuple>
 ARIA_HOST_DEVICE constexpr decltype(auto) apply_with_brackets(T &&t, TTuple &&tuple) {
-  //! Use `get` instead of `std::get` to support tuple types different from `std::tuple`,
-  //! for example, `cuda::std::tuple`.
-  //! Let ADL decides which `get` to call.
-  return invoke_with_brackets(std::forward<T>(t), get<0>(std::forward<TTuple>(tuple)));
+  return invocations::detail::apply_with_brackets_impl(
+      std::forward<T>(t), std::forward<TTuple>(tuple),
+      std::make_index_sequence<std::tuple_size_v<std::decay_t<TTuple>>>{});
 }
 
 /// \brief If expression `t(get<0>(tuple), get<1>(tuple), ...)` is valid,
@@ -214,7 +240,9 @@ ARIA_HOST_DEVICE constexpr decltype(auto) apply_with_brackets(T &&t, TTuple &&tu
 /// `operator[]` has higher priority.
 template <typename T, typename TTuple>
 ARIA_HOST_DEVICE constexpr decltype(auto) apply_with_parentheses_or_brackets(T &&t, TTuple &&tuple) {
-  return invoke_with_parentheses_or_brackets(std::forward<T>(t), get<0>(std::forward<TTuple>(tuple)));
+  return invocations::detail::apply_with_parentheses_or_brackets_impl(
+      std::forward<T>(t), std::forward<TTuple>(tuple),
+      std::make_index_sequence<std::tuple_size_v<std::decay_t<TTuple>>>{});
 }
 
 /// \brief If expression `t[get<0>(tuple), get<1>(tuple), ...]` is valid,
@@ -235,7 +263,9 @@ ARIA_HOST_DEVICE constexpr decltype(auto) apply_with_parentheses_or_brackets(T &
 /// `operator()` has higher priority.
 template <typename T, typename TTuple>
 ARIA_HOST_DEVICE constexpr decltype(auto) apply_with_brackets_or_parentheses(T &&t, TTuple &&tuple) {
-  return invoke_with_brackets_or_parentheses(std::forward<T>(t), get<0>(std::forward<TTuple>(tuple)));
+  return invocations::detail::apply_with_brackets_or_parentheses_impl(
+      std::forward<T>(t), std::forward<TTuple>(tuple),
+      std::make_index_sequence<std::tuple_size_v<std::decay_t<TTuple>>>{});
 }
 
 } // namespace ARIA
