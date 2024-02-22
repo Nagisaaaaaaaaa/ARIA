@@ -14,6 +14,7 @@
 //
 #include "ARIA/Curve.h"
 #include "ARIA/ForEach.h"
+#include "ARIA/Invocations.h"
 #include "ARIA/Math.h"
 #include "ARIA/SmallVector.h"
 
@@ -34,6 +35,8 @@ namespace ARIA {
 /// `std::vector`, `std::array`, `thrust::host_vector`, `thrust::device_vector`, `TensorVector`, .etc.
 /// You can also define non-owning `BezierCurve` by entering:
 /// `std::span`, `Tensor`, .etc.
+/// You can even define owning or non-owning accessors:
+/// `auto accessor = [&](size_t i) { return controlPoints[i]; };`
 ///
 /// \example ```cpp
 /// // Define type of the control points.

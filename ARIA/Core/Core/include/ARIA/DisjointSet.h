@@ -16,6 +16,7 @@
 //
 //
 //
+#include "ARIA/Invocations.h"
 #include "ARIA/Property.h"
 
 #include <cuda/std/atomic>
@@ -39,7 +40,9 @@ namespace ARIA {
 /// "nodes" is the container of all the disjoint set elements, and `TNodes` is type of this container.
 /// For this disjoint set implementation, `TNodes` can be an owning container, such as
 /// `std::vector`, `std::array`, `thrust::host_vector`, `thrust::device_vector`, `TensorVector`, .etc.
-/// or a non-owning view, such as `std::span`, `Tensor`, .etc.
+/// Or a non-owning view, such as `std::span`, `Tensor`, .etc.
+/// Or even an owning or non-owning accessor, such as
+/// `auto accessor = [&](size_t i) -> decltype(auto) { return nodes[i]; };`, .etc.
 ///
 /// \example ```cpp
 /// // A thread-unsafe owning host disjoint set.
@@ -56,9 +59,8 @@ namespace ARIA {
 template <typename TThreadUnsafeOrSafe, typename TNodes>
 class DisjointSet {
 public:
-  using value_type = TNodes::value_type;
+  using value_type = decltype(Auto(invoke_with_parentheses_or_brackets(std::declval<TNodes>(), 0)));
   static_assert(std::integral<value_type>, "Type of `TNodes` elements should be integral");
-  //! Should not use `std::decay_t<decltype(std::declval<TNodes>()[0])>` in order to support proxy systems.
 
 private:
   static_assert(std::is_same_v<TThreadUnsafeOrSafe, ThreadUnsafe> || std::is_same_v<TThreadUnsafeOrSafe, ThreadSafe>,

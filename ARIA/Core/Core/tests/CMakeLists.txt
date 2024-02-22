@@ -6,6 +6,7 @@ if (ARIA_BUILD_TESTS)
       Constant.cpp
       DisjointSet.cu
       ForEach.cpp
+      Invocations.cpp
       Launcher.cu
       Layout.cu
       Property.cpp

@@ -15,14 +15,13 @@ ARIA_HOST_DEVICE inline DisjointSet<U0, U1>::value_type DisjointSet<U0, U1>::Fin
 
   if constexpr (sizeof...(Coords) == 1 && (std::convertible_to<Coords, value_type> && ...))
     i = static_cast<value_type>(std::get<0>(std::forward_as_tuple(std::forward<Coords>(coords)...)));
-  else if constexpr (sizeof...(Coords) == 1)
-    i = nodes()[std::get<0>(std::forward_as_tuple(std::forward<Coords>(coords)...))];
   else
-    i = nodes()(std::forward<Coords>(coords)...);
+    i = invoke_with_parentheses_or_brackets(nodes(), std::forward<Coords>(coords)...);
 
   value_type iNew;
 
-  while ((iNew = nodes()[i]) != i) {
+  // Pseudocode: `while ((iNew = nodes()[i]) != i)`.
+  while ((iNew = invoke_with_parentheses_or_brackets(nodes(), i)) != i) {
     i = iNew;
   }
 
@@ -36,21 +35,17 @@ ARIA_HOST_DEVICE inline DisjointSet<U0, U1>::value_type DisjointSet<U0, U1>::Fin
 
   if constexpr (sizeof...(Coords) == 1 && (std::convertible_to<Coords, value_type> && ...))
     i = static_cast<value_type>(std::get<0>(std::forward_as_tuple(std::forward<Coords>(coords)...)));
-  else if constexpr (sizeof...(Coords) == 1)
-    i = nodes()[std::get<0>(std::forward_as_tuple(std::forward<Coords>(coords)...))];
   else
-    i = nodes()(std::forward<Coords>(coords)...);
+    i = invoke_with_parentheses_or_brackets(nodes(), std::forward<Coords>(coords)...);
 
   size_t iNew;
 
-  while ((iNew = nodes()[i]) != i) {
+  // Pseudocode: `while ((iNew = nodes()[i]) != i)`.
+  while ((iNew = invoke_with_parentheses_or_brackets(nodes(), i)) != i) {
     i = iNew;
 
     // Pseudocode: `nodes()[i] = i`.
-    if constexpr (sizeof...(Coords) == 1)
-      nodes()[std::get<0>(std::forward_as_tuple(std::forward<Coords>(coords)...))] = i;
-    else
-      nodes()(std::forward<Coords>(coords)...) = i;
+    invoke_with_parentheses_or_brackets(nodes(), std::forward<Coords>(coords)...) = i;
   }
 
   return i;
@@ -65,8 +60,8 @@ ARIA_HOST_DEVICE inline void DisjointSet<U0, TNodes>::Union(const Coords &coords
     i0 = static_cast<value_type>(coords0);
     i1 = static_cast<value_type>(coords1);
   } else {
-    i0 = nodes()[coords0];
-    i1 = nodes()[coords1];
+    i0 = invoke_with_parentheses_or_brackets(nodes(), coords0); // Pseudocode: `i0 = nodes()[coords0]`.
+    i1 = invoke_with_parentheses_or_brackets(nodes(), coords1);
   }
 
   if constexpr (threadSafe) {
@@ -82,13 +77,12 @@ ARIA_HOST_DEVICE inline void DisjointSet<U0, TNodes>::Union(const Coords &coords
       }
 
       if (i0 < i1) {
-        static_assert(std::is_same_v<value_type, decltype(Auto(std::declval<TNodes>()[0]))>,
-                      "Return type of `TNodes::operator[]` should represents the same type with `value_type`");
-        static_assert(std::is_reference_v<decltype(std::declval<TNodes>()[0])>,
-                      "Return type of `TNodes::operator[]` should be a reference");
+        static_assert(std::is_reference_v<decltype(invoke_with_parentheses_or_brackets(std::declval<TNodes>(), 0))>,
+                      "Return type of `TNodes::operator()` or `TNodes::operator[]` should be a reference");
         //! Proxy systems are not allowed here because constructors of `atomic_ref` only accept references.
 
-        cuda::atomic_ref node1{nodes()[i1]};
+        // Pseudocode: `cuda::atomic_ref node1{nodes()[i1]};`.
+        cuda::atomic_ref node1{invoke_with_parentheses_or_brackets(nodes(), i1)};
         auto old = node1.fetch_min(i0);
         done = (old == i1);
         i1 = old;
@@ -105,8 +99,10 @@ ARIA_HOST_DEVICE inline void DisjointSet<U0, TNodes>::Union(const Coords &coords
       swap(i0, i1);
     }
 
-    if (i0 < i1)
-      nodes()[i1] = i0;
+    if (i0 < i1) {
+      // Pseudocode: `nodes()[i1] = i0;`.
+      invoke_with_parentheses_or_brackets(nodes(), i1) = i0;
+    }
   }
 }
 
@@ -114,7 +110,8 @@ template <typename U0, typename U1>
 template <typename... Coords>
   requires(sizeof...(Coords) > 1)
 ARIA_HOST_DEVICE inline void DisjointSet<U0, U1>::Union(Coords &&...coords0, Coords &&...coords1) {
-  return Union(nodes()(std::forward<Coords>(coords0)...), nodes()(std::forward<Coords>(coords1)...));
+  return Union(invoke_with_parentheses_or_brackets(nodes(), std::forward<Coords>(coords0)...),
+               invoke_with_parentheses_or_brackets(nodes(), std::forward<Coords>(coords1)...));
 }
 
 } // namespace ARIA

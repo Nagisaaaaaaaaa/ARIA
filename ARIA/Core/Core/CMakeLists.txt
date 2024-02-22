@@ -49,6 +49,7 @@ set(core_core_headers
     ARIA/Constant.h
     ARIA/DisjointSet.h
     ARIA/ForEach.h
+    ARIA/Invocations.h
     ARIA/Launcher.h
     ARIA/Layout.h
     ARIA/Property.h
