@@ -35,7 +35,7 @@ public:
 
 } // namespace
 
-TEST(Concepts, Base) {
+TEST(Invocations, Base) {
   // Is invocable with brackets.
   static_assert(is_invocable_with_brackets_v<std::vector<std::string>, int>);
   static_assert(is_invocable_with_brackets_v<std::vector<std::string>, uint64>);
@@ -99,6 +99,16 @@ TEST(Concepts, Base) {
 
   static_assert(!is_invocable_with_brackets_r_v<int, CallByBrackets, int, int>);
   static_assert(!is_invocable_with_brackets_r_v<int, CallByParentheses, int>);
+}
+
+TEST(Invocations, InvokeWithBrackets) {
+  static_assert(std::is_same_v<decltype(invoke_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 0)), float &>);
+  decltype(auto) v = invoke_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 0);
+  static_assert(std::is_same_v<decltype(v), float &>);
+
+  EXPECT_FLOAT_EQ(invoke_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 0), 1.1F);
+  EXPECT_FLOAT_EQ(invoke_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 1), 2.2F);
+  EXPECT_FLOAT_EQ(invoke_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 2), 3.3F);
 }
 
 } // namespace ARIA
