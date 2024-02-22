@@ -28,6 +28,11 @@ public:
   Float operator[](int v) {}
 };
 
+class CallByBothVoid {
+public:
+  void operator[](int v) {}
+};
+
 } // namespace
 
 TEST(Concepts, Base) {
@@ -44,6 +49,10 @@ TEST(Concepts, Base) {
   static_assert(is_invocable_with_brackets_v<CallByBoth, uint64>);
   static_assert(is_invocable_with_brackets_v<CallByBoth, double>);
 
+  static_assert(is_invocable_with_brackets_v<CallByBothVoid, int>);
+  static_assert(is_invocable_with_brackets_v<CallByBothVoid, uint64>);
+  static_assert(is_invocable_with_brackets_v<CallByBothVoid, double>);
+
   static_assert(!is_invocable_with_brackets_v<CallByBrackets, int, int>);
   static_assert(!is_invocable_with_brackets_v<CallByParentheses, int>);
 
@@ -59,6 +68,10 @@ TEST(Concepts, Base) {
   static_assert(invocable_with_brackets<CallByBoth, int>);
   static_assert(invocable_with_brackets<CallByBoth, uint64>);
   static_assert(invocable_with_brackets<CallByBoth, double>);
+
+  static_assert(invocable_with_brackets<CallByBothVoid, int>);
+  static_assert(invocable_with_brackets<CallByBothVoid, uint64>);
+  static_assert(invocable_with_brackets<CallByBothVoid, double>);
 
   static_assert(!invocable_with_brackets<CallByBrackets, int, int>);
   static_assert(!invocable_with_brackets<CallByParentheses, int>);
@@ -79,6 +92,10 @@ TEST(Concepts, Base) {
   static_assert(is_invocable_with_brackets_r_v<Float, CallByBoth, int>);
   static_assert(!is_invocable_with_brackets_r_v<float, CallByBoth, double>);
   static_assert(!is_invocable_with_brackets_r_v<std::string, CallByBoth, double>);
+
+  static_assert(std::is_invocable_r_v<void, CallByBoth, int>);
+
+  static_assert(is_invocable_with_brackets_r_v<void, CallByBothVoid, int>);
 
   static_assert(!is_invocable_with_brackets_r_v<int, CallByBrackets, int, int>);
   static_assert(!is_invocable_with_brackets_r_v<int, CallByParentheses, int>);

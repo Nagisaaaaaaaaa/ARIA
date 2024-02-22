@@ -77,4 +77,17 @@ struct is_invocable_with_brackets_r<TRes, T, Ts...> {
 template <typename TRes, typename T, typename... Ts>
 static constexpr bool is_invocable_with_brackets_r_v = is_invocable_with_brackets_r<TRes, T, Ts...>::value;
 
+//
+//
+//
+//
+//
+template <typename T, typename... Ts>
+decltype(auto) invoke_with_brackets(T &&t, Ts &&...ts) {
+  static_assert(invocable_with_brackets<T, Ts...>,
+                "The given types should satisfy the `invocable_with_brackets` concepts");
+
+  return t[std::get<0>(std::forward_as_tuple(std::forward<Ts>(ts)...))];
+}
+
 } // namespace ARIA
