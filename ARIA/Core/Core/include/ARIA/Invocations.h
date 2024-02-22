@@ -119,7 +119,7 @@ static constexpr bool is_invocable_with_brackets_r_v = is_invocable_with_bracket
 /// EXPECT_FLOAT_EQ(invoke_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 0), 1.1F);
 /// ```
 template <typename T, typename... Ts>
-ARIA_HOST_DEVICE decltype(auto) invoke_with_brackets(T &&t, Ts &&...ts) {
+ARIA_HOST_DEVICE constexpr decltype(auto) invoke_with_brackets(T &&t, Ts &&...ts) {
   static_assert(invocable_with_brackets<T, Ts...>,
                 "The given types should satisfy the `invocable_with_brackets` concepts");
 
@@ -143,7 +143,7 @@ ARIA_HOST_DEVICE decltype(auto) invoke_with_brackets(T &&t, Ts &&...ts) {
 /// Use `invoke_with_brackets_or_parentheses` instead if you want
 /// `operator[]` has higher priority.
 template <typename T, typename... Ts>
-ARIA_HOST_DEVICE decltype(auto) invoke_with_parentheses_or_brackets(T &&t, Ts &&...ts) {
+ARIA_HOST_DEVICE constexpr decltype(auto) invoke_with_parentheses_or_brackets(T &&t, Ts &&...ts) {
   if constexpr (std::invocable<T, Ts...>)
     return std::invoke(std::forward<T>(t), std::forward<Ts>(ts)...);
   else if constexpr (invocable_with_brackets<T, Ts...>)
@@ -169,7 +169,7 @@ ARIA_HOST_DEVICE decltype(auto) invoke_with_parentheses_or_brackets(T &&t, Ts &&
 /// Use `invoke_with_parentheses_or_brackets` instead if you want
 /// `operator()` has higher priority.
 template <typename T, typename... Ts>
-ARIA_HOST_DEVICE decltype(auto) invoke_with_brackets_or_parentheses(T &&t, Ts &&...ts) {
+ARIA_HOST_DEVICE constexpr decltype(auto) invoke_with_brackets_or_parentheses(T &&t, Ts &&...ts) {
   if constexpr (invocable_with_brackets<T, Ts...>)
     return invoke_with_brackets(std::forward<T>(t), std::forward<Ts>(ts)...);
   else if constexpr (std::invocable<T, Ts...>)
@@ -189,7 +189,7 @@ ARIA_HOST_DEVICE decltype(auto) invoke_with_brackets_or_parentheses(T &&t, Ts &&
 /// EXPECT_FLOAT_EQ(apply_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, std::make_tuple(0)), 1.1F);
 /// ```
 template <typename T, typename TTuple>
-ARIA_HOST_DEVICE decltype(auto) apply_with_brackets(T &&t, TTuple &&tuple) {
+ARIA_HOST_DEVICE constexpr decltype(auto) apply_with_brackets(T &&t, TTuple &&tuple) {
   //! Use `get` instead of `std::get` to support tuple types different from `std::tuple`,
   //! for example, `cuda::std::tuple`.
   //! Let ADL decides which `get` to call.
@@ -213,7 +213,7 @@ ARIA_HOST_DEVICE decltype(auto) apply_with_brackets(T &&t, TTuple &&tuple) {
 /// Use `apply_with_brackets_or_parentheses` instead if you want
 /// `operator[]` has higher priority.
 template <typename T, typename TTuple>
-ARIA_HOST_DEVICE decltype(auto) apply_with_parentheses_or_brackets(T &&t, TTuple &&tuple) {
+ARIA_HOST_DEVICE constexpr decltype(auto) apply_with_parentheses_or_brackets(T &&t, TTuple &&tuple) {
   return invoke_with_parentheses_or_brackets(std::forward<T>(t), get<0>(std::forward<TTuple>(tuple)));
 }
 
@@ -234,7 +234,7 @@ ARIA_HOST_DEVICE decltype(auto) apply_with_parentheses_or_brackets(T &&t, TTuple
 /// Use `apply_with_brackets_or_parentheses` instead if you want
 /// `operator()` has higher priority.
 template <typename T, typename TTuple>
-ARIA_HOST_DEVICE decltype(auto) apply_with_brackets_or_parentheses(T &&t, TTuple &&tuple) {
+ARIA_HOST_DEVICE constexpr decltype(auto) apply_with_brackets_or_parentheses(T &&t, TTuple &&tuple) {
   return invoke_with_brackets_or_parentheses(std::forward<T>(t), get<0>(std::forward<TTuple>(tuple)));
 }
 
