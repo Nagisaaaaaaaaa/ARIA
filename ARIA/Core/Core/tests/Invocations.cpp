@@ -1,5 +1,6 @@
 #include "ARIA/Invocations.h"
 
+#include <cuda/std/tuple>
 #include <gtest/gtest.h>
 
 namespace ARIA {
@@ -174,6 +175,180 @@ TEST(Invocations, Invoke) {
       EXPECT_FLOAT_EQ(invoke_with_brackets_or_parentheses(vs, 0), 1.1F);
       EXPECT_FLOAT_EQ(invoke_with_brackets_or_parentheses(vs, 1), 2.2F);
       EXPECT_FLOAT_EQ(invoke_with_brackets_or_parentheses(vs, 2), 3.3F);
+    }
+  }
+}
+
+TEST(Invocations, ApplySTDTuple) {
+  // Apply with brackets.
+  {
+    static_assert(
+        std::is_same_v<decltype(apply_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, std::make_tuple(0))),
+                       float &>);
+    decltype(auto) v = apply_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, std::make_tuple(0));
+    static_assert(std::is_same_v<decltype(v), float &>);
+
+    EXPECT_FLOAT_EQ(apply_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, std::make_tuple(0)), 1.1F);
+    EXPECT_FLOAT_EQ(apply_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, std::make_tuple(1)), 2.2F);
+    EXPECT_FLOAT_EQ(apply_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, std::make_tuple(2)), 3.3F);
+  }
+
+  // Apply with parentheses or brackets.
+  {
+    {
+      static_assert(std::is_same_v<decltype(apply_with_parentheses_or_brackets(std::vector<float>{1.1F, 2.2F, 3.3F},
+                                                                               std::make_tuple(0))),
+                                   float &>);
+      decltype(auto) v = apply_with_parentheses_or_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, std::make_tuple(0));
+      static_assert(std::is_same_v<decltype(v), float &>);
+
+      EXPECT_FLOAT_EQ(apply_with_parentheses_or_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, std::make_tuple(0)),
+                      1.1F);
+      EXPECT_FLOAT_EQ(apply_with_parentheses_or_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, std::make_tuple(1)),
+                      2.2F);
+      EXPECT_FLOAT_EQ(apply_with_parentheses_or_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, std::make_tuple(2)),
+                      3.3F);
+    }
+
+    {
+      std::vector<float> storage = {1.1F, 2.2F, 3.3F};
+      auto vs = [&](size_t i) -> decltype(auto) { return storage[i]; };
+
+      static_assert(std::is_same_v<decltype(apply_with_parentheses_or_brackets(vs, std::make_tuple(0))), float &>);
+      decltype(auto) v = apply_with_parentheses_or_brackets(vs, std::make_tuple(0));
+      static_assert(std::is_same_v<decltype(v), float &>);
+
+      EXPECT_FLOAT_EQ(apply_with_parentheses_or_brackets(storage, std::make_tuple(0)), 1.1F);
+      EXPECT_FLOAT_EQ(apply_with_parentheses_or_brackets(storage, std::make_tuple(1)), 2.2F);
+      EXPECT_FLOAT_EQ(apply_with_parentheses_or_brackets(storage, std::make_tuple(2)), 3.3F);
+
+      EXPECT_FLOAT_EQ(apply_with_parentheses_or_brackets(vs, std::make_tuple(0)), 1.1F);
+      EXPECT_FLOAT_EQ(apply_with_parentheses_or_brackets(vs, std::make_tuple(1)), 2.2F);
+      EXPECT_FLOAT_EQ(apply_with_parentheses_or_brackets(vs, std::make_tuple(2)), 3.3F);
+    }
+  }
+
+  // Apply with brackets or parentheses.
+  {
+    {
+      static_assert(std::is_same_v<decltype(apply_with_brackets_or_parentheses(std::vector<float>{1.1F, 2.2F, 3.3F},
+                                                                               std::make_tuple(0))),
+                                   float &>);
+      decltype(auto) v = apply_with_brackets_or_parentheses(std::vector<float>{1.1F, 2.2F, 3.3F}, std::make_tuple(0));
+      static_assert(std::is_same_v<decltype(v), float &>);
+
+      EXPECT_FLOAT_EQ(apply_with_brackets_or_parentheses(std::vector<float>{1.1F, 2.2F, 3.3F}, std::make_tuple(0)),
+                      1.1F);
+      EXPECT_FLOAT_EQ(apply_with_brackets_or_parentheses(std::vector<float>{1.1F, 2.2F, 3.3F}, std::make_tuple(1)),
+                      2.2F);
+      EXPECT_FLOAT_EQ(apply_with_brackets_or_parentheses(std::vector<float>{1.1F, 2.2F, 3.3F}, std::make_tuple(2)),
+                      3.3F);
+    }
+
+    {
+      std::vector<float> storage = {1.1F, 2.2F, 3.3F};
+      auto vs = [&](size_t i) -> decltype(auto) { return storage[i]; };
+
+      static_assert(std::is_same_v<decltype(apply_with_brackets_or_parentheses(vs, std::make_tuple(0))), float &>);
+      decltype(auto) v = apply_with_brackets_or_parentheses(vs, std::make_tuple(0));
+      static_assert(std::is_same_v<decltype(v), float &>);
+
+      EXPECT_FLOAT_EQ(apply_with_brackets_or_parentheses(storage, std::make_tuple(0)), 1.1F);
+      EXPECT_FLOAT_EQ(apply_with_brackets_or_parentheses(storage, std::make_tuple(1)), 2.2F);
+      EXPECT_FLOAT_EQ(apply_with_brackets_or_parentheses(storage, std::make_tuple(2)), 3.3F);
+
+      EXPECT_FLOAT_EQ(apply_with_brackets_or_parentheses(vs, std::make_tuple(0)), 1.1F);
+      EXPECT_FLOAT_EQ(apply_with_brackets_or_parentheses(vs, std::make_tuple(1)), 2.2F);
+      EXPECT_FLOAT_EQ(apply_with_brackets_or_parentheses(vs, std::make_tuple(2)), 3.3F);
+    }
+  }
+}
+
+TEST(Invocations, ApplyCUDASTDTuple) {
+  // Apply with brackets.
+  {
+    static_assert(
+        std::is_same_v<decltype(apply_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, cuda::std::make_tuple(0))),
+                       float &>);
+    decltype(auto) v = apply_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, cuda::std::make_tuple(0));
+    static_assert(std::is_same_v<decltype(v), float &>);
+
+    EXPECT_FLOAT_EQ(apply_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, cuda::std::make_tuple(0)), 1.1F);
+    EXPECT_FLOAT_EQ(apply_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, cuda::std::make_tuple(1)), 2.2F);
+    EXPECT_FLOAT_EQ(apply_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, cuda::std::make_tuple(2)), 3.3F);
+  }
+
+  // Apply with parentheses or brackets.
+  {
+    {
+      static_assert(std::is_same_v<decltype(apply_with_parentheses_or_brackets(std::vector<float>{1.1F, 2.2F, 3.3F},
+                                                                               cuda::std::make_tuple(0))),
+                                   float &>);
+      decltype(auto) v =
+          apply_with_parentheses_or_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, cuda::std::make_tuple(0));
+      static_assert(std::is_same_v<decltype(v), float &>);
+
+      EXPECT_FLOAT_EQ(
+          apply_with_parentheses_or_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, cuda::std::make_tuple(0)), 1.1F);
+      EXPECT_FLOAT_EQ(
+          apply_with_parentheses_or_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, cuda::std::make_tuple(1)), 2.2F);
+      EXPECT_FLOAT_EQ(
+          apply_with_parentheses_or_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, cuda::std::make_tuple(2)), 3.3F);
+    }
+
+    {
+      std::vector<float> storage = {1.1F, 2.2F, 3.3F};
+      auto vs = [&](size_t i) -> decltype(auto) { return storage[i]; };
+
+      static_assert(
+          std::is_same_v<decltype(apply_with_parentheses_or_brackets(vs, cuda::std::make_tuple(0))), float &>);
+      decltype(auto) v = apply_with_parentheses_or_brackets(vs, cuda::std::make_tuple(0));
+      static_assert(std::is_same_v<decltype(v), float &>);
+
+      EXPECT_FLOAT_EQ(apply_with_parentheses_or_brackets(storage, cuda::std::make_tuple(0)), 1.1F);
+      EXPECT_FLOAT_EQ(apply_with_parentheses_or_brackets(storage, cuda::std::make_tuple(1)), 2.2F);
+      EXPECT_FLOAT_EQ(apply_with_parentheses_or_brackets(storage, cuda::std::make_tuple(2)), 3.3F);
+
+      EXPECT_FLOAT_EQ(apply_with_parentheses_or_brackets(vs, cuda::std::make_tuple(0)), 1.1F);
+      EXPECT_FLOAT_EQ(apply_with_parentheses_or_brackets(vs, cuda::std::make_tuple(1)), 2.2F);
+      EXPECT_FLOAT_EQ(apply_with_parentheses_or_brackets(vs, cuda::std::make_tuple(2)), 3.3F);
+    }
+  }
+
+  // Apply with brackets or parentheses.
+  {
+    {
+      static_assert(std::is_same_v<decltype(apply_with_brackets_or_parentheses(std::vector<float>{1.1F, 2.2F, 3.3F},
+                                                                               cuda::std::make_tuple(0))),
+                                   float &>);
+      decltype(auto) v =
+          apply_with_brackets_or_parentheses(std::vector<float>{1.1F, 2.2F, 3.3F}, cuda::std::make_tuple(0));
+      static_assert(std::is_same_v<decltype(v), float &>);
+
+      EXPECT_FLOAT_EQ(
+          apply_with_brackets_or_parentheses(std::vector<float>{1.1F, 2.2F, 3.3F}, cuda::std::make_tuple(0)), 1.1F);
+      EXPECT_FLOAT_EQ(
+          apply_with_brackets_or_parentheses(std::vector<float>{1.1F, 2.2F, 3.3F}, cuda::std::make_tuple(1)), 2.2F);
+      EXPECT_FLOAT_EQ(
+          apply_with_brackets_or_parentheses(std::vector<float>{1.1F, 2.2F, 3.3F}, cuda::std::make_tuple(2)), 3.3F);
+    }
+
+    {
+      std::vector<float> storage = {1.1F, 2.2F, 3.3F};
+      auto vs = [&](size_t i) -> decltype(auto) { return storage[i]; };
+
+      static_assert(
+          std::is_same_v<decltype(apply_with_brackets_or_parentheses(vs, cuda::std::make_tuple(0))), float &>);
+      decltype(auto) v = apply_with_brackets_or_parentheses(vs, cuda::std::make_tuple(0));
+      static_assert(std::is_same_v<decltype(v), float &>);
+
+      EXPECT_FLOAT_EQ(apply_with_brackets_or_parentheses(storage, cuda::std::make_tuple(0)), 1.1F);
+      EXPECT_FLOAT_EQ(apply_with_brackets_or_parentheses(storage, cuda::std::make_tuple(1)), 2.2F);
+      EXPECT_FLOAT_EQ(apply_with_brackets_or_parentheses(storage, cuda::std::make_tuple(2)), 3.3F);
+
+      EXPECT_FLOAT_EQ(apply_with_brackets_or_parentheses(vs, cuda::std::make_tuple(0)), 1.1F);
+      EXPECT_FLOAT_EQ(apply_with_brackets_or_parentheses(vs, cuda::std::make_tuple(1)), 2.2F);
+      EXPECT_FLOAT_EQ(apply_with_brackets_or_parentheses(vs, cuda::std::make_tuple(2)), 3.3F);
     }
   }
 }
