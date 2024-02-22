@@ -10,8 +10,9 @@ public:
 
 private:
   using VecDim = Vec<T, dim>;
-  static_assert(std::is_same_v<VecDim, decltype(Auto(std::declval<TControlPoints>()[0]))>,
-                "Type of control points does not match the dimension");
+  static_assert(
+      std::is_same_v<VecDim, decltype(Auto(invoke_with_parentheses_or_brackets(std::declval<TControlPoints>(), 0)))>,
+      "Type of control points does not match the dimension");
 
 public:
   BezierCurve() = default;
@@ -27,7 +28,8 @@ public:
   ///
   /// \example ```cpp
   /// bezier.controlPoints() = ...;
-  /// bezier.controlPoints()[i] = ...;
+  /// bezier.controlPoints()(...) = ...;
+  /// bezier.controlPoints()[...] = ...;
   /// ```
   ARIA_REF_PROP(public, ARIA_HOST_DEVICE, controlPoints, controlPoints_);
 
@@ -41,7 +43,7 @@ public:
     // Apply the deCasteljau algorithm, 1997, The NURBS Book, 24.
     std::array<VecDim, nCPs> temp;
 
-    ForEach<nCPs>([&]<auto i>() { temp[i] = controlPoints()[i]; });
+    ForEach<nCPs>([&]<auto i>() { temp[i] = invoke_with_parentheses_or_brackets(controlPoints(), i); });
     ForEach<degree>([&]<auto _r>() {
       constexpr auto round = _r + 1;
       ForEach<nCPs - round>([&]<auto i>() { temp[i] = Lerp(temp[i], temp[i + 1], t); });
@@ -70,8 +72,9 @@ public:
 
 private:
   using VecDim = Vec<T, dim>;
-  static_assert(std::is_same_v<VecDim, decltype(Auto(std::declval<TControlPoints>()[0]))>,
-                "Type of control points does not match the dimension");
+  static_assert(
+      std::is_same_v<VecDim, decltype(Auto(invoke_with_parentheses_or_brackets(std::declval<TControlPoints>(), 0)))>,
+      "Type of control points does not match the dimension");
 
 public:
   BezierCurve() = default;
@@ -87,7 +90,8 @@ public:
   ///
   /// \example ```cpp
   /// bezier.controlPoints() = ...;
-  /// bezier.controlPoints()[i] = ...;
+  /// bezier.controlPoints()(...) = ...;
+  /// bezier.controlPoints()[...] = ...;
   /// ```
   ARIA_REF_PROP(public, ARIA_HOST_DEVICE, controlPoints, controlPoints_);
 
@@ -107,7 +111,7 @@ public:
     small_vector<VecDim, 8> temp(nCPs); //! Local buffer optimization for degrees <= 7.
 
     for (uint i = 0; i < nCPs; ++i)
-      temp[i] = controlPoints()[i];
+      temp[i] = invoke_with_parentheses_or_brackets(controlPoints(), i);
     for (uint round = 1; round < nCPs; ++round)
       for (uint i = 0; i < nCPs - round; ++i)
         temp[i] = Lerp(temp[i], temp[i + 1], t);
@@ -134,7 +138,7 @@ public:
 
     // Directly compute the Bernstein polynomials.
     for (uint i = 0; i < nCPs; ++i) {
-      VecDim cp = controlPoints()[i];
+      VecDim cp = invoke_with_parentheses_or_brackets(controlPoints(), i);
       pos += cp * nCr(degree, i) * pow(1 - t, degree - i) * pow(t, i);
     }
 

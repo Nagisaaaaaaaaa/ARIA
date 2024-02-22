@@ -14,6 +14,7 @@
 //
 #include "ARIA/Curve.h"
 #include "ARIA/ForEach.h"
+#include "ARIA/Invocations.h"
 #include "ARIA/Math.h"
 #include "ARIA/SmallVector.h"
 

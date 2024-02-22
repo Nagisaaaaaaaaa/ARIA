@@ -127,6 +127,22 @@ TEST(BezierCurve, NonRational3D) {
     expectSphere(bezier);
   }
 
+  // Static degree + non-owning operator().
+  {
+    std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+    auto accessor = [&](size_t i) { return controlPoints[i]; };
+    BezierCurve<float, 3, Degree<2>, decltype(accessor)> bezier{accessor};
+    expectSphere(bezier);
+  }
+
+  // Static degree + owning operator().
+  {
+    std::vector<Vec3f> controlPoints = {{1, 0, 1}, {1, 1, 1}, {0, 2, 2}};
+    auto accessor = [=](size_t i) { return controlPoints[i]; };
+    BezierCurve<float, 3, Degree<2>, decltype(accessor)> bezier{accessor};
+    expectSphere(bezier);
+  }
+
   // Static degree + TensorVector / Tensor.
   {
     // Host + static.
