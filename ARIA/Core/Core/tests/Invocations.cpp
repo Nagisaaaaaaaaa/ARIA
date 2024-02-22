@@ -101,14 +101,73 @@ TEST(Invocations, Base) {
   static_assert(!is_invocable_with_brackets_r_v<int, CallByParentheses, int>);
 }
 
-TEST(Invocations, InvokeWithBrackets) {
-  static_assert(std::is_same_v<decltype(invoke_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 0)), float &>);
-  decltype(auto) v = invoke_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 0);
-  static_assert(std::is_same_v<decltype(v), float &>);
+TEST(Invocations, Invoke) {
+  // Invoke with brackets.
+  {
+    static_assert(std::is_same_v<decltype(invoke_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 0)), float &>);
+    decltype(auto) v = invoke_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 0);
+    static_assert(std::is_same_v<decltype(v), float &>);
 
-  EXPECT_FLOAT_EQ(invoke_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 0), 1.1F);
-  EXPECT_FLOAT_EQ(invoke_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 1), 2.2F);
-  EXPECT_FLOAT_EQ(invoke_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 2), 3.3F);
+    EXPECT_FLOAT_EQ(invoke_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 0), 1.1F);
+    EXPECT_FLOAT_EQ(invoke_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 1), 2.2F);
+    EXPECT_FLOAT_EQ(invoke_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 2), 3.3F);
+  }
+
+  // Invoke with parentheses or brackets.
+  {
+    {
+      static_assert(
+          std::is_same_v<decltype(invoke_with_parentheses_or_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 0)),
+                         float &>);
+      decltype(auto) v = invoke_with_parentheses_or_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 0);
+      static_assert(std::is_same_v<decltype(v), float &>);
+
+      EXPECT_FLOAT_EQ(invoke_with_parentheses_or_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 0), 1.1F);
+      EXPECT_FLOAT_EQ(invoke_with_parentheses_or_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 1), 2.2F);
+      EXPECT_FLOAT_EQ(invoke_with_parentheses_or_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 2), 3.3F);
+    }
+
+    {
+      std::vector<float> storage = {1.1F, 2.2F, 3.3F};
+      auto vs = [&](size_t i) -> decltype(auto) { return storage[i]; };
+
+      static_assert(std::is_same_v<decltype(invoke_with_parentheses_or_brackets(vs, 0)), float &>);
+      decltype(auto) v = invoke_with_parentheses_or_brackets(vs, 0);
+      static_assert(std::is_same_v<decltype(v), float &>);
+
+      EXPECT_FLOAT_EQ(invoke_with_parentheses_or_brackets(vs, 0), 1.1F);
+      EXPECT_FLOAT_EQ(invoke_with_parentheses_or_brackets(vs, 1), 2.2F);
+      EXPECT_FLOAT_EQ(invoke_with_parentheses_or_brackets(vs, 2), 3.3F);
+    }
+  }
+
+  // Invoke with brackets or parentheses.
+  {
+    {
+      static_assert(
+          std::is_same_v<decltype(invoke_with_brackets_or_parentheses(std::vector<float>{1.1F, 2.2F, 3.3F}, 0)),
+                         float &>);
+      decltype(auto) v = invoke_with_brackets_or_parentheses(std::vector<float>{1.1F, 2.2F, 3.3F}, 0);
+      static_assert(std::is_same_v<decltype(v), float &>);
+
+      EXPECT_FLOAT_EQ(invoke_with_brackets_or_parentheses(std::vector<float>{1.1F, 2.2F, 3.3F}, 0), 1.1F);
+      EXPECT_FLOAT_EQ(invoke_with_brackets_or_parentheses(std::vector<float>{1.1F, 2.2F, 3.3F}, 1), 2.2F);
+      EXPECT_FLOAT_EQ(invoke_with_brackets_or_parentheses(std::vector<float>{1.1F, 2.2F, 3.3F}, 2), 3.3F);
+    }
+
+    {
+      std::vector<float> storage = {1.1F, 2.2F, 3.3F};
+      auto vs = [&](size_t i) -> decltype(auto) { return storage[i]; };
+
+      static_assert(std::is_same_v<decltype(invoke_with_brackets_or_parentheses(vs, 0)), float &>);
+      decltype(auto) v = invoke_with_brackets_or_parentheses(vs, 0);
+      static_assert(std::is_same_v<decltype(v), float &>);
+
+      EXPECT_FLOAT_EQ(invoke_with_brackets_or_parentheses(vs, 0), 1.1F);
+      EXPECT_FLOAT_EQ(invoke_with_brackets_or_parentheses(vs, 1), 2.2F);
+      EXPECT_FLOAT_EQ(invoke_with_brackets_or_parentheses(vs, 2), 3.3F);
+    }
+  }
 }
 
 } // namespace ARIA

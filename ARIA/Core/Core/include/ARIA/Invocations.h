@@ -90,4 +90,24 @@ decltype(auto) invoke_with_brackets(T &&t, Ts &&...ts) {
   return t[std::get<0>(std::forward_as_tuple(std::forward<Ts>(ts)...))];
 }
 
+template <typename T, typename... Ts>
+decltype(auto) invoke_with_parentheses_or_brackets(T &&t, Ts &&...ts) {
+  if constexpr (std::invocable<T, Ts...>)
+    return std::invoke(std::forward<T>(t), std::forward<Ts>(ts)...);
+  else if constexpr (invocable_with_brackets<T, Ts...>)
+    return invoke_with_brackets(std::forward<T>(t), std::forward<Ts>(ts)...);
+  else
+    ARIA_STATIC_ASSERT_FALSE("The given types should satisfy either `invocable` or `invocable_with_brackets`");
+}
+
+template <typename T, typename... Ts>
+decltype(auto) invoke_with_brackets_or_parentheses(T &&t, Ts &&...ts) {
+  if constexpr (invocable_with_brackets<T, Ts...>)
+    return invoke_with_brackets(std::forward<T>(t), std::forward<Ts>(ts)...);
+  else if constexpr (std::invocable<T, Ts...>)
+    return std::invoke(std::forward<T>(t), std::forward<Ts>(ts)...);
+  else
+    ARIA_STATIC_ASSERT_FALSE("The given types should satisfy either `invocable_with_brackets` or `invocable`");
+}
+
 } // namespace ARIA
