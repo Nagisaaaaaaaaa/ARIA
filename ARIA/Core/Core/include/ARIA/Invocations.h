@@ -82,6 +82,11 @@ static constexpr bool is_invocable_with_brackets_r_v = is_invocable_with_bracket
 //
 //
 //
+/// \brief Calls `t[std::forward<Ts>(ts)...]` and gets the return value if exists.
+///
+/// \example ```cpp
+/// EXPECT_FLOAT_EQ(invoke_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, 0), 1.1F);
+/// ```
 template <typename T, typename... Ts>
 decltype(auto) invoke_with_brackets(T &&t, Ts &&...ts) {
   static_assert(invocable_with_brackets<T, Ts...>,
@@ -90,6 +95,22 @@ decltype(auto) invoke_with_brackets(T &&t, Ts &&...ts) {
   return t[std::get<0>(std::forward_as_tuple(std::forward<Ts>(ts)...))];
 }
 
+/// \brief If expression `t(std::forward<Ts>(ts)...)` is valid,
+/// calls it and gets the return value if exists.
+/// Else if expression `t[std::forward<Ts>(ts)...]` is valid,
+/// calls it and gets the return value if exists.
+///
+/// \example ```cpp
+/// std::vector<float> storage = {1.1F, 2.2F, 3.3F};
+/// auto accessor = [&](size_t i) -> decltype(auto) { return storage[i]; };
+///
+/// EXPECT_FLOAT_EQ(invoke_with_parentheses_or_brackets(storage, 0), 1.1F);
+/// EXPECT_FLOAT_EQ(invoke_with_parentheses_or_brackets(accessor, 1), 2.2F);
+/// ```
+///
+/// \warning By definition, `operator()` has higher priority than `operator[]`.
+/// Use `invoke_with_brackets_or_parentheses` instead if you want
+/// `operator[]` has higher priority.
 template <typename T, typename... Ts>
 decltype(auto) invoke_with_parentheses_or_brackets(T &&t, Ts &&...ts) {
   if constexpr (std::invocable<T, Ts...>)
@@ -100,6 +121,22 @@ decltype(auto) invoke_with_parentheses_or_brackets(T &&t, Ts &&...ts) {
     ARIA_STATIC_ASSERT_FALSE("The given types should satisfy either `invocable` or `invocable_with_brackets`");
 }
 
+/// \brief If expression `t[std::forward<Ts>(ts)...]` is valid,
+/// calls it and gets the return value if exists.
+/// Else if expression `t(std::forward<Ts>(ts)...)` is valid,
+/// calls it and gets the return value if exists.
+///
+/// \example ```cpp
+/// std::vector<float> storage = {1.1F, 2.2F, 3.3F};
+/// auto accessor = [&](size_t i) -> decltype(auto) { return storage[i]; };
+///
+/// EXPECT_FLOAT_EQ(invoke_with_parentheses_or_brackets(storage, 0), 1.1F);
+/// EXPECT_FLOAT_EQ(invoke_with_parentheses_or_brackets(accessor, 1), 2.2F);
+/// ```
+///
+/// \warning By definition, `operator[]` has higher priority than `operator()`.
+/// Use `invoke_with_parentheses_or_brackets` instead if you want
+/// `operator()` has higher priority.
 template <typename T, typename... Ts>
 decltype(auto) invoke_with_brackets_or_parentheses(T &&t, Ts &&...ts) {
   if constexpr (invocable_with_brackets<T, Ts...>)
