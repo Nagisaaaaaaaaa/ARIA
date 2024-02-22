@@ -41,7 +41,7 @@
 //
 #include "ARIA/ARIA.h"
 
-#include <concepts>
+#include <cuda/std/functional>
 
 namespace ARIA {
 
@@ -145,7 +145,7 @@ ARIA_HOST_DEVICE constexpr decltype(auto) invoke_with_brackets(T &&t, Ts &&...ts
 template <typename T, typename... Ts>
 ARIA_HOST_DEVICE constexpr decltype(auto) invoke_with_parentheses_or_brackets(T &&t, Ts &&...ts) {
   if constexpr (std::invocable<T, Ts...>)
-    return std::invoke(std::forward<T>(t), std::forward<Ts>(ts)...);
+    return cuda::std::invoke(std::forward<T>(t), std::forward<Ts>(ts)...);
   else if constexpr (invocable_with_brackets<T, Ts...>)
     return invoke_with_brackets(std::forward<T>(t), std::forward<Ts>(ts)...);
   else
@@ -173,7 +173,7 @@ ARIA_HOST_DEVICE constexpr decltype(auto) invoke_with_brackets_or_parentheses(T 
   if constexpr (invocable_with_brackets<T, Ts...>)
     return invoke_with_brackets(std::forward<T>(t), std::forward<Ts>(ts)...);
   else if constexpr (std::invocable<T, Ts...>)
-    return std::invoke(std::forward<T>(t), std::forward<Ts>(ts)...);
+    return cuda::std::invoke(std::forward<T>(t), std::forward<Ts>(ts)...);
   else
     ARIA_STATIC_ASSERT_FALSE("The given types should satisfy either `invocable_with_brackets` or `invocable`");
 }
