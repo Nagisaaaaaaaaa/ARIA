@@ -20,12 +20,16 @@
 ///   return Vec3r{controlPointsX[i], controlPointsY[i], controlPointsZ[i]};
 /// };
 /// ```
+/// Types of accessors (`decltype(accessor)`) will be given as template parameters,
+/// instead of the underlying storages (`thrust::device_vector<Real>`).
 /// But accessors usually use `operator()` instead of `operator[]`.
 /// This makes it difficult to implement our generic Bezier curve.
 ///
-/// We usually want a function, which automatically decides
+/// So, we want a function, which automatically decides
 /// whether to call `operator()` or `operator[]` and calls the correct one.
-/// That is, we want to have more generic versions of `std::invoke` and `std::apply`.
+/// That is, we want to have more generic versions of `std::invoke` and `std::apply`,
+/// which are able to consider also the `operator[]`s.
+///
 /// This file introduces such an implementation.
 //
 //
@@ -171,5 +175,11 @@ decltype(auto) invoke_with_brackets_or_parentheses(T &&t, Ts &&...ts) {
   else
     ARIA_STATIC_ASSERT_FALSE("The given types should satisfy either `invocable_with_brackets` or `invocable`");
 }
+
+//
+//
+//
+//
+//
 
 } // namespace ARIA
