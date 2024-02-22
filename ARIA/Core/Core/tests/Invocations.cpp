@@ -135,6 +135,10 @@ TEST(Invocations, Invoke) {
       decltype(auto) v = invoke_with_parentheses_or_brackets(vs, 0);
       static_assert(std::is_same_v<decltype(v), float &>);
 
+      EXPECT_FLOAT_EQ(invoke_with_parentheses_or_brackets(storage, 0), 1.1F);
+      EXPECT_FLOAT_EQ(invoke_with_parentheses_or_brackets(storage, 1), 2.2F);
+      EXPECT_FLOAT_EQ(invoke_with_parentheses_or_brackets(storage, 2), 3.3F);
+
       EXPECT_FLOAT_EQ(invoke_with_parentheses_or_brackets(vs, 0), 1.1F);
       EXPECT_FLOAT_EQ(invoke_with_parentheses_or_brackets(vs, 1), 2.2F);
       EXPECT_FLOAT_EQ(invoke_with_parentheses_or_brackets(vs, 2), 3.3F);
@@ -162,6 +166,10 @@ TEST(Invocations, Invoke) {
       static_assert(std::is_same_v<decltype(invoke_with_brackets_or_parentheses(vs, 0)), float &>);
       decltype(auto) v = invoke_with_brackets_or_parentheses(vs, 0);
       static_assert(std::is_same_v<decltype(v), float &>);
+
+      EXPECT_FLOAT_EQ(invoke_with_brackets_or_parentheses(storage, 0), 1.1F);
+      EXPECT_FLOAT_EQ(invoke_with_brackets_or_parentheses(storage, 1), 2.2F);
+      EXPECT_FLOAT_EQ(invoke_with_brackets_or_parentheses(storage, 2), 3.3F);
 
       EXPECT_FLOAT_EQ(invoke_with_brackets_or_parentheses(vs, 0), 1.1F);
       EXPECT_FLOAT_EQ(invoke_with_brackets_or_parentheses(vs, 1), 2.2F);
