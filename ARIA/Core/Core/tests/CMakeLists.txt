@@ -3,10 +3,10 @@ if (ARIA_BUILD_TESTS)
       SOURCES
       detail/Macros.cpp
       Auto.cpp
-      Concepts.cpp
       Constant.cpp
       DisjointSet.cu
       ForEach.cpp
+      Invocations.cpp
       Launcher.cu
       Layout.cu
       Property.cpp
