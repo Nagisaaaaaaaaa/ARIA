@@ -40,7 +40,9 @@ namespace ARIA {
 /// "nodes" is the container of all the disjoint set elements, and `TNodes` is type of this container.
 /// For this disjoint set implementation, `TNodes` can be an owning container, such as
 /// `std::vector`, `std::array`, `thrust::host_vector`, `thrust::device_vector`, `TensorVector`, .etc.
-/// or a non-owning view, such as `std::span`, `Tensor`, .etc.
+/// Or a non-owning view, such as `std::span`, `Tensor`, .etc.
+/// Or even an owning or non-owning accessor, such as
+/// `auto accessor = [&](size_t i) -> decltype(auto) { return nodes[i]; };`, .etc.
 ///
 /// \example ```cpp
 /// // A thread-unsafe owning host disjoint set.
