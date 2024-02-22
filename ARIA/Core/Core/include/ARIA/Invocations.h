@@ -1,7 +1,32 @@
 #pragma once
 
 /// \file
-/// \brief
+/// \brief Suppose you want to implement a policy-based Bezier curve, where
+/// type of the control points are determined by template parameters.
+/// And you want to support both owning and non-owing control points.
+/// Then, there are 2 simple cases:
+/// 1. Type of the given control points is `std::vector<Vec3r>`.
+///    This will create an owning Bezier curve.
+/// 2. Type is `std::span<Vec3r>`, non-owning.
+///
+/// Only the above 2 cases? NO!
+/// For GPU storages, data are usually stored as SOA instead of AOS.
+/// For example, the control points may be stored in three `thrust::device_vector<Real>`s,
+/// instead of one `thrust::device_vector<Vec3r>`.
+///
+/// In order to handle these kinds of storages, usually, accessors are introduced:
+/// ```cpp
+/// auto accessor = [&] (size_t i) {
+///   return Vec3r{controlPointsX[i], controlPointsY[i], controlPointsZ[i]};
+/// };
+/// ```
+/// But accessors usually use `operator()` instead of `operator[]`.
+/// This makes it difficult to implement our generic Bezier curve.
+///
+/// We usually want a function, which automatically decides
+/// whether to call `operator()` or `operator[]` and calls the correct one.
+/// That is, we want to have more generic versions of `std::invoke` and `std::apply`.
+/// This file introduces such an implementation.
 //
 //
 //
