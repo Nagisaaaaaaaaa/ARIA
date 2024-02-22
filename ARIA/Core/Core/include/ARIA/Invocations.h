@@ -32,7 +32,8 @@
 ///
 /// This file introduces such an implementation.
 ///
-/// \todo Update all the implementations after C++23.
+/// \todo Update all the implementations after C++23,
+/// when `operator[]` can accept different numbers of parameters.
 //
 //
 //
@@ -182,22 +183,59 @@ ARIA_HOST_DEVICE decltype(auto) invoke_with_brackets_or_parentheses(T &&t, Ts &&
 //
 //
 //
+/// \brief Calls `t[get<0>(tuple), get<1>(tuple), ...]` and gets the return value if exists.
+///
+/// \example ```cpp
+/// EXPECT_FLOAT_EQ(apply_with_brackets(std::vector<float>{1.1F, 2.2F, 3.3F}, std::make_tuple(0)), 1.1F);
+/// ```
 template <typename T, typename TTuple>
 ARIA_HOST_DEVICE decltype(auto) apply_with_brackets(T &&t, TTuple &&tuple) {
   //! Use `get` instead of `std::get` to support tuple types different from `std::tuple`,
   //! for example, `cuda::std::tuple`.
   //! Let ADL decides which `get` to call.
-  return invoke_with_brackets(std::forward<T>(t), get<0>(tuple));
+  return invoke_with_brackets(std::forward<T>(t), get<0>(std::forward<TTuple>(tuple)));
 }
 
+/// \brief If expression `t(get<0>(tuple), get<1>(tuple), ...)` is valid,
+/// calls it and gets the return value if exists.
+/// Else if expression `t[get<0>(tuple), get<1>(tuple), ...]` is valid,
+/// calls it and gets the return value if exists.
+///
+/// \example ```cpp
+/// std::vector<float> storage = {1.1F, 2.2F, 3.3F};
+/// auto accessor = [&](size_t i) -> decltype(auto) { return storage[i]; };
+///
+/// EXPECT_FLOAT_EQ(apply_with_parentheses_or_brackets(storage, std::make_tuple(0)), 1.1F);
+/// EXPECT_FLOAT_EQ(apply_with_parentheses_or_brackets(accessor, std::make_tuple(1)), 2.2F);
+/// ```
+///
+/// \warning By definition, `operator()` has higher priority than `operator[]`.
+/// Use `apply_with_brackets_or_parentheses` instead if you want
+/// `operator[]` has higher priority.
 template <typename T, typename TTuple>
 ARIA_HOST_DEVICE decltype(auto) apply_with_parentheses_or_brackets(T &&t, TTuple &&tuple) {
-  return invoke_with_parentheses_or_brackets(std::forward<T>(t), get<0>(tuple));
+  return invoke_with_parentheses_or_brackets(std::forward<T>(t), get<0>(std::forward<TTuple>(tuple)));
 }
 
+/// \brief If expression `t[get<0>(tuple), get<1>(tuple), ...]` is valid,
+/// calls it and gets the return value if exists.
+/// Else if expression `t(get<0>(tuple), get<1>(tuple), ...)` is valid,
+/// calls it and gets the return value if exists.
+///
+/// \example ```cpp
+/// std::vector<float> storage = {1.1F, 2.2F, 3.3F};
+/// auto accessor = [&](size_t i) -> decltype(auto) { return storage[i]; };
+///
+/// EXPECT_FLOAT_EQ(apply_with_brackets_or_parentheses(storage, std::make_tuple(0)), 1.1F);
+/// EXPECT_FLOAT_EQ(apply_with_brackets_or_parentheses(accessor, std::make_tuple(1)), 2.2F);
+/// ```
+///
+/// \warning By definition, `operator[]` has higher priority than `operator()`.
+/// Use `apply_with_brackets_or_parentheses` instead if you want
+/// `operator()` has higher priority.
 template <typename T, typename TTuple>
 ARIA_HOST_DEVICE decltype(auto) apply_with_brackets_or_parentheses(T &&t, TTuple &&tuple) {
-  return invoke_with_brackets_or_parentheses(std::forward<T>(t), get<0>(tuple));
+  return invoke_with_brackets_or_parentheses(std::forward<T>(t), get<0>(std::forward<TTuple>(tuple)));
 }
 
 } // namespace ARIA
