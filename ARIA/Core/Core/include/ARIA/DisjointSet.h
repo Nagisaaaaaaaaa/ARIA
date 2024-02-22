@@ -16,6 +16,7 @@
 //
 //
 //
+#include "ARIA/Invocations.h"
 #include "ARIA/Property.h"
 
 #include <cuda/std/atomic>
@@ -56,7 +57,7 @@ namespace ARIA {
 template <typename TThreadUnsafeOrSafe, typename TNodes>
 class DisjointSet {
 public:
-  using value_type = decltype(Auto(std::declval<TNodes>()[0]));
+  using value_type = decltype(Auto(invoke_with_parentheses_or_brackets(std::declval<TNodes>(), 0)));
   static_assert(std::integral<value_type>, "Type of `TNodes` elements should be integral");
 
 private:

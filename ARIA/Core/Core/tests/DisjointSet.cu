@@ -470,6 +470,78 @@ void TestCUDA() {
   }
 }
 
+class ParenthesesAccessor {
+public:
+  int *pointer;
+
+  ARIA_DEVICE const int &operator()(int i) const { return pointer[i]; }
+
+  ARIA_DEVICE int &operator()(int i) { return pointer[i]; }
+};
+
+class BracketsAccessor {
+public:
+  int *pointer;
+
+  ARIA_DEVICE const int &operator[](int i) const { return pointer[i]; }
+
+  ARIA_DEVICE int &operator[](int i) { return pointer[i]; }
+};
+
+template <typename TAccessor>
+void TestParenthesesAndBracketsAccessor() {
+  using Volume = TensorVector<int, SpaceDevice>;
+
+  // Initialize.
+  Volume volume{make_layout_major(1000)};
+  DisjointSet<ThreadSafe, Volume::RawTensor> disjointSet(volume.rawTensor());
+  for (int x = 0; x < disjointSet.nodes().size(); ++x)
+    volume(x) = x;
+
+  DisjointSet<ThreadSafe, TAccessor> disjointSet1(TAccessor{.pointer = volume.rawTensor().data()});
+  DisjointSet<ThreadUnsafe, TAccessor> disjointSet2(TAccessor{.pointer = volume.rawTensor().data()});
+
+  // Thread safe.
+  {
+    // Parallel union.
+    Launcher(volume.size() - 1, [=] ARIA_DEVICE(int x) mutable { disjointSet1.Union(x + 1, x); }).Launch();
+
+    Launcher(volume.size(), [=] ARIA_DEVICE(int x) mutable { disjointSet1.FindAndCompress(x); }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    // Check
+    Volume::Mirrored<SpaceHost> volumeH{volume.layout()};
+    copy(volumeH, volume);
+
+    cuda::device::current::get().synchronize();
+
+    for (int x = 0; x < volumeH.size(); ++x) {
+      EXPECT_EQ(volumeH(x), 0);
+    }
+  }
+
+  // Thread unsafe.
+  {
+    // Parallel union.
+    Launcher(volume.size() - 1, [=] ARIA_DEVICE(int x) mutable { disjointSet2.Union(x + 1, x); }).Launch();
+
+    Launcher(volume.size(), [=] ARIA_DEVICE(int x) mutable { disjointSet2.FindAndCompress(x); }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    // Check
+    Volume::Mirrored<SpaceHost> volumeH{volume.layout()};
+    copy(volumeH, volume);
+
+    cuda::device::current::get().synchronize();
+
+    for (int x = 0; x < volumeH.size(); ++x) {
+      EXPECT_EQ(volumeH(x), 0);
+    }
+  }
+}
+
 } // namespace
 
 TEST(DisjointSet, Base) {
@@ -479,6 +551,9 @@ TEST(DisjointSet, Base) {
   // TestCPU<ThreadSafe, SpaceDevice>(); // Should not compile.
 
   TestCUDA();
+
+  TestParenthesesAndBracketsAccessor<ParenthesesAccessor>();
+  TestParenthesesAndBracketsAccessor<BracketsAccessor>();
 }
 
 } // namespace ARIA
