@@ -85,14 +85,14 @@ void TestBVH() {
   Primitives primitives{
       .vertices_ = vertices.data(), .triangles_ = triangles.data(), .size_ = static_cast<uint>(triangles.size())};
 
-  auto fPrimitiveToPos = [=] ARIA_HOST_DEVICE(const cuda::std::tuple<Vec3f, Vec3f, Vec3f> &triangle) -> Vec3f {
+  auto fPrimitiveToPos = [] ARIA_HOST_DEVICE(const cuda::std::tuple<Vec3f, Vec3f, Vec3f> &triangle) -> Vec3f {
     const Vec3f &v0 = cuda::std::get<0>(triangle);
     const Vec3f &v1 = cuda::std::get<1>(triangle);
     const Vec3f &v2 = cuda::std::get<2>(triangle);
     return (v0 + v1 + v2) / 3;
   };
 
-  auto fPrimitiveToAABB = [=] ARIA_HOST_DEVICE(const cuda::std::tuple<Vec3f, Vec3f, Vec3f> &triangle) -> AABB3f {
+  auto fPrimitiveToAABB = [] ARIA_HOST_DEVICE(const cuda::std::tuple<Vec3f, Vec3f, Vec3f> &triangle) -> AABB3f {
     const Vec3f &v0 = cuda::std::get<0>(triangle);
     const Vec3f &v1 = cuda::std::get<1>(triangle);
     const Vec3f &v2 = cuda::std::get<2>(triangle);

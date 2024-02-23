@@ -9,6 +9,7 @@
 //
 #include "ARIA/AABB.h"
 #include "ARIA/Invocations.h"
+#include "ARIA/Launcher.h"
 
 #include <thrust/device_vector.h>
 
@@ -29,15 +30,15 @@ private:
 //
 //
 template <typename TPrimitives, typename FPrimitiveToPos, typename FPrimitiveToAABB>
-[[nodiscard]] auto
+[[nodiscard]] bool
 make_bvh_device(TPrimitives &&primitives, FPrimitiveToPos &&fPrimitiveToPos, FPrimitiveToAABB &&fPrimitiveToAABB) {
-  //! Check safety.
-  if (primitives.size() > 0x7FFFFFFFU)
+  //! Check overflow.
+  if (static_cast<uint64>(primitives.size()) > 0x7FFFFFFFLLU)
     ARIA_THROW(
         std::runtime_error,
         "Number of primitives given to the BVH excesses 0x7FFFFFFF, which can not be handled by Karras's algorithm");
 
-  //! Determine types.
+  //! Check and determine types.
   using UPrimitivePos = decltype(invoke_with_parentheses_or_brackets(
       fPrimitiveToPos, invoke_with_parentheses_or_brackets(primitives, 0)));
   using UPrimitiveAABB = decltype(invoke_with_parentheses_or_brackets(
@@ -58,16 +59,23 @@ make_bvh_device(TPrimitives &&primitives, FPrimitiveToPos &&fPrimitiveToPos, FPr
   using TVec = UPrimitivePos;
   using TAABB = UPrimitiveAABB;
 
-  //! Fetch basic information.
-  uint nPrimitives = primitives.size();
-
   //! Map primitives to positions.
-  thrust::device_vector<TReal> positions(nPrimitives);
+  uint nPrimitives = primitives.size();
+  thrust::device_vector<TVec> positions(nPrimitives);
 
-  // TODO: Compute positions of every primitives.
+  Launcher(nPrimitives, [=, ps = positions.data()] ARIA_DEVICE(uint i) {
+    // Pseudocode: `ps[i] = fPrimitiveToPos[primitives[i]];`.
+    ps[i] = invoke_with_parentheses_or_brackets(fPrimitiveToPos, invoke_with_parentheses_or_brackets(primitives, i));
+  }).Launch();
+
   // TODO: Compute AABB of all the positions.
   // TODO: Compute Morton codes, sort by Morton codes, and create the reordering indices.
   //! Never explicitly reorder the primitives.
+
+  // TODO: Add abstractions for CUDA streams.
+  cuda::device::current::get().synchronize();
+
+  return true;
 }
 
 } // namespace ARIA
