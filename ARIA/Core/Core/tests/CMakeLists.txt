@@ -5,6 +5,7 @@ if (ARIA_BUILD_TESTS)
       Auto.cpp
       Constant.cpp
       DisjointSet.cu
+      Float16.cu
       ForEach.cpp
       Invocations.cpp
       Launcher.cu
