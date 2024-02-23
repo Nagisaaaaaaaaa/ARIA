@@ -40,7 +40,7 @@ using float16 = half;
 // Specialized numeric limits.
 namespace float16_::detail {
 
-struct aria_numeric_limits_float16_base_default {
+struct numeric_limits_float16_base_default {
   static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
   static constexpr bool has_denorm_loss = false;
   static constexpr bool has_infinity = false;
@@ -66,7 +66,7 @@ struct aria_numeric_limits_float16_base_default {
   static constexpr int radix = 0;
 };
 
-struct aria_numeric_limits_float16_base : aria_numeric_limits_float16_base_default {
+struct numeric_limits_float16_base : numeric_limits_float16_base_default {
   static constexpr std::float_denorm_style has_denorm = std::denorm_present;
   static constexpr bool has_infinity = true;
   static constexpr bool has_quiet_NaN = true;
@@ -89,7 +89,7 @@ struct aria_numeric_limits_float16_base : aria_numeric_limits_float16_base_defau
 namespace std {
 
 template <>
-class numeric_limits<ARIA::float16> : public ARIA::float16_::detail::aria_numeric_limits_float16_base {
+class numeric_limits<ARIA::float16> : public ARIA::float16_::detail::numeric_limits_float16_base {
 public:
   [[nodiscard]] ARIA_HOST_DEVICE static /*constexpr*/ ARIA::float16 min() noexcept = delete;
 
