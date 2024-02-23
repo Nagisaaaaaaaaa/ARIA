@@ -88,16 +88,11 @@ void SortByMortonCodes(const thrust::device_vector<Vec3<T>> &positionsD,
   thrust::sort_by_key(sortedMortonCodesD.begin(), sortedMortonCodesD.end(), sortedIndicesD.begin());
 }
 
-template <typename T>
-void BuildKarras1ByMortonCodes(const ArrayD<Vector3f> &vertices_d,
-                               const ArrayD<Vector3f> &normals_d,
-                               const ArrayD<Vector3u> &triangles_d,
-                               const ArrayD<uint16_t> &triangle_indices_to_object_indices_d,
-                               const ArrayD<uint64_t> &morton_codes_d,
-                               NodesVariant &nodes_d,
-                               TessellatedBinaryBVHDataType3f &node_type,
-                               ArrayD<Family> &families_d,
-                               ArrayD<unsigned> &interior_atomics_d) {
+template <typename T, typename TPrimitives>
+void BuildKarras1ByMortonCodes(const TPrimitives &primitives,
+                               const thrust::device_vector<uint64_t> &mortonCodesD,
+                               thrust::device_vector<Nodes> &nodesD,
+                               thrust::device_vector<Family> &families_d) {
   unsigned num_triangles = triangles_d.Size();
 
   // build tree structure
