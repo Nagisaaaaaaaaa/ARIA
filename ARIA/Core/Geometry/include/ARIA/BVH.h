@@ -38,8 +38,10 @@ make_bvh_device(TPrimitives &&primitives, FPrimitiveToPos &&fPrimitiveToPos, FPr
         "Number of primitives given to the BVH excesses 0x7FFFFFFF, which can not be handled by Karras's algorithm");
 
   //! Determine types.
-  using UPrimitivePos = decltype(fPrimitiveToPos(invoke_with_parentheses_or_brackets(primitives, 0)));
-  using UPrimitiveAABB = decltype(fPrimitiveToAABB(invoke_with_parentheses_or_brackets(primitives, 0)));
+  using UPrimitivePos = decltype(invoke_with_parentheses_or_brackets(
+      fPrimitiveToPos, invoke_with_parentheses_or_brackets(primitives, 0)));
+  using UPrimitiveAABB = decltype(invoke_with_parentheses_or_brackets(
+      fPrimitiveToAABB, invoke_with_parentheses_or_brackets(primitives, 0)));
 
   static_assert(vec::detail::is_vec_v<UPrimitivePos>,
                 "Type of invocation results of `FPrimitiveToPos` should be `Vec`");
