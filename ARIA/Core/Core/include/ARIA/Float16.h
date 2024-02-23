@@ -88,6 +88,7 @@ struct numeric_limits_float16_base : numeric_limits_float16_base_default {
 //
 namespace std {
 
+// TODO: Implement all the functions below (even though they are seldom used).
 template <>
 class numeric_limits<ARIA::float16> : public ARIA::float16_::detail::numeric_limits_float16_base {
 public:
