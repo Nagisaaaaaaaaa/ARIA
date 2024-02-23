@@ -29,6 +29,31 @@ private:
 //
 //
 //
+// Compute AABB for the given positions.
+namespace bvh::detail {
+
+template <typename T>
+[[nodiscard]] AABB3<T> ComputeAABB(const thrust::device_vector<Vec3<T>> &positions) {
+  auto opVecMin = [] ARIA_HOST_DEVICE(const Vec3<T> &v0, const Vec3<T> &v1) -> Vec3<T> {
+    return {min(v0.x(), v1.x()), min(v0.y(), v1.y()), min(v0.z(), v1.z())};
+  };
+  auto opVecMax = [] ARIA_HOST_DEVICE(const Vec3<T> &v0, const Vec3<T> &v1) -> Vec3<T> {
+    return {max(v0.x(), v1.x()), max(v0.y(), v1.y()), max(v0.z(), v1.z())};
+  };
+
+  Vec3<T> inf =
+      thrust::reduce(positions.begin(), positions.end(), Vec3<T>{infinity<T>, infinity<T>, infinity<T>}, opVecMin);
+  Vec3<T> sup =
+      thrust::reduce(positions.begin(), positions.end(), Vec3<T>{-infinity<T>, -infinity<T>, -infinity<T>}, opVecMax);
+
+  return AABB3<T>{inf, sup};
+}
+
+} // namespace bvh::detail
+
+//
+//
+//
 template <typename TPrimitives, typename FPrimitiveToPos, typename FPrimitiveToAABB>
 [[nodiscard]] bool
 make_bvh_device(TPrimitives &&primitives, FPrimitiveToPos &&fPrimitiveToPos, FPrimitiveToAABB &&fPrimitiveToAABB) {
@@ -68,7 +93,8 @@ make_bvh_device(TPrimitives &&primitives, FPrimitiveToPos &&fPrimitiveToPos, FPr
     ps[i] = invoke_with_parentheses_or_brackets(fPrimitiveToPos, invoke_with_parentheses_or_brackets(primitives, i));
   }).Launch();
 
-  // TODO: Compute AABB of all the positions.
+  TAABB positionsAABB = bvh::detail::ComputeAABB(positions);
+
   // TODO: Compute Morton codes, sort by Morton codes, and create the reordering indices.
   //! Never explicitly reorder the primitives.
 
