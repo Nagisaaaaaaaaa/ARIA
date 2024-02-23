@@ -150,4 +150,40 @@ ARIA_HOST_DEVICE inline /*constexpr*/ AABB<T, d> AABB<T, d>::unionized(Args &&..
   return unionizedImpl(std::forward<Args>(args)...);
 }
 
+//
+//
+//
+//
+//
+//
+//
+//
+//
+namespace aabb::detail {
+
+// Whether the given type is `AABB<T, ...>`.
+template <typename T>
+struct is_aabb : std::false_type {};
+
+template <typename T, auto d>
+struct is_aabb<AABB<T, d>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_aabb_v = is_aabb<T>::value;
+
+//
+//
+//
+// Whether the given type is `AABB<T, d>`.
+template <typename T, auto d>
+struct is_aabb_d : std::false_type {};
+
+template <typename T, auto d>
+struct is_aabb_d<AABB<T, d>, d> : std::true_type {};
+
+template <typename T, auto d>
+static constexpr bool is_aabb_d_v = is_aabb_d<T, d>::value;
+
+} // namespace aabb::detail
+
 } // namespace ARIA
