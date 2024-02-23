@@ -1,5 +1,14 @@
 #pragma once
 
+/// \file
+/// \brief A 16-bit half-precision floating point (FP16) implementation:
+/// 1 sign bit, 5 exponent bits, and 10 mantissa bits.
+/// See https://en.wikipedia.org/wiki/Half-precision_floating-point_format.
+//
+//
+//
+//
+//
 #include "ARIA/ARIA.h"
 
 #include <cuda/std/limits>
@@ -7,8 +16,11 @@
 
 namespace ARIA {
 
-/// \brief A NVIDIA-based 16-bit half-precision floating point (FP16) implementation:
+/// \brief A 16-bit half-precision floating point (FP16) implementation:
 /// 1 sign bit, 5 exponent bits, and 10 mantissa bits.
+///
+/// ARIA directly uses CUDA's implementation,
+/// see https://docs.nvidia.com/cuda/cuda-math-api/struct____half.html.
 ///
 /// \example ```cpp
 /// float16 a{0.1F};
