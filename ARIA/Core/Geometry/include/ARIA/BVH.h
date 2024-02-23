@@ -31,9 +31,9 @@ private:
 //
 //
 //
-// Compute AABB for the given positions.
 namespace bvh::detail {
 
+// Compute AABB for the given positions.
 template <typename T>
 [[nodiscard]] AABB3<T> ComputeAABB(const thrust::device_vector<Vec3<T>> &positionsD) {
   auto opVecMin = [] ARIA_HOST_DEVICE(const Vec3<T> &v0, const Vec3<T> &v1) -> Vec3<T> {
@@ -51,9 +51,9 @@ template <typename T>
   return AABB3<T>{inf, sup};
 }
 
+// Sort `positionsD` by Morton codes.
 template <typename T>
 void SortByMortonCodes(const thrust::device_vector<Vec3<T>> &positionsD,
-                       const AABB3<T> &aabb,
                        thrust::device_vector<uint> &sortedIndicesD,
                        thrust::device_vector<uint64> &sortedMortonCodesD) {
   // Check safety.
@@ -62,6 +62,9 @@ void SortByMortonCodes(const thrust::device_vector<Vec3<T>> &positionsD,
   if ((sortedIndicesD.size() != 0 && sortedIndicesD.size() != nPositions) ||
       (sortedMortonCodesD.size() != 0 && sortedMortonCodesD.size() != nPositions))
     ARIA_THROW(std::runtime_error, "Inconsistent input");
+
+  // Compute AABB.
+  AABB3<T> aabb = ComputeAABB(positionsD);
 
   // Allocate and init.
   if (sortedIndicesD.empty()) { // Init to [0, 1, 2, ... ] if indices have not been initialized.
@@ -130,12 +133,10 @@ make_bvh_device(TPrimitives &&primitives, FPrimitiveToPos &&fPrimitiveToPos, FPr
         invoke_with_parentheses_or_brackets(fPrimitiveToPos, invoke_with_parentheses_or_brackets(primitives, i));
   }).Launch();
 
-  TAABB positionsAABB = bvh::detail::ComputeAABB(positionsD);
-
   // Compute Morton codes, sort by Morton codes, and create the reordering indices.
   thrust::device_vector<uint> sortedIndicesD;
   thrust::device_vector<uint64> sortedMortonCodesD;
-  bvh::detail::SortByMortonCodes(positionsD, positionsAABB, sortedIndicesD, sortedMortonCodesD);
+  bvh::detail::SortByMortonCodes(positionsD, sortedIndicesD, sortedMortonCodesD);
 
   //! Never explicitly reorder the primitives.
 
