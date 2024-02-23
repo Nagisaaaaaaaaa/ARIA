@@ -2,9 +2,8 @@
 
 #include "ARIA/ARIA.h"
 
+#include <cuda/std/limits>
 #include <cuda_fp16.h>
-
-#include <limits>
 
 namespace ARIA {
 
@@ -98,3 +97,42 @@ public:
 };
 
 } // namespace std
+
+//
+//
+//
+namespace cuda::std {
+
+template <>
+class numeric_limits<ARIA::float16> : public ARIA::float16_::detail::aria_numeric_limits_float16_base {
+public:
+  [[nodiscard]] static /*constexpr*/ ARIA::float16 min() noexcept = delete;
+
+  [[nodiscard]] static /*constexpr*/ ARIA::float16 max() noexcept = delete;
+
+  [[nodiscard]] static /*constexpr*/ ARIA::float16 lowest() noexcept = delete;
+
+  [[nodiscard]] static /*constexpr*/ ARIA::float16 epsilon() noexcept = delete;
+
+  [[nodiscard]] static /*constexpr*/ ARIA::float16 round_error() noexcept { return ARIA::float16{0.5F}; }
+
+  [[nodiscard]] static /*constexpr*/ ARIA::float16 denorm_min() noexcept = delete;
+
+  [[nodiscard]] static /*constexpr*/ ARIA::float16 infinity() noexcept {
+    return ARIA::float16{std::numeric_limits<float>::infinity()};
+  }
+
+  [[nodiscard]] static /*constexpr*/ ARIA::float16 quiet_NaN() noexcept = delete;
+
+  [[nodiscard]] static /*constexpr*/ ARIA::float16 signaling_NaN() noexcept = delete;
+
+  static constexpr int digits = 10;
+  // static constexpr int digits10 = ...;
+  // static constexpr int max_digits10 = ...;
+  static constexpr int max_exponent = 16;
+  // static constexpr int max_exponent10 = ...;
+  static constexpr int min_exponent = -13;
+  // static constexpr int min_exponent10 = ...;
+};
+
+} // namespace cuda::std
