@@ -112,6 +112,66 @@ ARIA_HOST_DEVICE ARIA::float16 min(const ARIA::float16 &x, const ARIA::float16 &
   return __hmin(x, y);
 }
 
+ARIA_DEVICE ARIA::float16 ceil(const ARIA::float16 &x) {
+  return hceil(x);
+}
+
+ARIA_DEVICE ARIA::float16 cos(const ARIA::float16 &x) {
+  return hcos(x);
+}
+
+ARIA_DEVICE ARIA::float16 exp(const ARIA::float16 &x) {
+  return hexp(x);
+}
+
+ARIA_DEVICE ARIA::float16 exp10(const ARIA::float16 &x) {
+  return hexp10(x);
+}
+
+ARIA_DEVICE ARIA::float16 exp2(const ARIA::float16 &x) {
+  return hexp2(x);
+}
+
+ARIA_DEVICE ARIA::float16 floor(const ARIA::float16 &x) {
+  return hfloor(x);
+}
+
+ARIA_DEVICE ARIA::float16 log(const ARIA::float16 &x) {
+  return hlog(x);
+}
+
+ARIA_DEVICE ARIA::float16 log10(const ARIA::float16 &x) {
+  return hlog10(x);
+}
+
+ARIA_DEVICE ARIA::float16 log2(const ARIA::float16 &x) {
+  return hlog2(x);
+}
+
+ARIA_DEVICE ARIA::float16 rcp(const ARIA::float16 &x) {
+  return hrcp(x);
+}
+
+ARIA_DEVICE ARIA::float16 round(const ARIA::float16 &x) {
+  return hrint(x);
+}
+
+ARIA_DEVICE ARIA::float16 rsqrt(const ARIA::float16 &x) {
+  return hrsqrt(x);
+}
+
+ARIA_DEVICE ARIA::float16 sin(const ARIA::float16 &x) {
+  return hsin(x);
+}
+
+ARIA_DEVICE ARIA::float16 sqrt(const ARIA::float16 &x) {
+  return hsqrt(x);
+}
+
+ARIA_DEVICE ARIA::float16 trunc(const ARIA::float16 &x) {
+  return htrunc(x);
+}
+
 namespace std {
 
 ARIA_HOST_DEVICE ARIA::float16 abs(const ARIA::float16 &x) {
