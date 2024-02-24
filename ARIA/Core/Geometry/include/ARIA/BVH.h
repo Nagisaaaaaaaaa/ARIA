@@ -88,6 +88,7 @@ void SortByMortonCodes(const thrust::device_vector<Vec3<T>> &positionsD,
   thrust::sort_by_key(sortedMortonCodesD.begin(), sortedMortonCodesD.end(), sortedIndicesD.begin());
 }
 
+#if 0
 template <typename T, typename TPrimitives>
 void BuildKarras1ByMortonCodes(const TPrimitives &primitives,
                                const thrust::device_vector<uint64_t> &mortonCodesD,
@@ -233,6 +234,7 @@ void BuildKarras1ByMortonCodes(const TPrimitives &primitives,
     }
   }));
 }
+#endif
 
 } // namespace bvh::detail
 
@@ -283,14 +285,14 @@ make_bvh_device(TPrimitives &&primitives, FPrimitiveToPos &&fPrimitiveToPos, FPr
   thrust::device_vector<uint> sortedIndicesD;
   thrust::device_vector<uint64> sortedMortonCodesD;
   bvh::detail::SortByMortonCodes(positionsD, sortedIndicesD, sortedMortonCodesD);
-  auto sortedPrimitives = [=, sortedIndices = sortedIndicesD.data()] ARIA_HOST_DEVICE(uint i) {
+  auto sortedPrimitives = [=, sortedIndices = sortedIndicesD.data()] ARIA_DEVICE(uint i) {
     return invoke_with_parentheses_or_brackets(primitives, sortedIndicesD[i]);
   };
 
   //! Never explicitly reorder the primitives.
 
   // Perform Karras's algorithm.
-  bvh::detail::BuildKarras1ByMortonCodes();
+  // bvh::detail::BuildKarras1ByMortonCodes();
 
   // TODO: Add abstractions for CUDA streams.
   cuda::device::current::get().synchronize();
