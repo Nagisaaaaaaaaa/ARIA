@@ -8,15 +8,21 @@ namespace ARIA {
 namespace {
 
 ARIA_KERNEL void TestBaseCUDAKernel() {
+  ARIA_ASSERT(bfloat16{} == CUDART_ZERO_BF16);
+
   bfloat16 a{0.1F};
   bfloat16 b{0.2F};
   bfloat16 c = a + b;
   ARIA_ASSERT(std::abs(static_cast<float>(c) - 0.3F) < 0.001F);
 
+  ARIA_ASSERT(std::numeric_limits<bfloat16>::min() > bfloat16{});
+  ARIA_ASSERT(std::numeric_limits<bfloat16>::max() > bfloat16{});
   ARIA_ASSERT(static_cast<float>(std::numeric_limits<bfloat16>::infinity()) == std::numeric_limits<float>::infinity());
   ARIA_ASSERT(static_cast<float>(-std::numeric_limits<bfloat16>::infinity()) ==
               -std::numeric_limits<float>::infinity());
 
+  ARIA_ASSERT(cuda::std::numeric_limits<bfloat16>::min() > bfloat16{});
+  ARIA_ASSERT(cuda::std::numeric_limits<bfloat16>::max() > bfloat16{});
   ARIA_ASSERT(static_cast<float>(cuda::std::numeric_limits<bfloat16>::infinity()) ==
               cuda::std::numeric_limits<float>::infinity());
   ARIA_ASSERT(static_cast<float>(-cuda::std::numeric_limits<bfloat16>::infinity()) ==
@@ -50,15 +56,21 @@ void TestMathCUDA() {
 } // namespace
 
 TEST(BFloat16, Base) {
+  EXPECT_EQ(bfloat16{}, CUDART_ZERO_BF16);
+
   bfloat16 a{0.1F};
   bfloat16 b{0.2F};
   bfloat16 c = a + b;
   EXPECT_TRUE(std::abs(static_cast<float>(c) - 0.3F) < 0.001F);
 
+  EXPECT_TRUE(std::numeric_limits<bfloat16>::min() > bfloat16{});
+  EXPECT_TRUE(std::numeric_limits<bfloat16>::max() > bfloat16{});
   EXPECT_TRUE(static_cast<float>(std::numeric_limits<bfloat16>::infinity()) == std::numeric_limits<float>::infinity());
   EXPECT_TRUE(static_cast<float>(-std::numeric_limits<bfloat16>::infinity()) ==
               -std::numeric_limits<float>::infinity());
 
+  EXPECT_TRUE(cuda::std::numeric_limits<bfloat16>::min() > bfloat16{});
+  EXPECT_TRUE(cuda::std::numeric_limits<bfloat16>::max() > bfloat16{});
   EXPECT_TRUE(static_cast<float>(cuda::std::numeric_limits<bfloat16>::infinity()) ==
               cuda::std::numeric_limits<float>::infinity());
   EXPECT_TRUE(static_cast<float>(-cuda::std::numeric_limits<bfloat16>::infinity()) ==

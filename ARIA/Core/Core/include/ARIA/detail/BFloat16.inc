@@ -57,9 +57,9 @@ namespace std {
 template <>
 class numeric_limits<ARIA::bfloat16> : public ARIA::bfloat16_::detail::numeric_limits_bfloat16_base {
 public:
-  [[nodiscard]] ARIA_HOST_DEVICE static /*constexpr*/ ARIA::bfloat16 min() noexcept = delete;
+  [[nodiscard]] ARIA_HOST_DEVICE static /*constexpr*/ ARIA::bfloat16 min() noexcept { return CUDART_MIN_DENORM_BF16; }
 
-  [[nodiscard]] ARIA_HOST_DEVICE static /*constexpr*/ ARIA::bfloat16 max() noexcept = delete;
+  [[nodiscard]] ARIA_HOST_DEVICE static /*constexpr*/ ARIA::bfloat16 max() noexcept { return CUDART_MAX_NORMAL_BF16; }
 
   [[nodiscard]] ARIA_HOST_DEVICE static /*constexpr*/ ARIA::bfloat16 lowest() noexcept = delete;
 
@@ -71,11 +71,9 @@ public:
 
   [[nodiscard]] ARIA_HOST_DEVICE static /*constexpr*/ ARIA::bfloat16 denorm_min() noexcept = delete;
 
-  [[nodiscard]] ARIA_HOST_DEVICE static /*constexpr*/ ARIA::bfloat16 infinity() noexcept {
-    return ARIA::bfloat16{std::numeric_limits<float>::infinity()};
-  }
+  [[nodiscard]] ARIA_HOST_DEVICE static /*constexpr*/ ARIA::bfloat16 infinity() noexcept { return CUDART_INF_BF16; }
 
-  [[nodiscard]] ARIA_HOST_DEVICE static /*constexpr*/ ARIA::bfloat16 quiet_NaN() noexcept = delete;
+  [[nodiscard]] ARIA_HOST_DEVICE static /*constexpr*/ ARIA::bfloat16 quiet_NaN() noexcept { return CUDART_NAN_BF16; }
 
   [[nodiscard]] ARIA_HOST_DEVICE static /*constexpr*/ ARIA::bfloat16 signaling_NaN() noexcept = delete;
 
