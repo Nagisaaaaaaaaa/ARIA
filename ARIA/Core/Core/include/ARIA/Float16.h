@@ -11,6 +11,7 @@
 //
 #include "ARIA/ARIA.h"
 
+#include <cuda/std/cmath>
 #include <cuda/std/limits>
 #include <cuda_fp16.h>
 

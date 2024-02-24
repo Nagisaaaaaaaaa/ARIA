@@ -111,3 +111,11 @@ ARIA_HOST_DEVICE ARIA::bfloat16 abs(const ARIA::bfloat16 &v) {
 }
 
 } // namespace std
+
+namespace cuda::std {
+
+ARIA_HOST_DEVICE ARIA::bfloat16 abs(const ARIA::bfloat16 &v) {
+  return ::abs(v);
+}
+
+} // namespace cuda::std
