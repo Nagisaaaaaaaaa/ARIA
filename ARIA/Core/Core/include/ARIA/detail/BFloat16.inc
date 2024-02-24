@@ -100,22 +100,46 @@ class numeric_limits<ARIA::bfloat16> : public ::std::numeric_limits<ARIA::bfloat
 //
 //
 //
-ARIA_HOST_DEVICE ARIA::bfloat16 abs(const ARIA::bfloat16 &v) {
-  return __habs(v);
+ARIA_HOST_DEVICE ARIA::bfloat16 abs(const ARIA::bfloat16 &x) {
+  return __habs(x);
+}
+
+ARIA_HOST_DEVICE ARIA::bfloat16 max(const ARIA::bfloat16 &x, const ARIA::bfloat16 &y) {
+  return __hmax(x, y);
+}
+
+ARIA_HOST_DEVICE ARIA::bfloat16 min(const ARIA::bfloat16 &x, const ARIA::bfloat16 &y) {
+  return __hmin(x, y);
 }
 
 namespace std {
 
-ARIA_HOST_DEVICE ARIA::bfloat16 abs(const ARIA::bfloat16 &v) {
-  return ::abs(v);
+ARIA_HOST_DEVICE ARIA::bfloat16 abs(const ARIA::bfloat16 &x) {
+  return ::abs(x);
+}
+
+ARIA_HOST_DEVICE ARIA::bfloat16 max(const ARIA::bfloat16 &x, const ARIA::bfloat16 &y) {
+  return ::max(x, y);
+}
+
+ARIA_HOST_DEVICE ARIA::bfloat16 min(const ARIA::bfloat16 &x, const ARIA::bfloat16 &y) {
+  return ::min(x, y);
 }
 
 } // namespace std
 
 namespace cuda::std {
 
-ARIA_HOST_DEVICE ARIA::bfloat16 abs(const ARIA::bfloat16 &v) {
-  return ::abs(v);
+ARIA_HOST_DEVICE ARIA::bfloat16 abs(const ARIA::bfloat16 &x) {
+  return ::abs(x);
+}
+
+ARIA_HOST_DEVICE ARIA::bfloat16 max(const ARIA::bfloat16 &x, const ARIA::bfloat16 &y) {
+  return ::max(x, y);
+}
+
+ARIA_HOST_DEVICE ARIA::bfloat16 min(const ARIA::bfloat16 &x, const ARIA::bfloat16 &y) {
+  return ::min(x, y);
 }
 
 } // namespace cuda::std

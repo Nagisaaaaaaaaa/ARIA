@@ -39,6 +39,13 @@ ARIA_KERNEL void TestMathCUDAKernel() {
   ARIA_ASSERT(std::abs(b) == a);
   ARIA_ASSERT(cuda::std::abs(a) == a);
   ARIA_ASSERT(cuda::std::abs(b) == a);
+
+  ARIA_ASSERT(max(a, b) == a);
+  ARIA_ASSERT(min(a, b) == b);
+  ARIA_ASSERT(std::max(a, b) == a);
+  ARIA_ASSERT(std::min(a, b) == b);
+  ARIA_ASSERT(cuda::std::max(a, b) == a);
+  ARIA_ASSERT(cuda::std::min(a, b) == b);
 }
 
 void TestBaseCUDA() {
@@ -91,6 +98,13 @@ TEST(BFloat16, Math) {
   EXPECT_EQ(std::abs(b), a);
   EXPECT_EQ(cuda::std::abs(a), a);
   EXPECT_EQ(cuda::std::abs(b), a);
+
+  EXPECT_EQ(max(a, b), a);
+  EXPECT_EQ(min(a, b), b);
+  EXPECT_EQ(std::max(a, b), a);
+  EXPECT_EQ(std::min(a, b), b);
+  EXPECT_EQ(cuda::std::max(a, b), a);
+  EXPECT_EQ(cuda::std::min(a, b), b);
 
   TestMathCUDA();
 }
