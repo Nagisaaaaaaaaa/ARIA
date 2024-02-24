@@ -100,89 +100,89 @@ class numeric_limits<ARIA::bfloat16> : public ::std::numeric_limits<ARIA::bfloat
 //
 //
 //
-ARIA_HOST_DEVICE ARIA::bfloat16 abs(const ARIA::bfloat16 &x) {
+[[nodiscard]] ARIA_HOST_DEVICE inline ARIA::bfloat16 abs(const ARIA::bfloat16 &x) {
   return __habs(x);
 }
 
-ARIA_HOST_DEVICE ARIA::bfloat16 max(const ARIA::bfloat16 &x, const ARIA::bfloat16 &y) {
+[[nodiscard]] ARIA_HOST_DEVICE inline ARIA::bfloat16 max(const ARIA::bfloat16 &x, const ARIA::bfloat16 &y) {
   return __hmax(x, y);
 }
 
-ARIA_HOST_DEVICE ARIA::bfloat16 min(const ARIA::bfloat16 &x, const ARIA::bfloat16 &y) {
+[[nodiscard]] ARIA_HOST_DEVICE inline ARIA::bfloat16 min(const ARIA::bfloat16 &x, const ARIA::bfloat16 &y) {
   return __hmin(x, y);
 }
 
-ARIA_DEVICE ARIA::bfloat16 ceil(const ARIA::bfloat16 &x) {
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 ceil(const ARIA::bfloat16 &x) {
   return hceil(x);
 }
 
-ARIA_DEVICE ARIA::bfloat16 cos(const ARIA::bfloat16 &x) {
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 cos(const ARIA::bfloat16 &x) {
   return hcos(x);
 }
 
-ARIA_DEVICE ARIA::bfloat16 exp(const ARIA::bfloat16 &x) {
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 exp(const ARIA::bfloat16 &x) {
   return hexp(x);
 }
 
-ARIA_DEVICE ARIA::bfloat16 exp10(const ARIA::bfloat16 &x) {
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 exp10(const ARIA::bfloat16 &x) {
   return hexp10(x);
 }
 
-ARIA_DEVICE ARIA::bfloat16 exp2(const ARIA::bfloat16 &x) {
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 exp2(const ARIA::bfloat16 &x) {
   return hexp2(x);
 }
 
-ARIA_DEVICE ARIA::bfloat16 floor(const ARIA::bfloat16 &x) {
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 floor(const ARIA::bfloat16 &x) {
   return hfloor(x);
 }
 
-ARIA_DEVICE ARIA::bfloat16 log(const ARIA::bfloat16 &x) {
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 log(const ARIA::bfloat16 &x) {
   return hlog(x);
 }
 
-ARIA_DEVICE ARIA::bfloat16 log10(const ARIA::bfloat16 &x) {
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 log10(const ARIA::bfloat16 &x) {
   return hlog10(x);
 }
 
-ARIA_DEVICE ARIA::bfloat16 log2(const ARIA::bfloat16 &x) {
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 log2(const ARIA::bfloat16 &x) {
   return hlog2(x);
 }
 
-ARIA_DEVICE ARIA::bfloat16 rcp(const ARIA::bfloat16 &x) {
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 rcp(const ARIA::bfloat16 &x) {
   return hrcp(x);
 }
 
-ARIA_DEVICE ARIA::bfloat16 round(const ARIA::bfloat16 &x) {
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 round(const ARIA::bfloat16 &x) {
   return hrint(x);
 }
 
-ARIA_DEVICE ARIA::bfloat16 rsqrt(const ARIA::bfloat16 &x) {
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 rsqrt(const ARIA::bfloat16 &x) {
   return hrsqrt(x);
 }
 
-ARIA_DEVICE ARIA::bfloat16 sin(const ARIA::bfloat16 &x) {
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 sin(const ARIA::bfloat16 &x) {
   return hsin(x);
 }
 
-ARIA_DEVICE ARIA::bfloat16 sqrt(const ARIA::bfloat16 &x) {
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 sqrt(const ARIA::bfloat16 &x) {
   return hsqrt(x);
 }
 
-ARIA_DEVICE ARIA::bfloat16 trunc(const ARIA::bfloat16 &x) {
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 trunc(const ARIA::bfloat16 &x) {
   return htrunc(x);
 }
 
 namespace std {
 
-ARIA_HOST_DEVICE ARIA::bfloat16 abs(const ARIA::bfloat16 &x) {
+[[nodiscard]] ARIA_HOST_DEVICE inline ARIA::bfloat16 abs(const ARIA::bfloat16 &x) {
   return ::abs(x);
 }
 
-ARIA_HOST_DEVICE ARIA::bfloat16 max(const ARIA::bfloat16 &x, const ARIA::bfloat16 &y) {
+[[nodiscard]] ARIA_HOST_DEVICE inline ARIA::bfloat16 max(const ARIA::bfloat16 &x, const ARIA::bfloat16 &y) {
   return ::max(x, y);
 }
 
-ARIA_HOST_DEVICE ARIA::bfloat16 min(const ARIA::bfloat16 &x, const ARIA::bfloat16 &y) {
+[[nodiscard]] ARIA_HOST_DEVICE inline ARIA::bfloat16 min(const ARIA::bfloat16 &x, const ARIA::bfloat16 &y) {
   return ::min(x, y);
 }
 
@@ -190,15 +190,15 @@ ARIA_HOST_DEVICE ARIA::bfloat16 min(const ARIA::bfloat16 &x, const ARIA::bfloat1
 
 namespace cuda::std {
 
-ARIA_HOST_DEVICE ARIA::bfloat16 abs(const ARIA::bfloat16 &x) {
+[[nodiscard]] ARIA_HOST_DEVICE inline ARIA::bfloat16 abs(const ARIA::bfloat16 &x) {
   return ::abs(x);
 }
 
-ARIA_HOST_DEVICE ARIA::bfloat16 max(const ARIA::bfloat16 &x, const ARIA::bfloat16 &y) {
+[[nodiscard]] ARIA_HOST_DEVICE inline ARIA::bfloat16 max(const ARIA::bfloat16 &x, const ARIA::bfloat16 &y) {
   return ::max(x, y);
 }
 
-ARIA_HOST_DEVICE ARIA::bfloat16 min(const ARIA::bfloat16 &x, const ARIA::bfloat16 &y) {
+[[nodiscard]] ARIA_HOST_DEVICE inline ARIA::bfloat16 min(const ARIA::bfloat16 &x, const ARIA::bfloat16 &y) {
   return ::min(x, y);
 }
 
