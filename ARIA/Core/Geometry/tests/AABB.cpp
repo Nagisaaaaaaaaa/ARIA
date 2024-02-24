@@ -1,4 +1,6 @@
 #include "ARIA/AABB.h"
+#include "ARIA/BFloat16.h"
+#include "ARIA/Float16.h"
 
 #include <gtest/gtest.h>
 
@@ -255,12 +257,12 @@ TEST(AABB, Base) {
 }
 
 TEST(AABB, Methods) {
-  auto expectV2 = [](const Vec2r &lhs, const Vec2r &rhs) {
+  auto expectV2 = [](const Vec2f &lhs, const Vec2f &rhs) {
     EXPECT_FLOAT_EQ(float(lhs.x()), float(rhs.x()));
     EXPECT_FLOAT_EQ(float(lhs.y()), float(rhs.y()));
   };
 
-  auto expectV3 = [](const Vec3r &lhs, const Vec3r &rhs) {
+  auto expectV3 = [](const Vec3f &lhs, const Vec3f &rhs) {
     EXPECT_FLOAT_EQ(float(lhs.x()), float(rhs.x()));
     EXPECT_FLOAT_EQ(float(lhs.y()), float(rhs.y()));
     EXPECT_FLOAT_EQ(float(lhs.z()), float(rhs.z()));
@@ -299,6 +301,142 @@ TEST(AABB, Methods) {
     expectV3(aabb[C<0>{}], {0.1F, 0.2F, 0.3F});
     expectV3(aabb[C<1>{}], {0.4F, 0.6F, 0.9F});
   }
+}
+
+TEST(AABB, Half) {
+  auto testHalf = []<typename THalf>() {
+    using Vec2h = Vec2<THalf>;
+    using AABB2h = AABB2<THalf>;
+
+    auto expectAABB2 = [](const AABB2h &aabb, const Vec2h &inf, const Vec2h &sup) {
+      EXPECT_FLOAT_EQ(aabb.inf().x(), inf.x());
+      EXPECT_FLOAT_EQ(aabb.inf().y(), inf.y());
+      EXPECT_FLOAT_EQ(aabb.sup().x(), sup.x());
+      EXPECT_FLOAT_EQ(aabb.sup().y(), sup.y());
+    };
+
+    auto expectV2 = [](const Vec2h &lhs, const Vec2h &rhs) {
+      EXPECT_TRUE(std::abs(float(lhs.x()) - float(rhs.x())) < 0.005);
+      EXPECT_TRUE(std::abs(float(lhs.y()) - float(rhs.y())) < 0.005);
+    };
+
+    // 2D constructors, unionize, inf, sup, and empty.
+    {
+      // Default constructor.
+      AABB2h aabb0;
+      expectAABB2(aabb0, {infinity<THalf>, infinity<THalf>}, {-infinity<THalf>, -infinity<THalf>});
+      EXPECT_TRUE(aabb0.empty());
+
+      // Copy constructor.
+      AABB2h aabb1 = aabb0;
+      expectAABB2(aabb1, {infinity<THalf>, infinity<THalf>}, {-infinity<THalf>, -infinity<THalf>});
+      EXPECT_TRUE(aabb1.empty());
+
+      // Construct from 1 point.
+      AABB2h aabb2{Vec2h{0.1F, 0.1F}};
+      expectAABB2(aabb2, {0.1F, 0.1F}, {0.1F, 0.1F});
+      EXPECT_FALSE(aabb2.empty());
+
+      // Construct from 2 AABBs.
+      AABB2h aabb3{Vec2h{0.01F, 0.01F}};
+      AABB2h aabb4{aabb2, aabb3};
+      expectAABB2(aabb4, {0.01F, 0.01F}, {0.1F, 0.1F});
+      EXPECT_FALSE(aabb4.empty());
+
+      // Construct from 1 AABB + 1 point.
+      AABB2h aabb5{aabb4, Vec2h{0.001F, 0.001F}};
+      expectAABB2(aabb5, {0.001F, 0.001F}, {0.1F, 0.1F});
+      EXPECT_FALSE(aabb5.empty());
+
+      // Construct from 3 items.
+      Vec2h point{0.001F, 0.001F};
+      {
+        AABB2h aabb{aabb5, aabb4, aabb3};
+        expectAABB2(aabb, {0.001F, 0.001F}, {0.1F, 0.1F});
+      }
+      {
+        AABB2h aabb{aabb5, aabb4, point};
+        expectAABB2(aabb, {0.001F, 0.001F}, {0.1F, 0.1F});
+      }
+      {
+        AABB2h aabb{aabb5, point, aabb3};
+        expectAABB2(aabb, {0.001F, 0.001F}, {0.1F, 0.1F});
+      }
+      {
+        AABB2h aabb{aabb5, point, point};
+        expectAABB2(aabb, {0.001F, 0.001F}, {0.1F, 0.1F});
+      }
+      {
+        AABB2h aabb{point, aabb4, aabb3};
+        expectAABB2(aabb, {0.001F, 0.001F}, {0.1F, 0.1F});
+      }
+      {
+        AABB2h aabb{point, aabb4, point};
+        expectAABB2(aabb, {0.001F, 0.001F}, {0.1F, 0.1F});
+      }
+      {
+        AABB2h aabb{point, point, aabb3};
+        expectAABB2(aabb, {0.001F, 0.001F}, {0.01F, 0.01F});
+      }
+      {
+        AABB2h aabb{point, point, point};
+        expectAABB2(aabb, {0.001F, 0.001F}, {0.001F, 0.001F});
+      }
+
+      AABB2h aabb6 = aabb2;
+      aabb6.Unionize(Vec2h{0.05F, 0.05F}, Vec2h{0.01F, 0.01F});
+      expectAABB2(aabb6, {0.01F, 0.01F}, {0.1F, 0.1F});
+
+      // Complex Empty.
+      {
+        AABB2h aabb;
+        aabb.inf() = {0.1F, 0.2F};
+        aabb.sup() = {0.3F, 0.4F};
+        EXPECT_FALSE(aabb.empty());
+      }
+
+      {
+        AABB2h aabb;
+        aabb.inf() = {0.1F, 0.4F};
+        aabb.sup() = {0.3F, 0.2F};
+        EXPECT_TRUE(aabb.empty());
+      }
+
+      {
+        AABB2h aabb;
+        aabb.inf() = {0.3F, 0.2F};
+        aabb.sup() = {0.1F, 0.4F};
+        EXPECT_TRUE(aabb.empty());
+      }
+
+      {
+        AABB2h aabb;
+        aabb.inf() = {0.3F, 0.4F};
+        aabb.sup() = {0.1F, 0.2F};
+        EXPECT_TRUE(aabb.empty());
+      }
+    }
+
+    // 2D other methods.
+    {
+      AABB2h aabb;
+      aabb.inf() = {0.1F, 0.2F};
+      aabb.sup() = {0.3F, 0.5F};
+
+      expectV2(aabb.center(), {0.2F, 0.35F});
+      expectV2(aabb.offset({0.25F, 0.4F}), {0.75F, 0.666666666666667F});
+      expectV2(aabb.diagonal(), {0.2F, 0.3F});
+
+      expectV2(aabb[0], {0.1F, 0.2F});
+      expectV2(aabb[1], {0.3F, 0.5F});
+
+      expectV2(aabb[C<0>{}], {0.1F, 0.2F});
+      expectV2(aabb[C<1>{}], {0.3F, 0.5F});
+    }
+  };
+
+  testHalf.template operator()<float16>();
+  testHalf.template operator()<bfloat16>();
 }
 
 } // namespace ARIA

@@ -112,6 +112,7 @@ class numeric_limits<ARIA::float16> : public ::std::numeric_limits<ARIA::float16
   return __hmin(x, y);
 }
 
+#if defined(__CUDACC__) || defined(_NVHPC_CUDA)
 [[nodiscard]] ARIA_DEVICE inline ARIA::float16 ceil(const ARIA::float16 &x) {
   return hceil(x);
 }
@@ -171,6 +172,7 @@ class numeric_limits<ARIA::float16> : public ::std::numeric_limits<ARIA::float16
 [[nodiscard]] ARIA_DEVICE inline ARIA::float16 trunc(const ARIA::float16 &x) {
   return htrunc(x);
 }
+#endif
 
 //
 //
@@ -190,6 +192,7 @@ namespace std {
   return ::min(x, y);
 }
 
+#if defined(__CUDACC__) || defined(_NVHPC_CUDA)
 [[nodiscard]] ARIA_DEVICE inline ARIA::float16 ceil(const ARIA::float16 &x) {
   return ::ceil(x);
 }
@@ -249,6 +252,7 @@ namespace std {
 [[nodiscard]] ARIA_DEVICE inline ARIA::float16 trunc(const ARIA::float16 &x) {
   return ::trunc(x);
 }
+#endif
 
 } // namespace std
 
@@ -269,6 +273,7 @@ namespace cuda::std {
   return ::min(x, y);
 }
 
+#if defined(__CUDACC__) || defined(_NVHPC_CUDA)
 [[nodiscard]] ARIA_DEVICE inline ARIA::float16 ceil(const ARIA::float16 &x) {
   return ::ceil(x);
 }
@@ -328,5 +333,6 @@ namespace cuda::std {
 [[nodiscard]] ARIA_DEVICE inline ARIA::float16 trunc(const ARIA::float16 &x) {
   return ::trunc(x);
 }
+#endif
 
 } // namespace cuda::std
