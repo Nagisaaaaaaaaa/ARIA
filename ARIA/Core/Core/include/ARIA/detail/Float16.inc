@@ -96,3 +96,20 @@ template <>
 class numeric_limits<ARIA::float16> : public ::std::numeric_limits<ARIA::float16> {};
 
 } // namespace cuda::std
+
+//
+//
+//
+//
+//
+ARIA_HOST_DEVICE ARIA::float16 abs(const ARIA::float16 &v) {
+  return __habs(v);
+}
+
+namespace std {
+
+ARIA_HOST_DEVICE ARIA::float16 abs(const ARIA::float16 &v) {
+  return ::abs(v);
+}
+
+} // namespace std

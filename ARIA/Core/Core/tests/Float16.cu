@@ -7,7 +7,7 @@ namespace ARIA {
 
 namespace {
 
-ARIA_KERNEL void TestCUDAKernel() {
+ARIA_KERNEL void TestBaseCUDAKernel() {
   float16 a{0.1F};
   float16 b{0.2F};
   float16 c = a + b;
@@ -22,9 +22,26 @@ ARIA_KERNEL void TestCUDAKernel() {
               -cuda::std::numeric_limits<float>::infinity());
 }
 
-void TestCUDA() {
+ARIA_KERNEL void TestMathCUDAKernel() {
+  float16 a{0.1F};
+  float16 b{-0.1F};
+
+  ARIA_ASSERT(abs(a) == a);
+  ARIA_ASSERT(abs(b) == a);
+  ARIA_ASSERT(std::abs(a) == a);
+  ARIA_ASSERT(std::abs(b) == a);
+}
+
+void TestBaseCUDA() {
   try {
-    TestCUDAKernel<<<1, 1>>>();
+    TestBaseCUDAKernel<<<1, 1>>>();
+    cuda::device::current::get().synchronize();
+  } catch (...) { EXPECT_FALSE(true); }
+}
+
+void TestMathCUDA() {
+  try {
+    TestMathCUDAKernel<<<1, 1>>>();
     cuda::device::current::get().synchronize();
   } catch (...) { EXPECT_FALSE(true); }
 }
@@ -45,7 +62,19 @@ TEST(Float16, Base) {
   EXPECT_TRUE(static_cast<float>(-cuda::std::numeric_limits<float16>::infinity()) ==
               -cuda::std::numeric_limits<float>::infinity());
 
-  TestCUDA();
+  TestBaseCUDA();
+}
+
+TEST(Float16, Math) {
+  float16 a{0.1F};
+  float16 b{-0.1F};
+
+  EXPECT_EQ(abs(a), a);
+  EXPECT_EQ(abs(b), a);
+  EXPECT_EQ(std::abs(a), a);
+  EXPECT_EQ(std::abs(b), a);
+
+  TestMathCUDA();
 }
 
 } // namespace ARIA
