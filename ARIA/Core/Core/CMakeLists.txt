@@ -46,8 +46,10 @@ target_include_directories(CUTLASS INTERFACE ${cutlass_SOURCE_DIR}/include)
 set(core_core_headers
     ARIA/ARIA.h
     ARIA/Auto.h
+    ARIA/BFloat16.h
     ARIA/Constant.h
     ARIA/DisjointSet.h
+    ARIA/Float16.h
     ARIA/ForEach.h
     ARIA/Invocations.h
     ARIA/Launcher.h

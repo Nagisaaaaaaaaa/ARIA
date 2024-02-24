@@ -244,6 +244,14 @@ TEST(AABB, Base) {
       EXPECT_TRUE(aabb.empty());
     }
   }
+
+  // Is AABB.
+  {
+    static_assert(aabb::detail::is_aabb_v<AABB2i>);
+    static_assert(aabb::detail::is_aabb_d_v<AABB2i, 2>);
+    static_assert(!aabb::detail::is_aabb_d_v<AABB2i, 1>);
+    static_assert(!aabb::detail::is_aabb_d_v<AABB2i, 3>);
+  }
 }
 
 TEST(AABB, Methods) {
