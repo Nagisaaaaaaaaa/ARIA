@@ -172,6 +172,10 @@ class numeric_limits<ARIA::float16> : public ::std::numeric_limits<ARIA::float16
   return htrunc(x);
 }
 
+//
+//
+//
+//! STL is extended, even though we know that it may be dangerous.
 namespace std {
 
 [[nodiscard]] ARIA_HOST_DEVICE inline ARIA::float16 abs(const ARIA::float16 &x) {
@@ -248,6 +252,9 @@ namespace std {
 
 } // namespace std
 
+//
+//
+//
 namespace cuda::std {
 
 [[nodiscard]] ARIA_HOST_DEVICE inline ARIA::float16 abs(const ARIA::float16 &x) {
