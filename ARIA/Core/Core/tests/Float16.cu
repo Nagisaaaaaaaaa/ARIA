@@ -19,6 +19,7 @@ ARIA_KERNEL void TestBaseCUDAKernel() {
   ARIA_ASSERT(std::numeric_limits<float16>::max() > float16{});
   ARIA_ASSERT(static_cast<float>(std::numeric_limits<float16>::infinity()) == std::numeric_limits<float>::infinity());
   ARIA_ASSERT(static_cast<float>(-std::numeric_limits<float16>::infinity()) == -std::numeric_limits<float>::infinity());
+  ARIA_ASSERT(std::numeric_limits<float16>::quiet_NaN() != std::numeric_limits<float16>::quiet_NaN());
 
   ARIA_ASSERT(cuda::std::numeric_limits<float16>::min() > float16{});
   ARIA_ASSERT(cuda::std::numeric_limits<float16>::max() > float16{});
@@ -26,6 +27,7 @@ ARIA_KERNEL void TestBaseCUDAKernel() {
               cuda::std::numeric_limits<float>::infinity());
   ARIA_ASSERT(static_cast<float>(-cuda::std::numeric_limits<float16>::infinity()) ==
               -cuda::std::numeric_limits<float>::infinity());
+  ARIA_ASSERT(cuda::std::numeric_limits<float16>::quiet_NaN() != cuda::std::numeric_limits<float16>::quiet_NaN());
 }
 
 ARIA_KERNEL void TestMathCUDAKernel() {
@@ -75,6 +77,7 @@ TEST(Float16, Base) {
   EXPECT_TRUE(std::numeric_limits<float16>::max() > float16{});
   EXPECT_TRUE(static_cast<float>(std::numeric_limits<float16>::infinity()) == std::numeric_limits<float>::infinity());
   EXPECT_TRUE(static_cast<float>(-std::numeric_limits<float16>::infinity()) == -std::numeric_limits<float>::infinity());
+  EXPECT_NE(std::numeric_limits<float16>::quiet_NaN(), std::numeric_limits<float16>::quiet_NaN());
 
   EXPECT_TRUE(cuda::std::numeric_limits<float16>::min() > float16{});
   EXPECT_TRUE(cuda::std::numeric_limits<float16>::max() > float16{});
@@ -82,6 +85,7 @@ TEST(Float16, Base) {
               cuda::std::numeric_limits<float>::infinity());
   EXPECT_TRUE(static_cast<float>(-cuda::std::numeric_limits<float16>::infinity()) ==
               -cuda::std::numeric_limits<float>::infinity());
+  EXPECT_NE(cuda::std::numeric_limits<float16>::quiet_NaN(), cuda::std::numeric_limits<float16>::quiet_NaN());
 
   TestBaseCUDA();
 }
