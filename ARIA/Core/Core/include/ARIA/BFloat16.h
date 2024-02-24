@@ -4,6 +4,8 @@
 /// \brief A 16-bit brain floating point (BF16) implementation:
 /// 1 sign bit, 8 exponent bits, and 7 mantissa bits.
 /// See https://en.wikipedia.org/wiki/Bfloat16_floating-point_format.
+///
+/// `cmath` and `limits` are extended to support `bfloat16`.
 //
 //
 //
@@ -22,6 +24,10 @@ namespace ARIA {
 ///
 /// ARIA directly uses CUDA's implementation,
 /// see https://docs.nvidia.com/cuda/cuda-math-api/struct____nv__bfloat16.html.
+///
+/// \note `cmath` and `limits` are extended to support `bfloat16`, so
+/// you are able to use functions such as `std::abs`, `std::max`, and
+/// `std::numeric_limits`, or the `cuda::std::` ones with `bfloat16`.
 ///
 /// \example ```cpp
 /// bfloat16 a{0.1F};
