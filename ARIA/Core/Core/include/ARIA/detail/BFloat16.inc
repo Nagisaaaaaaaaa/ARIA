@@ -152,7 +152,7 @@ class numeric_limits<ARIA::bfloat16> : public ::std::numeric_limits<ARIA::bfloat
   return hrcp(x);
 }
 
-[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 round(const ARIA::bfloat16 &x) {
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 rint(const ARIA::bfloat16 &x) {
   return hrint(x);
 }
 
@@ -186,6 +186,66 @@ namespace std {
   return ::min(x, y);
 }
 
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 ceil(const ARIA::bfloat16 &x) {
+  return ::ceil(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 cos(const ARIA::bfloat16 &x) {
+  return ::cos(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 exp(const ARIA::bfloat16 &x) {
+  return ::exp(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 exp10(const ARIA::bfloat16 &x) {
+  return ::exp10(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 exp2(const ARIA::bfloat16 &x) {
+  return ::exp2(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 floor(const ARIA::bfloat16 &x) {
+  return ::floor(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 log(const ARIA::bfloat16 &x) {
+  return ::log(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 log10(const ARIA::bfloat16 &x) {
+  return ::log10(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 log2(const ARIA::bfloat16 &x) {
+  return ::log2(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 rcp(const ARIA::bfloat16 &x) {
+  return ::rcp(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 rint(const ARIA::bfloat16 &x) {
+  return ::rint(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 rsqrt(const ARIA::bfloat16 &x) {
+  return ::rsqrt(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 sin(const ARIA::bfloat16 &x) {
+  return ::sin(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 sqrt(const ARIA::bfloat16 &x) {
+  return ::sqrt(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 trunc(const ARIA::bfloat16 &x) {
+  return ::trunc(x);
+}
+
 } // namespace std
 
 namespace cuda::std {
@@ -200,6 +260,66 @@ namespace cuda::std {
 
 [[nodiscard]] ARIA_HOST_DEVICE inline ARIA::bfloat16 min(const ARIA::bfloat16 &x, const ARIA::bfloat16 &y) {
   return ::min(x, y);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 ceil(const ARIA::bfloat16 &x) {
+  return ::ceil(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 cos(const ARIA::bfloat16 &x) {
+  return ::cos(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 exp(const ARIA::bfloat16 &x) {
+  return ::exp(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 exp10(const ARIA::bfloat16 &x) {
+  return ::exp10(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 exp2(const ARIA::bfloat16 &x) {
+  return ::exp2(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 floor(const ARIA::bfloat16 &x) {
+  return ::floor(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 log(const ARIA::bfloat16 &x) {
+  return ::log(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 log10(const ARIA::bfloat16 &x) {
+  return ::log10(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 log2(const ARIA::bfloat16 &x) {
+  return ::log2(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 rcp(const ARIA::bfloat16 &x) {
+  return ::rcp(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 rint(const ARIA::bfloat16 &x) {
+  return ::rint(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 rsqrt(const ARIA::bfloat16 &x) {
+  return ::rsqrt(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 sin(const ARIA::bfloat16 &x) {
+  return ::sin(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 sqrt(const ARIA::bfloat16 &x) {
+  return ::sqrt(x);
+}
+
+[[nodiscard]] ARIA_DEVICE inline ARIA::bfloat16 trunc(const ARIA::bfloat16 &x) {
+  return ::trunc(x);
 }
 
 } // namespace cuda::std
