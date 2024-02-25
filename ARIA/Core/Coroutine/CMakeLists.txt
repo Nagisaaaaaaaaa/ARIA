@@ -16,7 +16,16 @@ file(GLOB cppcoro_SOURCES "${cppcoro_SOURCE_DIR}/lib/*.cpp")
 if (MSVC)
   list(REMOVE_ITEM cppcoro_SOURCES "${cppcoro_SOURCE_DIR}/lib/linux.cpp")
 else ()
-  list(REMOVE_ITEM cppcoro_SOURCES "${cppcoro_SOURCE_DIR}/lib/win32.cpp")
+  list(REMOVE_ITEM cppcoro_SOURCES
+      "${cppcoro_SOURCE_DIR}/lib/win32.cpp"
+      "${cppcoro_SOURCE_DIR}/lib/socket.cpp"
+      "${cppcoro_SOURCE_DIR}/lib/socket_accept_operation.cpp"
+      "${cppcoro_SOURCE_DIR}/lib/socket_connect_operation.cpp"
+      "${cppcoro_SOURCE_DIR}/lib/socket_disconnect_operation.cpp"
+      "${cppcoro_SOURCE_DIR}/lib/socket_recv_from_operation.cpp"
+      "${cppcoro_SOURCE_DIR}/lib/socket_recv_operation.cpp"
+      "${cppcoro_SOURCE_DIR}/lib/socket_send_operation.cpp"
+      "${cppcoro_SOURCE_DIR}/lib/socket_send_to_operation.cpp")
 endif ()
 
 # Add and setup library.
@@ -26,6 +35,8 @@ if (MSVC)
   target_compile_options(cppcoro PRIVATE /std:c++latest)
   target_link_libraries(cppcoro PUBLIC synchronization.lib)
   #  target_compile_options(cppcoro PUBLIC /await) # Does not work with NVCC.
+else ()
+  target_compile_options(cppcoro PRIVATE -std=c++20)
 endif ()
 
 set(core_coroutine_headers
