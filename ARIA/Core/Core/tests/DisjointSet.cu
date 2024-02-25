@@ -34,8 +34,8 @@ void TestCPU() {
 
     // Initialize.
     DisjointSet<TThreadUnsafeOrSafe, Volume> disjointSet(Volume{make_layout_major(5, 5)});
-    for (int y = 0; y < disjointSet.nodes().size<1>(); ++y)
-      for (int x = 0; x < disjointSet.nodes().size<0>(); ++x)
+    for (int y = 0; y < disjointSet.nodes().template size<1>(); ++y)
+      for (int x = 0; x < disjointSet.nodes().template size<0>(); ++x)
         disjointSet.nodes()(x, y) = disjointSet.nodes().layout()(x, y);
 
     // Supporting functions.
@@ -103,16 +103,16 @@ void TestCPU() {
                 10, 10, 22, 23, 24);
 
     // Complex union.
-    for (int y = 0; y < disjointSet.nodes().size<1>(); ++y)
-      for (int x = 0; x < disjointSet.nodes().size<0>(); ++x)
+    for (int y = 0; y < disjointSet.nodes().template size<1>(); ++y)
+      for (int x = 0; x < disjointSet.nodes().template size<0>(); ++x)
         if (flags(x, y) == L) {
           if (x - 1 >= 0 && flags(x - 1, y) == L)
             disjointSet.Union(crd2Idx(x - 1, y), crd2Idx(x, y));
-          if (x + 1 < disjointSet.nodes().size<0>() && flags(x + 1, y) == L)
+          if (x + 1 < disjointSet.nodes().template size<0>() && flags(x + 1, y) == L)
             disjointSet.Union(crd2Idx(x + 1, y), crd2Idx(x, y));
           if (y - 1 >= 0 && flags(x, y - 1) == L)
             disjointSet.Union(crd2Idx(x, y - 1), crd2Idx(x, y));
-          if (y + 1 < disjointSet.nodes().size<1>() && flags(x, y + 1) == L)
+          if (y + 1 < disjointSet.nodes().template size<1>() && flags(x, y + 1) == L)
             disjointSet.Union(crd2Idx(x, y + 1), crd2Idx(x, y));
         }
     expectNodes(0, 1, 1, 1, 1,    //
@@ -121,16 +121,16 @@ void TestCPU() {
                 10, 16, 17, 1, 1, //
                 10, 10, 22, 23, 24);
 
-    for (int y = 0; y < disjointSet.nodes().size<1>(); ++y)
-      for (int x = 0; x < disjointSet.nodes().size<0>(); ++x)
+    for (int y = 0; y < disjointSet.nodes().template size<1>(); ++y)
+      for (int x = 0; x < disjointSet.nodes().template size<0>(); ++x)
         if (flags(x, y) == I) {
           if (x - 1 >= 0 && flags(x - 1, y) == I)
             disjointSet.Union(crd2Idx(x - 1, y), crd2Idx(x, y));
-          if (x + 1 < disjointSet.nodes().size<0>() && flags(x + 1, y) == I)
+          if (x + 1 < disjointSet.nodes().template size<0>() && flags(x + 1, y) == I)
             disjointSet.Union(crd2Idx(x + 1, y), crd2Idx(x, y));
           if (y - 1 >= 0 && flags(x, y - 1) == I)
             disjointSet.Union(crd2Idx(x, y - 1), crd2Idx(x, y));
-          if (y + 1 < disjointSet.nodes().size<1>() && flags(x, y + 1) == I)
+          if (y + 1 < disjointSet.nodes().template size<1>() && flags(x, y + 1) == I)
             disjointSet.Union(crd2Idx(x, y + 1), crd2Idx(x, y));
         }
     expectNodes(0, 1, 1, 1, 1,  //
@@ -178,8 +178,8 @@ void TestCPU() {
 
     // Initialize.
     DisjointSet<TThreadUnsafeOrSafe, Volume> disjointSet(Volume{make_layout_major(5, 5)});
-    for (int y = 0; y < disjointSet.nodes().size<1>(); ++y)
-      for (int x = 0; x < disjointSet.nodes().size<0>(); ++x)
+    for (int y = 0; y < disjointSet.nodes().template size<1>(); ++y)
+      for (int x = 0; x < disjointSet.nodes().template size<0>(); ++x)
         disjointSet.nodes()(x, y) = disjointSet.nodes().layout()(x, y);
 
     // Supporting functions.
@@ -247,16 +247,16 @@ void TestCPU() {
                 10, 10, 22, 23, 24);
 
     // Complex union.
-    for (int y = 0; y < disjointSet.nodes().size<1>(); ++y)
-      for (int x = 0; x < disjointSet.nodes().size<0>(); ++x)
+    for (int y = 0; y < disjointSet.nodes().template size<1>(); ++y)
+      for (int x = 0; x < disjointSet.nodes().template size<0>(); ++x)
         if (flags(x, y) == L) {
           if (x - 1 >= 0 && flags(x - 1, y) == L)
             disjointSet.Union(crd2Idx(x - 1, y), crd2Idx(x, y));
-          if (x + 1 < disjointSet.nodes().size<0>() && flags(x + 1, y) == L)
+          if (x + 1 < disjointSet.nodes().template size<0>() && flags(x + 1, y) == L)
             disjointSet.Union(crd2Idx(x + 1, y), crd2Idx(x, y));
           if (y - 1 >= 0 && flags(x, y - 1) == L)
             disjointSet.Union(crd2Idx(x, y - 1), crd2Idx(x, y));
-          if (y + 1 < disjointSet.nodes().size<1>() && flags(x, y + 1) == L)
+          if (y + 1 < disjointSet.nodes().template size<1>() && flags(x, y + 1) == L)
             disjointSet.Union(crd2Idx(x, y + 1), crd2Idx(x, y));
         }
     expectNodes(0, 1, 1, 1, 1,    //
@@ -265,16 +265,16 @@ void TestCPU() {
                 10, 16, 17, 1, 1, //
                 10, 10, 22, 23, 24);
 
-    for (int y = 0; y < disjointSet.nodes().size<1>(); ++y)
-      for (int x = 0; x < disjointSet.nodes().size<0>(); ++x)
+    for (int y = 0; y < disjointSet.nodes().template size<1>(); ++y)
+      for (int x = 0; x < disjointSet.nodes().template size<0>(); ++x)
         if (flags(x, y) == I) {
           if (x - 1 >= 0 && flags(x - 1, y) == I)
             disjointSet.Union(crd2Idx(x - 1, y), crd2Idx(x, y));
-          if (x + 1 < disjointSet.nodes().size<0>() && flags(x + 1, y) == I)
+          if (x + 1 < disjointSet.nodes().template size<0>() && flags(x + 1, y) == I)
             disjointSet.Union(crd2Idx(x + 1, y), crd2Idx(x, y));
           if (y - 1 >= 0 && flags(x, y - 1) == I)
             disjointSet.Union(crd2Idx(x, y - 1), crd2Idx(x, y));
-          if (y + 1 < disjointSet.nodes().size<1>() && flags(x, y + 1) == I)
+          if (y + 1 < disjointSet.nodes().template size<1>() && flags(x, y + 1) == I)
             disjointSet.Union(crd2Idx(x, y + 1), crd2Idx(x, y));
         }
     expectNodes(0, 1, 1, 1, 1,  //
@@ -322,8 +322,8 @@ void TestCPU() {
 
     // Initialize.
     DisjointSet<TThreadUnsafeOrSafe, Volume> disjointSet(Volume{make_layout_major(5, 5)});
-    for (int y = 0; y < disjointSet.nodes().size<1>(); ++y)
-      for (int x = 0; x < disjointSet.nodes().size<0>(); ++x)
+    for (int y = 0; y < disjointSet.nodes().template size<1>(); ++y)
+      for (int x = 0; x < disjointSet.nodes().template size<0>(); ++x)
         disjointSet.nodes()(x, y) = disjointSet.nodes().layout()(x, y);
 
     // Supporting functions.
@@ -390,16 +390,16 @@ void TestCPU() {
 
 #if 0 // TODO: MSVC bug?
     // Complex union.
-    for (int y = 0; y < disjointSet.nodes().size<1>(); ++y)
-      for (int x = 0; x < disjointSet.nodes().size<0>(); ++x)
+    for (int y = 0; y < disjointSet.nodes().template size<1>(); ++y)
+      for (int x = 0; x < disjointSet.nodes().template size<0>(); ++x)
         if (flags(x, y) == L) {
           if (x - 1 >= 0 && flags(x - 1, y) == L)
             disjointSet.template Union<int, int>(x - 1, y, x, y);
-          if (x + 1 < disjointSet.nodes().size<0>() && flags(x + 1, y) == L)
+          if (x + 1 < disjointSet.nodes().template size<0>() && flags(x + 1, y) == L)
             disjointSet.template Union<int, int>(x + 1, y, x, y);
           if (y - 1 >= 0 && flags(x, y - 1) == L)
             disjointSet.template Union<int, int>(x, y - 1, x, y);
-          if (y + 1 < disjointSet.nodes().size<1>() && flags(x, y + 1) == L)
+          if (y + 1 < disjointSet.nodes().template size<1>() && flags(x, y + 1) == L)
             disjointSet.template Union<int, int>(x, y + 1, x, y);
         }
     expectNodes(0, 1, 1, 1, 1,    //
@@ -408,16 +408,16 @@ void TestCPU() {
                 10, 16, 17, 1, 1, //
                 10, 10, 22, 23, 24);
 
-    for (int y = 0; y < disjointSet.nodes().size<1>(); ++y)
-      for (int x = 0; x < disjointSet.nodes().size<0>(); ++x)
+    for (int y = 0; y < disjointSet.nodes().template size<1>(); ++y)
+      for (int x = 0; x < disjointSet.nodes().template size<0>(); ++x)
         if (flags(x, y) == I) {
           if (x - 1 >= 0 && flags(x - 1, y) == I)
             disjointSet.template Union<int, int>(x - 1, y, x, y);
-          if (x + 1 < disjointSet.nodes().size<0>() && flags(x + 1, y) == I)
+          if (x + 1 < disjointSet.nodes().template size<0>() && flags(x + 1, y) == I)
             disjointSet.template Union<int, int>(x + 1, y, x, y);
           if (y - 1 >= 0 && flags(x, y - 1) == I)
             disjointSet.template Union<int, int>(x, y - 1, x, y);
-          if (y + 1 < disjointSet.nodes().size<1>() && flags(x, y + 1) == I)
+          if (y + 1 < disjointSet.nodes().template size<1>() && flags(x, y + 1) == I)
             disjointSet.template Union<int, int>(x, y + 1, x, y);
         }
     expectNodes(0, 1, 1, 1, 1,  //

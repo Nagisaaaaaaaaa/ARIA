@@ -701,7 +701,7 @@ private:                                                                        
 //
 //
 //
-#if defined(ARIA_MSVC)
+#if ARIA_MSVC
   #define __ARIA_PROP_FUNC(ACCESS, SPECIFIERS, DOT_OR_ARROW, FUNC_NAME)                                                \
   /* Supporting of member functions for properties is non-trivial because */                                           \
   /* there are actually 4 kinds of member functions: */                                                                \
