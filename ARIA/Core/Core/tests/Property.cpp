@@ -2375,19 +2375,19 @@ TEST(Property, ReferenceProperties) {
     static_assert(std::is_reference_v<decltype(DecltypeAuto(t0.forward()))>);
     static_assert(std::is_rvalue_reference_v<decltype(DecltypeAuto(t0.forward()))>);
     static_assert(property::detail::PropertyType<std::decay_t<decltype(DecltypeAuto(t0.forward()))>>);
-    Vec3<float>& v02 = t0.forward();
-    Vec3<float>& v03 = DecltypeAuto(t0.forward());
+    const Vec3<float>& v02 = t0.forward(); //! `const` is required by clang here.
+    const Vec3<float>& v03 = DecltypeAuto(t0.forward()); //! `const` is required by clang here.
 
     decltype(auto) f00 = DecltypeAuto(t0.forward());
     static_assert(std::is_reference_v<decltype(f00)>);
     static_assert(std::is_rvalue_reference_v<decltype(f00)>);
     static_assert(property::detail::PropertyType<std::decay_t<decltype(f00)>>);
-    Vec3<float>& v00 = f00;
+    const Vec3<float>& v00 = f00; //! `const` is required by clang here.
 
     auto f01 = DecltypeAuto(t0.forward());
     static_assert(!std::is_reference_v<decltype(f01)>);
     static_assert(property::detail::PropertyType<decltype(f01)>);
-    Vec3<float>& v01 = f00;
+    const Vec3<float>& v01 = f00; //! `const` is required by clang here.
 
     static_assert(std::is_reference_v<decltype(DecltypeAuto(t1.forward()))>);
     static_assert(std::is_rvalue_reference_v<decltype(DecltypeAuto(t1.forward()))>);

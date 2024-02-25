@@ -7,7 +7,7 @@ namespace ARIA {
 #define __ARIA_PROP_AND_SUB_PROP_PREFAB_MEMBERS_STD_STRING(specifiers, type)                                           \
                                                                                                                        \
   ARIA_PROP_FUNC(public, specifiers, ., assign);                                                                       \
-  ARIA_PROP_FUNC(public, specifiers, ., assign_range);                                                                 \
+  /*ARIA_PROP_FUNC(public, specifiers, ., assign_range);*/                                                             \
   ARIA_PROP_FUNC(public, specifiers, ., get_allocator);                                                                \
   /* Element access. */                                                                                                \
   ARIA_PROP_FUNC(public, specifiers, ., at);                                                                           \
@@ -35,17 +35,17 @@ namespace ARIA {
   /* Modifiers. */                                                                                                     \
   ARIA_PROP_FUNC(public, specifiers, ., clear);                                                                        \
   ARIA_PROP_FUNC(public, specifiers, ., insert);                                                                       \
-  ARIA_PROP_FUNC(public, specifiers, ., insert_range);                                                                 \
+  /*ARIA_PROP_FUNC(public, specifiers, ., insert_range);*/                                                             \
   ARIA_PROP_FUNC(public, specifiers, ., erase);                                                                        \
   ARIA_PROP_FUNC(public, specifiers, ., push_back);                                                                    \
   ARIA_PROP_FUNC(public, specifiers, ., pop_back);                                                                     \
   ARIA_PROP_FUNC(public, specifiers, ., append);                                                                       \
-  ARIA_PROP_FUNC(public, specifiers, ., append_range);                                                                 \
+  /*ARIA_PROP_FUNC(public, specifiers, ., append_range);*/                                                             \
   ARIA_PROP_FUNC(public, specifiers, ., replace);                                                                      \
-  ARIA_PROP_FUNC(public, specifiers, ., replace_with_range);                                                           \
+  /*ARIA_PROP_FUNC(public, specifiers, ., replace_with_range);*/                                                       \
   ARIA_PROP_FUNC(public, specifiers, ., copy);                                                                         \
   ARIA_PROP_FUNC(public, specifiers, ., resize);                                                                       \
-  ARIA_PROP_FUNC(public, specifiers, ., resize_and_overwrite);                                                         \
+  /*ARIA_PROP_FUNC(public, specifiers, ., resize_and_overwrite);*/                                                     \
   ARIA_PROP_FUNC(public, specifiers, ., swap);                                                                         \
   /* Search. */                                                                                                        \
   ARIA_PROP_FUNC(public, specifiers, ., find);                                                                         \
@@ -58,7 +58,7 @@ namespace ARIA {
   ARIA_PROP_FUNC(public, specifiers, ., compare);                                                                      \
   ARIA_PROP_FUNC(public, specifiers, ., starts_with);                                                                  \
   ARIA_PROP_FUNC(public, specifiers, ., ends_with);                                                                    \
-  ARIA_PROP_FUNC(public, specifiers, ., contains);                                                                     \
+  /*ARIA_PROP_FUNC(public, specifiers, ., contains);*/                                                                 \
   ARIA_PROP_FUNC(public, specifiers, ., substr)
 
 #define __ARIA_PROP_PREFAB_STD_STRING(accessGet, accessSet, specifiers, type, propName)                                \
