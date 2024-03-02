@@ -45,7 +45,13 @@ public:
 
   void dummy0() {}
 
+  void dummy0() const { ARIA_THROW(std::runtime_error, "This method should never be called"); }
+
+  void dummy1() { ARIA_THROW(std::runtime_error, "This method should never be called"); }
+
   void dummy1() const {}
+
+  void dummy2(int v) { ARIA_THROW(std::runtime_error, "This method should never be called"); }
 
   void dummy2(int v) const {}
 
