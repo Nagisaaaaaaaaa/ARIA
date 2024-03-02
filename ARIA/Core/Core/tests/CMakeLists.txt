@@ -11,6 +11,7 @@ if (ARIA_BUILD_TESTS)
       Invocations.cpp
       Launcher.cu
       Layout.cu
+      Lua.cpp
       Property.cpp
       PropertySTL.cpp
       Registry.cpp
