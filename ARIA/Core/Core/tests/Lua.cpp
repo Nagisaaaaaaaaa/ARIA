@@ -10,6 +10,24 @@ namespace ARIA {
 
 namespace {
 
+class GrandParent {
+public:
+  virtual int value() = 0;
+};
+
+class Parent : public GrandParent {
+public:
+  int value() override { return 1; }
+};
+
+class Child final : public Parent {
+public:
+  int value() final { return 2; }
+};
+
+//
+//
+//
 class Object {
 public:
   [[nodiscard]] const std::string &name0() const { return name_; }
@@ -34,7 +52,32 @@ private:
 //
 //
 //
-TEST(Lua, Base) {
+TEST(Lua, OwnershipAndInheritance) {
+  sol::state lua;
+  lua.open_libraries(sol::lib::base);
+
+  lua.new_usertype<GrandParent>("GrandParent", "value", &GrandParent::value);
+  lua.new_usertype<Parent>("Parent", "value", &Parent::value, sol::base_classes, sol::bases<GrandParent>());
+  lua.new_usertype<Child>("Child", "value", &Child::value, sol::base_classes, sol::bases<Parent>());
+
+  std::shared_ptr<GrandParent> parent = std::make_shared<Parent>();
+  lua["parent"] = parent;
+
+  std::unique_ptr<GrandParent> child = std::make_unique<Child>();
+  lua["child"] = child.get();
+
+  std::unique_ptr<GrandParent> owningChild = std::make_unique<Child>();
+  lua["owningChild"] = std::move(owningChild);
+
+  lua.script("assert(parent:value() == 1)");
+  lua.script("assert(child:value() == 2, \"Should equals to 2\")"
+             "assert(owningChild:value() == 2, \"Should equals to 2\")");
+  lua.script("assert(parent:value() == 1)"
+             "assert(child:value() == 2, \"Should equals to 2\")"
+             "assert(owningChild:value() == 2, \"Should equals to 2\")");
+}
+
+TEST(Lua, Property) {
   sol::state lua;
   lua.open_libraries(sol::lib::base);
 
