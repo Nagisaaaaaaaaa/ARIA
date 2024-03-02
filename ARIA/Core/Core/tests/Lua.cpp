@@ -113,22 +113,22 @@ public:
 #define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS4(CONST_OR_EMPTY, TYPE, NAME, T0)                                        \
   , #NAME, static_cast<decltype(std::declval<TYPE>().NAME(                                                             \
   std::declval<T0>()))                                                                                                 \
-  (TYPE::*)(T0)CONST_OR_EMPTY>(&TYPE::NAME)
+  (TYPE::*)(T0) CONST_OR_EMPTY>(&TYPE::NAME)
 
 #define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS5(CONST_OR_EMPTY, TYPE, NAME, T0, T1)                                    \
   , #NAME, static_cast<decltype(std::declval<TYPE>().NAME(                                                             \
   std::declval<T0>(), std::declval<T1>()))                                                                             \
-  (TYPE::*)(T0, T1)CONST_OR_EMPTY>(&TYPE::NAME)
+  (TYPE::*)(T0, T1) CONST_OR_EMPTY>(&TYPE::NAME)
 
 #define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS6(CONST_OR_EMPTY, TYPE, NAME, T0, T1, T2)                                \
   , #NAME, static_cast<decltype(std::declval<TYPE>().NAME(                                                             \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>()))                                                         \
-  (TYPE::*)(T0, T1, T2)CONST_OR_EMPTY>(&TYPE::NAME)
+  (TYPE::*)(T0, T1, T2) CONST_OR_EMPTY>(&TYPE::NAME)
 
 #define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS7(CONST_OR_EMPTY, TYPE, NAME, T0, T1, T2, T3)                            \
   , #NAME, static_cast<decltype(std::declval<TYPE>().NAME(                                                             \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>()))                                     \
-  (TYPE::*)(T0, T1, T2, T3)CONST_OR_EMPTY>(&TYPE::NAME)
+  (TYPE::*)(T0, T1, T2, T3) CONST_OR_EMPTY>(&TYPE::NAME)
 // clang-format on
 
 #define __ARIA_LUA_NEW_USER_TYPE_METHOD(...)                                                                           \
