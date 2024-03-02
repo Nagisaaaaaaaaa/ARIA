@@ -43,6 +43,12 @@ public:
 public:
   [[nodiscard]] std::vector<int> oneTwoThree() const { return {1, 2, 3}; }
 
+  void dummy0() {}
+
+  void dummy1() const {}
+
+  void dummy2(int v) const {}
+
 private:
   std::string name_ = "Lua です喵"; // Test UTF-8.
 
@@ -50,6 +56,32 @@ private:
 
   std::string ARIA_PROP_IMPL(name1)(const std::string &name) { name_ = name; }
 };
+
+//
+//
+//
+#define __ARIA_LUA_NEW_USER_TYPE_BEGIN(LUA, TYPE) LUA.new_usertype<TYPE>(#TYPE
+
+#define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS2(TYPE, NAME)                                                            \
+  , #NAME, static_cast<decltype(std::declval<TYPE>().NAME()) (TYPE::*)()>(&TYPE::NAME)
+
+#define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS3(TYPE, NAME, SPECIFIERS)                                                \
+  , #NAME, static_cast<decltype(std::declval<TYPE>().NAME()) (TYPE::*)() SPECIFIERS>(&TYPE::NAME)
+
+#define __ARIA_LUA_NEW_USER_TYPE_METHOD(...)                                                                           \
+  __ARIA_EXPAND(                                                                                                       \
+      __ARIA_EXPAND(ARIA_CONCAT(__ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS, ARIA_NUM_OF(__VA_ARGS__)))(__VA_ARGS__))
+
+#define __ARIA_LUA_NEW_USER_TYPE_END )
+
+//
+//
+//
+#define ARIA_LUA_NEW_USER_TYPE_BEGIN(lua, type) __ARIA_LUA_NEW_USER_TYPE_BEGIN(lua, type)
+
+#define ARIA_LUA_NEW_USER_TYPE_METHOD(...) __ARIA_EXPAND(__ARIA_LUA_NEW_USER_TYPE_METHOD(__VA_ARGS__))
+
+#define ARIA_LUA_NEW_USER_TYPE_END __ARIA_LUA_NEW_USER_TYPE_END
 
 } // namespace
 
@@ -87,14 +119,17 @@ TEST(Lua, Property) {
   sol::state lua;
   lua.open_libraries(sol::lib::base);
 
-  lua.new_usertype<Object>("Object", "name0", &Object::name0, "name1",
-                           static_cast<decltype(std::declval<Object>().name1()) (Object::*)()>(&Object::name1),
-                           "oneTwoThree", &Object::oneTwoThree);
+  ARIA_LUA_NEW_USER_TYPE_BEGIN(lua, Object)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(Object, name0, const)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(Object, name1)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(Object, oneTwoThree, const)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(Object, dummy0)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(Object, dummy1, const)
+  ARIA_LUA_NEW_USER_TYPE_END;
 
-  lua.new_usertype<decltype(std::declval<Object>().name1())>(
-      "Object::name1", "value",
-      static_cast<decltype(std::declval<Object>().name1().value()) (decltype(std::declval<Object>().name1())::*)()>(
-          &decltype(std::declval<Object>().name1())::value));
+  ARIA_LUA_NEW_USER_TYPE_BEGIN(lua, decltype(std::declval<Object>().name1()))
+  ARIA_LUA_NEW_USER_TYPE_METHOD(decltype(std::declval<Object>().name1()), value)
+  ARIA_LUA_NEW_USER_TYPE_END;
 
   Object obj;
   lua["obj"] = &obj;
@@ -107,7 +142,10 @@ TEST(Lua, Property) {
              "assert(name1:value() == \"Lua です喵\", \"Error message です喵\")"
              "assert(obj:oneTwoThree()[1] == 1)"
              "assert(obj:oneTwoThree()[2] == 2)"
-             "assert(obj:oneTwoThree()[3] == 3)");
+             "assert(obj:oneTwoThree()[3] == 3)"
+             "obj:dummy0()"
+             "obj:dummy1()"
+             "obj:dummy2(1)");
 }
 
 } // namespace ARIA
