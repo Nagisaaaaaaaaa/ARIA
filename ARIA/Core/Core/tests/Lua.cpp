@@ -70,26 +70,66 @@ private:
   std::string ARIA_PROP_IMPL(name1)(const std::string &name) { name_ = name; }
 };
 
+class ManyOverloads {
+public:
+  using str = std::string;
+
+  std::vector<bool> F0() const { return {}; }
+
+  std::vector<bool> F1(int v0) const { return {}; }
+
+  std::vector<bool> F2(int v0, str v1) const { return {}; }
+
+  std::vector<bool> F3(int v0, str v1, int v2) const { return {}; }
+
+  std::vector<bool> F4(int v0, str v1, int v2, str v3) const { return {}; }
+
+  std::vector<bool> F5(int v0, str v1, int v2, str v3, int v4) const { return {}; }
+
+  std::vector<bool> F6(int v0, str v1, int v2, str v3, int v4, str v5) const { return {}; }
+
+  std::vector<bool> F7(int v0, str v1, int v2, str v3, int v4, str v5, int v6) const { return {}; }
+
+  std::vector<bool> F8(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7) const { return {}; }
+
+  std::vector<bool> F9(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8) const { return {}; }
+
+  std::vector<bool> F10(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8, str v9) const {
+    return {};
+  }
+};
+
 //
 //
 //
 #define __ARIA_LUA_NEW_USER_TYPE_BEGIN(LUA, TYPE) LUA.new_usertype<TYPE>(#TYPE
 
+// clang-format off
 #define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS3(CONST_OR_EMPTY, TYPE, NAME)                                            \
-  , #NAME, static_cast<decltype(std::declval<TYPE>().NAME()) (TYPE::*)() CONST_OR_EMPTY>(&TYPE::NAME)
+  , #NAME, static_cast<decltype(std::declval<TYPE>().NAME(                                                             \
+  ))                                                                                                                   \
+  (TYPE::*)() CONST_OR_EMPTY>(&TYPE::NAME)
 
 #define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS4(CONST_OR_EMPTY, TYPE, NAME, T0)                                        \
-  , #NAME, static_cast<decltype(std::declval<TYPE>().NAME(std::declval<T0>())) (TYPE::*)(T0)CONST_OR_EMPTY>(&TYPE::NAME)
+  , #NAME, static_cast<decltype(std::declval<TYPE>().NAME(                                                             \
+  std::declval<T0>()))                                                                                                 \
+  (TYPE::*)(T0)CONST_OR_EMPTY>(&TYPE::NAME)
 
 #define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS5(CONST_OR_EMPTY, TYPE, NAME, T0, T1)                                    \
-  , #NAME,                                                                                                             \
-      static_cast<decltype(std::declval<TYPE>().NAME(std::declval<T0>(), std::declval<T1>())) (TYPE::*)(               \
-          T0, T1)CONST_OR_EMPTY>(&TYPE::NAME)
+  , #NAME, static_cast<decltype(std::declval<TYPE>().NAME(                                                             \
+  std::declval<T0>(), std::declval<T1>()))                                                                             \
+  (TYPE::*)(T0, T1)CONST_OR_EMPTY>(&TYPE::NAME)
 
 #define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS6(CONST_OR_EMPTY, TYPE, NAME, T0, T1, T2)                                \
-  , #NAME,                                                                                                             \
-      static_cast<decltype(std::declval<TYPE>().NAME(std::declval<T0>(), std::declval<T1>(), std::declval<T2>())) (    \
-          TYPE::*)(T0, T1, T2)CONST_OR_EMPTY>(&TYPE::NAME)
+  , #NAME, static_cast<decltype(std::declval<TYPE>().NAME(                                                             \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>()))                                                         \
+  (TYPE::*)(T0, T1, T2)CONST_OR_EMPTY>(&TYPE::NAME)
+
+#define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS7(CONST_OR_EMPTY, TYPE, NAME, T0, T1, T2, T3)                            \
+  , #NAME, static_cast<decltype(std::declval<TYPE>().NAME(                                                             \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>()))                                     \
+  (TYPE::*)(T0, T1, T2, T3)CONST_OR_EMPTY>(&TYPE::NAME)
+// clang-format on
 
 #define __ARIA_LUA_NEW_USER_TYPE_METHOD(...)                                                                           \
   __ARIA_EXPAND(                                                                                                       \
@@ -175,6 +215,10 @@ TEST(Lua, MethodsAndProperties) {
              "obj:func2(1)\n"
              "obj:func3(obj:name0(), obj:oneTwoThree())\n"
              "obj:func3(\"Lua です喵\", obj:oneTwoThree())\n");
+}
+
+TEST(Lua, MultipleArguments) {
+  // TODO: Test this.
 }
 
 } // namespace ARIA
