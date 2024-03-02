@@ -12,16 +12,22 @@ namespace {
 
 class GrandParent {
 public:
+  virtual ~GrandParent() = default;
+
   virtual int value() = 0;
 };
 
 class Parent : public GrandParent {
 public:
+  virtual ~Parent() = default;
+
   int value() override { return 1; }
 };
 
 class Child final : public Parent {
 public:
+  virtual ~Child() = default;
+
   int value() final { return 2; }
 };
 
