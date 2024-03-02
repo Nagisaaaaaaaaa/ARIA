@@ -43,21 +43,21 @@ public:
 public:
   [[nodiscard]] std::vector<int> oneTwoThree() const { return {1, 2, 3}; }
 
-  void dummy0() {}
+  void func0() {}
 
-  void dummy0() const { ARIA_THROW(std::runtime_error, "This method should never be called"); }
+  void func0() const { ARIA_THROW(std::runtime_error, "This method should never be called"); }
 
-  void dummy1() { ARIA_THROW(std::runtime_error, "This method should never be called"); }
+  void func1() { ARIA_THROW(std::runtime_error, "This method should never be called"); }
 
-  void dummy1() const {}
+  void func1() const {}
 
-  void dummy2(int v) { ARIA_THROW(std::runtime_error, "This method should never be called"); }
+  void func2(int v) { ARIA_THROW(std::runtime_error, "This method should never be called"); }
 
-  void dummy2(int v) const {}
+  void func2(int v) const {}
 
-  std::vector<int> dummy3(std::string v0, const std::vector<int> &v1) { return v1; }
+  std::vector<int> func3(std::string v0, const std::vector<int> &v1) { return v1; }
 
-  std::vector<int> dummy3(std::string v0, const std::vector<int> &v1) const {
+  std::vector<int> func3(std::string v0, const std::vector<int> &v1) const {
     ARIA_THROW(std::runtime_error, "This method should never be called");
     return v1;
   }
@@ -85,6 +85,11 @@ private:
   , #NAME,                                                                                                             \
       static_cast<decltype(std::declval<TYPE>().NAME(std::declval<T0>(), std::declval<T1>())) (TYPE::*)(               \
           T0, T1)CONST_OR_EMPTY>(&TYPE::NAME)
+
+#define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS6(CONST_OR_EMPTY, TYPE, NAME, T0, T1, T2)                                \
+  , #NAME,                                                                                                             \
+      static_cast<decltype(std::declval<TYPE>().NAME(std::declval<T0>(), std::declval<T1>(), std::declval<T2>())) (    \
+          TYPE::*)(T0, T1, T2)CONST_OR_EMPTY>(&TYPE::NAME)
 
 #define __ARIA_LUA_NEW_USER_TYPE_METHOD(...)                                                                           \
   __ARIA_EXPAND(                                                                                                       \
@@ -125,12 +130,12 @@ TEST(Lua, OwnershipAndInheritance) {
   std::unique_ptr<GrandParent> owningChild = std::make_unique<Child>();
   lua["owningChild"] = std::move(owningChild);
 
-  lua.script("assert(parent:value() == 1)");
-  lua.script("assert(child:value() == 2, \"Should equals to 2\")"
-             "assert(owningChild:value() == 2, \"Should equals to 2\")");
-  lua.script("assert(parent:value() == 1)"
-             "assert(child:value() == 2, \"Should equals to 2\")"
-             "assert(owningChild:value() == 2, \"Should equals to 2\")");
+  lua.script("assert(parent:value() == 1)\n");
+  lua.script("assert(child:value() == 2, \"Should equals to 2\")\n"
+             "assert(owningChild:value() == 2, \"Should equals to 2\")\n");
+  lua.script("assert(parent:value() == 1)\n"
+             "assert(child:value() == 2, \"Should equals to 2\")\n"
+             "assert(owningChild:value() == 2, \"Should equals to 2\")\n");
 }
 
 TEST(Lua, MethodsAndProperties) {
@@ -143,10 +148,10 @@ TEST(Lua, MethodsAndProperties) {
   ARIA_LUA_NEW_USER_TYPE_METHOD(const, Object, name0)
   ARIA_LUA_NEW_USER_TYPE_METHOD(, Object, name1)
   ARIA_LUA_NEW_USER_TYPE_METHOD(const, Object, oneTwoThree)
-  ARIA_LUA_NEW_USER_TYPE_METHOD(, Object, dummy0)
-  ARIA_LUA_NEW_USER_TYPE_METHOD(const, Object, dummy1)
-  ARIA_LUA_NEW_USER_TYPE_METHOD(const, Object, dummy2, int)
-  ARIA_LUA_NEW_USER_TYPE_METHOD(, Object, dummy3, std::string, const std::vector<int> &)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(, Object, func0)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(const, Object, func1)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(const, Object, func2, int)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(, Object, func3, std::string, const std::vector<int> &)
   ARIA_LUA_NEW_USER_TYPE_END;
 
   ARIA_LUA_NEW_USER_TYPE_BEGIN(lua, decltype(std::declval<Object>().name1()))
@@ -165,11 +170,11 @@ TEST(Lua, MethodsAndProperties) {
              "assert(obj:oneTwoThree()[1] == 1)\n"
              "assert(obj:oneTwoThree()[2] == 2)\n"
              "assert(obj:oneTwoThree()[3] == 3)\n"
-             "obj:dummy0()\n"
-             "obj:dummy1()\n"
-             "obj:dummy2(1)\n"
-             "obj:dummy3(obj:name0(), obj:oneTwoThree())\n"
-             "obj:dummy3(\"Lua です喵\", obj:oneTwoThree())\n");
+             "obj:func0()\n"
+             "obj:func1()\n"
+             "obj:func2(1)\n"
+             "obj:func3(obj:name0(), obj:oneTwoThree())\n"
+             "obj:func3(\"Lua です喵\", obj:oneTwoThree())\n");
 }
 
 } // namespace ARIA
