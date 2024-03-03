@@ -24,9 +24,9 @@ CPMAddPackage(
 )
 nanobind_build_library(nanobind SHARED)
 
-find_package(Python 3
-    REQUIRED COMPONENTS Interpreter Development.Module
-    OPTIONAL_COMPONENTS Development.SABIModule)
+find_package(Python REQUIRED COMPONENTS Interpreter Development)
+target_include_directories(nanobind PUBLIC ${Python_INCLUDE_DIRS})
+target_link_libraries(nanobind PUBLIC ${Python_LIBRARIES})
 
 CPMAddPackage(
     NAME small_vector
