@@ -3,6 +3,7 @@ if (ARIA_BUILD_TESTS)
       SOURCES
       detail/Macros.cpp
       #experimental/Lua.cpp
+      experimental/Python.cpp
       Auto.cpp
       BFloat16.cu
       Constant.cpp

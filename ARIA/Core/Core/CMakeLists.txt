@@ -19,6 +19,16 @@ CPMAddPackage(
 #)
 
 CPMAddPackage(
+    GITHUB_REPOSITORY wjakob/nanobind
+    GIT_TAG v1.9.2
+)
+nanobind_build_library(nanobind SHARED)
+
+find_package(Python 3
+    REQUIRED COMPONENTS Interpreter Development.Module
+    OPTIONAL_COMPONENTS Development.SABIModule)
+
+CPMAddPackage(
     NAME small_vector
     GITHUB_REPOSITORY gharveymn/small_vector
     GIT_TAG main
@@ -87,6 +97,7 @@ aria_add_module(
     CUDA::cudart
     fmt::fmt
     #libluajit
+    nanobind
     small_vector
     #sol2::sol2
     spdlog::spdlog
