@@ -13,30 +13,30 @@ namespace {
 #define __ARIA_LUA_NEW_USER_TYPE_BEGIN(LUA, TYPE) LUA.new_usertype<TYPE>(#TYPE
 
 // clang-format off
-#define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS3(CONST_OR_EMPTY, TYPE, NAME)                                            \
-  , #NAME, static_cast<decltype(std::declval<CONST_OR_EMPTY TYPE>().NAME(                                                             \
+#define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS3(TYPE, SPECIFIERS, NAME)                                                \
+  , #NAME, static_cast<decltype(std::declval<SPECIFIERS TYPE>().NAME(                                                  \
   ))                                                                                                                   \
-  (TYPE::*)() CONST_OR_EMPTY>(&TYPE::NAME)
+  (TYPE::*)() SPECIFIERS>(&TYPE::NAME)
 
-#define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS4(CONST_OR_EMPTY, TYPE, NAME, T0)                                        \
-  , #NAME, static_cast<decltype(std::declval<CONST_OR_EMPTY TYPE>().NAME(                                                             \
+#define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS4(TYPE, SPECIFIERS, NAME, T0)                                            \
+  , #NAME, static_cast<decltype(std::declval<SPECIFIERS TYPE>().NAME(                                                  \
   std::declval<T0>()))                                                                                                 \
-  (TYPE::*)(T0) CONST_OR_EMPTY>(&TYPE::NAME)
+  (TYPE::*)(T0) SPECIFIERS>(&TYPE::NAME)
 
-#define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS5(CONST_OR_EMPTY, TYPE, NAME, T0, T1)                                    \
-  , #NAME, static_cast<decltype(std::declval<CONST_OR_EMPTY TYPE>().NAME(                                                             \
+#define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS5(TYPE, SPECIFIERS, NAME, T0, T1)                                        \
+  , #NAME, static_cast<decltype(std::declval<SPECIFIERS TYPE>().NAME(                                                  \
   std::declval<T0>(), std::declval<T1>()))                                                                             \
-  (TYPE::*)(T0, T1) CONST_OR_EMPTY>(&TYPE::NAME)
+  (TYPE::*)(T0, T1) SPECIFIERS>(&TYPE::NAME)
 
-#define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS6(CONST_OR_EMPTY, TYPE, NAME, T0, T1, T2)                                \
-  , #NAME, static_cast<decltype(std::declval<CONST_OR_EMPTY TYPE>().NAME(                                                             \
+#define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS6(TYPE, SPECIFIERS, NAME, T0, T1, T2)                                    \
+  , #NAME, static_cast<decltype(std::declval<SPECIFIERS TYPE>().NAME(                                                  \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>()))                                                         \
-  (TYPE::*)(T0, T1, T2) CONST_OR_EMPTY>(&TYPE::NAME)
+  (TYPE::*)(T0, T1, T2) SPECIFIERS>(&TYPE::NAME)
 
-#define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS7(CONST_OR_EMPTY, TYPE, NAME, T0, T1, T2, T3)                            \
-  , #NAME, static_cast<decltype(std::declval<CONST_OR_EMPTY TYPE>().NAME(                                                             \
+#define __ARIA_LUA_NEW_USER_TYPE_METHOD_PARAMS7(TYPE, SPECIFIERS, NAME, T0, T1, T2, T3)                                \
+  , #NAME, static_cast<decltype(std::declval<SPECIFIERS TYPE>().NAME(                                                  \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>()))                                     \
-  (TYPE::*)(T0, T1, T2, T3) CONST_OR_EMPTY>(&TYPE::NAME)
+  (TYPE::*)(T0, T1, T2, T3) SPECIFIERS>(&TYPE::NAME)
 // clang-format on
 
 #define __ARIA_LUA_NEW_USER_TYPE_METHOD(...)                                                                           \
@@ -194,10 +194,10 @@ TEST(Lua, ConstOrNonConst) {
   static_assert(std::is_same_v<int &, decltype(std::declval<int &>())>);
 
   ARIA_LUA_NEW_USER_TYPE_BEGIN(lua, ConstOrNonConst)
-  ARIA_LUA_NEW_USER_TYPE_METHOD(, ConstOrNonConst, func0)
-  ARIA_LUA_NEW_USER_TYPE_METHOD(const, ConstOrNonConst, func1)
-  ARIA_LUA_NEW_USER_TYPE_METHOD(const, ConstOrNonConst, func2, int)
-  ARIA_LUA_NEW_USER_TYPE_METHOD(, ConstOrNonConst, func3, std::string, const std::vector<int> &)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(ConstOrNonConst, , func0)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(ConstOrNonConst, const, func1)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(ConstOrNonConst, const, func2, int)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(ConstOrNonConst, , func3, std::string, const std::vector<int> &)
   ARIA_LUA_NEW_USER_TYPE_END;
 
   ConstOrNonConst v;
@@ -223,13 +223,13 @@ TEST(Lua, ARIAProperties) {
   static_assert(std::is_same_v<int &, decltype(std::declval<int &>())>);
 
   ARIA_LUA_NEW_USER_TYPE_BEGIN(lua, Object)
-  ARIA_LUA_NEW_USER_TYPE_METHOD(const, Object, name0)
-  ARIA_LUA_NEW_USER_TYPE_METHOD(, Object, name1)
-  ARIA_LUA_NEW_USER_TYPE_METHOD(const, Object, oneTwoThree)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(Object, const, name0)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(Object, , name1)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(Object, const, oneTwoThree)
   ARIA_LUA_NEW_USER_TYPE_END;
 
   ARIA_LUA_NEW_USER_TYPE_BEGIN(lua, decltype(std::declval<Object>().name1()))
-  ARIA_LUA_NEW_USER_TYPE_METHOD(, decltype(std::declval<Object>().name1()), value)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(decltype(std::declval<Object>().name1()), , value)
   ARIA_LUA_NEW_USER_TYPE_END;
 
   Object obj;
