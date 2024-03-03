@@ -99,8 +99,9 @@ ARIA_HOST_DEVICE auto ConstructWithArray(const T *args, std::index_sequence<is..
   ARIA_HOST_DEVICE friend decltype(auto) operator op(const TProperty &lhs, const TRhs &rhs) {                          \
     return Auto(lhs.value() op rhs);                                                                                   \
   }                                                                                                                    \
-  template <NonPropertyType TRhs>                                                                                      \
-  ARIA_HOST_DEVICE friend decltype(auto) operator op(const TRhs &lhs, const TProperty &rhs) {                          \
+  template <NonPropertyType TLhs> /* This requirement is added to support sol2. */                                     \
+    requires(!std::is_same_v<std::decay_t<TLhs>, std::ostringstream>)                                                  \
+  ARIA_HOST_DEVICE friend decltype(auto) operator op(const TLhs &lhs, const TProperty &rhs) {                          \
     return Auto(lhs op rhs.value());                                                                                   \
   }                                                                                                                    \
   ARIA_HOST_DEVICE friend decltype(auto) operator op(const TProperty &lhs, const TProperty &rhs) {                     \
