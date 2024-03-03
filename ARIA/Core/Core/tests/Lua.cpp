@@ -83,6 +83,8 @@ public:
 //
 class ConstOrNonConst {
 public:
+  std::vector<int> oneTwoThree() const { return {1, 2, 3}; }
+
   void func0() {}
 
   void func0() const { ARIA_THROW(std::runtime_error, "This method should never be called"); }
@@ -108,12 +110,9 @@ public:
 //
 class Object {
 public:
-  [[nodiscard]] const std::string &name0() const { return name_; }
+  const std::string &name0() const { return name_; }
 
   ARIA_PROP_PREFAB_STD_STRING(public, public, , std::string, name1);
-
-public:
-  [[nodiscard]] std::vector<int> oneTwoThree() const { return {1, 2, 3}; }
 
 private:
   std::string name_ = "Lua です喵"; // Test UTF-8.
@@ -194,6 +193,7 @@ TEST(Lua, ConstOrNonConst) {
   static_assert(std::is_same_v<int &, decltype(std::declval<int &>())>);
 
   ARIA_LUA_NEW_USER_TYPE_BEGIN(lua, ConstOrNonConst)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(ConstOrNonConst, const, oneTwoThree)
   ARIA_LUA_NEW_USER_TYPE_METHOD(ConstOrNonConst, , func0)
   ARIA_LUA_NEW_USER_TYPE_METHOD(ConstOrNonConst, const, func1)
   ARIA_LUA_NEW_USER_TYPE_METHOD(ConstOrNonConst, const, func2, int)
@@ -209,7 +209,10 @@ TEST(Lua, ConstOrNonConst) {
   std::vector<int> vec;
   lua["vec"] = &vec;
 
-  lua.script("v:func0()\n"
+  lua.script("assert(v:oneTwoThree()[1] == 1)\n"
+             "assert(v:oneTwoThree()[2] == 2)\n"
+             "assert(v:oneTwoThree()[3] == 3)\n"
+             "v:func0()\n"
              "v:func1()\n"
              "v:func2(1)\n"
              "v:func3(str, vec)\n"
@@ -225,7 +228,6 @@ TEST(Lua, ARIAProperties) {
   ARIA_LUA_NEW_USER_TYPE_BEGIN(lua, Object)
   ARIA_LUA_NEW_USER_TYPE_METHOD(Object, const, name0)
   ARIA_LUA_NEW_USER_TYPE_METHOD(Object, , name1)
-  ARIA_LUA_NEW_USER_TYPE_METHOD(Object, const, oneTwoThree)
   ARIA_LUA_NEW_USER_TYPE_END;
 
   ARIA_LUA_NEW_USER_TYPE_BEGIN(lua, decltype(std::declval<Object>().name1()))
@@ -240,10 +242,10 @@ TEST(Lua, ARIAProperties) {
              "\n"
              "assert(name0 == \"Lua です喵\", \"Error message です喵\")\n"
              "assert(tostring(name1) == \"Lua です喵\", \"Error message です喵\")\n"
-             "assert(name1:value() == \"Lua です喵\", \"Error message です喵\")\n"
-             "assert(obj:oneTwoThree()[1] == 1)\n"
-             "assert(obj:oneTwoThree()[2] == 2)\n"
-             "assert(obj:oneTwoThree()[3] == 3)\n");
+             "assert(name1:value() == \"Lua です喵\", \"Error message です喵\")\n");
+
+  // TODO: It is almost impossible to directly use ARIA properties.
+  //       But using sol3 properties will populate the namespace.
 }
 
 TEST(Lua, MultipleArguments) {
