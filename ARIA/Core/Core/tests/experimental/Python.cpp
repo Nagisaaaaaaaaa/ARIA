@@ -1,22 +1,35 @@
 #include "ARIA/Property.h"
 
 #include <gtest/gtest.h>
-#include <nanobind/eval.h>
+#include <pybind11/embed.h>
 
-namespace nb = nanobind;
+namespace py = pybind11;
 
 namespace ARIA {
 
-namespace {} // namespace
+namespace {
+
+int add(int a, int b) {
+  return a + b;
+}
+
+PYBIND11_EMBEDDED_MODULE(test, m) {
+  m.def("add", [](int i, int j) { return i + j; });
+}
+
+} // namespace
 
 TEST(Python, Base) {
-  Py_Initialize();
-  nb::module_ module = nb::module_::import_("__main__");
-  nb::object scope = module.attr("__dict__");
+  py::scoped_interpreter guard{};
 
-  module.def("add", [](int a, int b) { return a + b; }, nb::arg("a"), nb::arg("b"));
+  auto test = py::module_::import("test");
 
-  nb::exec("a = add(1, 2)\n", scope);
+  py::exec("import test\n"
+           "\n"
+           "a = 5\n"
+           "b = 6\n"
+           "c = test.add(a, b)\n"
+           "print(c)\n");
 }
 
 } // namespace ARIA

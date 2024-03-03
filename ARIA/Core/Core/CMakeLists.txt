@@ -19,14 +19,14 @@ CPMAddPackage(
 #)
 
 CPMAddPackage(
-    GITHUB_REPOSITORY wjakob/nanobind
-    GIT_TAG v1.9.2
+    NAME pybind11
+    GITHUB_REPOSITORY pybind/pybind11
+    GIT_TAG v2.11.1
 )
-nanobind_build_library(nanobind SHARED)
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development)
-target_include_directories(nanobind PUBLIC ${Python_INCLUDE_DIRS})
-target_link_libraries(nanobind PUBLIC ${Python_LIBRARIES})
+target_include_directories(pybind11::pybind11 INTERFACE ${Python_INCLUDE_DIRS})
+target_link_libraries(pybind11::pybind11 INTERFACE ${Python_LIBRARIES})
 
 CPMAddPackage(
     NAME small_vector
@@ -97,7 +97,7 @@ aria_add_module(
     CUDA::cudart
     fmt::fmt
     #libluajit
-    nanobind
+    pybind11::pybind11
     small_vector
     #sol2::sol2
     spdlog::spdlog
