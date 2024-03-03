@@ -2,6 +2,7 @@ if (ARIA_BUILD_TESTS)
   aria_add_tests(Tests.ARIA.Core.Core
       SOURCES
       detail/Macros.cpp
+      experimental/Lua.cpp
       Auto.cpp
       BFloat16.cu
       Constant.cpp
@@ -11,7 +12,6 @@ if (ARIA_BUILD_TESTS)
       Invocations.cpp
       Launcher.cu
       Layout.cu
-      Lua.cpp
       Property.cpp
       PropertySTL.cpp
       Registry.cpp
