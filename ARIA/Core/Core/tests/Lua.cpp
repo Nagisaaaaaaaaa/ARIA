@@ -10,98 +10,6 @@ namespace ARIA {
 
 namespace {
 
-class GrandParent {
-public:
-  virtual ~GrandParent() = default;
-
-  virtual int value() = 0;
-};
-
-class Parent : public GrandParent {
-public:
-  virtual ~Parent() = default;
-
-  int value() override { return 1; }
-};
-
-class Child final : public Parent {
-public:
-  virtual ~Child() = default;
-
-  int value() final { return 2; }
-};
-
-//
-//
-//
-class Object {
-public:
-  [[nodiscard]] const std::string &name0() const { return name_; }
-
-  ARIA_PROP_PREFAB_STD_STRING(public, public, , std::string, name1);
-
-public:
-  [[nodiscard]] std::vector<int> oneTwoThree() const { return {1, 2, 3}; }
-
-  void func0() {}
-
-  void func0() const { ARIA_THROW(std::runtime_error, "This method should never be called"); }
-
-  void func1() { ARIA_THROW(std::runtime_error, "This method should never be called"); }
-
-  void func1() const {}
-
-  void func2(int v) { ARIA_THROW(std::runtime_error, "This method should never be called"); }
-
-  void func2(int v) const {}
-
-  std::vector<int> func3(std::string v0, const std::vector<int> &v1) { return v1; }
-
-  std::vector<int> func3(std::string v0, const std::vector<int> &v1) const {
-    ARIA_THROW(std::runtime_error, "This method should never be called");
-    return v1;
-  }
-
-private:
-  std::string name_ = "Lua です喵"; // Test UTF-8.
-
-  std::string ARIA_PROP_IMPL(name1)() const { return name_; }
-
-  std::string ARIA_PROP_IMPL(name1)(const std::string &name) { name_ = name; }
-};
-
-class ManyOverloads {
-public:
-  using str = std::string;
-
-  std::vector<bool> F0() const { return {}; }
-
-  std::vector<bool> F1(int v0) const { return {}; }
-
-  std::vector<bool> F2(int v0, str v1) const { return {}; }
-
-  std::vector<bool> F3(int v0, str v1, int v2) const { return {}; }
-
-  std::vector<bool> F4(int v0, str v1, int v2, str v3) const { return {}; }
-
-  std::vector<bool> F5(int v0, str v1, int v2, str v3, int v4) const { return {}; }
-
-  std::vector<bool> F6(int v0, str v1, int v2, str v3, int v4, str v5) const { return {}; }
-
-  std::vector<bool> F7(int v0, str v1, int v2, str v3, int v4, str v5, int v6) const { return {}; }
-
-  std::vector<bool> F8(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7) const { return {}; }
-
-  std::vector<bool> F9(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8) const { return {}; }
-
-  std::vector<bool> F10(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8, str v9) const {
-    return {};
-  }
-};
-
-//
-//
-//
 #define __ARIA_LUA_NEW_USER_TYPE_BEGIN(LUA, TYPE) LUA.new_usertype<TYPE>(#TYPE
 
 // clang-format off
@@ -146,6 +54,107 @@ public:
 
 #define ARIA_LUA_NEW_USER_TYPE_END __ARIA_LUA_NEW_USER_TYPE_END
 
+//
+//
+//
+class GrandParent {
+public:
+  virtual ~GrandParent() = default;
+
+  virtual int value() = 0;
+};
+
+class Parent : public GrandParent {
+public:
+  virtual ~Parent() = default;
+
+  int value() override { return 1; }
+};
+
+class Child final : public Parent {
+public:
+  virtual ~Child() = default;
+
+  int value() final { return 2; }
+};
+
+//
+//
+//
+class ConstOrNonConst {
+public:
+  void func0() {}
+
+  void func0() const { ARIA_THROW(std::runtime_error, "This method should never be called"); }
+
+  void func1() { ARIA_THROW(std::runtime_error, "This method should never be called"); }
+
+  void func1() const {}
+
+  void func2(int v) { ARIA_THROW(std::runtime_error, "This method should never be called"); }
+
+  void func2(int v) const {}
+
+  std::vector<int> func3(std::string v0, const std::vector<int> &v1) { return v1; }
+
+  std::vector<int> func3(std::string v0, const std::vector<int> &v1) const {
+    ARIA_THROW(std::runtime_error, "This method should never be called");
+    return v1;
+  }
+};
+
+//
+//
+//
+class Object {
+public:
+  [[nodiscard]] const std::string &name0() const { return name_; }
+
+  ARIA_PROP_PREFAB_STD_STRING(public, public, , std::string, name1);
+
+public:
+  [[nodiscard]] std::vector<int> oneTwoThree() const { return {1, 2, 3}; }
+
+private:
+  std::string name_ = "Lua です喵"; // Test UTF-8.
+
+  std::string ARIA_PROP_IMPL(name1)() const { return name_; }
+
+  std::string ARIA_PROP_IMPL(name1)(const std::string &name) { name_ = name; }
+};
+
+//
+//
+//
+class ManyOverloads {
+public:
+  using str = std::string;
+
+  std::vector<bool> F0() const { return {}; }
+
+  std::vector<bool> F1(int v0) const { return {}; }
+
+  std::vector<bool> F2(int v0, str v1) const { return {}; }
+
+  std::vector<bool> F3(int v0, str v1, int v2) const { return {}; }
+
+  std::vector<bool> F4(int v0, str v1, int v2, str v3) const { return {}; }
+
+  std::vector<bool> F5(int v0, str v1, int v2, str v3, int v4) const { return {}; }
+
+  std::vector<bool> F6(int v0, str v1, int v2, str v3, int v4, str v5) const { return {}; }
+
+  std::vector<bool> F7(int v0, str v1, int v2, str v3, int v4, str v5, int v6) const { return {}; }
+
+  std::vector<bool> F8(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7) const { return {}; }
+
+  std::vector<bool> F9(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8) const { return {}; }
+
+  std::vector<bool> F10(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8, str v9) const {
+    return {};
+  }
+};
+
 } // namespace
 
 //
@@ -153,7 +162,7 @@ public:
 //
 //
 //
-TEST(Lua, OwnershipAndInheritance) {
+TEST(Lua, Inheritance) {
   sol::state lua;
   lua.open_libraries(sol::lib::base);
 
@@ -178,7 +187,36 @@ TEST(Lua, OwnershipAndInheritance) {
              "assert(owningChild:value() == 2, \"Should equals to 2\")\n");
 }
 
-TEST(Lua, MethodsAndProperties) {
+TEST(Lua, ConstOrNonConst) {
+  sol::state lua;
+  lua.open_libraries(sol::lib::base);
+
+  static_assert(std::is_same_v<int &, decltype(std::declval<int &>())>);
+
+  ARIA_LUA_NEW_USER_TYPE_BEGIN(lua, ConstOrNonConst)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(, ConstOrNonConst, func0)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(const, ConstOrNonConst, func1)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(const, ConstOrNonConst, func2, int)
+  ARIA_LUA_NEW_USER_TYPE_METHOD(, ConstOrNonConst, func3, std::string, const std::vector<int> &)
+  ARIA_LUA_NEW_USER_TYPE_END;
+
+  ConstOrNonConst v;
+  lua["v"] = &v;
+
+  std::string str;
+  lua["str"] = str;
+
+  std::vector<int> vec;
+  lua["vec"] = &vec;
+
+  lua.script("v:func0()\n"
+             "v:func1()\n"
+             "v:func2(1)\n"
+             "v:func3(str, vec)\n"
+             "v:func3(\"Lua です喵\", vec)\n");
+}
+
+TEST(Lua, ARIAProperties) {
   sol::state lua;
   lua.open_libraries(sol::lib::base);
 
@@ -188,10 +226,6 @@ TEST(Lua, MethodsAndProperties) {
   ARIA_LUA_NEW_USER_TYPE_METHOD(const, Object, name0)
   ARIA_LUA_NEW_USER_TYPE_METHOD(, Object, name1)
   ARIA_LUA_NEW_USER_TYPE_METHOD(const, Object, oneTwoThree)
-  ARIA_LUA_NEW_USER_TYPE_METHOD(, Object, func0)
-  ARIA_LUA_NEW_USER_TYPE_METHOD(const, Object, func1)
-  ARIA_LUA_NEW_USER_TYPE_METHOD(const, Object, func2, int)
-  ARIA_LUA_NEW_USER_TYPE_METHOD(, Object, func3, std::string, const std::vector<int> &)
   ARIA_LUA_NEW_USER_TYPE_END;
 
   ARIA_LUA_NEW_USER_TYPE_BEGIN(lua, decltype(std::declval<Object>().name1()))
@@ -209,12 +243,7 @@ TEST(Lua, MethodsAndProperties) {
              "assert(name1:value() == \"Lua です喵\", \"Error message です喵\")\n"
              "assert(obj:oneTwoThree()[1] == 1)\n"
              "assert(obj:oneTwoThree()[2] == 2)\n"
-             "assert(obj:oneTwoThree()[3] == 3)\n"
-             "obj:func0()\n"
-             "obj:func1()\n"
-             "obj:func2(1)\n"
-             "obj:func3(obj:name0(), obj:oneTwoThree())\n"
-             "obj:func3(\"Lua です喵\", obj:oneTwoThree())\n");
+             "assert(obj:oneTwoThree()[3] == 3)\n");
 }
 
 TEST(Lua, MultipleArguments) {
