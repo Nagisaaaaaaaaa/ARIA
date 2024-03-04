@@ -28,6 +28,9 @@ struct Child final : public Parent {
   int value() final { return 2; }
 };
 
+//
+//
+//
 struct OverloadWithConst {
   int value() const { return 0; }
 
@@ -42,6 +45,9 @@ struct OverloadWithParameters {
   std::vector<std::string> value(int, double) { return {"0"}; }
 };
 
+//
+//
+//
 class Object {
 public:
   std::vector<std::string> &name0() { return name_; }
