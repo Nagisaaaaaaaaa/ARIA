@@ -440,5 +440,15 @@ TEST(Python, ReadonlyProperties) {
 //       这里，local 不能是共享的，因为会有变量名冲突
 //       module 需要是共享的，因为都位于 ARIA
 //       类似，globals 需要是共享的，这个概念也需要被定义出来
+//
+// TODO: 但是这并不见得是个好事情，我们更希望 Python 被放在 Core 里面，而不是 scene
+//       更好的做法可能是把它设计得更底层一些，例如定义这些 class：
+//         1. Python::Interpreter: 封装了对 Python 字符串脚本或者文件的调用
+//         2. Python::Generator: 可暂停的 Python 字符串脚本或者文件
+//                它的实现可以很简单，因为我们有解释器，可以为 Python 定义关键字
+//                比如 yield 就可以是一个关键字，表示暂停
+//                只需要写一个 parser 就完事了
+//         3. 那很显然地，可以做到任何 coroutine 能做到的事情
+//            但具体应该设计成什么样我还没想清楚，困困喵～
 
 } // namespace ARIA
