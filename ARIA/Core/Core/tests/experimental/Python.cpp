@@ -66,9 +66,6 @@ TEST(Python, Base) {
   locals["a"] = py::cast(a, py::return_value_policy::reference);
   locals["b"] = py::cast(b, py::return_value_policy::reference);
 
-  //
-  //
-  //
   // Execute.
   try {
     py::exec("c = add(a, b)\n"
@@ -112,14 +109,50 @@ TEST(Python, Inheritance) {
   locals["parent2"] = parent2.get(); // Pass by pointer.
   locals["child2"] = child2.get();
 
-  //
-  //
-  //
   // Execute.
   try {
     py::exec("assert parent0.value() == 1\n"
              "assert child0.value() == 2\n"
              "assert parent1.value() == 1\n"
+             "assert child1.value() == 2\n"
+             "assert parent2.value() == 1\n"
+             "assert child2.value() == 2\n",
+             py::globals(), locals);
+  } catch (std::exception &e) {
+    fmt::print("{}\n", e.what());
+    EXPECT_FALSE(true);
+  }
+}
+
+TEST(Python, Constness) {
+  py::scoped_interpreter guard{};
+
+  // Get scope.
+  py::object main = py::module_::import("__main__");
+  py::dict locals;
+
+  // Define types.
+  py::class_<GrandParent>(main, "GrandParent").def("value", &GrandParent::value);
+  py::class_<Parent, GrandParent>(main, "Parent").def("value", &Parent::value);
+  py::class_<Child, Parent>(main, "Child").def("value", &Child::value);
+
+  // Define variables.
+  const Parent parent1;
+  const Child child1;
+  std::shared_ptr<const GrandParent> parent2 = std::make_shared<const Parent>();
+  std::unique_ptr<const GrandParent> child2 = std::make_unique<const Child>();
+
+  locals["parent1"] = py::cast(parent1, py::return_value_policy::reference); // Pass by reference.
+  locals["child1"] = py::cast(child1, py::return_value_policy::reference);
+  locals["parent2"] = parent2.get(); // Pass by pointer.
+  locals["child2"] = child2.get();
+
+  static_assert(std::is_same_v<decltype(parent2.get()), const GrandParent *>);
+
+  // Execute.
+  // TODO: Like sol2 for Lua, pybind11 bypasses the `const` requirement.
+  try {
+    py::exec("assert parent1.value() == 1\n"
              "assert child1.value() == 2\n"
              "assert parent2.value() == 1\n"
              "assert child2.value() == 2\n",
