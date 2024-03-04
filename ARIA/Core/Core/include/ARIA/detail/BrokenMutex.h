@@ -23,6 +23,7 @@ public:
 
   bool try_lock() noexcept {
     // Do nothing.
+    return true;
   }
 };
 

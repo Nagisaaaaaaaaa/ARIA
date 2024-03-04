@@ -57,6 +57,8 @@ namespace {
 //
 //
 //
+//
+//
 class GrandParent {
 public:
   virtual ~GrandParent() = default;
@@ -78,8 +80,6 @@ public:
   int value() final { return 2; }
 };
 
-//
-//
 //
 //
 //

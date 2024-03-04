@@ -12,11 +12,21 @@ CPMAddPackage(
     GIT_TAG "10.1.1"
 )
 
+#CPMAddPackage(
+#    NAME LuaJIT
+#    GITHUB_REPOSITORY WohlSoft/LuaJIT
+#    GIT_TAG v2.1
+#)
+
 CPMAddPackage(
-    NAME LuaJIT
-    GITHUB_REPOSITORY WohlSoft/LuaJIT
-    GIT_TAG v2.1
+    NAME pybind11
+    GITHUB_REPOSITORY pybind/pybind11
+    GIT_TAG v2.11.1
 )
+
+find_package(Python REQUIRED COMPONENTS Interpreter Development)
+target_include_directories(pybind11::pybind11 INTERFACE ${Python_INCLUDE_DIRS})
+target_link_libraries(pybind11::pybind11 INTERFACE ${Python_LIBRARIES})
 
 CPMAddPackage(
     NAME small_vector
@@ -24,11 +34,11 @@ CPMAddPackage(
     GIT_TAG main
 )
 
-CPMAddPackage(
-    NAME sol2
-    GITHUB_REPOSITORY ThePhD/sol2
-    GIT_TAG v3.3.1
-)
+#CPMAddPackage(
+#    NAME sol2
+#    GITHUB_REPOSITORY ThePhD/sol2
+#    GIT_TAG v3.3.1
+#)
 
 CPMAddPackage(
     NAME spdlog
@@ -86,9 +96,10 @@ aria_add_module(
     HARD_DEPENDENCIES
     CUDA::cudart
     fmt::fmt
-    libluajit
+    #libluajit
+    pybind11::pybind11
     small_vector
-    sol2::sol2
+    #sol2::sol2
     spdlog::spdlog
     cuda-api-wrappers::runtime-and-driver
     CUTLASS
