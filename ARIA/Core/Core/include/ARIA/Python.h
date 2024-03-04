@@ -69,6 +69,20 @@ void DefinePythonType(const py::module_ &module);
 //
 //
 //
+#define ARIA_PYTHON_TYPE_UNARY_OPERATOR(OPERATOR, TYPE_OTHERS) cls.def(decltype(OPERATOR py::self)())
+
+//
+//
+//
+#define ARIA_PYTHON_TYPE_BINARY_OPERATOR(OPERATOR, TYPE_OTHERS)                                                        \
+                                                                                                                       \
+  cls.def(decltype(py::self OPERATOR py::self)());                                                                     \
+  cls.def(decltype(py::self OPERATOR std::declval<TYPE_OTHERS>())());                                                  \
+  cls.def(decltype(std::declval<TYPE_OTHERS>() OPERATOR py::self)())
+
+//
+//
+//
 #define ARIA_PYTHON_TYPE_PROPERTY(NAME)                                                                                \
                                                                                                                        \
   cls.def_property(#NAME, static_cast<decltype(std::declval<Type>().NAME()) (Type::*)()>(&Type::NAME),                 \
@@ -81,5 +95,10 @@ void DefinePythonType(const py::module_ &module);
 #define ARIA_PYTHON_TYPE_END                                                                                           \
   }                                                                                                                    \
   using ARIA::DefinePythonType
+
+//
+//
+//
+#define ARIA_ADD_PYTHON_TYPE(TYPE, MODULE) DefinePythonType<TYPE>(main)
 
 } // namespace ARIA

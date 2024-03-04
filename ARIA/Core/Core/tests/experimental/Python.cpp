@@ -76,6 +76,12 @@ ARIA_PYTHON_TYPE_METHOD(, name0);
 ARIA_PYTHON_TYPE_PROPERTY(name1);
 ARIA_PYTHON_TYPE_END;
 
+ARIA_PYTHON_TYPE_BEGIN(decltype(std::declval<ARIATestPython_Object>().name1()));
+ARIA_PYTHON_TYPE_METHOD(, value);
+ARIA_PYTHON_TYPE_METHOD(, clear);
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, std::vector<std::string>);
+ARIA_PYTHON_TYPE_END;
+
 //
 //
 //
@@ -333,20 +339,8 @@ TEST(Python, Properties) {
       .def(py::self == py::self)
       .def("clear", &std::vector<std::string>::clear);
 
-  DefinePythonType<ARIATestPython_Object>(main);
-
-  py::class_<decltype(std::declval<ARIATestPython_Object>().name1())>(main, "Object::name1")
-      .def("value",
-           static_cast<decltype(std::declval<decltype(std::declval<ARIATestPython_Object>().name1())>().value()) (
-               decltype(std::declval<ARIATestPython_Object>().name1())::*)() const>(
-               &decltype(std::declval<ARIATestPython_Object>().name1())::value))
-      .def(py::self == py::self)
-      .def(py::self == std::vector<std::string>())
-      .def(std::vector<std::string>() == py::self)
-      .def("clear",
-           static_cast<decltype(std::declval<decltype(std::declval<ARIATestPython_Object>().name1())>().clear()) (
-               decltype(std::declval<ARIATestPython_Object>().name1())::*)()>(
-               &decltype(std::declval<ARIATestPython_Object>().name1())::clear));
+  ARIA_ADD_PYTHON_TYPE(ARIATestPython_Object, main);
+  ARIA_ADD_PYTHON_TYPE(decltype(std::declval<ARIATestPython_Object>().name1()), main);
 
   // Define variables.
   std::vector<std::string> nameCase0 = {"Python です喵"};
@@ -361,18 +355,30 @@ TEST(Python, Properties) {
 
   // Execute.
   try {
-    py::exec("assert obj.name0() == nameCase0\n" // Test getter.
+    py::exec("assert obj.name0() == obj.name0()\n"
+             "assert obj.name1 == obj.name1\n"
+             "assert obj.name0() == obj.name1\n"
+             "assert obj.name1 == obj.name0()\n"
+             "assert obj.name0() == nameCase0\n" // Test getter.
              "assert obj.name1 == nameCase0\n"
              "assert nameCase0 == obj.name0()\n"
              "assert nameCase0 == obj.name1\n"
              "\n"
              "obj.name1 = nameCase1\n" // Test setter with `operator=`.
+             "assert obj.name0() == obj.name0()\n"
+             "assert obj.name1 == obj.name1\n"
+             "assert obj.name0() == obj.name1\n"
+             "assert obj.name1 == obj.name0()\n"
              "assert obj.name0() == nameCase1\n"
              "assert obj.name1 == nameCase1\n"
              "assert nameCase1 == obj.name0()\n"
              "assert nameCase1 == obj.name1\n"
              "\n"
              "obj.name1.clear()\n" // Test setter with `clear()`.
+             "assert obj.name0() == obj.name0()\n"
+             "assert obj.name1 == obj.name1\n"
+             "assert obj.name0() == obj.name1\n"
+             "assert obj.name1 == obj.name0()\n"
              "assert obj.name0() == nameCase2\n"
              "assert obj.name1 == nameCase2\n"
              "assert nameCase2 == obj.name0()\n"
