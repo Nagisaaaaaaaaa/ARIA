@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 #include <pybind11/embed.h>
+#include <pybind11/operators.h>
 
 namespace py = pybind11;
 
@@ -31,6 +32,14 @@ struct OverloadWithConst {
   int value() const { return 0; }
 
   int value() { return 1; }
+};
+
+struct OverloadWithParameters {
+  int value(int) { return 0; }
+
+  std::string value(double) { return "0"; }
+
+  std::vector<std::string> value(int, double) { return {"0"}; }
 };
 
 } // namespace
@@ -242,7 +251,42 @@ TEST(Python, Const) {
 }
 
 TEST(Python, Overload) {
-  // TODO: Test this.
+  py::scoped_interpreter guard{};
+
+  // Get scope.
+  py::object main = py::module_::import("__main__");
+  py::dict locals;
+
+  // Define types.
+  py::class_<std::vector<std::string>>(main, "std::vector<std::string>").def(py::self == py::self);
+
+  py::class_<OverloadWithParameters>(main, "OverloadWithParameters")
+      .def("value", static_cast<decltype(std::declval<OverloadWithParameters>().value(std::declval<int>())) (
+                        OverloadWithParameters::*)(int)>(&OverloadWithParameters::value))
+      .def("value", static_cast<decltype(std::declval<OverloadWithParameters>().value(std::declval<double>())) (
+                        OverloadWithParameters::*)(double)>(&OverloadWithParameters::value))
+      .def("value", static_cast<decltype(std::declval<OverloadWithParameters>().value(
+                        std::declval<int>(), std::declval<double>())) (OverloadWithParameters::*)(int, double)>(
+                        &OverloadWithParameters::value));
+
+  // Define variables.
+  OverloadWithParameters overload;
+
+  locals["overload"] = py::cast(overload, py::return_value_policy::reference);
+  locals["vector"] = std::vector<std::string>{"0"};
+
+  EXPECT_TRUE(overload.value(0, 0.0) == std::vector<std::string>{"0"});
+
+  // Execute.
+  try {
+    py::exec("assert overload.value(0) == 0\n"
+             "assert overload.value(0.0) == '0'\n"
+             "assert overload.value(0, 0.0) == vector\n",
+             py::globals(), locals);
+  } catch (std::exception &e) {
+    fmt::print("{}\n", e.what());
+    EXPECT_FALSE(true);
+  }
 }
 
 TEST(Python, ARIAProperties) {
