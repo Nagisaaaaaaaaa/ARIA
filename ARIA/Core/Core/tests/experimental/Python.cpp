@@ -1,10 +1,6 @@
-#include "ARIA/Property.h"
+#include "ARIA/Python.h"
 
 #include <gtest/gtest.h>
-#include <pybind11/embed.h>
-#include <pybind11/operators.h>
-
-namespace py = pybind11;
 
 namespace ARIA {
 
@@ -48,26 +44,37 @@ struct OverloadWithParameters {
 //
 //
 //
-class Object {
+class ARIATestPython_Object {
 public:
   std::vector<std::string> &name0() { return name_; }
 
-  std::vector<std::string> &get_name0() { return name_; }
-
-  void set_name0(const std::vector<std::string> &value) { name_ = value; }
-
 public:
-  ARIA_PROP(public, public, , std::vector<std::string>, name1);
+  ARIA_PROP_BEGIN(public, public, , std::vector<std::string>, name1);
+  ARIA_PROP_FUNC(public, , ., clear);
+  ARIA_PROP_END;
 
 private:
   std::vector<std::string> name_ = {"Python です喵"}; // Test UTF-8.
 
   std::vector<std::string> ARIA_PROP_IMPL(name1)() const { return name_; }
 
-  std::vector<std::string> ARIA_PROP_IMPL(name1)(const std::vector<std::string> &name) { name_ = name; }
+  void ARIA_PROP_IMPL(name1)(const std::vector<std::string> &name) { name_ = name; }
+
+  ARIA_PYTHON_TYPE_FRIEND;
 };
 
 } // namespace
+
+//
+//
+//
+//
+//
+// Define Python types.
+ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_Object);
+ARIA_PYTHON_TYPE_METHOD(, name0);
+ARIA_PYTHON_TYPE_PROPERTY(name1);
+ARIA_PYTHON_TYPE_END;
 
 //
 //
@@ -326,24 +333,26 @@ TEST(Python, Properties) {
       .def(py::self == py::self)
       .def("clear", &std::vector<std::string>::clear);
 
-  py::class_<Object>(main, "Object")
-      .def("name0", static_cast<decltype(std::declval<Object>().name0()) (Object::*)()>(&Object::name0))
-      .def("name1", static_cast<decltype(std::declval<Object>().name1()) (Object::*)()>(&Object::name1))
-      .def_property("name0_prop", &Object::get_name0, &Object::set_name0);
+  DefinePythonType<ARIATestPython_Object>(main);
 
-  py::class_<decltype(std::declval<Object>().name1())>(main, "Object::name1")
+  py::class_<decltype(std::declval<ARIATestPython_Object>().name1())>(main, "Object::name1")
       .def("value",
-           static_cast<decltype(std::declval<decltype(std::declval<Object>().name1())>().value()) (
-               decltype(std::declval<Object>().name1())::*)() const>(&decltype(std::declval<Object>().name1())::value))
+           static_cast<decltype(std::declval<decltype(std::declval<ARIATestPython_Object>().name1())>().value()) (
+               decltype(std::declval<ARIATestPython_Object>().name1())::*)() const>(
+               &decltype(std::declval<ARIATestPython_Object>().name1())::value))
       .def(py::self == py::self)
       .def(py::self == std::vector<std::string>())
-      .def(std::vector<std::string>() == py::self);
+      .def(std::vector<std::string>() == py::self)
+      .def("clear",
+           static_cast<decltype(std::declval<decltype(std::declval<ARIATestPython_Object>().name1())>().clear()) (
+               decltype(std::declval<ARIATestPython_Object>().name1())::*)()>(
+               &decltype(std::declval<ARIATestPython_Object>().name1())::clear));
 
   // Define variables.
   std::vector<std::string> nameCase0 = {"Python です喵"};
   std::vector<std::string> nameCase1 = {"Python 喵です"};
   std::vector<std::string> nameCase2 = {};
-  Object obj;
+  ARIATestPython_Object obj;
 
   locals["nameCase0"] = py::cast(nameCase0, py::return_value_policy::reference);
   locals["nameCase1"] = py::cast(nameCase1, py::return_value_policy::reference);
@@ -353,27 +362,21 @@ TEST(Python, Properties) {
   // Execute.
   try {
     py::exec("assert obj.name0() == nameCase0\n" // Test getter.
-             "assert obj.name1() == nameCase0\n"
-             "assert obj.name0_prop == nameCase0\n"
+             "assert obj.name1 == nameCase0\n"
              "assert nameCase0 == obj.name0()\n"
-             "assert nameCase0 == obj.name1()\n"
-             "assert nameCase0 == obj.name0_prop\n"
+             "assert nameCase0 == obj.name1\n"
              "\n"
-             "obj.name0_prop = nameCase1\n" // Test setter with `operator=`.
+             "obj.name1 = nameCase1\n" // Test setter with `operator=`.
              "assert obj.name0() == nameCase1\n"
-             "assert obj.name1() == nameCase1\n"
-             "assert obj.name0_prop == nameCase1\n"
+             "assert obj.name1 == nameCase1\n"
              "assert nameCase1 == obj.name0()\n"
-             "assert nameCase1 == obj.name1()\n"
-             "assert nameCase1 == obj.name0_prop\n"
+             "assert nameCase1 == obj.name1\n"
              "\n"
-             "obj.name0_prop.clear()\n" // Test setter with `clear()`.
+             "obj.name1.clear()\n" // Test setter with `clear()`.
              "assert obj.name0() == nameCase2\n"
-             "assert obj.name1() == nameCase2\n"
-             "assert obj.name0_prop == nameCase2\n"
+             "assert obj.name1 == nameCase2\n"
              "assert nameCase2 == obj.name0()\n"
-             "assert nameCase2 == obj.name1()\n"
-             "assert nameCase2 == obj.name0_prop\n",
+             "assert nameCase2 == obj.name1\n",
              py::globals(), locals);
   } catch (std::exception &e) {
     fmt::print("{}\n", e.what());
