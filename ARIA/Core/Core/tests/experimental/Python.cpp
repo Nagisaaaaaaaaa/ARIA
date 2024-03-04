@@ -70,9 +70,14 @@ TEST(Python, Base) {
   //
   //
   // Execute.
-  py::exec("c = add(a, b)\n"
-           "\n",
-           py::globals(), locals);
+  try {
+    py::exec("c = add(a, b)\n"
+             "\n",
+             py::globals(), locals);
+  } catch (std::exception &e) {
+    fmt::print("{}\n", e.what());
+    EXPECT_FALSE(true);
+  }
 
   auto c = locals["c"].cast<std::vector<int>>();
   EXPECT_EQ(c[0], 5);
@@ -93,19 +98,36 @@ TEST(Python, Inheritance) {
   py::class_<Child, Parent>(main, "Child").def("value", &Child::value);
 
   // Define variables.
-  std::shared_ptr<GrandParent> parent = std::make_shared<Parent>();
-  std::unique_ptr<GrandParent> child = std::make_unique<Child>();
+  Parent parent0;
+  Child child0;
+  Parent parent1;
+  Child child1;
+  std::shared_ptr<GrandParent> parent2 = std::make_shared<Parent>();
+  std::unique_ptr<GrandParent> child2 = std::make_unique<Child>();
 
-  locals["parent"] = parent.get();
-  locals["child"] = child.get();
+  locals["parent0"] = parent0; // Pass by copy.
+  locals["child0"] = child0;
+  locals["parent1"] = py::cast(parent1, py::return_value_policy::reference); // Pass by reference.
+  locals["child1"] = py::cast(child1, py::return_value_policy::reference);
+  locals["parent2"] = parent2.get(); // Pass by pointer.
+  locals["child2"] = child2.get();
 
   //
   //
   //
   // Execute.
-  py::exec("assert parent.value() == 1\n"
-           "assert child.value() == 2\n",
-           py::globals(), locals);
+  try {
+    py::exec("assert parent0.value() == 1\n"
+             "assert child0.value() == 2\n"
+             "assert parent1.value() == 1\n"
+             "assert child1.value() == 2\n"
+             "assert parent2.value() == 1\n"
+             "assert child2.value() == 2\n",
+             py::globals(), locals);
+  } catch (std::exception &e) {
+    fmt::print("{}\n", e.what());
+    EXPECT_FALSE(true);
+  }
 }
 
 } // namespace ARIA
