@@ -33,7 +33,7 @@ struct OverloadWithConst {
   int value() { return 1; }
 };
 
-struct OverloadWithParameters {
+struct ARIATestPython_OverloadWithParameters {
   int value(int) { return 0; }
 
   std::string value(double) { return "0"; }
@@ -71,6 +71,12 @@ private:
 //
 //
 // Define Python types.
+ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_OverloadWithParameters);
+ARIA_PYTHON_TYPE_METHOD(, value, int);
+ARIA_PYTHON_TYPE_METHOD(, value, double);
+ARIA_PYTHON_TYPE_METHOD(, value, int, double);
+ARIA_PYTHON_TYPE_END;
+
 ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_Object);
 ARIA_PYTHON_TYPE_METHOD(, name0);
 ARIA_PYTHON_TYPE_PROPERTY(name1);
@@ -298,17 +304,10 @@ TEST(Python, Overload) {
   // Define types.
   py::class_<std::vector<std::string>>(main, "std::vector<std::string>").def(py::self == py::self);
 
-  py::class_<OverloadWithParameters>(main, "OverloadWithParameters")
-      .def("value", static_cast<decltype(std::declval<OverloadWithParameters>().value(std::declval<int>())) (
-                        OverloadWithParameters::*)(int)>(&OverloadWithParameters::value))
-      .def("value", static_cast<decltype(std::declval<OverloadWithParameters>().value(std::declval<double>())) (
-                        OverloadWithParameters::*)(double)>(&OverloadWithParameters::value))
-      .def("value", static_cast<decltype(std::declval<OverloadWithParameters>().value(
-                        std::declval<int>(), std::declval<double>())) (OverloadWithParameters::*)(int, double)>(
-                        &OverloadWithParameters::value));
+  ARIA_ADD_PYTHON_TYPE(ARIATestPython_OverloadWithParameters, main);
 
   // Define variables.
-  OverloadWithParameters overload;
+  ARIATestPython_OverloadWithParameters overload;
 
   locals["overload"] = py::cast(overload, py::return_value_policy::reference);
   locals["vector"] = std::vector<std::string>{"0"};
