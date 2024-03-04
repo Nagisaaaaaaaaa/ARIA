@@ -81,6 +81,15 @@ void DefinePythonType(const py::module_ &module);
 //
 //
 //
+#define __ARIA_PYTHON_TYPE_READONLY_PROPERTY(NAME)                                                                     \
+                                                                                                                       \
+  static_assert(property::detail::PropertyType<decltype(std::declval<Type>().NAME())>,                                 \
+                "The given type to be defined in Python should be an ARIA property type");                             \
+  cls.def_property_readonly(#NAME, static_cast<decltype(std::declval<Type>().NAME()) (Type::*)()>(&Type::NAME))
+
+//
+//
+//
 #define __ARIA_PYTHON_TYPE_UNARY_OPERATOR(OPERATOR) cls.def(decltype(OPERATOR py::self)())
 
 //

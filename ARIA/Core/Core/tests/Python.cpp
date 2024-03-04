@@ -53,12 +53,18 @@ public:
   ARIA_PROP_FUNC(public, , ., clear);
   ARIA_PROP_END;
 
+  ARIA_PROP_BEGIN(public, public, , std::vector<std::string>, name2);
+  ARIA_PROP_FUNC(public, , ., clear);
+  ARIA_PROP_END;
+
 private:
   std::vector<std::string> name_ = {"Python です喵"}; // Test UTF-8.
 
   std::vector<std::string> ARIA_PROP_IMPL(name1)() const { return name_; }
 
   void ARIA_PROP_IMPL(name1)(const std::vector<std::string> &name) { name_ = name; }
+
+  std::vector<std::string> ARIA_PROP_IMPL(name2)() const { return name_; }
 
   ARIA_PYTHON_TYPE_FRIEND;
 };
@@ -80,6 +86,7 @@ ARIA_PYTHON_TYPE_END;
 ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_Object);
 ARIA_PYTHON_TYPE_METHOD(, name0);
 ARIA_PYTHON_TYPE_PROPERTY(name1);
+ARIA_PYTHON_TYPE_READONLY_PROPERTY(name2);
 ARIA_PYTHON_TYPE_END;
 
 ARIA_PYTHON_TYPE_BEGIN(decltype(std::declval<ARIATestPython_Object>().name1()));
