@@ -9,25 +9,28 @@ namespace ARIA {
 
 namespace {
 
-class GrandParent {
-public:
+struct GrandParent {
   virtual ~GrandParent() = default;
 
   virtual int value() = 0;
 };
 
-class Parent : public GrandParent {
-public:
+struct Parent : public GrandParent {
   virtual ~Parent() = default;
 
   int value() override { return 1; }
 };
 
-class Child final : public Parent {
-public:
+struct Child final : public Parent {
   virtual ~Child() = default;
 
   int value() final { return 2; }
+};
+
+struct OverloadWithConst {
+  int value() const { return 0; }
+
+  int value() { return 1; }
 };
 
 } // namespace
@@ -124,43 +127,126 @@ TEST(Python, Inheritance) {
   }
 }
 
-TEST(Python, Constness) {
-  py::scoped_interpreter guard{};
+TEST(Python, Const) {
+  // TODO: Pybind11 always bypasses the `const` requirement.
+  // TODO: For overloaded methods where `const` is the only difference,
+  //       the earlier-defined one will be selected.
 
-  // Get scope.
-  py::object main = py::module_::import("__main__");
-  py::dict locals;
+  // Bypass const.
+  {
+    py::scoped_interpreter guard{};
 
-  // Define types.
-  py::class_<GrandParent>(main, "GrandParent").def("value", &GrandParent::value);
-  py::class_<Parent, GrandParent>(main, "Parent").def("value", &Parent::value);
-  py::class_<Child, Parent>(main, "Child").def("value", &Child::value);
+    // Get scope.
+    py::object main = py::module_::import("__main__");
+    py::dict locals;
 
-  // Define variables.
-  const Parent parent1;
-  const Child child1;
-  std::shared_ptr<const GrandParent> parent2 = std::make_shared<const Parent>();
-  std::unique_ptr<const GrandParent> child2 = std::make_unique<const Child>();
+    // Define types.
+    py::class_<GrandParent>(main, "GrandParent").def("value", &GrandParent::value);
+    py::class_<Parent, GrandParent>(main, "Parent").def("value", &Parent::value);
+    py::class_<Child, Parent>(main, "Child").def("value", &Child::value);
 
-  locals["parent1"] = py::cast(parent1, py::return_value_policy::reference); // Pass by reference.
-  locals["child1"] = py::cast(child1, py::return_value_policy::reference);
-  locals["parent2"] = parent2.get(); // Pass by pointer.
-  locals["child2"] = child2.get();
+    // Define variables.
+    const Parent parent1;
+    const Child child1;
+    std::shared_ptr<const GrandParent> parent2 = std::make_shared<const Parent>();
+    std::unique_ptr<const GrandParent> child2 = std::make_unique<const Child>();
 
-  static_assert(std::is_same_v<decltype(parent2.get()), const GrandParent *>);
+    locals["parent1"] = py::cast(parent1, py::return_value_policy::reference); // Pass by reference.
+    locals["child1"] = py::cast(child1, py::return_value_policy::reference);
+    locals["parent2"] = parent2.get(); // Pass by pointer.
+    locals["child2"] = child2.get();
 
-  // Execute.
-  // TODO: Like sol2 for Lua, pybind11 bypasses the `const` requirement.
-  try {
-    py::exec("assert parent1.value() == 1\n"
-             "assert child1.value() == 2\n"
-             "assert parent2.value() == 1\n"
-             "assert child2.value() == 2\n",
-             py::globals(), locals);
-  } catch (std::exception &e) {
-    fmt::print("{}\n", e.what());
-    EXPECT_FALSE(true);
+    static_assert(std::is_same_v<decltype(parent2.get()), const GrandParent *>);
+    static_assert(std::is_same_v<decltype(child2.get()), const GrandParent *>);
+
+    // Execute.
+    try {
+      py::exec("assert parent1.value() == 1\n"
+               "assert child1.value() == 2\n"
+               "assert parent2.value() == 1\n"
+               "assert child2.value() == 2\n",
+               py::globals(), locals);
+    } catch (std::exception &e) {
+      fmt::print("{}\n", e.what());
+      EXPECT_FALSE(true);
+    }
   }
+
+  // Give const version higher priority.
+  {
+    py::scoped_interpreter guard{};
+
+    // Get scope.
+    py::object main = py::module_::import("__main__");
+    py::dict locals;
+
+    // Define types.
+    py::class_<OverloadWithConst>(main, "OverloadWithConst")
+        .def("value",
+             static_cast<decltype(std::declval<const OverloadWithConst>().value()) (OverloadWithConst::*)() const>(
+                 &OverloadWithConst::value))
+        .def("value", static_cast<decltype(std::declval<OverloadWithConst>().value()) (OverloadWithConst::*)()>(
+                          &OverloadWithConst::value));
+
+    // Define variables.
+    const OverloadWithConst overloadConst;
+    OverloadWithConst overloadNonConst;
+
+    locals["overloadConst"] = py::cast(overloadConst, py::return_value_policy::reference); // Pass by reference.
+    locals["overloadNonConst"] = py::cast(overloadNonConst, py::return_value_policy::reference);
+
+    // Execute.
+    try {
+      py::exec("assert overloadConst.value() == 0\n"
+               "assert overloadNonConst.value() == 0\n",
+               py::globals(), locals);
+    } catch (std::exception &e) {
+      fmt::print("{}\n", e.what());
+      EXPECT_FALSE(true);
+    }
+  }
+
+  // Give non-const version higher priority.
+  {
+    py::scoped_interpreter guard{};
+
+    // Get scope.
+    py::object main = py::module_::import("__main__");
+    py::dict locals;
+
+    // Define types.
+    py::class_<OverloadWithConst>(main, "OverloadWithConst")
+        .def("value", static_cast<decltype(std::declval<OverloadWithConst>().value()) (OverloadWithConst::*)()>(
+                          &OverloadWithConst::value))
+        .def("value",
+             static_cast<decltype(std::declval<const OverloadWithConst>().value()) (OverloadWithConst::*)() const>(
+                 &OverloadWithConst::value));
+
+    // Define variables.
+    const OverloadWithConst overloadConst;
+    OverloadWithConst overloadNonConst;
+
+    locals["overloadConst"] = py::cast(overloadConst, py::return_value_policy::reference); // Pass by reference.
+    locals["overloadNonConst"] = py::cast(overloadNonConst, py::return_value_policy::reference);
+
+    // Execute.
+    try {
+      py::exec("assert overloadConst.value() == 1\n"
+               "assert overloadNonConst.value() == 1\n",
+               py::globals(), locals);
+    } catch (std::exception &e) {
+      fmt::print("{}\n", e.what());
+      EXPECT_FALSE(true);
+    }
+  }
+}
+
+TEST(Python, Overload) {
+  // TODO: Test this.
+}
+
+TEST(Python, ARIAProperties) {
+  // TODO: Test this.
 }
 
 } // namespace ARIA
