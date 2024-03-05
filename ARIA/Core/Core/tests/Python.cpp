@@ -612,16 +612,20 @@ TEST(Python, WrapperBase) {
 
   Module main = guard.Import("__main__");
 
-  EXPECT_FALSE(main.HasType("std::vector<int>"));
+  static_assert(main.HasType<int>());
+  static_assert(main.HasType<double>());
+  static_assert(main.HasType<std::string>());
+  static_assert(main.HasType<std::tuple<int, double, std::string>>());
+  EXPECT_FALSE((main.HasType<std::tuple<int, double, std::string, std::vector<int>>>()));
 
   Dict local{main};
 
-  local["a"] = "Hello";
-  local["b"] = 233;
+  local["a"] = std::string("Hello");
+  local["b"] = std::make_tuple(1, 2, 3);
 
   try {
     py::exec("assert a == 'Hello'\n"
-             "assert b == 233\n",
+             "assert b == (1, 2, 3)\n",
              py::globals(), local);
   } catch (std::exception &e) {
     fmt::print("{}\n", e.what());

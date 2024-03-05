@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ARIA/Property.h"
+#include "ARIA/TypeArray.h"
 
 #include <pybind11/embed.h>
 #include <pybind11/operators.h>
@@ -9,6 +10,22 @@
 
 namespace ARIA {
 
+namespace python::detail {
+
+template <typename T>
+struct is_std_tuple : std::false_type {};
+
+template <typename... Args>
+struct is_std_tuple<std::tuple<Args...>> : std::true_type {};
+
+template <typename T>
+inline constexpr bool is_std_tuple_v = is_std_tuple<T>::value;
+
+} // namespace python::detail
+
+//
+//
+//
 namespace py = pybind11;
 
 //
@@ -167,7 +184,19 @@ void __ARIAPython_DefinePythonType(const py::module_ &module);
 //
 class Module {
 public:
-  [[nodiscard]] bool HasType(const std::string &name) { return types_->contains(name); }
+  template <typename T>
+  [[nodiscard]] constexpr bool HasType() const {
+    using TDecayed = std::decay_t<T>;
+
+    // Return true if `TDecayed` is fundamental, `std::string`, or `std::tuple`,
+    // because these types have been implicitly handled by pybind11.
+    if (std::is_fundamental_v<TDecayed> || std::is_same_v<TDecayed, std::string> ||
+        python::detail::is_std_tuple_v<TDecayed>)
+      return true;
+
+    // Check whether the unordered set contains the hash code.
+    return types_->contains(typeid(std::declval<TDecayed>()).hash_code());
+  }
 
 public:
   ARIA_COPY_MOVE_ABILITY(Module, default, default);
@@ -176,12 +205,12 @@ private:
   friend class ScopedInterpreter;
 
   // The constructor is only allowed to be called by `ScopedInterpreter::Import()`.
-  Module(py::module_ module, std::unordered_set<std::string> &types) : module_(std::move(module)), types_(&types) {}
+  Module(py::module_ module, std::unordered_set<size_t> &types) : module_(std::move(module)), types_(&types) {}
 
   py::module_ module_;
 
   // Have to use pointer instead of reference here to allow copying and moving.
-  std::unordered_set<std::string> *types_{};
+  std::unordered_set<size_t> *types_{};
 };
 
 //
@@ -215,7 +244,7 @@ public:
         return {std::move(module), types.second};
 
     // If the module has not been imported, create an instance for it.
-    auto &types = moduleTypes_.emplace_back(std::string{name}, std::unordered_set<std::string>{});
+    auto &types = moduleTypes_.emplace_back(std::string{name}, std::unordered_set<size_t>{});
 
     return {std::move(module), types.second};
   }
@@ -225,10 +254,10 @@ private:
 
   // A "singleton" dictionary containing all the types defined by all the imported modules.
   // The layout looks like this:
-  //   [ "__main__"   : { "Vec3i", "Vec3f", ... },
-  //     "someModule" : { "Object", "Transform", ... },
+  //   [ "__main__"   : { typeid(std::declval<...>()).hash_code(), ... },
+  //     "someModule" : { typeid(std::declval<...>()).hash_code(), ... },
   //     ... ]
-  std::list<std::pair<std::string, std::unordered_set<std::string>>> moduleTypes_;
+  std::list<std::pair<std::string, std::unordered_set<size_t>>> moduleTypes_;
 };
 
 //
@@ -283,5 +312,42 @@ private:
   Module module_;
   py::dict dict_;
 };
+
+//
+//
+//
+//
+//
+namespace python::detail {
+
+template <typename T>
+struct method_traits;
+
+template <type_array::detail::NonArrayType Ret,
+          type_array::detail::NonArrayType T,
+          type_array::detail::NonArrayType... Args>
+struct method_traits<Ret (T::*)(Args...)> {
+  using return_type = Ret;
+  using arguments_types = MakeTypeArray<Args...>;
+  using all_types = MakeTypeArray<return_type, arguments_types>;
+};
+
+//
+//
+//
+template <typename TMethod>
+void __ARIAPython_RecursivelyDefinePythonType(const Module &module) {
+  ForEach<method_traits<TMethod>::all_types>([&]<typename T>() {
+    using TDecayed = std::decay_t<T>;
+
+    // Continue if this type already defined in this module.
+    if (module.HasType<T>())
+      return;
+
+    // TODO: Implement this.
+  });
+}
+
+} // namespace python::detail
 
 } // namespace ARIA
