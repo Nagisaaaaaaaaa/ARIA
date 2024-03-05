@@ -617,8 +617,16 @@ TEST(Python, WrapperBase) {
   Dict local{main};
 
   local["a"] = "Hello";
+  local["b"] = 233;
 
-  py::exec("print(a)\n", py::globals(), local);
+  try {
+    py::exec("assert a == 'Hello'\n"
+             "assert b == 233\n",
+             py::globals(), local);
+  } catch (std::exception &e) {
+    fmt::print("{}\n", e.what());
+    EXPECT_FALSE(true);
+  }
 }
 
 } // namespace ARIA
