@@ -602,47 +602,4 @@ TEST(Python, Operators) {
   }
 }
 
-//
-//
-//
-// TODO: 谁负责调用 ARIA_ADD_PYTHON_TYPE 呢？
-//       用户不应该显示地调用这个函数，否则很容易弄出 bug 来
-//       我们需要封装 module 这个概念
-//       然后需要定义 local 这个概念，local 至少要隶属于某个 module 才是合法的
-//       接着，当我调用 local[...] = ... 时
-//       这个 operator= 才会真正调用 ARIA_ADD_PYTHON_TYPE
-//       它需要做这么几件事情：
-//         1. 检查是否是内置类型，例如 int, float, std::string 等
-//         2. 如果是内置类型，不允许传入引用，否则会危险
-//         3. 如果不是内置类型，检查 decayed 这个类型是否已经被 ARIA_PYTHON_TYPE_BEGIN 定义
-//         4. 如果被定义，检查是否已经被这个 module add 过
-//         5. 如果是 reference，包一层 capsule
-//         6. 最后将变量传给 Python local
-//
-// TODO: 别忘了，注册需要是递归的：
-//       对于任何一个要注册的 class，我要递归注册：
-//         1. 对于所有 method，递归注册所有的输入参数和输出参数类型
-//         2. 对于所有 property，递归注册它们
-//         3. 小心死循环，eg: obj.parent.parent....
-//         4. 递归注册本质上就是递归地调用 ARIA_ADD_PYTHON_TYPE, 仅此而已
-//       因此，我们还需要“模板”版本的 ARIA_ADD_PYTHON_TYPE，或者定义一系列 prefabs
-//
-// TODO: 那么谁负责调用 local[...] = ... 呢？
-//       可以定义一个类似叫做 PythonMonoBehavior 的类
-//       这个类在初始化的时候，会调用 local[transform] = object.transform() 等操作
-//       因此，每个 PythonMonoBehavior 有自己的 local，但是共享同一个 module
-//       这里，local 不能是共享的，因为会有变量名冲突
-//       module 需要是共享的，因为都位于 ARIA
-//       类似，globals 需要是共享的，这个概念也需要被定义出来
-//
-// TODO: 但是这并不见得是个好事情，我们更希望 Python 被放在 Core 里面，而不是 scene
-//       更好的做法可能是把它设计得更底层一些，例如定义这些 class：
-//         1. Python::Interpreter: 封装了对 Python 字符串脚本或者文件的调用
-//         2. Python::Generator: 可暂停的 Python 字符串脚本或者文件
-//                它的实现可以很简单，因为我们有解释器，可以为 Python 定义关键字
-//                比如 yield 就可以是一个关键字，表示暂停
-//                只需要写一个 parser 就完事了
-//         3. 那很显然地，可以做到任何 coroutine 能做到的事情
-//            但具体应该设计成什么样我还没想清楚，困困喵～
-
 } // namespace ARIA

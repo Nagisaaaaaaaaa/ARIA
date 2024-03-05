@@ -159,6 +159,8 @@ void DefinePythonType(const py::module_ &module);
 //
 //
 //
+namespace python::detail {
+
 class module_item_accessor {
 public:
   explicit module_item_accessor(py::module_ module, py::detail::item_accessor accessor)
@@ -169,7 +171,7 @@ public:
 public:
   template <typename T>
   void operator=(T &&value) {
-    // TODO: Calls ARIA_ADD_PYTHON_TYPE and recursively define types.
+    // TODO: Calls `ARIA_ADD_PYTHON_TYPE` and recursively define types for `module_`.
 
     accessor_ = std::forward<T>(value);
   }
@@ -189,5 +191,7 @@ public:
 private:
   py::module_ module_;
 };
+
+} // namespace python::detail
 
 } // namespace ARIA
