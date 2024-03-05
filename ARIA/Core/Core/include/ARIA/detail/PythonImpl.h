@@ -15,7 +15,7 @@ namespace py = pybind11;
 //
 //
 template <typename T>
-void DefinePythonType(const py::module_ &module);
+void __ARIAPython_DefinePythonType(const py::module_ &module);
 
 //
 //
@@ -23,7 +23,7 @@ void DefinePythonType(const py::module_ &module);
 #define __ARIA_PYTHON_TYPE_FRIEND                                                                                      \
                                                                                                                        \
   template <typename TUVW>                                                                                             \
-  friend void ::ARIA::DefinePythonType(const py::module_ &module)
+  friend void ::ARIA::__ARIAPython_DefinePythonType(const py::module_ &module)
 
 //
 //
@@ -31,7 +31,7 @@ void DefinePythonType(const py::module_ &module);
 #define __ARIA_PYTHON_TYPE_BEGIN(TYPE)                                                                                 \
                                                                                                                        \
   template <>                                                                                                          \
-  void DefinePythonType<TYPE>(const py::module_ &module) {                                                             \
+  void __ARIAPython_DefinePythonType<TYPE>(const py::module_ &module) {                                                \
     using Type = TYPE;                                                                                                 \
                                                                                                                        \
     py::class_<Type> cls(module, #TYPE)
@@ -154,7 +154,7 @@ void DefinePythonType(const py::module_ &module);
 //
 //
 //
-#define __ARIA_ADD_PYTHON_TYPE(TYPE, MODULE) ::ARIA::DefinePythonType<TYPE>(main)
+#define __ARIA_ADD_PYTHON_TYPE(TYPE, MODULE) ::ARIA::__ARIAPython_DefinePythonType<TYPE>(main)
 
 //
 //
