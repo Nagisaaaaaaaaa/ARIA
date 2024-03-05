@@ -97,6 +97,23 @@ private:
   ARIA_PYTHON_TYPE_FRIEND;
 };
 
+//
+//
+//
+class ARIATestPython_IntProperty {
+public:
+  ARIA_PROP(public, public, , int, value);
+
+private:
+  int value_ = 233;
+
+  int ARIA_PROP_IMPL(value)() const { return value_; }
+
+  void ARIA_PROP_IMPL(value)(const int &value) { value_ = value; }
+
+  ARIA_PYTHON_TYPE_FRIEND;
+};
+
 } // namespace
 
 //
@@ -136,6 +153,22 @@ ARIA_PYTHON_TYPE_BEGIN(decltype(std::declval<ARIATestPython_Object>().name1()));
 ARIA_PYTHON_TYPE_METHOD(, value);
 ARIA_PYTHON_TYPE_METHOD(, clear);
 ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, std::vector<std::string>);
+ARIA_PYTHON_TYPE_END;
+
+ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_IntProperty);
+ARIA_PYTHON_TYPE_PROPERTY(value);
+ARIA_PYTHON_TYPE_END;
+
+ARIA_PYTHON_TYPE_BEGIN(decltype(std::declval<ARIATestPython_IntProperty>().value()));
+ARIA_PYTHON_TYPE_METHOD(, value);
+ARIA_PYTHON_TYPE_UNARY_OPERATOR(+);
+ARIA_PYTHON_TYPE_UNARY_OPERATOR(-);
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, decltype(std::declval<ARIATestPython_IntProperty>().value().value()));
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(+, decltype(std::declval<ARIATestPython_IntProperty>().value().value()));
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(-, decltype(std::declval<ARIATestPython_IntProperty>().value().value()));
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(*, decltype(std::declval<ARIATestPython_IntProperty>().value().value()));
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(
+    /, decltype(std::declval<ARIATestPython_IntProperty>().value().value())); // Test binary operators with self.
 ARIA_PYTHON_TYPE_END;
 
 //
@@ -414,10 +447,6 @@ TEST(Python, ManyOverloads) {
   }
 }
 
-TEST(Python, Operators) {
-  // TODO: Test this.
-}
-
 TEST(Python, Properties) {
   py::scoped_interpreter guard{};
 
@@ -474,6 +503,69 @@ TEST(Python, Properties) {
              "assert obj.name1 == nameCase2\n"
              "assert nameCase2 == obj.name0()\n"
              "assert nameCase2 == obj.name1\n",
+             py::globals(), locals);
+  } catch (std::exception &e) {
+    fmt::print("{}\n", e.what());
+    EXPECT_FALSE(true);
+  }
+}
+
+TEST(Python, Operators) {
+  py::scoped_interpreter guard{};
+
+  // Get scope.
+  py::object main = py::module_::import("__main__");
+  py::dict locals;
+
+  // Define types.
+  ARIA_ADD_PYTHON_TYPE(ARIATestPython_IntProperty, main);
+  ARIA_ADD_PYTHON_TYPE(decltype(std::declval<ARIATestPython_IntProperty>().value()), main);
+
+  // Define variables.
+  ARIATestPython_IntProperty intP;
+
+  locals["intP"] = py::cast(intP, py::return_value_policy::reference);
+
+  // Execute.
+  try {
+    py::exec("assert intP.value == intP.value\n"
+             "assert intP.value == 233\n"
+             "assert 233 == intP.value\n"
+             "\n"
+             "intP.value = -1\n"
+             "assert intP.value == intP.value\n"
+             "assert intP.value == -1\n"
+             "assert -1 == intP.value\n"
+             "\n"
+             "intP.value = intP.value + -5\n"
+             "assert intP.value == intP.value\n"
+             "assert intP.value == -6\n"
+             "assert -6 == intP.value\n"
+             "\n"
+             "intP.value = intP.value - -7\n"
+             "assert intP.value == intP.value\n"
+             "assert intP.value == 1\n"
+             "assert 1 == intP.value\n"
+             "\n"
+             "intP.value = intP.value * -3\n"
+             "assert intP.value == intP.value\n"
+             "assert intP.value == -3\n"
+             "assert -3 == intP.value\n"
+             "\n"
+             "intP.value = +intP.value\n"
+             "assert intP.value == intP.value\n"
+             "assert intP.value == -3\n"
+             "assert -3 == intP.value\n"
+             "\n"
+             "intP.value = -intP.value\n"
+             "assert intP.value == intP.value\n"
+             "assert intP.value == +3\n"
+             "assert +3 == intP.value\n"
+             "\n"
+             "intP.value = intP.value / intP.value\n"
+             "assert intP.value == intP.value\n"
+             "assert intP.value == 1\n"
+             "assert 1 == intP.value\n",
              py::globals(), locals);
   } catch (std::exception &e) {
     fmt::print("{}\n", e.what());

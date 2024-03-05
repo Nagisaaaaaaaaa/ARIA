@@ -130,11 +130,17 @@ void DefinePythonType(const py::module_ &module);
 //
 //
 //
-#define __ARIA_PYTHON_TYPE_BINARY_OPERATOR(OPERATOR, OTHERS)                                                           \
+#define __ARIA_PYTHON_TYPE_BINARY_OPERATOR_PARAMS1(OPERATOR) cls.def(decltype(py::self OPERATOR py::self)());
+
+#define __ARIA_PYTHON_TYPE_BINARY_OPERATOR_PARAMS2(OPERATOR, OTHERS)                                                   \
                                                                                                                        \
   cls.def(decltype(py::self OPERATOR py::self)());                                                                     \
   cls.def(decltype(py::self OPERATOR std::declval<OTHERS>())());                                                       \
   cls.def(decltype(std::declval<OTHERS>() OPERATOR py::self)())
+
+#define __ARIA_PYTHON_TYPE_BINARY_OPERATOR(...)                                                                        \
+  __ARIA_EXPAND(                                                                                                       \
+      __ARIA_EXPAND(ARIA_CONCAT(__ARIA_PYTHON_TYPE_BINARY_OPERATOR_PARAMS, ARIA_NUM_OF(__VA_ARGS__)))(__VA_ARGS__))
 
 //
 //
@@ -147,5 +153,41 @@ void DefinePythonType(const py::module_ &module);
 //
 //
 #define __ARIA_ADD_PYTHON_TYPE(TYPE, MODULE) ::ARIA::DefinePythonType<TYPE>(main)
+
+//
+//
+//
+//
+//
+class module_item_accessor {
+public:
+  explicit module_item_accessor(py::module_ module, py::detail::item_accessor accessor)
+      : module_(std::move(module)), accessor_(std::move(accessor)) {}
+
+  ARIA_COPY_MOVE_ABILITY(module_item_accessor, default, default);
+
+public:
+  template <typename T>
+  void operator=(T &&value) {
+    // TODO: Calls ARIA_ADD_PYTHON_TYPE and recursively define types.
+
+    accessor_ = std::forward<T>(value);
+  }
+
+private:
+  py::module_ module_;
+  py::detail::item_accessor accessor_;
+};
+
+class module_local {
+public:
+  explicit module_local(py::module module) : module_(std::move(module)) {}
+
+  ARIA_COPY_MOVE_ABILITY(module_local, delete, delete);
+
+public:
+private:
+  py::module_ module_;
+};
 
 } // namespace ARIA
