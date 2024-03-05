@@ -78,6 +78,7 @@ set(core_core_headers
     ARIA/Layout.h
     ARIA/Property.h
     ARIA/PropertySTL.h
+    ARIA/Python.h
     ARIA/Registry.h
     ARIA/SmallVector.h
     ARIA/TensorVector.h

@@ -3,7 +3,6 @@ if (ARIA_BUILD_TESTS)
       SOURCES
       detail/Macros.cpp
       #experimental/Lua.cpp
-      experimental/Python.cpp
       Auto.cpp
       BFloat16.cu
       Constant.cpp
@@ -15,6 +14,7 @@ if (ARIA_BUILD_TESTS)
       Layout.cu
       Property.cpp
       PropertySTL.cpp
+      Python.cpp
       Registry.cpp
       TensorVector.cu
       TypeArray.cpp
