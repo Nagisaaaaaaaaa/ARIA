@@ -602,4 +602,16 @@ TEST(Python, Operators) {
   }
 }
 
+//
+//
+//
+//
+//
+TEST(Python, WarppedScopedInterpreterAndModule) {
+  ScopedInterpreter guard{};
+
+  Module main = guard.Import("__main__");
+  EXPECT_FALSE(main.HasType("std::vector<int>"));
+}
+
 } // namespace ARIA

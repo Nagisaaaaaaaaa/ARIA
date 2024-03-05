@@ -5,6 +5,8 @@
 #include <pybind11/embed.h>
 #include <pybind11/operators.h>
 
+#include <list>
+
 namespace ARIA {
 
 namespace py = pybind11;
@@ -159,14 +161,69 @@ void DefinePythonType(const py::module_ &module);
 //
 //
 //
+//
+//
+//
+//
+class Module {
+public:
+  [[nodiscard]] bool HasType(const std::string &name) { return types_->contains(name); }
+
+public:
+  ARIA_COPY_MOVE_ABILITY(Module, default, default);
+
+private:
+  Module(py::module_ module, std::unordered_set<std::string> &types) : module_(std::move(module)), types_(&types) {}
+
+  py::module_ module_;
+  std::unordered_set<std::string> *types_{}; // Have to use pointer here to allow copying and moving.
+
+  friend class ScopedInterpreter;
+};
+
+class ScopedInterpreter {
+public:
+  explicit ScopedInterpreter(bool init_signal_handlers = true,
+                             int argc = 0,
+                             const char *const *argv = nullptr,
+                             bool add_program_dir_to_path = true)
+      : interpreter_(init_signal_handlers, argc, argv, add_program_dir_to_path) {}
+
+#if PY_VERSION_HEX >= PYBIND11_PYCONFIG_SUPPORT_PY_VERSION_HEX
+  explicit ScopedInterpreter(PyConfig *config,
+                             int argc = 0,
+                             const char *const *argv = nullptr,
+                             bool add_program_dir_to_path = true)
+      : interpreter_(config, argc, argv, add_program_dir_to_path) {}
+#endif
+
+  ARIA_COPY_MOVE_ABILITY(ScopedInterpreter, delete, delete);
+
+  [[nodiscard]] Module Import(const char *name) {
+    py::module_ module = py::module_::import(name);
+
+    for (auto &types : moduleTypes_)
+      if (types.first == name)
+        return {std::move(module), types.second};
+
+    auto &types = moduleTypes_.emplace_back(std::string{name}, std::unordered_set<std::string>{});
+
+    return {std::move(module), types.second};
+  }
+
+private:
+  py::scoped_interpreter interpreter_;
+  std::list<std::pair<std::string, std::unordered_set<std::string>>> moduleTypes_;
+};
+
 namespace python::detail {
 
-class module_item_accessor {
+class ModuleItemAccessor {
 public:
-  explicit module_item_accessor(py::module_ module, py::detail::item_accessor accessor)
+  ModuleItemAccessor(Module module, py::detail::item_accessor accessor)
       : module_(std::move(module)), accessor_(std::move(accessor)) {}
 
-  ARIA_COPY_MOVE_ABILITY(module_item_accessor, default, default);
+  ARIA_COPY_MOVE_ABILITY(ModuleItemAccessor, default, default);
 
 public:
   template <typename T>
@@ -177,21 +234,28 @@ public:
   }
 
 private:
-  py::module_ module_;
+  Module module_;
   py::detail::item_accessor accessor_;
 };
 
-class module_local {
-public:
-  explicit module_local(py::module module) : module_(std::move(module)) {}
-
-  ARIA_COPY_MOVE_ABILITY(module_local, delete, delete);
-
-public:
-private:
-  py::module_ module_;
-};
-
 } // namespace python::detail
+
+class Dict {
+public:
+  explicit Dict(Module module) : module_(std::move(module)) {}
+
+  ARIA_COPY_MOVE_ABILITY(Dict, default, default);
+
+public:
+  python::detail::ModuleItemAccessor operator[](py::handle key) const { return {module_, dict_[key]}; }
+
+  python::detail::ModuleItemAccessor operator[](py::object &&key) const { return {module_, dict_[std::move(key)]}; }
+
+  python::detail::ModuleItemAccessor operator[](const char *key) const { return {module_, dict_[pybind11::str(key)]}; }
+
+private:
+  Module module_;
+  py::dict dict_;
+};
 
 } // namespace ARIA
