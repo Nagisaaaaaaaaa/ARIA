@@ -173,39 +173,48 @@ public:
   ARIA_COPY_MOVE_ABILITY(Module, default, default);
 
 private:
+  friend class ScopedInterpreter;
+
+  // The constructor is only allowed to be called by `ScopedInterpreter::Import()`.
   Module(py::module_ module, std::unordered_set<std::string> &types) : module_(std::move(module)), types_(&types) {}
 
   py::module_ module_;
-  std::unordered_set<std::string> *types_{}; // Have to use pointer here to allow copying and moving.
 
-  friend class ScopedInterpreter;
+  // Have to use pointer instead of reference here to allow copying and moving.
+  std::unordered_set<std::string> *types_{};
 };
 
+//
+//
+//
 class ScopedInterpreter {
 public:
-  explicit ScopedInterpreter(bool init_signal_handlers = true,
+  explicit ScopedInterpreter(bool initSignalHandlers = true,
                              int argc = 0,
                              const char *const *argv = nullptr,
-                             bool add_program_dir_to_path = true)
-      : interpreter_(init_signal_handlers, argc, argv, add_program_dir_to_path) {}
+                             bool addProgramDirToPath = true)
+      : interpreter_(initSignalHandlers, argc, argv, addProgramDirToPath) {}
 
 #if PY_VERSION_HEX >= PYBIND11_PYCONFIG_SUPPORT_PY_VERSION_HEX
   explicit ScopedInterpreter(PyConfig *config,
                              int argc = 0,
                              const char *const *argv = nullptr,
-                             bool add_program_dir_to_path = true)
-      : interpreter_(config, argc, argv, add_program_dir_to_path) {}
+                             bool addProgramDirToPath = true)
+      : interpreter_(config, argc, argv, addProgramDirToPath) {}
 #endif
 
   ARIA_COPY_MOVE_ABILITY(ScopedInterpreter, delete, delete);
 
+public:
   [[nodiscard]] Module Import(const char *name) {
     py::module_ module = py::module_::import(name);
 
+    // First check whether the module has been imported sometime earlier.
     for (auto &types : moduleTypes_)
       if (types.first == name)
         return {std::move(module), types.second};
 
+    // If the module has not been imported, create an instance for it.
     auto &types = moduleTypes_.emplace_back(std::string{name}, std::unordered_set<std::string>{});
 
     return {std::move(module), types.second};
@@ -213,17 +222,26 @@ public:
 
 private:
   py::scoped_interpreter interpreter_;
+
+  // A "singleton" dictionary containing all the types defined by all the imported modules.
+  // The layout looks like this:
+  //   [ "__main__"   : { "Vec3i", "Vec3f", ... },
+  //     "someModule" : { "Object", "Transform", ... },
+  //     ... ]
   std::list<std::pair<std::string, std::unordered_set<std::string>>> moduleTypes_;
 };
 
+//
+//
+//
 namespace python::detail {
 
-class ModuleItemAccessor {
+class ItemAccessor {
 public:
-  ModuleItemAccessor(Module module, py::detail::item_accessor accessor)
+  ItemAccessor(Module module, py::detail::item_accessor accessor)
       : module_(std::move(module)), accessor_(std::move(accessor)) {}
 
-  ARIA_COPY_MOVE_ABILITY(ModuleItemAccessor, default, default);
+  ARIA_COPY_MOVE_ABILITY(ItemAccessor, default, default);
 
 public:
   template <typename T>
@@ -240,18 +258,23 @@ private:
 
 } // namespace python::detail
 
+//
+//
+//
 class Dict {
 public:
   explicit Dict(Module module) : module_(std::move(module)) {}
 
   ARIA_COPY_MOVE_ABILITY(Dict, default, default);
 
+  operator py::dict() { return dict_; }
+
 public:
-  python::detail::ModuleItemAccessor operator[](py::handle key) const { return {module_, dict_[key]}; }
+  python::detail::ItemAccessor operator[](py::handle key) const { return {module_, dict_[key]}; }
 
-  python::detail::ModuleItemAccessor operator[](py::object &&key) const { return {module_, dict_[std::move(key)]}; }
+  python::detail::ItemAccessor operator[](py::object &&key) const { return {module_, dict_[std::move(key)]}; }
 
-  python::detail::ModuleItemAccessor operator[](const char *key) const { return {module_, dict_[pybind11::str(key)]}; }
+  python::detail::ItemAccessor operator[](const char *key) const { return {module_, dict_[pybind11::str(key)]}; }
 
 private:
   Module module_;
