@@ -106,8 +106,8 @@
 #define __ARIA_EXPAND(x) x
 
 // Helper macros.
-#define __ARIA_NUM_OF_HELPER(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _, ...) _
-#define __ARIA_CONCAT_HELPER(x, y)                                            x##y
+#define __ARIA_NUM_OF_HELPER(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _, ...) _
+#define __ARIA_CONCAT_HELPER(x, y)                                                                          x##y
 
 #define __ARIA_COND_0(x, y)     y
 #define __ARIA_COND_1(x, y)     x
@@ -120,7 +120,8 @@
 /// EXPECT_EQ(ARIA_NUM_OF(a, b), 2);
 /// EXPECT_EQ(ARIA_NUM_OF(a, b, c), 3);
 /// ```
-#define ARIA_NUM_OF(...) __ARIA_EXPAND(__ARIA_NUM_OF_HELPER(__VA_ARGS__, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1))
+#define ARIA_NUM_OF(...)                                                                                               \
+  __ARIA_EXPAND(__ARIA_NUM_OF_HELPER(__VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1))
 
 /// \brief Concatenate `x` and `y`.
 ///

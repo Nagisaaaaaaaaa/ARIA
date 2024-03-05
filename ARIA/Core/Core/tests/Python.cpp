@@ -41,6 +41,34 @@ struct ARIATestPython_OverloadWithParameters {
   std::vector<std::string> value(int, double) { return {"0"}; }
 };
 
+struct ARIATestPython_ManyOverloads {
+  using str = std::string;
+
+  std::vector<bool> F0() const { return {}; }
+
+  std::vector<bool> F1(int v0) const { return {}; }
+
+  std::vector<bool> F2(int v0, str v1) const { return {}; }
+
+  std::vector<bool> F3(int v0, str v1, int v2) const { return {}; }
+
+  std::vector<bool> F4(int v0, str v1, int v2, str v3) const { return {}; }
+
+  std::vector<bool> F5(int v0, str v1, int v2, str v3, int v4) const { return {}; }
+
+  std::vector<bool> F6(int v0, str v1, int v2, str v3, int v4, str v5) const { return {}; }
+
+  std::vector<bool> F7(int v0, str v1, int v2, str v3, int v4, str v5, int v6) const { return {}; }
+
+  std::vector<bool> F8(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7) const { return {}; }
+
+  std::vector<bool> F9(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8) const { return {}; }
+
+  std::vector<bool> F10(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8, str v9) const {
+    return {};
+  }
+};
+
 //
 //
 //
@@ -81,6 +109,21 @@ ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_OverloadWithParameters);
 ARIA_PYTHON_TYPE_METHOD(, value, int);
 ARIA_PYTHON_TYPE_METHOD(, value, double);
 ARIA_PYTHON_TYPE_METHOD(, value, int, double);
+ARIA_PYTHON_TYPE_END;
+
+ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_ManyOverloads);
+ARIA_PYTHON_TYPE_METHOD(const, F0);
+ARIA_PYTHON_TYPE_METHOD(const, F1, int);
+ARIA_PYTHON_TYPE_METHOD(const, F2, int, std::string);
+ARIA_PYTHON_TYPE_METHOD(const, F3, int, std::string, int);
+ARIA_PYTHON_TYPE_METHOD(const, F4, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_METHOD(const, F5, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_METHOD(const, F6, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_METHOD(const, F7, int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_METHOD(const, F8, int, std::string, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_METHOD(const, F9, int, std::string, int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_METHOD(
+    const, F10, int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
 ARIA_PYTHON_TYPE_END;
 
 ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_Object);
