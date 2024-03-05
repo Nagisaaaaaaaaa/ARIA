@@ -81,8 +81,7 @@ public:
   ARIA_PROP_FUNC(public, , ., clear);
   ARIA_PROP_END;
 
-  ARIA_PROP_BEGIN(public, public, , std::vector<std::string>, name2);
-  ARIA_PROP_FUNC(public, , ., clear);
+  ARIA_PROP_BEGIN(public, private, , std::vector<std::string>, name2);
   ARIA_PROP_END;
 
 private:
@@ -152,6 +151,11 @@ ARIA_PYTHON_TYPE_END;
 ARIA_PYTHON_TYPE_BEGIN(decltype(std::declval<ARIATestPython_Object>().name1()));
 ARIA_PYTHON_TYPE_METHOD(, value);
 ARIA_PYTHON_TYPE_METHOD(, clear);
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, std::vector<std::string>);
+ARIA_PYTHON_TYPE_END;
+
+ARIA_PYTHON_TYPE_BEGIN(decltype(std::declval<ARIATestPython_Object>().name2()));
+ARIA_PYTHON_TYPE_METHOD(, value);
 ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, std::vector<std::string>);
 ARIA_PYTHON_TYPE_END;
 
@@ -461,6 +465,7 @@ TEST(Python, Properties) {
 
   ARIA_ADD_PYTHON_TYPE(ARIATestPython_Object, main);
   ARIA_ADD_PYTHON_TYPE(decltype(std::declval<ARIATestPython_Object>().name1()), main);
+  ARIA_ADD_PYTHON_TYPE(decltype(std::declval<ARIATestPython_Object>().name2()), main);
 
   // Define variables.
   std::vector<std::string> nameCase0 = {"Python です喵"};
@@ -479,10 +484,18 @@ TEST(Python, Properties) {
              "assert obj.name1 == obj.name1\n"
              "assert obj.name0() == obj.name1\n"
              "assert obj.name1 == obj.name0()\n"
-             "assert obj.name0() == nameCase0\n" // Test getter.
+             "assert obj.name0() == nameCase0\n"
              "assert obj.name1 == nameCase0\n"
              "assert nameCase0 == obj.name0()\n"
              "assert nameCase0 == obj.name1\n"
+             "assert obj.name0() == obj.name0()\n"
+             "assert obj.name2 == obj.name2\n"
+             "assert obj.name0() == obj.name2\n"
+             "assert obj.name2 == obj.name0()\n"
+             "assert obj.name0() == nameCase0\n"
+             "assert obj.name2 == nameCase0\n"
+             "assert nameCase0 == obj.name0()\n"
+             "assert nameCase0 == obj.name2\n"
              "\n"
              "obj.name1 = nameCase1\n" // Test setter with `operator=`.
              "assert obj.name0() == obj.name0()\n"
@@ -493,6 +506,14 @@ TEST(Python, Properties) {
              "assert obj.name1 == nameCase1\n"
              "assert nameCase1 == obj.name0()\n"
              "assert nameCase1 == obj.name1\n"
+             "assert obj.name0() == obj.name0()\n"
+             "assert obj.name2 == obj.name2\n"
+             "assert obj.name0() == obj.name2\n"
+             "assert obj.name2 == obj.name0()\n"
+             "assert obj.name0() == nameCase1\n"
+             "assert obj.name2 == nameCase1\n"
+             "assert nameCase1 == obj.name0()\n"
+             "assert nameCase1 == obj.name2\n"
              "\n"
              "obj.name1.clear()\n" // Test setter with `clear()`.
              "assert obj.name0() == obj.name0()\n"
@@ -502,7 +523,15 @@ TEST(Python, Properties) {
              "assert obj.name0() == nameCase2\n"
              "assert obj.name1 == nameCase2\n"
              "assert nameCase2 == obj.name0()\n"
-             "assert nameCase2 == obj.name1\n",
+             "assert nameCase2 == obj.name1\n"
+             "assert obj.name0() == obj.name0()\n"
+             "assert obj.name2 == obj.name2\n"
+             "assert obj.name0() == obj.name2\n"
+             "assert obj.name2 == obj.name0()\n"
+             "assert obj.name0() == nameCase2\n"
+             "assert obj.name2 == nameCase2\n"
+             "assert nameCase2 == obj.name0()\n"
+             "assert nameCase2 == obj.name2\n",
              py::globals(), locals);
   } catch (std::exception &e) {
     fmt::print("{}\n", e.what());
@@ -571,10 +600,6 @@ TEST(Python, Operators) {
     fmt::print("{}\n", e.what());
     EXPECT_FALSE(true);
   }
-}
-
-TEST(Python, ReadonlyProperties) {
-  // TODO: Test this.
 }
 
 //
