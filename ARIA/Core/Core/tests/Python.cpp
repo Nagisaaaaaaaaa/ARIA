@@ -44,27 +44,27 @@ struct ARIATestPython_OverloadWithParameters {
 struct ARIATestPython_ManyOverloads {
   using str = std::string;
 
-  std::vector<bool> F0() const { return {}; }
+  std::vector<bool> F() const { return {}; }
 
-  std::vector<bool> F1(int v0) const { return {}; }
+  std::vector<bool> F(int v0) const { return {}; }
 
-  std::vector<bool> F2(int v0, str v1) const { return {}; }
+  std::vector<bool> F(int v0, str v1) const { return {}; }
 
-  std::vector<bool> F3(int v0, str v1, int v2) const { return {}; }
+  std::vector<bool> F(int v0, str v1, int v2) const { return {}; }
 
-  std::vector<bool> F4(int v0, str v1, int v2, str v3) const { return {}; }
+  std::vector<bool> F(int v0, str v1, int v2, str v3) const { return {}; }
 
-  std::vector<bool> F5(int v0, str v1, int v2, str v3, int v4) const { return {}; }
+  std::vector<bool> F(int v0, str v1, int v2, str v3, int v4) const { return {}; }
 
-  std::vector<bool> F6(int v0, str v1, int v2, str v3, int v4, str v5) const { return {}; }
+  std::vector<bool> F(int v0, str v1, int v2, str v3, int v4, str v5) const { return {}; }
 
-  std::vector<bool> F7(int v0, str v1, int v2, str v3, int v4, str v5, int v6) const { return {}; }
+  std::vector<bool> F(int v0, str v1, int v2, str v3, int v4, str v5, int v6) const { return {}; }
 
-  std::vector<bool> F8(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7) const { return {}; }
+  std::vector<bool> F(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7) const { return {}; }
 
-  std::vector<bool> F9(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8) const { return {}; }
+  std::vector<bool> F(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8) const { return {}; }
 
-  std::vector<bool> F10(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8, str v9) const {
+  std::vector<bool> F(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8, str v9) const {
     return {};
   }
 };
@@ -112,18 +112,18 @@ ARIA_PYTHON_TYPE_METHOD(, value, int, double);
 ARIA_PYTHON_TYPE_END;
 
 ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_ManyOverloads);
-ARIA_PYTHON_TYPE_METHOD(const, F0);
-ARIA_PYTHON_TYPE_METHOD(const, F1, int);
-ARIA_PYTHON_TYPE_METHOD(const, F2, int, std::string);
-ARIA_PYTHON_TYPE_METHOD(const, F3, int, std::string, int);
-ARIA_PYTHON_TYPE_METHOD(const, F4, int, std::string, int, std::string);
-ARIA_PYTHON_TYPE_METHOD(const, F5, int, std::string, int, std::string, int);
-ARIA_PYTHON_TYPE_METHOD(const, F6, int, std::string, int, std::string, int, std::string);
-ARIA_PYTHON_TYPE_METHOD(const, F7, int, std::string, int, std::string, int, std::string, int);
-ARIA_PYTHON_TYPE_METHOD(const, F8, int, std::string, int, std::string, int, std::string, int, std::string);
-ARIA_PYTHON_TYPE_METHOD(const, F9, int, std::string, int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_METHOD(const, F);
+ARIA_PYTHON_TYPE_METHOD(const, F, int);
+ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string);
+ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int);
+ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int, std::string, int, std::string, int, std::string, int);
 ARIA_PYTHON_TYPE_METHOD(
-    const, F10, int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
+    const, F, int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
 ARIA_PYTHON_TYPE_END;
 
 ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_Object);
@@ -377,7 +377,41 @@ TEST(Python, Overload) {
 }
 
 TEST(Python, ManyOverloads) {
-  // TODO: Test this.
+  py::scoped_interpreter guard{};
+
+  // Get scope.
+  py::object main = py::module_::import("__main__");
+  py::dict locals;
+
+  // Define types.
+  py::class_<std::vector<bool>>(main, "std::vector<bool>").def(py::self == py::self);
+
+  ARIA_ADD_PYTHON_TYPE(ARIATestPython_ManyOverloads, main);
+
+  // Define variables.
+  ARIATestPython_ManyOverloads manyOverloads;
+
+  locals["manyOverloads"] = py::cast(manyOverloads, py::return_value_policy::reference);
+  locals["vector"] = std::vector<bool>{};
+
+  // Execute.
+  try {
+    py::exec("assert manyOverloads.F() == vector\n"
+             "assert manyOverloads.F(0) == vector\n"
+             "assert manyOverloads.F(0, '1') == vector\n"
+             "assert manyOverloads.F(0, '1', 2) == vector\n"
+             "assert manyOverloads.F(0, '1', 2, '3') == vector\n"
+             "assert manyOverloads.F(0, '1', 2, '3', 4) == vector\n"
+             "assert manyOverloads.F(0, '1', 2, '3', 4, '5') == vector\n"
+             "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6) == vector\n"
+             "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6, '7') == vector\n"
+             "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6, '7', 8) == vector\n"
+             "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6, '7', 8, '9') == vector\n",
+             py::globals(), locals);
+  } catch (std::exception &e) {
+    fmt::print("{}\n", e.what());
+    EXPECT_FALSE(true);
+  }
 }
 
 TEST(Python, Operators) {
