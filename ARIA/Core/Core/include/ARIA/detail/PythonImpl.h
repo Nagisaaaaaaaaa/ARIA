@@ -236,10 +236,12 @@ private:
 //
 namespace python::detail {
 
+// TODO: Directly wrapping a `py::item_accessor` will result in runtime error, why?
+template <typename Arg>
 class ItemAccessor {
 public:
-  ItemAccessor(Module module, py::detail::item_accessor accessor)
-      : module_(std::move(module)), accessor_(std::move(accessor)) {}
+  ItemAccessor(Module module, py::dict dict, Arg arg)
+      : module_(std::move(module)), dict_(std::move(dict)), arg_(std::move(arg)) {}
 
   ARIA_COPY_MOVE_ABILITY(ItemAccessor, default, default);
 
@@ -248,12 +250,13 @@ public:
   void operator=(T &&value) {
     // TODO: Calls `ARIA_ADD_PYTHON_TYPE` and recursively define types for `module_`.
 
-    accessor_ = std::forward<T>(value);
+    dict_[arg_] = std::forward<T>(value);
   }
 
 private:
   Module module_;
-  py::detail::item_accessor accessor_;
+  py::dict dict_;
+  Arg arg_;
 };
 
 } // namespace python::detail
@@ -270,11 +273,11 @@ public:
   operator py::dict() { return dict_; }
 
 public:
-  python::detail::ItemAccessor operator[](py::handle key) const { return {module_, dict_[key]}; }
+  auto operator[](py::handle key) const { return python::detail::ItemAccessor{module_, dict_, key}; }
 
-  python::detail::ItemAccessor operator[](py::object &&key) const { return {module_, dict_[std::move(key)]}; }
+  auto operator[](py::object &&key) const { return python::detail::ItemAccessor{module_, dict_, std::move(key)}; }
 
-  python::detail::ItemAccessor operator[](const char *key) const { return {module_, dict_[pybind11::str(key)]}; }
+  auto operator[](const char *key) const { return python::detail::ItemAccessor{module_, dict_, key}; }
 
 private:
   Module module_;
