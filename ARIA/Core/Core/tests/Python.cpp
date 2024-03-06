@@ -206,8 +206,8 @@ TEST(Python, Base) {
   std::vector<int> a = {1, 2, 3};
   std::vector<int> b = {4, 6, 9};
 
-  local["a"] = py::cast(a, py::return_value_policy::reference);
-  local["b"] = py::cast(b, py::return_value_policy::reference);
+  local["a"] = a;
+  local["b"] = b;
 
   // Execute.
   try {
@@ -245,7 +245,7 @@ TEST(Python, Inheritance) {
   std::shared_ptr<GrandParent> parent2 = std::make_shared<Parent>();
   std::unique_ptr<GrandParent> child2 = std::make_unique<Child>();
 
-  local["parent0"] = parent0; // Pass by copy.
+  local["parent0"] = parent0; // Pass by reference.
   local["child0"] = child0;
   local["parent1"] = py::cast(parent1, py::return_value_policy::reference); // Pass by reference.
   local["child1"] = py::cast(child1, py::return_value_policy::reference);
@@ -291,8 +291,8 @@ TEST(Python, Const) {
     std::shared_ptr<const GrandParent> parent2 = std::make_shared<const Parent>();
     std::unique_ptr<const GrandParent> child2 = std::make_unique<const Child>();
 
-    local["parent1"] = py::cast(parent1, py::return_value_policy::reference); // Pass by reference.
-    local["child1"] = py::cast(child1, py::return_value_policy::reference);
+    local["parent1"] = parent1; // Pass by reference.
+    local["child1"] = child1;
     local["parent2"] = parent2.get(); // Pass by pointer.
     local["child2"] = child2.get();
 
@@ -332,8 +332,8 @@ TEST(Python, Const) {
     const OverloadWithConst overloadConst;
     OverloadWithConst overloadNonConst;
 
-    local["overloadConst"] = py::cast(overloadConst, py::return_value_policy::reference); // Pass by reference.
-    local["overloadNonConst"] = py::cast(overloadNonConst, py::return_value_policy::reference);
+    local["overloadConst"] = overloadConst; // Pass by reference.
+    local["overloadNonConst"] = overloadNonConst;
 
     // Execute.
     try {
@@ -366,8 +366,8 @@ TEST(Python, Const) {
     const OverloadWithConst overloadConst;
     OverloadWithConst overloadNonConst;
 
-    local["overloadConst"] = py::cast(overloadConst, py::return_value_policy::reference); // Pass by reference.
-    local["overloadNonConst"] = py::cast(overloadNonConst, py::return_value_policy::reference);
+    local["overloadConst"] = overloadConst; // Pass by reference.
+    local["overloadNonConst"] = overloadNonConst;
 
     // Execute.
     try {
@@ -396,7 +396,7 @@ TEST(Python, Overload) {
   // Define variables.
   ARIATestPython_OverloadWithParameters overload;
 
-  local["overload"] = py::cast(overload, py::return_value_policy::reference);
+  local["overload"] = overload;
   local["vector"] = std::vector<std::string>{"0"};
 
   EXPECT_TRUE(overload.value(0, 0.0) == std::vector<std::string>{"0"});
@@ -428,7 +428,7 @@ TEST(Python, ManyOverloads) {
   // Define variables.
   ARIATestPython_ManyOverloads manyOverloads;
 
-  local["manyOverloads"] = py::cast(manyOverloads, py::return_value_policy::reference);
+  local["manyOverloads"] = manyOverloads;
   local["vector"] = std::vector<bool>{};
 
   // Execute.
@@ -473,10 +473,10 @@ TEST(Python, Properties) {
   std::vector<std::string> nameCase2 = {};
   ARIATestPython_Object obj;
 
-  local["nameCase0"] = py::cast(nameCase0, py::return_value_policy::reference);
-  local["nameCase1"] = py::cast(nameCase1, py::return_value_policy::reference);
-  local["nameCase2"] = py::cast(nameCase2, py::return_value_policy::reference);
-  local["obj"] = py::cast(obj, py::return_value_policy::reference);
+  local["nameCase0"] = nameCase0;
+  local["nameCase1"] = nameCase1;
+  local["nameCase2"] = nameCase2;
+  local["obj"] = obj;
 
   // Execute.
   try {
@@ -553,7 +553,7 @@ TEST(Python, Operators) {
   // Define variables.
   ARIATestPython_IntProperty intP;
 
-  local["intP"] = py::cast(intP, py::return_value_policy::reference);
+  local["intP"] = intP;
 
   // Execute.
   try {
@@ -621,7 +621,7 @@ TEST(Python, WrapperBase) {
 
   Dict local{main};
 
-  local["a"] = std::string("Hello");
+  local["a"] = "Hello";
   local["b"] = std::make_pair(1, 2);
   local["c"] = std::make_tuple(1, 2, 3);
 

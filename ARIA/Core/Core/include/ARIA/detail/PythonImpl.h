@@ -204,6 +204,8 @@ public:
 public:
   ARIA_COPY_MOVE_ABILITY(Module, default, default);
 
+  operator py::module() const { return module_; }
+
 private:
   friend class ScopedInterpreter;
 
@@ -302,7 +304,7 @@ public:
 
   ARIA_COPY_MOVE_ABILITY(Dict, default, default);
 
-  operator py::dict() { return dict_; }
+  operator py::dict() const { return dict_; }
 
 public:
   auto operator[](py::handle key) const { return python::detail::ItemAccessor{module_, dict_, key}; }
