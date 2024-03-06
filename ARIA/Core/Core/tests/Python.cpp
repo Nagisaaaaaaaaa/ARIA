@@ -616,16 +616,19 @@ TEST(Python, WrapperBase) {
   static_assert(main.HasType<double>());
   static_assert(main.HasType<std::string>());
   static_assert(main.HasType<std::tuple<int, double, std::string>>());
-  EXPECT_FALSE((main.HasType<std::tuple<int, double, std::string, std::vector<int>>>()));
+  EXPECT_TRUE((main.HasType<std::pair<std::string, std::vector<int>>>()));
+  EXPECT_TRUE((main.HasType<std::tuple<int, double, std::string, std::vector<int>>>()));
 
   Dict local{main};
 
   local["a"] = std::string("Hello");
-  local["b"] = std::make_tuple(1, 2, 3);
+  local["b"] = std::make_pair(1, 2);
+  local["c"] = std::make_tuple(1, 2, 3);
 
   try {
     py::exec("assert a == 'Hello'\n"
-             "assert b == (1, 2, 3)\n",
+             "assert b == (1, 2)\n"
+             "assert c == (1, 2, 3)\n",
              py::globals(), local);
   } catch (std::exception &e) {
     fmt::print("{}\n", e.what());

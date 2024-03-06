@@ -13,13 +13,16 @@ namespace ARIA {
 namespace python::detail {
 
 template <typename T>
-struct is_std_tuple : std::false_type {};
+struct is_std_pair_or_std_tuple : std::false_type {};
 
 template <typename... Args>
-struct is_std_tuple<std::tuple<Args...>> : std::true_type {};
+struct is_std_pair_or_std_tuple<std::pair<Args...>> : std::true_type {};
+
+template <typename... Args>
+struct is_std_pair_or_std_tuple<std::tuple<Args...>> : std::true_type {};
 
 template <typename T>
-inline constexpr bool is_std_tuple_v = is_std_tuple<T>::value;
+inline constexpr bool is_std_pair_or_std_tuple_v = is_std_pair_or_std_tuple<T>::value;
 
 } // namespace python::detail
 
@@ -188,10 +191,10 @@ public:
   [[nodiscard]] constexpr bool HasType() const {
     using TDecayed = std::decay_t<T>;
 
-    // Return true if `TDecayed` is fundamental, `std::string`, or `std::tuple`,
+    // Return true if `TDecayed` is fundamental, `std::string`, `std::pair`, or `std::tuple`,
     // because these types have been implicitly handled by pybind11.
     if (std::is_fundamental_v<TDecayed> || std::is_same_v<TDecayed, std::string> ||
-        python::detail::is_std_tuple_v<TDecayed>)
+        python::detail::is_std_pair_or_std_tuple_v<TDecayed>)
       return true;
 
     // Check whether the unordered set contains the hash code.
