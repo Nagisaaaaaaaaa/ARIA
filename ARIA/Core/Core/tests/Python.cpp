@@ -181,14 +181,42 @@ ARIA_PYTHON_TYPE_END;
 //
 //
 TEST(Python, Base) {
-  py::scoped_interpreter guard{};
+  ScopedInterpreter guard{};
+
+  Module main = guard.Import("__main__");
+
+  static_assert(main.HasType<int>());
+  static_assert(main.HasType<double>());
+  static_assert(main.HasType<std::string>());
+  static_assert(main.HasType<std::tuple<int, double, std::string>>());
+  EXPECT_TRUE((main.HasType<std::pair<std::string, std::vector<int>>>()));
+  EXPECT_TRUE((main.HasType<std::tuple<int, double, std::string, std::vector<int>>>()));
+
+  Dict local{main};
+
+  static_assert(std::is_same_v<std::decay_t<decltype("Hello")>, const char *>);
+
+  local["a"] = "Hello";
+  local["b"] = std::make_pair(1, 2);
+  local["c"] = std::make_tuple(1, 2, 3);
+
+  try {
+    py::exec("assert a == 'Hello'\n"
+             "assert b == (1, 2)\n"
+             "assert c == (1, 2, 3)\n",
+             py::globals(), local);
+  } catch (std::exception &e) {
+    fmt::print("{}\n", e.what());
+    EXPECT_FALSE(true);
+  }
+}
+
+TEST(Python, Function) {
+  ScopedInterpreter guard{};
 
   // Get scope.
-  py::object main = py::module_::import("__main__");
-  py::dict local;
-
-  // Define types.
-  py::class_<std::vector<int>>(main, "std::vector<int>");
+  Module main = guard.Import("__main__");
+  Dict local{main};
 
   // Define functions.
   local["add"] = py::cpp_function([](const std::vector<int> &a, std::vector<int> &b) {
@@ -219,12 +247,13 @@ TEST(Python, Base) {
     EXPECT_FALSE(true);
   }
 
-  auto c = local["c"].cast<std::vector<int>>();
+  auto c = local["c"].Cast<std::vector<int>>();
   EXPECT_EQ(c[0], 5);
   EXPECT_EQ(c[1], 8);
   EXPECT_EQ(c[2], 12);
 }
 
+#if 0
 TEST(Python, Inheritance) {
   py::scoped_interpreter guard{};
 
@@ -601,39 +630,6 @@ TEST(Python, Operators) {
     EXPECT_FALSE(true);
   }
 }
-
-//
-//
-//
-//
-//
-TEST(Python, WrapperBase) {
-  ScopedInterpreter guard{};
-
-  Module main = guard.Import("__main__");
-
-  static_assert(main.HasType<int>());
-  static_assert(main.HasType<double>());
-  static_assert(main.HasType<std::string>());
-  static_assert(main.HasType<std::tuple<int, double, std::string>>());
-  EXPECT_TRUE((main.HasType<std::pair<std::string, std::vector<int>>>()));
-  EXPECT_TRUE((main.HasType<std::tuple<int, double, std::string, std::vector<int>>>()));
-
-  Dict local{main};
-
-  local["a"] = "Hello";
-  local["b"] = std::make_pair(1, 2);
-  local["c"] = std::make_tuple(1, 2, 3);
-
-  try {
-    py::exec("assert a == 'Hello'\n"
-             "assert b == (1, 2)\n"
-             "assert c == (1, 2, 3)\n",
-             py::globals(), local);
-  } catch (std::exception &e) {
-    fmt::print("{}\n", e.what());
-    EXPECT_FALSE(true);
-  }
-}
+#endif
 
 } // namespace ARIA

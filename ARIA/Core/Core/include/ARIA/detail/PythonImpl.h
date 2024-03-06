@@ -45,7 +45,7 @@ struct is_method<Ret (T::*)(Args...)> {
 
   using return_type = Ret;
   using arguments_types = MakeTypeArray<Args...>;
-  using all_types = MakeTypeArray<return_type, arguments_types>;
+  using return_and_arguments_types = MakeTypeArray<return_type, arguments_types>;
 };
 
 template <typename T>
@@ -53,6 +53,33 @@ static constexpr bool is_method_v = is_method<T>::value;
 
 template <typename T>
 concept method = is_method_v<T>;
+
+//
+//
+//
+template <typename T>
+consteval bool is_python_builtin_type() {
+  using TDecayed = std::decay_t<T>;
+
+  // Return true if `TDecayed` is a Python-builtin type, which is
+  // fundamental, `const char*`, `std::string`, `std::pair`, or `std::tuple`,
+  // because these types have been implicitly handled by pybind11.
+  //! Note that it is possible for `std::pair` and `std::tuple` to
+  //! contain unhandled types, for example, `std::pair<int, std::vector<int>>`, where
+  //! `std::vector<int>` is unhandled.
+  //! There's no way to perfectly address this problem.
+  if constexpr (std::is_fundamental_v<TDecayed> || std::is_same_v<TDecayed, const char *> ||
+                std::is_same_v<TDecayed, std::string> || python::detail::is_std_pair_or_std_tuple_v<TDecayed>) {
+    //! `T` is not allowed to be a non-const reference type, as explained below.
+    static_assert(!(!std::is_const_v<std::remove_reference_t<T>> && std::is_reference_v<T>),
+                  "It is dangerous to take non-const references for Python-builtin types because"
+                  "these types are immutable in Python codes thus will result in undefined behaviors");
+
+    return true;
+  }
+
+  return false;
+}
 
 } // namespace python::detail
 
@@ -65,22 +92,9 @@ public:
   [[nodiscard]] constexpr bool HasType() const {
     using TDecayed = std::decay_t<T>;
 
-    // Return true if `TDecayed` is a Python-builtin type, which is
-    // fundamental, `std::string`, `std::pair`, or `std::tuple`,
-    // because these types have been implicitly handled by pybind11.
-    //! Note that it is possible for `std::pair` and `std::tuple` to
-    //! contain unhandled types, for example, `std::pair<int, std::vector<int>>`, where
-    //! `std::vector<int>` is unhandled.
-    //! There's no way to perfectly address this problem.
-    if constexpr (std::is_fundamental_v<TDecayed> || std::is_same_v<TDecayed, std::string> ||
-                  python::detail::is_std_pair_or_std_tuple_v<TDecayed>) {
-      //! `T` is not allowed to be a non-const reference type, as explained below.
-      static_assert(!(!std::is_const_v<std::remove_reference_t<T>> && std::is_reference_v<T>),
-                    "It is dangerous to take non-const references for Python-builtin types because"
-                    "these types are immutable in Python codes thus will result in undefined behaviors");
-
+    //! Non-const references to Python-builtin types have already been checked here.
+    if constexpr (python::detail::is_python_builtin_type<T>())
       return true;
-    }
 
     // Check whether the unordered set contains the hash code.
     return types_->contains(typeid(std::declval<TDecayed>()).hash_code());
@@ -154,11 +168,11 @@ private:
 //
 //
 template <typename T>
-void __ARIAPython_RecursivelyDefinePythonType(const Module &module);
+inline void __ARIAPython_RecursivelyDefinePythonType(const Module &module);
 
 template <python::detail::method TMethod>
-void __ARIAPython_RecursivelyDefinePythonType(const Module &module) {
-  ForEach<python::detail::is_method<TMethod>::all_types>([&]<typename T>() {
+inline void __ARIAPython_RecursivelyDefinePythonType(const Module &module) {
+  ForEach<python::detail::is_method<TMethod>::return_and_arguments_types>([&]<typename T>() {
     using TDecayed = std::decay_t<T>;
 
     // Continue if this type has already been defined in this module.
@@ -187,10 +201,23 @@ public:
 public:
   template <typename T>
   void operator=(T &&value) {
-    // Recursively define all types related with `T`.
-    __ARIAPython_RecursivelyDefinePythonType<T>(module_);
+    using TDecayed = std::decay_t<T>;
+
+    if constexpr (!(python::detail::is_python_builtin_type<T>() || std::is_same_v<TDecayed, py::cpp_function>)) {
+      __ARIAPython_RecursivelyDefinePythonType<TDecayed>(module_);
+    }
 
     dict_[arg_] = std::forward<T>(value);
+  }
+
+  template <typename T>
+  decltype(auto) Cast() const {
+    return dict_[arg_].template cast<T>();
+  }
+
+  template <typename T>
+  decltype(auto) Cast() {
+    return dict_[arg_].template cast<T>();
   }
 
 private:
@@ -236,7 +263,7 @@ private:
 #define __ARIA_PYTHON_TYPE_FRIEND                                                                                      \
                                                                                                                        \
   template <typename TUVW>                                                                                             \
-  friend void ::ARIA::__ARIAPython_RecursivelyDefinePythonType(const py::module_ &module)
+  friend inline void ::ARIA::__ARIAPython_RecursivelyDefinePythonType(const Module &module)
 
 //
 //
@@ -244,7 +271,7 @@ private:
 #define __ARIA_PYTHON_TYPE_BEGIN(TYPE)                                                                                 \
                                                                                                                        \
   template <>                                                                                                          \
-  void __ARIAPython_RecursivelyDefinePythonType<TYPE>(const py::module_ &module) {                                     \
+  inline void __ARIAPython_RecursivelyDefinePythonType<TYPE>(const Module &module) {                                   \
     using Type = TYPE;                                                                                                 \
     static_assert(!python::detail::method<TYPE>, "The given type should not be a method type");                        \
                                                                                                                        \
@@ -424,5 +451,18 @@ private:
 //
 //
 #define __ARIA_ADD_PYTHON_TYPE(TYPE, MODULE) ::ARIA::__ARIAPython_RecursivelyDefinePythonType<TYPE>(MODULE)
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+// TODO: Support template defining and add `PythonSTL.h`.
+__ARIA_PYTHON_TYPE_BEGIN(std::vector<int>);
+__ARIA_PYTHON_TYPE_END;
 
 } // namespace ARIA
