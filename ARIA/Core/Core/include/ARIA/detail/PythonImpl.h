@@ -86,6 +86,14 @@ consteval bool is_python_builtin_type() {
 //
 //
 //
+class Module;
+
+template <typename T>
+inline void __ARIAPython_RecursivelyDefinePythonType(const Module &module);
+
+//
+//
+//
 class Module {
 public:
   template <typename T>
@@ -115,7 +123,22 @@ private:
 
   // Have to use pointer instead of reference here to allow copying and moving.
   std::unordered_set<size_t> *types_{};
+
+  template <typename TUVW>
+  friend inline void ::ARIA::__ARIAPython_RecursivelyDefinePythonType(const Module &module);
 };
+
+//
+//
+//
+template <python::detail::method TMethod>
+inline void __ARIAPython_RecursivelyDefinePythonType(const Module &module) {
+  ForEach<typename python::detail::is_method<TMethod>::return_and_arguments_types>([&]<typename T>() {
+    using TDecayed = std::decay_t<T>;
+
+    __ARIAPython_RecursivelyDefinePythonType<TDecayed>(module);
+  });
+}
 
 //
 //
@@ -163,26 +186,6 @@ private:
   //     ... ]
   std::list<std::pair<std::string, std::unordered_set<size_t>>> moduleTypes_;
 };
-
-//
-//
-//
-template <typename T>
-inline void __ARIAPython_RecursivelyDefinePythonType(const Module &module);
-
-template <python::detail::method TMethod>
-inline void __ARIAPython_RecursivelyDefinePythonType(const Module &module) {
-  ForEach<python::detail::is_method<TMethod>::return_and_arguments_types>([&]<typename T>() {
-    using TDecayed = std::decay_t<T>;
-
-    // Continue if this type has already been defined in this module.
-    //! Non-const references to Python-builtin types have already been checked here.
-    if (module.HasType<T>())
-      return;
-
-    __ARIAPython_RecursivelyDefinePythonType<TDecayed>(module);
-  });
-}
 
 //
 //
@@ -273,8 +276,19 @@ private:
   template <>                                                                                                          \
   inline void __ARIAPython_RecursivelyDefinePythonType<TYPE>(const Module &module) {                                   \
     using Type = TYPE;                                                                                                 \
-    static_assert(!python::detail::method<TYPE>, "The given type should not be a method type");                        \
+    static_assert(std::is_same_v<Type, std::decay_t<Type>>,                                                            \
+                  "The given type to be defined in Python should be a decayed type");                                  \
+    static_assert(!python::detail::method<Type>,                                                                       \
+                  "The given type to be defined in Python should not be a method type");                               \
                                                                                                                        \
+    /* Return if this type has already been defined in this module. */                                                 \
+    if (module.HasType<Type>())                                                                                        \
+      return;                                                                                                          \
+                                                                                                                       \
+    /* If this type has not been defined in this module, mark it as defined. */                                        \
+    module.types_->insert(typeid(std::declval<Type>()).hash_code());                                                   \
+                                                                                                                       \
+    /* Define this type in this module. */                                                                             \
     py::class_<Type> cls(module, #TYPE)
 
 //
@@ -282,115 +296,98 @@ private:
 //
 // clang-format off
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS2(SPECIFIERS, NAME)                                                            \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
+  ))                                                                                                                   \
+  (Type::*)() SPECIFIERS>(module);                                                                                     \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   ))                                                                                                                   \
   (Type::*)() SPECIFIERS>(&Type::NAME))
 
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS3(SPECIFIERS, NAME, T0)                                                        \
-  __ARIAPython_RecursivelyDefinePythonType<T0>(module);                                                                \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
+  std::declval<T0>()))                                                                                                 \
+  (Type::*)(T0) SPECIFIERS>(module);                                                                                   \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>()))                                                                                                 \
   (Type::*)(T0) SPECIFIERS>(&Type::NAME))
 
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS4(SPECIFIERS, NAME, T0, T1)                                                    \
-  __ARIAPython_RecursivelyDefinePythonType<T0>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T1>(module);                                                                \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
+  std::declval<T0>(), std::declval<T1>()))                                                                             \
+  (Type::*)(T0, T1) SPECIFIERS>(module);                                                                               \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>(), std::declval<T1>()))                                                                             \
   (Type::*)(T0, T1) SPECIFIERS>(&Type::NAME))
 
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS5(SPECIFIERS, NAME, T0, T1, T2)                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T0>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T1>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T2>(module);                                                                \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>()))                                                         \
+  (Type::*)(T0, T1, T2) SPECIFIERS>(module);                                                                           \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>()))                                                         \
   (Type::*)(T0, T1, T2) SPECIFIERS>(&Type::NAME))
 
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS6(SPECIFIERS, NAME, T0, T1, T2, T3)                                            \
-  __ARIAPython_RecursivelyDefinePythonType<T0>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T1>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T2>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T3>(module);                                                                \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>()))                                     \
+  (Type::*)(T0, T1, T2, T3) SPECIFIERS>(module);                                                                       \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>()))                                     \
   (Type::*)(T0, T1, T2, T3) SPECIFIERS>(&Type::NAME))
 
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS7(SPECIFIERS, NAME, T0, T1, T2, T3, T4)                                        \
-  __ARIAPython_RecursivelyDefinePythonType<T0>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T1>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T2>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T3>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T4>(module);                                                                \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>()))                 \
+  (Type::*)(T0, T1, T2, T3, T4) SPECIFIERS>(module);                                                                   \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>()))                 \
   (Type::*)(T0, T1, T2, T3, T4) SPECIFIERS>(&Type::NAME))
 
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS8(SPECIFIERS, NAME, T0, T1, T2, T3, T4, T5)                                    \
-  __ARIAPython_RecursivelyDefinePythonType<T0>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T1>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T2>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T3>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T4>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T5>(module);                                                                \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>()))                                                                                                 \
+  (Type::*)(T0, T1, T2, T3, T4, T5) SPECIFIERS>(module);                                                               \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>()))                                                                                                 \
   (Type::*)(T0, T1, T2, T3, T4, T5) SPECIFIERS>(&Type::NAME))
 
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS9(SPECIFIERS, NAME, T0, T1, T2, T3, T4, T5, T6)                                \
-  __ARIAPython_RecursivelyDefinePythonType<T0>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T1>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T2>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T3>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T4>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T5>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T6>(module);                                                                \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>()))                                                                             \
+  (Type::*)(T0, T1, T2, T3, T4, T5, T6) SPECIFIERS>(module);                                                           \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>()))                                                                             \
   (Type::*)(T0, T1, T2, T3, T4, T5, T6) SPECIFIERS>(&Type::NAME))
 
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS10(SPECIFIERS, NAME, T0, T1, T2, T3, T4, T5, T6, T7)                           \
-  __ARIAPython_RecursivelyDefinePythonType<T0>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T1>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T2>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T3>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T4>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T5>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T6>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T7>(module);                                                                \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>(), std::declval<T7>()))                                                         \
+  (Type::*)(T0, T1, T2, T3, T4, T5, T6, T7) SPECIFIERS>(module);                                                       \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>()))                                                         \
   (Type::*)(T0, T1, T2, T3, T4, T5, T6, T7) SPECIFIERS>(&Type::NAME))
 
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS11(SPECIFIERS, NAME, T0, T1, T2, T3, T4, T5, T6, T7, T8)                       \
-  __ARIAPython_RecursivelyDefinePythonType<T0>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T1>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T2>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T3>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T4>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T5>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T6>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T7>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T8>(module);                                                                \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>()))                                     \
+  (Type::*)(T0, T1, T2, T3, T4, T5, T6, T7, T8) SPECIFIERS>(module);                                                   \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>()))                                     \
   (Type::*)(T0, T1, T2, T3, T4, T5, T6, T7, T8) SPECIFIERS>(&Type::NAME))
 
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS12(SPECIFIERS, NAME, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9)                   \
-  __ARIAPython_RecursivelyDefinePythonType<T0>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T1>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T2>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T3>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T4>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T5>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T6>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T7>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T8>(module);                                                                \
-  __ARIAPython_RecursivelyDefinePythonType<T9>(module);                                                                \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>(), std::declval<T9>()))                 \
+  (Type::*)(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9) SPECIFIERS>(module);                                               \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>(), std::declval<T9>()))                 \
