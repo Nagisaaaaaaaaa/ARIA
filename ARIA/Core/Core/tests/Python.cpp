@@ -245,10 +245,10 @@ TEST(Python, Inheritance) {
   std::shared_ptr<GrandParent> parent2 = std::make_shared<Parent>();
   std::unique_ptr<GrandParent> child2 = std::make_unique<Child>();
 
-  local["parent0"] = parent0; // Pass by reference.
+  local["parent0"] = parent0; // Pass by copy.
   local["child0"] = child0;
-  local["parent1"] = py::cast(parent1, py::return_value_policy::reference); // Pass by reference.
-  local["child1"] = py::cast(child1, py::return_value_policy::reference);
+  local["parent1"] = &parent1; // Pass by pointer.
+  local["child1"] = &child1;
   local["parent2"] = parent2.get(); // Pass by pointer.
   local["child2"] = child2.get();
 
@@ -291,7 +291,7 @@ TEST(Python, Const) {
     std::shared_ptr<const GrandParent> parent2 = std::make_shared<const Parent>();
     std::unique_ptr<const GrandParent> child2 = std::make_unique<const Child>();
 
-    local["parent1"] = parent1; // Pass by reference.
+    local["parent1"] = parent1; // Pass by copy.
     local["child1"] = child1;
     local["parent2"] = parent2.get(); // Pass by pointer.
     local["child2"] = child2.get();
@@ -332,7 +332,7 @@ TEST(Python, Const) {
     const OverloadWithConst overloadConst;
     OverloadWithConst overloadNonConst;
 
-    local["overloadConst"] = overloadConst; // Pass by reference.
+    local["overloadConst"] = overloadConst; // Pass by copy.
     local["overloadNonConst"] = overloadNonConst;
 
     // Execute.
@@ -366,7 +366,7 @@ TEST(Python, Const) {
     const OverloadWithConst overloadConst;
     OverloadWithConst overloadNonConst;
 
-    local["overloadConst"] = overloadConst; // Pass by reference.
+    local["overloadConst"] = overloadConst; // Pass by copy.
     local["overloadNonConst"] = overloadNonConst;
 
     // Execute.

@@ -174,7 +174,7 @@ void __ARIAPython_DefinePythonType(const py::module_ &module);
 //
 //
 //
-#define __ARIA_ADD_PYTHON_TYPE(TYPE, MODULE) ::ARIA::__ARIAPython_DefinePythonType<TYPE>(main)
+#define __ARIA_ADD_PYTHON_TYPE(TYPE, MODULE) ::ARIA::__ARIAPython_DefinePythonType<TYPE>(MODULE)
 
 //
 //
@@ -191,11 +191,22 @@ public:
   [[nodiscard]] constexpr bool HasType() const {
     using TDecayed = std::decay_t<T>;
 
-    // Return true if `TDecayed` is fundamental, `std::string`, `std::pair`, or `std::tuple`,
+    // Return true if `TDecayed` is a Python-builtin type, which is
+    // fundamental, `std::string`, `std::pair`, or `std::tuple`,
     // because these types have been implicitly handled by pybind11.
-    if (std::is_fundamental_v<TDecayed> || std::is_same_v<TDecayed, std::string> ||
-        python::detail::is_std_pair_or_std_tuple_v<TDecayed>)
+    //! Note that it is possible for `std::pair` and `std::tuple` to
+    //! contain unhandled types, for example, `std::pair<int, std::vector<int>>`, where
+    //! `std::vector<int>` is unhandled.
+    //! There's no way to perfectly address this problem.
+    if constexpr (std::is_fundamental_v<TDecayed> || std::is_same_v<TDecayed, std::string> ||
+                  python::detail::is_std_pair_or_std_tuple_v<TDecayed>) {
+      //! `T` is not allowed to be a non-const reference type, as explained below.
+      static_assert(!(!std::is_const_v<std::remove_reference_t<T>> && std::is_reference_v<T>),
+                    "It is dangerous to take non-const references for Python-builtin types because"
+                    "these types are immutable in Python codes thus will result in undefined behaviors");
+
       return true;
+    }
 
     // Check whether the unordered set contains the hash code.
     return types_->contains(typeid(std::declval<TDecayed>()).hash_code());
@@ -341,15 +352,16 @@ struct method_traits<Ret (T::*)(Args...)> {
 //
 //
 template <typename TMethod>
-void __ARIAPython_RecursivelyDefinePythonType(const Module &module) {
+void __ARIAPython_DefineMethod(const Module &module) {
   ForEach<method_traits<TMethod>::all_types>([&]<typename T>() {
     using TDecayed = std::decay_t<T>;
 
-    // Continue if this type already defined in this module.
+    // Continue if this type has already been defined in this module.
+    //! Non-const references to Python-builtin types have already been checked here.
     if (module.HasType<T>())
       return;
 
-    // TODO: Implement this.
+    __ARIA_ADD_PYTHON_TYPE(TDecayed, module);
   });
 }
 
