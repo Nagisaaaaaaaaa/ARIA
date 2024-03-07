@@ -136,6 +136,10 @@ inline void __ARIAPython_RecursivelyDefinePythonType(const Module &module) {
   ForEach<typename python::detail::is_method<TMethod>::return_and_arguments_types>([&]<typename T>() {
     using TDecayed = std::decay_t<T>;
 
+    //! Non-const references to Python-builtin types have already been checked here.
+    if constexpr (python::detail::is_python_builtin_type<T>())
+      return true;
+
     __ARIAPython_RecursivelyDefinePythonType<std::remove_pointer_t<TDecayed>>(module);
   });
 }
