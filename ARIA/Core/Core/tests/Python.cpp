@@ -184,12 +184,11 @@ ARIA_PYTHON_TYPE_BEGIN(decltype(std::declval<ARIATestPython_IntProperty>().value
 ARIA_PYTHON_TYPE_METHOD(, value);
 ARIA_PYTHON_TYPE_UNARY_OPERATOR(+);
 ARIA_PYTHON_TYPE_UNARY_OPERATOR(-);
-ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, decltype(std::declval<ARIATestPython_IntProperty>().value().value()));
-ARIA_PYTHON_TYPE_BINARY_OPERATOR(+, decltype(std::declval<ARIATestPython_IntProperty>().value().value()));
-ARIA_PYTHON_TYPE_BINARY_OPERATOR(-, decltype(std::declval<ARIATestPython_IntProperty>().value().value()));
-ARIA_PYTHON_TYPE_BINARY_OPERATOR(*, decltype(std::declval<ARIATestPython_IntProperty>().value().value()));
-ARIA_PYTHON_TYPE_BINARY_OPERATOR(
-    /, decltype(std::declval<ARIATestPython_IntProperty>().value().value())); // Test binary operators with self.
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, decltype(std::declval<T>().value()));
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(+, decltype(std::declval<T>().value()));
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(-, decltype(std::declval<T>().value()));
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(*, decltype(std::declval<T>().value()));
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(/, decltype(std::declval<T>().value())); // Test binary operators with self.
 ARIA_PYTHON_TYPE_END;
 
 //
