@@ -374,18 +374,12 @@ TEST(Python, Const) {
   }
 }
 
-#if 0
 TEST(Python, Overload) {
-  py::scoped_interpreter guard{};
+  ScopedInterpreter guard{};
 
   // Get scope.
-  py::object main = py::module_::import("__main__");
-  py::dict local;
-
-  // Define types.
-  py::class_<std::vector<std::string>>(main, "std::vector<std::string>").def(py::self == py::self);
-
-  ARIA_ADD_PYTHON_TYPE(ARIATestPython_OverloadWithParameters, main);
+  Module main = guard.Import("__main__");
+  Dict local{main};
 
   // Define variables.
   ARIATestPython_OverloadWithParameters overload;
@@ -408,16 +402,11 @@ TEST(Python, Overload) {
 }
 
 TEST(Python, ManyOverloads) {
-  py::scoped_interpreter guard{};
+  ScopedInterpreter guard{};
 
   // Get scope.
-  py::object main = py::module_::import("__main__");
-  py::dict local;
-
-  // Define types.
-  py::class_<std::vector<bool>>(main, "std::vector<bool>").def(py::self == py::self);
-
-  ARIA_ADD_PYTHON_TYPE(ARIATestPython_ManyOverloads, main);
+  Module main = guard.Import("__main__");
+  Dict local{main};
 
   // Define variables.
   ARIATestPython_ManyOverloads manyOverloads;
@@ -446,20 +435,11 @@ TEST(Python, ManyOverloads) {
 }
 
 TEST(Python, Properties) {
-  py::scoped_interpreter guard{};
+  ScopedInterpreter guard{};
 
   // Get scope.
-  py::object main = py::module_::import("__main__");
-  py::dict local;
-
-  // Define types.
-  py::class_<std::vector<std::string>>(main, "std::vector<std::string>")
-      .def(py::self == py::self)
-      .def("clear", &std::vector<std::string>::clear);
-
-  ARIA_ADD_PYTHON_TYPE(ARIATestPython_Object, main);
-  ARIA_ADD_PYTHON_TYPE(decltype(std::declval<ARIATestPython_Object>().name1()), main);
-  ARIA_ADD_PYTHON_TYPE(decltype(std::declval<ARIATestPython_Object>().name2()), main);
+  Module main = guard.Import("__main__");
+  Dict local{main};
 
   // Define variables.
   std::vector<std::string> nameCase0 = {"Python です喵"};
@@ -533,6 +513,7 @@ TEST(Python, Properties) {
   }
 }
 
+#if 0
 TEST(Python, Operators) {
   py::scoped_interpreter guard{};
 

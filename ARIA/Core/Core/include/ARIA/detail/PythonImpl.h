@@ -476,7 +476,19 @@ private:
 //
 //
 // TODO: Support template defining and add `PythonSTL.h`.
+__ARIA_PYTHON_TYPE_BEGIN(std::vector<bool>);
+__ARIA_PYTHON_TYPE_METHOD(, clear);
+__ARIA_PYTHON_TYPE_BINARY_OPERATOR(==);
+__ARIA_PYTHON_TYPE_END;
+
 __ARIA_PYTHON_TYPE_BEGIN(std::vector<int>);
+__ARIA_PYTHON_TYPE_METHOD(, clear);
+__ARIA_PYTHON_TYPE_BINARY_OPERATOR(==);
+__ARIA_PYTHON_TYPE_END;
+
+__ARIA_PYTHON_TYPE_BEGIN(std::vector<std::string>);
+__ARIA_PYTHON_TYPE_METHOD(, clear);
+__ARIA_PYTHON_TYPE_BINARY_OPERATOR(==);
 __ARIA_PYTHON_TYPE_END;
 
 } // namespace ARIA
