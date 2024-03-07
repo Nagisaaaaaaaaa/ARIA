@@ -324,6 +324,39 @@ private:
 //
 //
 //
+#define __ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(TEMPLATE)                                                                    \
+                                                                                                                       \
+  template <typename... Args>                                                                                          \
+  struct __ARIAPython_RecursivelyDefinePythonType<TEMPLATE<Args...>> {                                                 \
+    void operator()(const Module &module) {                                                                            \
+      using Type = TEMPLATE<Args...>;                                                                                  \
+                                                                                                                       \
+      static_assert(std::is_same_v<Type, std::decay_t<Type>>,                                                          \
+                    "The given type to be defined in Python should be a decayed type");                                \
+                                                                                                                       \
+      static_assert(!std::is_const_v<Type>, "The given type to be defined in Python should not be a const type "       \
+                                            "because `const` has no effect in Python");                                \
+      static_assert(!std::is_pointer_v<Type>, "The given type to be defined in Python should not be a pointer type "   \
+                                              "because pointer types are automatically handled");                      \
+                                                                                                                       \
+      static_assert(!python::detail::is_python_builtin_type<Type>(),                                                   \
+                    "The given type to be defined in Python should not be a Python-builtin type");                     \
+      static_assert(!python::detail::method<Type>,                                                                     \
+                    "The given type to be defined in Python should not be a method type");                             \
+                                                                                                                       \
+      /* Return if this type has already been defined in this module. */                                               \
+      if (module.HasType<Type>())                                                                                      \
+        return;                                                                                                        \
+                                                                                                                       \
+      /* If this type has not been defined in this module, mark it as defined. */                                      \
+      module.types_->insert(typeid(Type).hash_code());                                                                 \
+                                                                                                                       \
+      /* Define this type in this module. */                                                                           \
+      py::class_<Type> cls(module, #TEMPLATE)
+
+//
+//
+//
 // clang-format off
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS2(SPECIFIERS, NAME)                                                            \
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
@@ -499,18 +532,8 @@ private:
 //
 //
 //
-// TODO: Support template defining and add `PythonSTL.h`.
-__ARIA_PYTHON_TYPE_BEGIN(std::vector<bool>);
-__ARIA_PYTHON_TYPE_METHOD(, clear);
-__ARIA_PYTHON_TYPE_BINARY_OPERATOR(==);
-__ARIA_PYTHON_TYPE_END;
-
-__ARIA_PYTHON_TYPE_BEGIN(std::vector<int>);
-__ARIA_PYTHON_TYPE_METHOD(, clear);
-__ARIA_PYTHON_TYPE_BINARY_OPERATOR(==);
-__ARIA_PYTHON_TYPE_END;
-
-__ARIA_PYTHON_TYPE_BEGIN(std::vector<std::string>);
+// TODO: Move to `PythonSTL.h`.
+__ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(std::vector);
 __ARIA_PYTHON_TYPE_METHOD(, clear);
 __ARIA_PYTHON_TYPE_BINARY_OPERATOR(==);
 __ARIA_PYTHON_TYPE_END;

@@ -23,6 +23,8 @@ namespace py = pybind11;
 //
 #define ARIA_PYTHON_TYPE_BEGIN(type) __ARIA_PYTHON_TYPE_BEGIN(type)
 
+#define ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(template_) __ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(template_)
+
 #define ARIA_PYTHON_TYPE_METHOD /*(specifiers, name, parameters...)*/ __ARIA_PYTHON_TYPE_METHOD
 
 #define ARIA_PYTHON_TYPE_PROPERTY(name) __ARIA_PYTHON_TYPE_PROPERTY(name)
