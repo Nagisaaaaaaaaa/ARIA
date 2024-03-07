@@ -6,20 +6,20 @@ namespace ARIA {
 
 namespace {
 
-struct GrandParent {
-  virtual ~GrandParent() = default;
+struct ARIATestPython_GrandParent {
+  virtual ~ARIATestPython_GrandParent() = default;
 
   virtual int value() = 0;
 };
 
-struct Parent : public GrandParent {
-  virtual ~Parent() = default;
+struct ARIATestPython_Parent : public ARIATestPython_GrandParent {
+  virtual ~ARIATestPython_Parent() = default;
 
   int value() override { return 1; }
 };
 
-struct Child final : public Parent {
-  virtual ~Child() = default;
+struct ARIATestPython_Child final : public ARIATestPython_Parent {
+  virtual ~ARIATestPython_Child() = default;
 
   int value() final { return 2; }
 };
@@ -27,7 +27,7 @@ struct Child final : public Parent {
 //
 //
 //
-struct OverloadWithConst {
+struct ARIATestPython_OverloadWithConst {
   int value() const { return 0; }
 
   int value() { return 1; }
@@ -121,6 +121,23 @@ private:
 //
 //
 // Define Python types.
+ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_GrandParent);
+ARIA_PYTHON_TYPE_METHOD(, value);
+ARIA_PYTHON_TYPE_END;
+
+ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_Parent);
+ARIA_PYTHON_TYPE_METHOD(, value);
+ARIA_PYTHON_TYPE_END;
+
+ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_Child);
+ARIA_PYTHON_TYPE_METHOD(, value);
+ARIA_PYTHON_TYPE_END;
+
+ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_OverloadWithConst);
+ARIA_PYTHON_TYPE_METHOD(const, value);
+ARIA_PYTHON_TYPE_METHOD(, value);
+ARIA_PYTHON_TYPE_END;
+
 ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_OverloadWithParameters);
 ARIA_PYTHON_TYPE_METHOD(, value, int);
 ARIA_PYTHON_TYPE_METHOD(, value, double);
@@ -181,17 +198,45 @@ ARIA_PYTHON_TYPE_END;
 //
 //
 TEST(Python, Base) {
-  py::scoped_interpreter guard{};
+  ScopedInterpreter guard{};
+
+  Module main = guard.Import("__main__");
+
+  static_assert(main.HasType<int>());
+  static_assert(main.HasType<double>());
+  static_assert(main.HasType<std::string>());
+  static_assert(main.HasType<std::tuple<int, double, std::string>>());
+  EXPECT_TRUE((main.HasType<std::pair<std::string, std::vector<int>>>()));
+  EXPECT_TRUE((main.HasType<std::tuple<int, double, std::string, std::vector<int>>>()));
+
+  Dict local{main};
+
+  static_assert(std::is_same_v<std::decay_t<decltype("Hello")>, const char *>);
+
+  local["a"] = "Hello";
+  local["b"] = std::make_pair(1, 2);
+  local["c"] = std::make_tuple(1, 2, 3);
+
+  try {
+    py::exec("assert a == 'Hello'\n"
+             "assert b == (1, 2)\n"
+             "assert c == (1, 2, 3)\n",
+             py::globals(), local);
+  } catch (std::exception &e) {
+    fmt::print("{}\n", e.what());
+    EXPECT_FALSE(true);
+  }
+}
+
+TEST(Python, Function) {
+  ScopedInterpreter guard{};
 
   // Get scope.
-  py::object main = py::module_::import("__main__");
-  py::dict locals;
-
-  // Define types.
-  py::class_<std::vector<int>>(main, "std::vector<int>");
+  Module main = guard.Import("__main__");
+  Dict local{main};
 
   // Define functions.
-  locals["add"] = py::cpp_function([](const std::vector<int> &a, std::vector<int> &b) {
+  local["add"] = py::cpp_function([](const std::vector<int> &a, std::vector<int> &b) {
     size_t size = a.size();
     ARIA_ASSERT(size == b.size());
 
@@ -206,51 +251,46 @@ TEST(Python, Base) {
   std::vector<int> a = {1, 2, 3};
   std::vector<int> b = {4, 6, 9};
 
-  locals["a"] = py::cast(a, py::return_value_policy::reference);
-  locals["b"] = py::cast(b, py::return_value_policy::reference);
+  local["a"] = a;
+  local["b"] = b;
 
   // Execute.
   try {
     py::exec("c = add(a, b)\n"
              "\n",
-             py::globals(), locals);
+             py::globals(), local);
   } catch (std::exception &e) {
     fmt::print("{}\n", e.what());
     EXPECT_FALSE(true);
   }
 
-  auto c = locals["c"].cast<std::vector<int>>();
+  auto c = local["c"].Cast<std::vector<int>>();
   EXPECT_EQ(c[0], 5);
   EXPECT_EQ(c[1], 8);
   EXPECT_EQ(c[2], 12);
 }
 
 TEST(Python, Inheritance) {
-  py::scoped_interpreter guard{};
+  ScopedInterpreter guard{};
 
   // Get scope.
-  py::object main = py::module_::import("__main__");
-  py::dict locals;
-
-  // Define types.
-  py::class_<GrandParent>(main, "GrandParent").def("value", &GrandParent::value);
-  py::class_<Parent, GrandParent>(main, "Parent").def("value", &Parent::value);
-  py::class_<Child, Parent>(main, "Child").def("value", &Child::value);
+  Module main = guard.Import("__main__");
+  Dict local{main};
 
   // Define variables.
-  Parent parent0;
-  Child child0;
-  Parent parent1;
-  Child child1;
-  std::shared_ptr<GrandParent> parent2 = std::make_shared<Parent>();
-  std::unique_ptr<GrandParent> child2 = std::make_unique<Child>();
+  ARIATestPython_Parent parent0;
+  ARIATestPython_Child child0;
+  ARIATestPython_Parent parent1;
+  ARIATestPython_Child child1;
+  std::shared_ptr<ARIATestPython_GrandParent> parent2 = std::make_shared<ARIATestPython_Parent>();
+  std::unique_ptr<ARIATestPython_GrandParent> child2 = std::make_unique<ARIATestPython_Child>();
 
-  locals["parent0"] = parent0; // Pass by copy.
-  locals["child0"] = child0;
-  locals["parent1"] = py::cast(parent1, py::return_value_policy::reference); // Pass by reference.
-  locals["child1"] = py::cast(child1, py::return_value_policy::reference);
-  locals["parent2"] = parent2.get(); // Pass by pointer.
-  locals["child2"] = child2.get();
+  local["parent0"] = parent0; // Pass by copy.
+  local["child0"] = child0;
+  local["parent1"] = &parent1; // Pass by pointer.
+  local["child1"] = &child1;
+  local["parent2"] = parent2.get(); // Pass by pointer.
+  local["child2"] = child2.get();
 
   // Execute.
   try {
@@ -260,7 +300,7 @@ TEST(Python, Inheritance) {
              "assert child1.value() == 2\n"
              "assert parent2.value() == 1\n"
              "assert child2.value() == 2\n",
-             py::globals(), locals);
+             py::globals(), local);
   } catch (std::exception &e) {
     fmt::print("{}\n", e.what());
     EXPECT_FALSE(true);
@@ -274,30 +314,25 @@ TEST(Python, Const) {
 
   // Bypass const.
   {
-    py::scoped_interpreter guard{};
+    ScopedInterpreter guard{};
 
     // Get scope.
-    py::object main = py::module_::import("__main__");
-    py::dict locals;
-
-    // Define types.
-    py::class_<GrandParent>(main, "GrandParent").def("value", &GrandParent::value);
-    py::class_<Parent, GrandParent>(main, "Parent").def("value", &Parent::value);
-    py::class_<Child, Parent>(main, "Child").def("value", &Child::value);
+    Module main = guard.Import("__main__");
+    Dict local{main};
 
     // Define variables.
-    const Parent parent1;
-    const Child child1;
-    std::shared_ptr<const GrandParent> parent2 = std::make_shared<const Parent>();
-    std::unique_ptr<const GrandParent> child2 = std::make_unique<const Child>();
+    const ARIATestPython_Parent parent1;
+    const ARIATestPython_Child child1;
+    std::shared_ptr<const ARIATestPython_GrandParent> parent2 = std::make_shared<const ARIATestPython_Parent>();
+    std::unique_ptr<const ARIATestPython_GrandParent> child2 = std::make_unique<const ARIATestPython_Child>();
 
-    locals["parent1"] = py::cast(parent1, py::return_value_policy::reference); // Pass by reference.
-    locals["child1"] = py::cast(child1, py::return_value_policy::reference);
-    locals["parent2"] = parent2.get(); // Pass by pointer.
-    locals["child2"] = child2.get();
+    local["parent1"] = parent1; // Pass by copy.
+    local["child1"] = child1;
+    local["parent2"] = parent2.get(); // Pass by pointer.
+    local["child2"] = child2.get();
 
-    static_assert(std::is_same_v<decltype(parent2.get()), const GrandParent *>);
-    static_assert(std::is_same_v<decltype(child2.get()), const GrandParent *>);
+    static_assert(std::is_same_v<decltype(parent2.get()), const ARIATestPython_GrandParent *>);
+    static_assert(std::is_same_v<decltype(child2.get()), const ARIATestPython_GrandParent *>);
 
     // Execute.
     try {
@@ -305,7 +340,7 @@ TEST(Python, Const) {
                "assert child1.value() == 2\n"
                "assert parent2.value() == 1\n"
                "assert child2.value() == 2\n",
-               py::globals(), locals);
+               py::globals(), local);
     } catch (std::exception &e) {
       fmt::print("{}\n", e.what());
       EXPECT_FALSE(true);
@@ -314,66 +349,24 @@ TEST(Python, Const) {
 
   // Give const version higher priority.
   {
-    py::scoped_interpreter guard{};
+    ScopedInterpreter guard{};
 
     // Get scope.
-    py::object main = py::module_::import("__main__");
-    py::dict locals;
-
-    // Define types.
-    py::class_<OverloadWithConst>(main, "OverloadWithConst")
-        .def("value",
-             static_cast<decltype(std::declval<const OverloadWithConst>().value()) (OverloadWithConst::*)() const>(
-                 &OverloadWithConst::value))
-        .def("value", static_cast<decltype(std::declval<OverloadWithConst>().value()) (OverloadWithConst::*)()>(
-                          &OverloadWithConst::value));
+    Module main = guard.Import("__main__");
+    Dict local{main};
 
     // Define variables.
-    const OverloadWithConst overloadConst;
-    OverloadWithConst overloadNonConst;
+    const ARIATestPython_OverloadWithConst overloadConst;
+    ARIATestPython_OverloadWithConst overloadNonConst;
 
-    locals["overloadConst"] = py::cast(overloadConst, py::return_value_policy::reference); // Pass by reference.
-    locals["overloadNonConst"] = py::cast(overloadNonConst, py::return_value_policy::reference);
+    local["overloadConst"] = overloadConst; // Pass by copy.
+    local["overloadNonConst"] = overloadNonConst;
 
     // Execute.
     try {
       py::exec("assert overloadConst.value() == 0\n"
                "assert overloadNonConst.value() == 0\n",
-               py::globals(), locals);
-    } catch (std::exception &e) {
-      fmt::print("{}\n", e.what());
-      EXPECT_FALSE(true);
-    }
-  }
-
-  // Give non-const version higher priority.
-  {
-    py::scoped_interpreter guard{};
-
-    // Get scope.
-    py::object main = py::module_::import("__main__");
-    py::dict locals;
-
-    // Define types.
-    py::class_<OverloadWithConst>(main, "OverloadWithConst")
-        .def("value", static_cast<decltype(std::declval<OverloadWithConst>().value()) (OverloadWithConst::*)()>(
-                          &OverloadWithConst::value))
-        .def("value",
-             static_cast<decltype(std::declval<const OverloadWithConst>().value()) (OverloadWithConst::*)() const>(
-                 &OverloadWithConst::value));
-
-    // Define variables.
-    const OverloadWithConst overloadConst;
-    OverloadWithConst overloadNonConst;
-
-    locals["overloadConst"] = py::cast(overloadConst, py::return_value_policy::reference); // Pass by reference.
-    locals["overloadNonConst"] = py::cast(overloadNonConst, py::return_value_policy::reference);
-
-    // Execute.
-    try {
-      py::exec("assert overloadConst.value() == 1\n"
-               "assert overloadNonConst.value() == 1\n",
-               py::globals(), locals);
+               py::globals(), local);
     } catch (std::exception &e) {
       fmt::print("{}\n", e.what());
       EXPECT_FALSE(true);
@@ -382,22 +375,17 @@ TEST(Python, Const) {
 }
 
 TEST(Python, Overload) {
-  py::scoped_interpreter guard{};
+  ScopedInterpreter guard{};
 
   // Get scope.
-  py::object main = py::module_::import("__main__");
-  py::dict locals;
-
-  // Define types.
-  py::class_<std::vector<std::string>>(main, "std::vector<std::string>").def(py::self == py::self);
-
-  ARIA_ADD_PYTHON_TYPE(ARIATestPython_OverloadWithParameters, main);
+  Module main = guard.Import("__main__");
+  Dict local{main};
 
   // Define variables.
   ARIATestPython_OverloadWithParameters overload;
 
-  locals["overload"] = py::cast(overload, py::return_value_policy::reference);
-  locals["vector"] = std::vector<std::string>{"0"};
+  local["overload"] = overload;
+  local["vector"] = std::vector<std::string>{"0"};
 
   EXPECT_TRUE(overload.value(0, 0.0) == std::vector<std::string>{"0"});
 
@@ -406,7 +394,7 @@ TEST(Python, Overload) {
     py::exec("assert overload.value(0) == 0\n"
              "assert overload.value(0.0) == '0'\n"
              "assert overload.value(0, 0.0) == vector\n",
-             py::globals(), locals);
+             py::globals(), local);
   } catch (std::exception &e) {
     fmt::print("{}\n", e.what());
     EXPECT_FALSE(true);
@@ -414,22 +402,17 @@ TEST(Python, Overload) {
 }
 
 TEST(Python, ManyOverloads) {
-  py::scoped_interpreter guard{};
+  ScopedInterpreter guard{};
 
   // Get scope.
-  py::object main = py::module_::import("__main__");
-  py::dict locals;
-
-  // Define types.
-  py::class_<std::vector<bool>>(main, "std::vector<bool>").def(py::self == py::self);
-
-  ARIA_ADD_PYTHON_TYPE(ARIATestPython_ManyOverloads, main);
+  Module main = guard.Import("__main__");
+  Dict local{main};
 
   // Define variables.
   ARIATestPython_ManyOverloads manyOverloads;
 
-  locals["manyOverloads"] = py::cast(manyOverloads, py::return_value_policy::reference);
-  locals["vector"] = std::vector<bool>{};
+  local["manyOverloads"] = manyOverloads;
+  local["vector"] = std::vector<bool>{};
 
   // Execute.
   try {
@@ -444,7 +427,7 @@ TEST(Python, ManyOverloads) {
              "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6, '7') == vector\n"
              "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6, '7', 8) == vector\n"
              "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6, '7', 8, '9') == vector\n",
-             py::globals(), locals);
+             py::globals(), local);
   } catch (std::exception &e) {
     fmt::print("{}\n", e.what());
     EXPECT_FALSE(true);
@@ -452,20 +435,11 @@ TEST(Python, ManyOverloads) {
 }
 
 TEST(Python, Properties) {
-  py::scoped_interpreter guard{};
+  ScopedInterpreter guard{};
 
   // Get scope.
-  py::object main = py::module_::import("__main__");
-  py::dict locals;
-
-  // Define types.
-  py::class_<std::vector<std::string>>(main, "std::vector<std::string>")
-      .def(py::self == py::self)
-      .def("clear", &std::vector<std::string>::clear);
-
-  ARIA_ADD_PYTHON_TYPE(ARIATestPython_Object, main);
-  ARIA_ADD_PYTHON_TYPE(decltype(std::declval<ARIATestPython_Object>().name1()), main);
-  ARIA_ADD_PYTHON_TYPE(decltype(std::declval<ARIATestPython_Object>().name2()), main);
+  Module main = guard.Import("__main__");
+  Dict local{main};
 
   // Define variables.
   std::vector<std::string> nameCase0 = {"Python です喵"};
@@ -473,10 +447,10 @@ TEST(Python, Properties) {
   std::vector<std::string> nameCase2 = {};
   ARIATestPython_Object obj;
 
-  locals["nameCase0"] = py::cast(nameCase0, py::return_value_policy::reference);
-  locals["nameCase1"] = py::cast(nameCase1, py::return_value_policy::reference);
-  locals["nameCase2"] = py::cast(nameCase2, py::return_value_policy::reference);
-  locals["obj"] = py::cast(obj, py::return_value_policy::reference);
+  local["nameCase0"] = nameCase0;
+  local["nameCase1"] = nameCase1;
+  local["nameCase2"] = nameCase2;
+  local["obj"] = obj;
 
   // Execute.
   try {
@@ -532,7 +506,7 @@ TEST(Python, Properties) {
              "assert obj.name2 == nameCase2\n"
              "assert nameCase2 == obj.name0()\n"
              "assert nameCase2 == obj.name2\n",
-             py::globals(), locals);
+             py::globals(), local);
   } catch (std::exception &e) {
     fmt::print("{}\n", e.what());
     EXPECT_FALSE(true);
@@ -540,20 +514,16 @@ TEST(Python, Properties) {
 }
 
 TEST(Python, Operators) {
-  py::scoped_interpreter guard{};
+  ScopedInterpreter guard{};
 
   // Get scope.
-  py::object main = py::module_::import("__main__");
-  py::dict locals;
-
-  // Define types.
-  ARIA_ADD_PYTHON_TYPE(ARIATestPython_IntProperty, main);
-  ARIA_ADD_PYTHON_TYPE(decltype(std::declval<ARIATestPython_IntProperty>().value()), main);
+  Module main = guard.Import("__main__");
+  Dict local{main};
 
   // Define variables.
   ARIATestPython_IntProperty intP;
 
-  locals["intP"] = py::cast(intP, py::return_value_policy::reference);
+  local["intP"] = intP;
 
   // Execute.
   try {
@@ -595,7 +565,7 @@ TEST(Python, Operators) {
              "assert intP.value == intP.value\n"
              "assert intP.value == 1\n"
              "assert 1 == intP.value\n",
-             py::globals(), locals);
+             py::globals(), local);
   } catch (std::exception &e) {
     fmt::print("{}\n", e.what());
     EXPECT_FALSE(true);
