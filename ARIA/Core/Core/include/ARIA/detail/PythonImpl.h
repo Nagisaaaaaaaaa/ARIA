@@ -418,6 +418,9 @@ private:
 //
 //
 #define __ARIA_PYTHON_TYPE_PROPERTY(NAME)                                                                              \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<Type>().NAME()) (Type::*)()>(module);                 \
+  __ARIAPython_RecursivelyDefinePythonType<void (Type::*)(                                                             \
+      const decltype(std::declval<Type>().ARIA_PROP_IMPL(NAME)()) &)>(module);                                         \
                                                                                                                        \
   static_assert(property::detail::PropertyType<decltype(std::declval<Type>().NAME())>,                                 \
                 "The given type to be defined in Python should be an ARIA property type");                             \
@@ -429,6 +432,7 @@ private:
 //
 //
 #define __ARIA_PYTHON_TYPE_READONLY_PROPERTY(NAME)                                                                     \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<Type>().NAME()) (Type::*)()>(module);                 \
                                                                                                                        \
   static_assert(property::detail::PropertyType<decltype(std::declval<Type>().NAME())>,                                 \
                 "The given type to be defined in Python should be an ARIA property type");                             \
