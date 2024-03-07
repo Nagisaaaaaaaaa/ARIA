@@ -6,20 +6,20 @@ namespace ARIA {
 
 namespace {
 
-struct GrandParent {
-  virtual ~GrandParent() = default;
+struct ARIATestPython_GrandParent {
+  virtual ~ARIATestPython_GrandParent() = default;
 
   virtual int value() = 0;
 };
 
-struct Parent : public GrandParent {
-  virtual ~Parent() = default;
+struct ARIATestPython_Parent : public ARIATestPython_GrandParent {
+  virtual ~ARIATestPython_Parent() = default;
 
   int value() override { return 1; }
 };
 
-struct Child final : public Parent {
-  virtual ~Child() = default;
+struct ARIATestPython_Child final : public ARIATestPython_Parent {
+  virtual ~ARIATestPython_Child() = default;
 
   int value() final { return 2; }
 };
@@ -121,6 +121,18 @@ private:
 //
 //
 // Define Python types.
+ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_GrandParent);
+ARIA_PYTHON_TYPE_METHOD(, value);
+ARIA_PYTHON_TYPE_END;
+
+ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_Parent);
+ARIA_PYTHON_TYPE_METHOD(, value);
+ARIA_PYTHON_TYPE_END;
+
+ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_Child);
+ARIA_PYTHON_TYPE_METHOD(, value);
+ARIA_PYTHON_TYPE_END;
+
 ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_OverloadWithParameters);
 ARIA_PYTHON_TYPE_METHOD(, value, int);
 ARIA_PYTHON_TYPE_METHOD(, value, double);
@@ -253,26 +265,20 @@ TEST(Python, Function) {
   EXPECT_EQ(c[2], 12);
 }
 
-#if 0
 TEST(Python, Inheritance) {
-  py::scoped_interpreter guard{};
+  ScopedInterpreter guard{};
 
   // Get scope.
-  py::object main = py::module_::import("__main__");
-  py::dict local;
-
-  // Define types.
-  py::class_<GrandParent>(main, "GrandParent").def("value", &GrandParent::value);
-  py::class_<Parent, GrandParent>(main, "Parent").def("value", &Parent::value);
-  py::class_<Child, Parent>(main, "Child").def("value", &Child::value);
+  Module main = guard.Import("__main__");
+  Dict local{main};
 
   // Define variables.
-  Parent parent0;
-  Child child0;
-  Parent parent1;
-  Child child1;
-  std::shared_ptr<GrandParent> parent2 = std::make_shared<Parent>();
-  std::unique_ptr<GrandParent> child2 = std::make_unique<Child>();
+  ARIATestPython_Parent parent0;
+  ARIATestPython_Child child0;
+  ARIATestPython_Parent parent1;
+  ARIATestPython_Child child1;
+  std::shared_ptr<ARIATestPython_GrandParent> parent2 = std::make_shared<ARIATestPython_Parent>();
+  std::unique_ptr<ARIATestPython_GrandParent> child2 = std::make_unique<ARIATestPython_Child>();
 
   local["parent0"] = parent0; // Pass by copy.
   local["child0"] = child0;
@@ -296,6 +302,7 @@ TEST(Python, Inheritance) {
   }
 }
 
+#if 0
 TEST(Python, Const) {
   // TODO: Pybind11 always bypasses the `const` requirement.
   // TODO: For overloaded methods where `const` is the only difference,

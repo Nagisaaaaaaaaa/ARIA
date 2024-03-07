@@ -105,7 +105,7 @@ public:
       return true;
 
     // Check whether the unordered set contains the hash code.
-    return types_->contains(typeid(std::declval<TDecayed>()).hash_code());
+    return types_->contains(typeid(TDecayed).hash_code());
   }
 
 public:
@@ -136,7 +136,7 @@ inline void __ARIAPython_RecursivelyDefinePythonType(const Module &module) {
   ForEach<typename python::detail::is_method<TMethod>::return_and_arguments_types>([&]<typename T>() {
     using TDecayed = std::decay_t<T>;
 
-    __ARIAPython_RecursivelyDefinePythonType<TDecayed>(module);
+    __ARIAPython_RecursivelyDefinePythonType<std::remove_pointer_t<TDecayed>>(module);
   });
 }
 
@@ -181,8 +181,8 @@ private:
 
   // A "singleton" dictionary containing all the types defined by all the imported modules.
   // The layout looks like this:
-  //   [ "__main__"   : { typeid(std::declval<...>()).hash_code(), ... },
-  //     "someModule" : { typeid(std::declval<...>()).hash_code(), ... },
+  //   [ "__main__"   : { typeid(...).hash_code(), ... },
+  //     "someModule" : { typeid(...).hash_code(), ... },
   //     ... ]
   std::list<std::pair<std::string, std::unordered_set<size_t>>> moduleTypes_;
 };
@@ -207,7 +207,7 @@ public:
     using TDecayed = std::decay_t<T>;
 
     if constexpr (!(python::detail::is_python_builtin_type<T>() || std::is_same_v<TDecayed, py::cpp_function>)) {
-      __ARIAPython_RecursivelyDefinePythonType<TDecayed>(module_);
+      __ARIAPython_RecursivelyDefinePythonType<std::remove_pointer_t<TDecayed>>(module_);
     }
 
     dict_[arg_] = std::forward<T>(value);
@@ -278,6 +278,8 @@ private:
     using Type = TYPE;                                                                                                 \
     static_assert(std::is_same_v<Type, std::decay_t<Type>>,                                                            \
                   "The given type to be defined in Python should be a decayed type");                                  \
+    static_assert(!std::is_pointer_v<Type>, "The given type to be defined in Python should not be a pointer type "     \
+                                            "because pointer types are automatically handled by pybind11");            \
     static_assert(!python::detail::method<Type>,                                                                       \
                   "The given type to be defined in Python should not be a method type");                               \
                                                                                                                        \
@@ -286,7 +288,7 @@ private:
       return;                                                                                                          \
                                                                                                                        \
     /* If this type has not been defined in this module, mark it as defined. */                                        \
-    module.types_->insert(typeid(std::declval<Type>()).hash_code());                                                   \
+    module.types_->insert(typeid(Type).hash_code());                                                                   \
                                                                                                                        \
     /* Define this type in this module. */                                                                             \
     py::class_<Type> cls(module, #TYPE)
