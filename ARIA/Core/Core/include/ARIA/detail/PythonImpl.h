@@ -328,7 +328,7 @@ private:
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS2(SPECIFIERS, NAME)                                                            \
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
   ))                                                                                                                   \
-  (Type::*)() SPECIFIERS>()(module);                                                                                     \
+  (Type::*)() SPECIFIERS>()(module);                                                                                   \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   ))                                                                                                                   \
   (Type::*)() SPECIFIERS>(&Type::NAME))
@@ -336,7 +336,7 @@ private:
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS3(SPECIFIERS, NAME, T0)                                                        \
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
   std::declval<T0>()))                                                                                                 \
-  (Type::*)(T0) SPECIFIERS>()(module);                                                                                   \
+  (Type::*)(T0) SPECIFIERS>()(module);                                                                                 \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>()))                                                                                                 \
   (Type::*)(T0) SPECIFIERS>(&Type::NAME))
@@ -344,7 +344,7 @@ private:
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS4(SPECIFIERS, NAME, T0, T1)                                                    \
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
   std::declval<T0>(), std::declval<T1>()))                                                                             \
-  (Type::*)(T0, T1) SPECIFIERS>()(module);                                                                               \
+  (Type::*)(T0, T1) SPECIFIERS>()(module);                                                                             \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>(), std::declval<T1>()))                                                                             \
   (Type::*)(T0, T1) SPECIFIERS>(&Type::NAME))
@@ -352,7 +352,7 @@ private:
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS5(SPECIFIERS, NAME, T0, T1, T2)                                                \
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>()))                                                         \
-  (Type::*)(T0, T1, T2) SPECIFIERS>()(module);                                                                           \
+  (Type::*)(T0, T1, T2) SPECIFIERS>()(module);                                                                         \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>()))                                                         \
   (Type::*)(T0, T1, T2) SPECIFIERS>(&Type::NAME))
@@ -360,7 +360,7 @@ private:
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS6(SPECIFIERS, NAME, T0, T1, T2, T3)                                            \
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>()))                                     \
-  (Type::*)(T0, T1, T2, T3) SPECIFIERS>()(module);                                                                       \
+  (Type::*)(T0, T1, T2, T3) SPECIFIERS>()(module);                                                                     \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>()))                                     \
   (Type::*)(T0, T1, T2, T3) SPECIFIERS>(&Type::NAME))
@@ -368,7 +368,7 @@ private:
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS7(SPECIFIERS, NAME, T0, T1, T2, T3, T4)                                        \
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>()))                 \
-  (Type::*)(T0, T1, T2, T3, T4) SPECIFIERS>()(module);                                                                   \
+  (Type::*)(T0, T1, T2, T3, T4) SPECIFIERS>()(module);                                                                 \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>()))                 \
   (Type::*)(T0, T1, T2, T3, T4) SPECIFIERS>(&Type::NAME))
@@ -377,7 +377,7 @@ private:
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>()))                                                                                                 \
-  (Type::*)(T0, T1, T2, T3, T4, T5) SPECIFIERS>()(module);                                                               \
+  (Type::*)(T0, T1, T2, T3, T4, T5) SPECIFIERS>()(module);                                                             \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>()))                                                                                                 \
@@ -387,7 +387,7 @@ private:
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>()))                                                                             \
-  (Type::*)(T0, T1, T2, T3, T4, T5, T6) SPECIFIERS>()(module);                                                           \
+  (Type::*)(T0, T1, T2, T3, T4, T5, T6) SPECIFIERS>()(module);                                                         \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>()))                                                                             \
@@ -397,7 +397,7 @@ private:
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>()))                                                         \
-  (Type::*)(T0, T1, T2, T3, T4, T5, T6, T7) SPECIFIERS>()(module);                                                       \
+  (Type::*)(T0, T1, T2, T3, T4, T5, T6, T7) SPECIFIERS>()(module);                                                     \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>()))                                                         \
@@ -407,7 +407,7 @@ private:
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>()))                                     \
-  (Type::*)(T0, T1, T2, T3, T4, T5, T6, T7, T8) SPECIFIERS>()(module);                                                   \
+  (Type::*)(T0, T1, T2, T3, T4, T5, T6, T7, T8) SPECIFIERS>()(module);                                                 \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>()))                                     \
@@ -417,7 +417,7 @@ private:
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS Type>().NAME(                              \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>(), std::declval<T9>()))                 \
-  (Type::*)(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9) SPECIFIERS>()(module);                                               \
+  (Type::*)(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9) SPECIFIERS>()(module);                                             \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS Type>().NAME(                                            \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>(), std::declval<T9>()))                 \
