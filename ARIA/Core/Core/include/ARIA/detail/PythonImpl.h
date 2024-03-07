@@ -418,6 +418,7 @@ private:
 //
 //
 #define __ARIA_PYTHON_TYPE_PROPERTY(NAME)                                                                              \
+                                                                                                                       \
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<Type>().NAME()) (Type::*)()>(module);                 \
   __ARIAPython_RecursivelyDefinePythonType<void (Type::*)(                                                             \
       const decltype(std::declval<Type>().ARIA_PROP_IMPL(NAME)()) &)>(module);                                         \
@@ -432,6 +433,7 @@ private:
 //
 //
 #define __ARIA_PYTHON_TYPE_READONLY_PROPERTY(NAME)                                                                     \
+                                                                                                                       \
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<Type>().NAME()) (Type::*)()>(module);                 \
                                                                                                                        \
   static_assert(property::detail::PropertyType<decltype(std::declval<Type>().NAME())>,                                 \
@@ -449,6 +451,12 @@ private:
 #define __ARIA_PYTHON_TYPE_BINARY_OPERATOR_PARAMS1(OPERATOR) cls.def(decltype(py::self OPERATOR py::self)());
 
 #define __ARIA_PYTHON_TYPE_BINARY_OPERATOR_PARAMS2(OPERATOR, OTHERS)                                                   \
+                                                                                                                       \
+  /*! Non-const references to Python-builtin types have already been checked here. */                                  \
+  if constexpr (!python::detail::is_python_builtin_type<OTHERS>()) {                                                   \
+    __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<OTHERS>>>>(        \
+        module);                                                                                                       \
+  }                                                                                                                    \
                                                                                                                        \
   cls.def(decltype(py::self OPERATOR py::self)());                                                                     \
   cls.def(decltype(py::self OPERATOR std::declval<OTHERS>())());                                                       \
