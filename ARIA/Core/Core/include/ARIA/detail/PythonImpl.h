@@ -48,6 +48,17 @@ struct is_method<Ret (T::*)(Args...)> {
   using return_and_arguments_types = MakeTypeArray<return_type, arguments_types>;
 };
 
+template <type_array::detail::NonArrayType Ret,
+          type_array::detail::NonArrayType T,
+          type_array::detail::NonArrayType... Args>
+struct is_method<Ret (T::*)(Args...) const> {
+  static constexpr bool value = true;
+
+  using return_type = Ret;
+  using arguments_types = MakeTypeArray<Args...>;
+  using return_and_arguments_types = MakeTypeArray<return_type, arguments_types>;
+};
+
 template <typename T>
 static constexpr bool is_method_v = is_method<T>::value;
 
@@ -140,7 +151,7 @@ inline void __ARIAPython_RecursivelyDefinePythonType(const Module &module) {
     if constexpr (python::detail::is_python_builtin_type<T>())
       return true;
 
-    __ARIAPython_RecursivelyDefinePythonType<std::remove_pointer_t<TDecayed>>(module);
+    __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<TDecayed>>>(module);
   });
 }
 
@@ -211,7 +222,7 @@ public:
     using TDecayed = std::decay_t<T>;
 
     if constexpr (!(python::detail::is_python_builtin_type<T>() || std::is_same_v<TDecayed, py::cpp_function>)) {
-      __ARIAPython_RecursivelyDefinePythonType<std::remove_pointer_t<TDecayed>>(module_);
+      __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<TDecayed>>>(module_);
     }
 
     dict_[arg_] = std::forward<T>(value);

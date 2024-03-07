@@ -27,7 +27,7 @@ struct ARIATestPython_Child final : public ARIATestPython_Parent {
 //
 //
 //
-struct OverloadWithConst {
+struct ARIATestPython_OverloadWithConst {
   int value() const { return 0; }
 
   int value() { return 1; }
@@ -130,6 +130,11 @@ ARIA_PYTHON_TYPE_METHOD(, value);
 ARIA_PYTHON_TYPE_END;
 
 ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_Child);
+ARIA_PYTHON_TYPE_METHOD(, value);
+ARIA_PYTHON_TYPE_END;
+
+ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_OverloadWithConst);
+ARIA_PYTHON_TYPE_METHOD(const, value);
 ARIA_PYTHON_TYPE_METHOD(, value);
 ARIA_PYTHON_TYPE_END;
 
@@ -302,7 +307,6 @@ TEST(Python, Inheritance) {
   }
 }
 
-#if 0
 TEST(Python, Const) {
   // TODO: Pybind11 always bypasses the `const` requirement.
   // TODO: For overloaded methods where `const` is the only difference,
@@ -310,30 +314,25 @@ TEST(Python, Const) {
 
   // Bypass const.
   {
-    py::scoped_interpreter guard{};
+    ScopedInterpreter guard{};
 
     // Get scope.
-    py::object main = py::module_::import("__main__");
-    py::dict local;
-
-    // Define types.
-    py::class_<GrandParent>(main, "GrandParent").def("value", &GrandParent::value);
-    py::class_<Parent, GrandParent>(main, "Parent").def("value", &Parent::value);
-    py::class_<Child, Parent>(main, "Child").def("value", &Child::value);
+    Module main = guard.Import("__main__");
+    Dict local{main};
 
     // Define variables.
-    const Parent parent1;
-    const Child child1;
-    std::shared_ptr<const GrandParent> parent2 = std::make_shared<const Parent>();
-    std::unique_ptr<const GrandParent> child2 = std::make_unique<const Child>();
+    const ARIATestPython_Parent parent1;
+    const ARIATestPython_Child child1;
+    std::shared_ptr<const ARIATestPython_GrandParent> parent2 = std::make_shared<const ARIATestPython_Parent>();
+    std::unique_ptr<const ARIATestPython_GrandParent> child2 = std::make_unique<const ARIATestPython_Child>();
 
     local["parent1"] = parent1; // Pass by copy.
     local["child1"] = child1;
     local["parent2"] = parent2.get(); // Pass by pointer.
     local["child2"] = child2.get();
 
-    static_assert(std::is_same_v<decltype(parent2.get()), const GrandParent *>);
-    static_assert(std::is_same_v<decltype(child2.get()), const GrandParent *>);
+    static_assert(std::is_same_v<decltype(parent2.get()), const ARIATestPython_GrandParent *>);
+    static_assert(std::is_same_v<decltype(child2.get()), const ARIATestPython_GrandParent *>);
 
     // Execute.
     try {
@@ -350,23 +349,15 @@ TEST(Python, Const) {
 
   // Give const version higher priority.
   {
-    py::scoped_interpreter guard{};
+    ScopedInterpreter guard{};
 
     // Get scope.
-    py::object main = py::module_::import("__main__");
-    py::dict local;
-
-    // Define types.
-    py::class_<OverloadWithConst>(main, "OverloadWithConst")
-        .def("value",
-             static_cast<decltype(std::declval<const OverloadWithConst>().value()) (OverloadWithConst::*)() const>(
-                 &OverloadWithConst::value))
-        .def("value", static_cast<decltype(std::declval<OverloadWithConst>().value()) (OverloadWithConst::*)()>(
-                          &OverloadWithConst::value));
+    Module main = guard.Import("__main__");
+    Dict local{main};
 
     // Define variables.
-    const OverloadWithConst overloadConst;
-    OverloadWithConst overloadNonConst;
+    const ARIATestPython_OverloadWithConst overloadConst;
+    ARIATestPython_OverloadWithConst overloadNonConst;
 
     local["overloadConst"] = overloadConst; // Pass by copy.
     local["overloadNonConst"] = overloadNonConst;
@@ -381,42 +372,9 @@ TEST(Python, Const) {
       EXPECT_FALSE(true);
     }
   }
-
-  // Give non-const version higher priority.
-  {
-    py::scoped_interpreter guard{};
-
-    // Get scope.
-    py::object main = py::module_::import("__main__");
-    py::dict local;
-
-    // Define types.
-    py::class_<OverloadWithConst>(main, "OverloadWithConst")
-        .def("value", static_cast<decltype(std::declval<OverloadWithConst>().value()) (OverloadWithConst::*)()>(
-                          &OverloadWithConst::value))
-        .def("value",
-             static_cast<decltype(std::declval<const OverloadWithConst>().value()) (OverloadWithConst::*)() const>(
-                 &OverloadWithConst::value));
-
-    // Define variables.
-    const OverloadWithConst overloadConst;
-    OverloadWithConst overloadNonConst;
-
-    local["overloadConst"] = overloadConst; // Pass by copy.
-    local["overloadNonConst"] = overloadNonConst;
-
-    // Execute.
-    try {
-      py::exec("assert overloadConst.value() == 1\n"
-               "assert overloadNonConst.value() == 1\n",
-               py::globals(), local);
-    } catch (std::exception &e) {
-      fmt::print("{}\n", e.what());
-      EXPECT_FALSE(true);
-    }
-  }
 }
 
+#if 0
 TEST(Python, Overload) {
   py::scoped_interpreter guard{};
 
