@@ -513,17 +513,12 @@ TEST(Python, Properties) {
   }
 }
 
-#if 0
 TEST(Python, Operators) {
-  py::scoped_interpreter guard{};
+  ScopedInterpreter guard{};
 
   // Get scope.
-  py::object main = py::module_::import("__main__");
-  py::dict local;
-
-  // Define types.
-  ARIA_ADD_PYTHON_TYPE(ARIATestPython_IntProperty, main);
-  ARIA_ADD_PYTHON_TYPE(decltype(std::declval<ARIATestPython_IntProperty>().value()), main);
+  Module main = guard.Import("__main__");
+  Dict local{main};
 
   // Define variables.
   ARIATestPython_IntProperty intP;
@@ -576,6 +571,5 @@ TEST(Python, Operators) {
     EXPECT_FALSE(true);
   }
 }
-#endif
 
 } // namespace ARIA
