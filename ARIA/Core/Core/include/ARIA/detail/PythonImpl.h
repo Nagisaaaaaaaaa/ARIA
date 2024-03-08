@@ -327,7 +327,6 @@ private:
 //
 //
 #define __ARIA_PYTHON_TYPE_FRIEND                                                                                      \
-                                                                                                                       \
   template <typename TUVW>                                                                                             \
   friend struct ::ARIA::__ARIAPython_RecursivelyDefinePythonType;
 
@@ -335,7 +334,6 @@ private:
 //
 //
 #define __ARIA_PYTHON_TYPE_BEGIN(TYPE)                                                                                 \
-                                                                                                                       \
   template <>                                                                                                          \
   struct __ARIAPython_RecursivelyDefinePythonType<TYPE> {                                                              \
     void operator()(const Module &module) {                                                                            \
@@ -367,7 +365,6 @@ private:
 //
 //
 #define __ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(TEMPLATE)                                                                    \
-                                                                                                                       \
   template <typename... Args>                                                                                          \
   struct __ARIAPython_RecursivelyDefinePythonType<TEMPLATE<Args...>> {                                                 \
     void operator()(const Module &module) {                                                                            \
@@ -505,7 +502,6 @@ private:
 //
 //
 #define __ARIA_PYTHON_TYPE_PROPERTY(NAME)                                                                              \
-                                                                                                                       \
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<T>().NAME()) (T::*)()>()(module);                     \
   __ARIAPython_RecursivelyDefinePythonType<void (T::*)(const decltype(std::declval<T>().ARIA_PROP_IMPL(NAME)()) &)>()( \
       module);                                                                                                         \
@@ -520,7 +516,6 @@ private:
 //
 //
 #define __ARIA_PYTHON_TYPE_READONLY_PROPERTY(NAME)                                                                     \
-                                                                                                                       \
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<T>().NAME()) (T::*)()>()(module);                     \
                                                                                                                        \
   static_assert(property::detail::PropertyType<decltype(std::declval<T>().NAME())>,                                    \
@@ -535,10 +530,9 @@ private:
 //
 //
 //
-#define __ARIA_PYTHON_TYPE_BINARY_OPERATOR_PARAMS1(OPERATOR) cls.def(decltype(py::self OPERATOR py::self)());
+#define __ARIA_PYTHON_TYPE_BINARY_OPERATOR_PARAMS1(OPERATOR) cls.def(decltype(py::self OPERATOR py::self)())
 
 #define __ARIA_PYTHON_TYPE_BINARY_OPERATOR_PARAMS2(OPERATOR, OTHERS)                                                   \
-                                                                                                                       \
   __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<OTHERS>>>>()(        \
       module);                                                                                                         \
                                                                                                                        \
