@@ -205,6 +205,7 @@ TEST(Python, Base) {
   static_assert(main.HasType<double>());
   static_assert(main.HasType<std::string>());
   static_assert(main.HasType<std::tuple<int, double, std::string>>());
+  EXPECT_FALSE(main.HasType<std::vector<int>>());
   EXPECT_TRUE((main.HasType<std::pair<std::string, std::vector<int>>>()));
   EXPECT_TRUE((main.HasType<std::tuple<int, double, std::string, std::vector<int>>>()));
 
@@ -251,7 +252,7 @@ TEST(Python, Function) {
   std::vector<int> b = {4, 6, 9};
 
   local["a"] = a;
-  local["b"] = b;
+  local["b"] = &b;
 
   // Execute.
   try {

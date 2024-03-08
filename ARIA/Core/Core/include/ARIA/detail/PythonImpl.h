@@ -368,7 +368,7 @@ private:
                                                                                                                        \
       /* Return if this type has already been defined in this module. */                                               \
       /*! Non-const references to Python-builtin types have already been checked here. */                              \
-      if (module.HasType<T>())                                                                                         \
+      if (module.HasType<T>()) [[likely]]                                                                              \
         return;                                                                                                        \
                                                                                                                        \
       /* If this type has not been defined in this module, mark it as defined. */                                      \
@@ -403,7 +403,7 @@ private:
                     "The given type to be defined in Python should not be a Python-builtin type because "              \
                     "these types have been automatically handled");                                                    \
                                                                                                                        \
-      if (module.HasType<T>())                                                                                         \
+      if (module.HasType<T>()) [[likely]]                                                                              \
         return;                                                                                                        \
                                                                                                                        \
       module.types_->insert(typeid(T).hash_code());                                                                    \
@@ -616,7 +616,7 @@ private:
 //
 //
 // Manually add Python types.
-#define __ARIA_ADD_PYTHON_TYPE(TYPE, MODULE) ::ARIA::__ARIAPython_RecursivelyDefinePythonType<T>()(MODULE)
+#define __ARIA_PYTHON_ADD_TYPE(TYPE, MODULE) ::ARIA::__ARIAPython_RecursivelyDefinePythonType<T>()(MODULE)
 
 //
 //
