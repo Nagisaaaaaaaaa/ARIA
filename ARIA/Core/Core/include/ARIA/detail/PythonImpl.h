@@ -77,7 +77,7 @@ concept method = is_method_v<T>;
 // Python-builtin types are taken special attention because
 // their hash codes are not contained in the unordered set of `Module`.
 template <typename T>
-consteval bool is_python_builtin_type() {
+[[nodiscard]] consteval bool is_python_builtin_type() {
   using TUndecorated = std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>;
 
   // Return true if `TUndecorated` is a Python-builtin type, which is
@@ -195,6 +195,7 @@ struct __ARIAPython_RecursivelyDefinePythonType<T> {
 //
 class ScopedInterpreter {
 public:
+  /// \see py::scoped_interpreter
   explicit ScopedInterpreter(bool initSignalHandlers = true,
                              int argc = 0,
                              const char *const *argv = nullptr,
@@ -202,6 +203,7 @@ public:
       : interpreter_(initSignalHandlers, argc, argv, addProgramDirToPath) {}
 
 #if PY_VERSION_HEX >= PYBIND11_PYCONFIG_SUPPORT_PY_VERSION_HEX
+  /// \see py::scoped_interpreter
   explicit ScopedInterpreter(PyConfig *config,
                              int argc = 0,
                              const char *const *argv = nullptr,
@@ -212,18 +214,21 @@ public:
   ARIA_COPY_MOVE_ABILITY(ScopedInterpreter, delete, delete);
 
 public:
+  /// \brief Import the Python module by name.
+  ///
+  /// \see py::module_::import
   [[nodiscard]] Module Import(const char *name) {
     py::module_ module = py::module_::import(name);
 
     // First check whether the module has been imported sometime earlier.
     for (auto &types : moduleTypes_)
       if (types.first == name)
-        return {std::move(module), types.second};
+        return {std::move(module), types.second}; // Return the wrapped module.
 
     // If the module has not been imported, create an instance for it.
     auto &types = moduleTypes_.emplace_back(std::string{name}, std::unordered_set<size_t>{});
 
-    return {std::move(module), types.second};
+    return {std::move(module), types.second}; // Return the wrapped module.
   }
 
 private:
@@ -242,7 +247,6 @@ private:
 //
 namespace python::detail {
 
-// TODO: Directly wrapping a `py::item_accessor` will result in runtime error, why?
 template <typename Arg>
 class ItemAccessor {
 public:
@@ -252,23 +256,27 @@ public:
   ARIA_COPY_MOVE_ABILITY(ItemAccessor, default, default);
 
 public:
+  /// \see py::item_accessor::operator=
   template <typename T>
   void operator=(T &&value) {
-    using TDecayed = std::decay_t<T>;
+    using TUndecorated = std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>;
 
-    if constexpr (!std::is_same_v<TDecayed, py::cpp_function>)
-      __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<TDecayed>>>()(module_);
+    // If `TUndecorated` is not `py::cpp_function`, recursively define it in Python.
+    if constexpr (!std::is_same_v<TUndecorated, py::cpp_function>)
+      __ARIAPython_RecursivelyDefinePythonType<TUndecorated>()(module_);
 
     dict_[arg_] = std::forward<T>(value);
   }
 
+  /// \see py::item_accessor::cast
   template <typename T>
-  decltype(auto) Cast() const {
+  [[nodiscard]] decltype(auto) Cast() const {
     return dict_[arg_].template cast<T>();
   }
 
+  /// \see py::item_accessor::cast
   template <typename T>
-  decltype(auto) Cast() {
+  [[nodiscard]] decltype(auto) Cast() {
     return dict_[arg_].template cast<T>();
   }
 
@@ -287,15 +295,21 @@ class Dict {
 public:
   explicit Dict(Module module) : module_(std::move(module)) {}
 
+  /// \brief `Dict` is implemented with reference counter thus
+  /// supports both copy and move.
   ARIA_COPY_MOVE_ABILITY(Dict, default, default);
 
+  /// \brief `Dict` can be implicitly cast to `py::dict`.
   operator py::dict() const { return dict_; }
 
 public:
+  /// \see py::dict::operator[]
   auto operator[](py::handle key) const { return python::detail::ItemAccessor{module_, dict_, key}; }
 
+  /// \see py::dict::operator[]
   auto operator[](py::object &&key) const { return python::detail::ItemAccessor{module_, dict_, std::move(key)}; }
 
+  /// \see py::dict::operator[]
   auto operator[](const char *key) const { return python::detail::ItemAccessor{module_, dict_, key}; }
 
 private:
