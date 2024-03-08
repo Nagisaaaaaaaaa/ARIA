@@ -619,7 +619,9 @@ private:
 //
 //
 //
-// TODO: Move to `PythonSTL.h`.
+// Define for STL types.
+
+// std::vector
 __ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(std::vector);
 __ARIA_PYTHON_TYPE_METHOD(, clear);
 __ARIA_PYTHON_TYPE_BINARY_OPERATOR(==);
