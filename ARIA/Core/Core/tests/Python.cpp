@@ -189,6 +189,9 @@ ARIA_PYTHON_TYPE_BINARY_OPERATOR(+, decltype(std::declval<T>().value()));
 ARIA_PYTHON_TYPE_BINARY_OPERATOR(-, decltype(std::declval<T>().value()));
 ARIA_PYTHON_TYPE_BINARY_OPERATOR(*, decltype(std::declval<T>().value()));
 ARIA_PYTHON_TYPE_BINARY_OPERATOR(/); // Test binary operators with self.
+ARIA_PYTHON_ADD_TYPE(int);
+ARIA_PYTHON_ADD_TYPE(double);
+ARIA_PYTHON_ADD_TYPE(std::string);
 ARIA_PYTHON_TYPE_END;
 
 //

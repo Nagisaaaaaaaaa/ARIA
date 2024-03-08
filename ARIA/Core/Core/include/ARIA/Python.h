@@ -110,7 +110,7 @@ using python::detail::Dict;
 
 #define ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(template_) __ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(template_)
 
-#define ARIA_PYTHON_TYPE_METHOD /*(specifiers, name, parameters...)*/ __ARIA_PYTHON_TYPE_METHOD
+#define ARIA_PYTHON_TYPE_METHOD /* (specifiers, name, parameters...) */ __ARIA_PYTHON_TYPE_METHOD
 
 #define ARIA_PYTHON_TYPE_PROPERTY(name) __ARIA_PYTHON_TYPE_PROPERTY(name)
 
@@ -118,10 +118,10 @@ using python::detail::Dict;
 
 #define ARIA_PYTHON_TYPE_UNARY_OPERATOR(op) __ARIA_PYTHON_TYPE_UNARY_OPERATOR(op)
 
-#define ARIA_PYTHON_TYPE_BINARY_OPERATOR /*(op) or (op, others)*/ __ARIA_PYTHON_TYPE_BINARY_OPERATOR
+#define ARIA_PYTHON_TYPE_BINARY_OPERATOR /* (op) or (op, others) */ __ARIA_PYTHON_TYPE_BINARY_OPERATOR
 
 #define ARIA_PYTHON_TYPE_END __ARIA_PYTHON_TYPE_END
 
-#define ARIA_PYTHON_ADD_TYPE(type, module) __ARIA_PYTHON_ADD_TYPE(type, module)
+#define ARIA_PYTHON_ADD_TYPE /* (type) or (type, module) */ __ARIA_PYTHON_ADD_TYPE
 
 } // namespace ARIA
