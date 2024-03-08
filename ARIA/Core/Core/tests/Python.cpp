@@ -188,7 +188,7 @@ ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, decltype(std::declval<T>().value()));
 ARIA_PYTHON_TYPE_BINARY_OPERATOR(+, decltype(std::declval<T>().value()));
 ARIA_PYTHON_TYPE_BINARY_OPERATOR(-, decltype(std::declval<T>().value()));
 ARIA_PYTHON_TYPE_BINARY_OPERATOR(*, decltype(std::declval<T>().value()));
-ARIA_PYTHON_TYPE_BINARY_OPERATOR(/, decltype(std::declval<T>().value())); // Test binary operators with self.
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(/); // Test binary operators with self.
 ARIA_PYTHON_TYPE_END;
 
 //

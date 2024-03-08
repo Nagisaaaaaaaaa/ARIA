@@ -326,6 +326,8 @@ private:
 //
 //
 //
+// `__ARIAPython_RecursivelyDefinePythonType` usually wants to access private methods of a class,
+// especially while declaring ARIA properties.
 #define __ARIA_PYTHON_TYPE_FRIEND                                                                                      \
   template <typename TUVW>                                                                                             \
   friend struct ::ARIA::__ARIAPython_RecursivelyDefinePythonType;
@@ -333,6 +335,7 @@ private:
 //
 //
 //
+// Eg: ARIA_PYTHON_TYPE_BEGIN(Object);
 #define __ARIA_PYTHON_TYPE_BEGIN(TYPE)                                                                                 \
   /* Specialization for the given type. */                                                                             \
   template <>                                                                                                          \
@@ -371,6 +374,7 @@ private:
 //
 //
 //
+// Eg: ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(std::vector);
 #define __ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(TEMPLATE)                                                                    \
   /* Specialization for the given template. */                                                                         \
   template <typename... Args>                                                                                          \
@@ -561,17 +565,30 @@ private:
 //
 //
 //
+// Define a unary operator.
+// Eg: ARIA_PYTHON_TYPE_UNARY_OPERATOR(-);
 #define __ARIA_PYTHON_TYPE_UNARY_OPERATOR(OPERATOR) cls.def(decltype(OPERATOR py::self)())
 
 //
 //
 //
+// Define a binary operator, which can only operate on the same type.
+// Eg: ARIA_PYTHON_TYPE_BINARY_OPERATOR(==);
 #define __ARIA_PYTHON_TYPE_BINARY_OPERATOR_PARAMS1(OPERATOR) cls.def(decltype(py::self OPERATOR py::self)())
 
+// Define a binary operator, which can operate on other types.
+// Eg: ARIA_PYTHON_TYPE_BINARY_OPERATOR(+, int);
 #define __ARIA_PYTHON_TYPE_BINARY_OPERATOR_PARAMS2(OPERATOR, OTHERS)                                                   \
+  static_assert(!std::is_same_v<std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>,                           \
+                                std::remove_const_t<std::remove_pointer_t<std::decay_t<OTHERS>>>>,                     \
+                "Omit the second argument and use something like `ARIA_PYTHON_TYPE_BINARY_OPERATOR(==)` instead, if "  \
+                "you only want to operate on the same type.");                                                         \
+                                                                                                                       \
+  /* Recursively define `OTHERS` in Python. */                                                                         \
   __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<OTHERS>>>>()(        \
       module);                                                                                                         \
                                                                                                                        \
+  /* Define all the 3 variants. */                                                                                     \
   cls.def(decltype(py::self OPERATOR py::self)());                                                                     \
   cls.def(decltype(py::self OPERATOR std::declval<OTHERS>())());                                                       \
   cls.def(decltype(std::declval<OTHERS>() OPERATOR py::self)())
@@ -590,6 +607,7 @@ private:
 //
 //
 //
+// Manually add Python types.
 #define __ARIA_ADD_PYTHON_TYPE(TYPE, MODULE) ::ARIA::__ARIAPython_RecursivelyDefinePythonType<T>()(MODULE)
 
 //
