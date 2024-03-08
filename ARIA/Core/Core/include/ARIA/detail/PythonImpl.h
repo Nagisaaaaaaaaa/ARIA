@@ -82,7 +82,7 @@ template <typename T>
 
   // Return true if `TUndecorated` is a Python-builtin type, which is
   // fundamental, `std::string`, `std::pair`, or `std::tuple`,
-  // because these types have been implicitly handled by pybind11.
+  // because these types have been automatically handled.
   //! Note that it is possible for `std::pair` and `std::tuple` to
   //! contain unhandled types, for example, `std::pair<int, std::vector<int>>`, where
   //! `std::vector<int>` is unhandled.
@@ -334,24 +334,31 @@ private:
 //
 //
 #define __ARIA_PYTHON_TYPE_BEGIN(TYPE)                                                                                 \
+  /* Specialization for the given type. */                                                                             \
   template <>                                                                                                          \
   struct __ARIAPython_RecursivelyDefinePythonType<TYPE> {                                                              \
     void operator()(const Module &module) {                                                                            \
+      /*! Alias to `T`, in order to make it able to use `T` in other macros. */                                        \
+      /*! For example, `ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, decltype(std::declval<T>().value()));`. */                \
+      /*! Here, `T` is the type of some complex ARIA property. */                                                      \
       using T = TYPE;                                                                                                  \
                                                                                                                        \
+      /* The given type to be defined in Python should be an undecorated type. */                                      \
       static_assert(std::is_same_v<T, std::decay_t<T>>,                                                                \
                     "The given type to be defined in Python should be a decayed type");                                \
-                                                                                                                       \
       static_assert(!std::is_const_v<T>, "The given type to be defined in Python should not be a const type "          \
                                          "because `const` has no effect in Python");                                   \
       static_assert(!std::is_pointer_v<T>, "The given type to be defined in Python should not be a pointer type "      \
                                            "because pointer types are automatically handled");                         \
                                                                                                                        \
+      static_assert(!python::detail::method<T>,                                                                        \
+                    "The given type to be defined in Python should not be a method type.");                            \
       static_assert(!python::detail::is_python_builtin_type<T>(),                                                      \
-                    "The given type to be defined in Python should not be a Python-builtin type");                     \
-      static_assert(!python::detail::method<T>, "The given type to be defined in Python should not be a method type"); \
+                    "The given type to be defined in Python should not be a Python-builtin type because "              \
+                    "these types have been automatically handled");                                                    \
                                                                                                                        \
       /* Return if this type has already been defined in this module. */                                               \
+      /*! Non-const references to Python-builtin types have already been checked here. */                              \
       if (module.HasType<T>())                                                                                         \
         return;                                                                                                        \
                                                                                                                        \
@@ -365,6 +372,7 @@ private:
 //
 //
 #define __ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(TEMPLATE)                                                                    \
+  /* Specialization for the given template. */                                                                         \
   template <typename... Args>                                                                                          \
   struct __ARIAPython_RecursivelyDefinePythonType<TEMPLATE<Args...>> {                                                 \
     void operator()(const Module &module) {                                                                            \
@@ -372,24 +380,23 @@ private:
                                                                                                                        \
       static_assert(std::is_same_v<T, std::decay_t<T>>,                                                                \
                     "The given type to be defined in Python should be a decayed type");                                \
-                                                                                                                       \
       static_assert(!std::is_const_v<T>, "The given type to be defined in Python should not be a const type "          \
                                          "because `const` has no effect in Python");                                   \
       static_assert(!std::is_pointer_v<T>, "The given type to be defined in Python should not be a pointer type "      \
                                            "because pointer types are automatically handled");                         \
                                                                                                                        \
+      static_assert(!python::detail::method<T>,                                                                        \
+                    "The given type to be defined in Python should not be a method type.");                            \
       static_assert(!python::detail::is_python_builtin_type<T>(),                                                      \
-                    "The given type to be defined in Python should not be a Python-builtin type");                     \
-      static_assert(!python::detail::method<T>, "The given type to be defined in Python should not be a method type"); \
+                    "The given type to be defined in Python should not be a Python-builtin type because "              \
+                    "these types have been automatically handled");                                                    \
                                                                                                                        \
-      /* Return if this type has already been defined in this module. */                                               \
       if (module.HasType<T>())                                                                                         \
         return;                                                                                                        \
                                                                                                                        \
-      /* If this type has not been defined in this module, mark it as defined. */                                      \
       module.types_->insert(typeid(T).hash_code());                                                                    \
                                                                                                                        \
-      /* Define this type in this module. */                                                                           \
+      /* TODO: Give unique name for each instantiated type. */                                                         \
       py::class_<T> cls(module, #TEMPLATE)
 
 //
