@@ -20,7 +20,7 @@ namespace py = python::detail::py;
 /// This class is a wrapper for `py::scoped_interpreter`.
 ///
 /// \example ```cpp
-/// ScopedInterpreter interpreter{};
+/// Python::ScopedInterpreter interpreter{};
 ///
 /// py::exec("print('Hello Python!')\n");
 /// ```
@@ -29,7 +29,9 @@ namespace py = python::detail::py;
 /// it contains more contexts about Python modules, for example,
 /// which C++ types have currently been defined for each module.
 /// These contexts are helpful for automatically and recursively defining types.
+namespace Python {
 using python::detail::ScopedInterpreter;
+}
 
 //
 //
@@ -38,8 +40,8 @@ using python::detail::ScopedInterpreter;
 /// This class is a wrapper for `py::module`.
 ///
 /// \example ```cpp
-/// ScopedInterpreter interpreter{};
-/// Module main = interpreter.Import("__main__");
+/// Python::ScopedInterpreter interpreter{};
+/// Python::Module main = interpreter.Import("__main__");
 ///
 /// static_assert(main.HasType<int>());
 /// EXPECT_FALSE(main.HasType<std::vector<int>>());
@@ -49,7 +51,9 @@ using python::detail::ScopedInterpreter;
 /// it contains more contexts, for example,
 /// which C++ types have currently been defined for this module.
 /// These contexts are helpful for automatically and recursively defining types.
+namespace Python {
 using python::detail::Module;
+}
 
 //
 //
@@ -58,9 +62,9 @@ using python::detail::Module;
 /// represent global or local variables.
 ///
 /// \example ```cpp
-/// ScopedInterpreter interpreter{};
-/// Module main = interpreter.Import("__main__");
-/// Dict local{main};
+/// Python::ScopedInterpreter interpreter{};
+/// Python::Module main = interpreter.Import("__main__");
+/// Python::Dict local{main};
 ///
 /// // Define a function which adds 2 `std::vector<int>` and returns the sum.
 /// local["add"] = py::cpp_function([](const std::vector<int> &a, const std::vector<int> &b) {
@@ -97,7 +101,9 @@ using python::detail::Module;
 /// noticed that `std::vector<int>` is not explicitly defined in this example.
 /// That is the magic provided by ARIA `ScopedInterpreter`, `Module`, and `Dict`.
 /// Types are automatically and recursively defined at `= a` and `= &b`.
+namespace Python {
 using python::detail::Dict;
+}
 
 //
 //

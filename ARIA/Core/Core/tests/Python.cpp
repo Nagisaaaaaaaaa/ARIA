@@ -200,9 +200,9 @@ ARIA_PYTHON_TYPE_END;
 //
 //
 TEST(Python, Base) {
-  ScopedInterpreter guard{};
+  Python::ScopedInterpreter guard{};
 
-  Module main = guard.Import("__main__");
+  Python::Module main = guard.Import("__main__");
 
   static_assert(main.HasType<int>());
   static_assert(main.HasType<double>());
@@ -212,7 +212,7 @@ TEST(Python, Base) {
   EXPECT_TRUE((main.HasType<std::pair<std::string, std::vector<int>>>()));
   EXPECT_TRUE((main.HasType<std::tuple<int, double, std::string, std::vector<int>>>()));
 
-  Dict local{main};
+  Python::Dict local{main};
 
   static_assert(std::is_same_v<std::decay_t<decltype("Hello")>, const char *>);
 
@@ -232,11 +232,11 @@ TEST(Python, Base) {
 }
 
 TEST(Python, Function) {
-  ScopedInterpreter guard{};
+  Python::ScopedInterpreter guard{};
 
   // Get scope.
-  Module main = guard.Import("__main__");
-  Dict local{main};
+  Python::Module main = guard.Import("__main__");
+  Python::Dict local{main};
 
   // Define functions.
   local["add"] = py::cpp_function([](const std::vector<int> &a, std::vector<int> &b) {
@@ -274,11 +274,11 @@ TEST(Python, Function) {
 }
 
 TEST(Python, Inheritance) {
-  ScopedInterpreter guard{};
+  Python::ScopedInterpreter guard{};
 
   // Get scope.
-  Module main = guard.Import("__main__");
-  Dict local{main};
+  Python::Module main = guard.Import("__main__");
+  Python::Dict local{main};
 
   // Define variables.
   ARIATestPython_Parent parent0;
@@ -317,11 +317,11 @@ TEST(Python, Const) {
 
   // Bypass const.
   {
-    ScopedInterpreter guard{};
+    Python::ScopedInterpreter guard{};
 
     // Get scope.
-    Module main = guard.Import("__main__");
-    Dict local{main};
+    Python::Module main = guard.Import("__main__");
+    Python::Dict local{main};
 
     // Define variables.
     const ARIATestPython_Parent parent1;
@@ -352,11 +352,11 @@ TEST(Python, Const) {
 
   // Give const version higher priority.
   {
-    ScopedInterpreter guard{};
+    Python::ScopedInterpreter guard{};
 
     // Get scope.
-    Module main = guard.Import("__main__");
-    Dict local{main};
+    Python::Module main = guard.Import("__main__");
+    Python::Dict local{main};
 
     // Define variables.
     const ARIATestPython_OverloadWithConst overloadConst;
@@ -378,11 +378,11 @@ TEST(Python, Const) {
 }
 
 TEST(Python, Overload) {
-  ScopedInterpreter guard{};
+  Python::ScopedInterpreter guard{};
 
   // Get scope.
-  Module main = guard.Import("__main__");
-  Dict local{main};
+  Python::Module main = guard.Import("__main__");
+  Python::Dict local{main};
 
   // Define variables.
   ARIATestPython_OverloadWithParameters overload;
@@ -405,11 +405,11 @@ TEST(Python, Overload) {
 }
 
 TEST(Python, ManyOverloads) {
-  ScopedInterpreter guard{};
+  Python::ScopedInterpreter guard{};
 
   // Get scope.
-  Module main = guard.Import("__main__");
-  Dict local{main};
+  Python::Module main = guard.Import("__main__");
+  Python::Dict local{main};
 
   // Define variables.
   ARIATestPython_ManyOverloads manyOverloads;
@@ -438,11 +438,11 @@ TEST(Python, ManyOverloads) {
 }
 
 TEST(Python, Properties) {
-  ScopedInterpreter guard{};
+  Python::ScopedInterpreter guard{};
 
   // Get scope.
-  Module main = guard.Import("__main__");
-  Dict local{main};
+  Python::Module main = guard.Import("__main__");
+  Python::Dict local{main};
 
   // Define variables.
   std::vector<std::string> nameCase0 = {"Python です喵"};
@@ -517,11 +517,11 @@ TEST(Python, Properties) {
 }
 
 TEST(Python, Operators) {
-  ScopedInterpreter guard{};
+  Python::ScopedInterpreter guard{};
 
   // Get scope.
-  Module main = guard.Import("__main__");
-  Dict local{main};
+  Python::Module main = guard.Import("__main__");
+  Python::Dict local{main};
 
   // Define variables.
   ARIATestPython_IntProperty intP;
