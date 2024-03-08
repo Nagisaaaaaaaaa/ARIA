@@ -17,6 +17,7 @@ namespace py = pybind11;
 //
 namespace python::detail {
 
+// Whether the given type is `std::pair` or `std::tuple`.
 template <typename T>
 struct is_std_pair_or_std_tuple : std::false_type {};
 
@@ -32,11 +33,13 @@ inline constexpr bool is_std_pair_or_std_tuple_v = is_std_pair_or_std_tuple<T>::
 //
 //
 //
+// Whether the given type is a method (non-static member function) type.
 template <typename T>
 struct is_method {
   static constexpr bool value = false;
 };
 
+// Specialization for non-const methods.
 template <type_array::detail::NonArrayType Ret,
           type_array::detail::NonArrayType T,
           type_array::detail::NonArrayType... Args>
@@ -48,6 +51,7 @@ struct is_method<Ret (T::*)(Args...)> {
   using return_and_arguments_types = MakeTypeArray<return_type, arguments_types>;
 };
 
+// Specialization for const methods.
 template <type_array::detail::NonArrayType Ret,
           type_array::detail::NonArrayType T,
           type_array::detail::NonArrayType... Args>
@@ -68,23 +72,27 @@ concept method = is_method_v<T>;
 //
 //
 //
+// Whether the given type is a Python-builtin type.
+//
+// Python-builtin types are taken special attention because
+// their hash codes are not contained in the unordered set of `Module`.
 template <typename T>
 consteval bool is_python_builtin_type() {
-  using TDecayed = std::decay_t<T>;
+  using TUndecorated = std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>;
 
-  // Return true if `TDecayed` is a Python-builtin type, which is
-  // fundamental, `const char*`, `std::string`, `std::pair`, or `std::tuple`,
+  // Return true if `TUndecorated` is a Python-builtin type, which is
+  // fundamental, `std::string`, `std::pair`, or `std::tuple`,
   // because these types have been implicitly handled by pybind11.
   //! Note that it is possible for `std::pair` and `std::tuple` to
   //! contain unhandled types, for example, `std::pair<int, std::vector<int>>`, where
   //! `std::vector<int>` is unhandled.
   //! There's no way to perfectly address this problem.
-  if constexpr (std::is_fundamental_v<TDecayed> || std::is_same_v<TDecayed, const char *> ||
-                std::is_same_v<TDecayed, std::string> || python::detail::is_std_pair_or_std_tuple_v<TDecayed>) {
+  if constexpr (std::is_fundamental_v<TUndecorated> || std::is_same_v<TUndecorated, std::string> ||
+                python::detail::is_std_pair_or_std_tuple_v<TUndecorated>) {
     //! `T` is not allowed to be a non-const reference type, as explained below.
-    static_assert(!(!std::is_const_v<std::remove_reference_t<T>> && std::is_reference_v<T>),
+    static_assert(!(!std::is_const_v<std::remove_reference_t<T>> && std::is_reference_v<std::remove_const_t<T>>),
                   "It is dangerous to take non-const references for Python-builtin types because"
-                  "these types are immutable in Python codes thus will result in undefined behaviors");
+                  "these types are immutable in Python codes thus will result in weird behaviors");
 
     return true;
   }
@@ -97,44 +105,62 @@ consteval bool is_python_builtin_type() {
 //
 //
 //
-class Module;
-
+//
+//
+// `operator()` of this class is called to
+// define the C++ type `T` in the given Python module.
 template <typename T>
-struct __ARIAPython_RecursivelyDefinePythonType {};
+struct __ARIAPython_RecursivelyDefinePythonType {
+  // void operator()(const Module &module) {}
+};
 
 //
 //
 //
 class Module {
 public:
+  /// \brief `Module` is implemented with reference counter thus
+  /// supports both copy and move.
+  ARIA_COPY_MOVE_ABILITY(Module, default, default);
+
+  /// \brief `Module` can be implicitly cast to `py::module`.
+  operator py::module() const { return module_; }
+
+public:
+  /// \brief Whether the given type has been defined in this module.
+  ///
+  /// \example ```cpp
+  /// bool has = module.HasType<std::vector<int>>();
+  /// ```
   template <typename T>
   [[nodiscard]] constexpr bool HasType() const {
-    using TDecayed = std::decay_t<T>;
+    using TUndecorated = std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>;
 
     //! Non-const references to Python-builtin types have already been checked here.
     if constexpr (python::detail::is_python_builtin_type<T>())
       return true;
 
     // Check whether the unordered set contains the hash code.
-    return types_->contains(typeid(TDecayed).hash_code());
+    return types_->contains(typeid(TUndecorated).hash_code());
   }
 
-public:
-  ARIA_COPY_MOVE_ABILITY(Module, default, default);
-
-  operator py::module() const { return module_; }
-
 private:
+  // The constructor is only allowed to be called by `ScopedInterpreter::Import()`.
   friend class ScopedInterpreter;
 
-  // The constructor is only allowed to be called by `ScopedInterpreter::Import()`.
   Module(py::module_ module, std::unordered_set<size_t> &types) : module_(std::move(module)), types_(&types) {}
 
   py::module_ module_;
 
+  // The `std::unordered_set` is owned by the interpreter, like a singleton.
+  // It contains hash codes of all the types which have been defined in this module.
+  // Note, Python-builtin types are excluded.
+  //
   // Have to use pointer instead of reference here to allow copying and moving.
   std::unordered_set<size_t> *types_{};
 
+  // We will insert types to the `std::unordered_set` within `__ARIAPython_RecursivelyDefinePythonType`, so
+  // `friend` is required here.
   template <typename TUVW>
   friend struct ::ARIA::__ARIAPython_RecursivelyDefinePythonType;
 };
@@ -142,17 +168,20 @@ private:
 //
 //
 //
+// Specialization for method types.
 template <python::detail::method TMethod>
 struct __ARIAPython_RecursivelyDefinePythonType<TMethod> {
   void operator()(const Module &module) {
+    // Define a method in Python will define its return type and all its arguments types.
     ForEach<typename python::detail::is_method<TMethod>::return_and_arguments_types>([&]<typename T>() {
-      using TDecayed = std::decay_t<T>;
+      using TUndecorated = std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>;
 
-      __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<TDecayed>>>()(module);
+      __ARIAPython_RecursivelyDefinePythonType<TUndecorated>()(module);
     });
   }
 };
 
+// Specialization for Python-builtin types.
 template <typename T>
   requires(python::detail::is_python_builtin_type<T>())
 struct __ARIAPython_RecursivelyDefinePythonType<T> {
@@ -512,9 +541,7 @@ private:
 //
 #define __ARIA_PYTHON_TYPE_END                                                                                         \
   }                                                                                                                    \
-  }                                                                                                                    \
-  ;                                                                                                                    \
-  namespace py = pybind11
+  }
 
 //
 //
