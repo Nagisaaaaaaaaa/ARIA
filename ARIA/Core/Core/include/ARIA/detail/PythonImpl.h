@@ -172,7 +172,7 @@ private:
 template <python::detail::method TMethod>
 struct __ARIAPython_RecursivelyDefinePythonType<TMethod> {
   void operator()(const Module &module) {
-    // Define a method in Python will define its return type and all its arguments types.
+    // Define a method will define its return type and all its arguments types.
     ForEach<typename python::detail::is_method<TMethod>::return_and_arguments_types>([&]<typename T>() {
       using TUndecorated = std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>;
 
@@ -402,15 +402,27 @@ private:
 //
 //
 //
+// Define a method with the given specifiers, name, and arguments types.
+// Eg: ARIA_PYTHON_TYPE_METHOD(const, value); // `T::value() const`.
+//     ARIA_PYTHON_TYPE_METHOD(, value, int); // `T::value(int)`.
+//
+// In order to support dynamic number of arguments types, "macro magics" are used,
+// see the implementation of `ARIA_ASSERT` as a simple example.
+//
 // clang-format off
+// For 2 parameters.
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS2(SPECIFIERS, NAME)                                                            \
+  /* Define a method will define its return type and all its arguments types. */                                       \
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().NAME(                                 \
   ))                                                                                                                   \
   (T::*)() SPECIFIERS>()(module);                                                                                      \
+                                                                                                                       \
+  /* Calls `py::class_::def` to actually define the method in Python. */                                               \
   cls.def(#NAME, static_cast<decltype(std::declval<SPECIFIERS T>().NAME(                                               \
   ))                                                                                                                   \
   (T::*)() SPECIFIERS>(&T::NAME))
 
+// For 3 parameters.
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS3(SPECIFIERS, NAME, T0)                                                        \
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().NAME(                                 \
   std::declval<T0>()))                                                                                                 \
@@ -419,6 +431,7 @@ private:
   std::declval<T0>()))                                                                                                 \
   (T::*)(T0) SPECIFIERS>(&T::NAME))
 
+// For 4 parameters...
 #define __ARIA_PYTHON_TYPE_METHOD_PARAMS4(SPECIFIERS, NAME, T0, T1)                                                    \
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().NAME(                                 \
   std::declval<T0>(), std::declval<T1>()))                                                                             \
