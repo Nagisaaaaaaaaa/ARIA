@@ -521,13 +521,25 @@ private:
 //
 //
 //
+// Define an ARIA property.
+// Eg: ARIA_PYTHON_TYPE_PROPERTY(name);
 #define __ARIA_PYTHON_TYPE_PROPERTY(NAME)                                                                              \
+  /* Define the getter. */                                                                                             \
+  /*! Here, `NAME` is used instead of `ARIA_PROP_IMPL(NAME)`, that is, */                                              \
+  /*! Python will directly use ARIA property types. */                                                                 \
+  /*! This is because the property system of pybind is not that strong, thus */                                        \
+  /*! cannot be used as a proxy system. */                                                                             \
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<T>().NAME()) (T::*)()>()(module);                     \
+                                                                                                                       \
+  /* Define the setter. */                                                                                             \
+  /*! Here `ARIA_PROP_IMPL(NAME)` is used. */                                                                          \
   __ARIAPython_RecursivelyDefinePythonType<void (T::*)(const decltype(std::declval<T>().ARIA_PROP_IMPL(NAME)()) &)>()( \
       module);                                                                                                         \
                                                                                                                        \
   static_assert(property::detail::PropertyType<decltype(std::declval<T>().NAME())>,                                    \
                 "The given type to be defined in Python should be an ARIA property type");                             \
+                                                                                                                       \
+  /* Calls `py::class_::def_property` to actually define the property in Python. */                                    \
   cls.def_property(                                                                                                    \
       #NAME, static_cast<decltype(std::declval<T>().NAME()) (T::*)()>(&T::NAME),                                       \
       static_cast<void (T::*)(const decltype(std::declval<T>().ARIA_PROP_IMPL(NAME)()) &)>(&T::ARIA_PROP_IMPL(NAME)))
@@ -535,11 +547,15 @@ private:
 //
 //
 //
+// Similar to `ARIA_PYTHON_TYPE_PROPERTY` but define a readonly ARIA property.
 #define __ARIA_PYTHON_TYPE_READONLY_PROPERTY(NAME)                                                                     \
+  /* Only need to define the getter. */                                                                                \
   __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<T>().NAME()) (T::*)()>()(module);                     \
                                                                                                                        \
   static_assert(property::detail::PropertyType<decltype(std::declval<T>().NAME())>,                                    \
                 "The given type to be defined in Python should be an ARIA property type");                             \
+                                                                                                                       \
+  /* Calls `py::class_::def_readonly_property` to actually define the property in Python. */                           \
   cls.def_property_readonly(#NAME, static_cast<decltype(std::declval<T>().NAME()) (T::*)()>(&T::NAME))
 
 //
