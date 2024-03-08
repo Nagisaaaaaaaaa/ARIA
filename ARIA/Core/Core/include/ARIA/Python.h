@@ -11,6 +11,11 @@
 
 namespace ARIA {
 
+/// \brief While namespace `Python` contains all the wrapped APIs,
+/// namespace `py` contains all the raw APIs, for example, `py::exec`.
+///
+/// Wrapped and raw APIs can be used together safely in ARIA, but
+/// we recommend using the wrapped APIs as much as you can.
 namespace py = python::detail::py;
 
 //
