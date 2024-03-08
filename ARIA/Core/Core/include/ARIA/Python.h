@@ -11,7 +11,16 @@
 
 namespace ARIA {
 
-namespace py = pybind11;
+namespace py = python::detail::py;
+
+//
+//
+//
+using python::detail::ScopedInterpreter;
+
+using python::detail::Module;
+
+using python::detail::Dict;
 
 //
 //

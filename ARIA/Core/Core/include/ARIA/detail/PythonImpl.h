@@ -10,13 +10,13 @@
 
 namespace ARIA {
 
+namespace python::detail {
+
 namespace py = pybind11;
 
 //
 //
 //
-namespace python::detail {
-
 // Whether the given type is `std::pair` or `std::tuple`.
 template <typename T>
 struct is_std_pair_or_std_tuple : std::false_type {};
@@ -117,6 +117,8 @@ struct __ARIAPython_RecursivelyDefinePythonType {
 //
 //
 //
+namespace python::detail {
+
 class Module {
 public:
   /// \brief `Module` is implemented with reference counter thus
@@ -165,13 +167,15 @@ private:
   friend struct ::ARIA::__ARIAPython_RecursivelyDefinePythonType;
 };
 
+} // namespace python::detail
+
 //
 //
 //
 // Specialization for method types.
 template <python::detail::method TMethod>
 struct __ARIAPython_RecursivelyDefinePythonType<TMethod> {
-  void operator()(const Module &module) {
+  void operator()(const python::detail::Module &module) {
     // Define a method will define its return type and all its arguments types.
     ForEach<typename python::detail::is_method<TMethod>::return_and_arguments_types>([&]<typename T>() {
       using TUndecorated = std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>;
@@ -185,7 +189,7 @@ struct __ARIAPython_RecursivelyDefinePythonType<TMethod> {
 template <typename T>
   requires(python::detail::is_python_builtin_type<T>())
 struct __ARIAPython_RecursivelyDefinePythonType<T> {
-  void operator()(const Module &module) {
+  void operator()(const python::detail::Module &module) {
     // Do nothing for Python-builtin types.
   }
 };
@@ -193,6 +197,8 @@ struct __ARIAPython_RecursivelyDefinePythonType<T> {
 //
 //
 //
+namespace python::detail {
+
 class ScopedInterpreter {
 public:
   /// \see py::scoped_interpreter
@@ -245,8 +251,6 @@ private:
 //
 //
 //
-namespace python::detail {
-
 template <typename Arg>
 class ItemAccessor {
 public:
@@ -286,8 +290,6 @@ private:
   Arg arg_;
 };
 
-} // namespace python::detail
-
 //
 //
 //
@@ -317,6 +319,8 @@ private:
   py::dict dict_;
 };
 
+} // namespace python::detail
+
 //
 //
 //
@@ -340,7 +344,9 @@ private:
   /* Specialization for the given type. */                                                                             \
   template <>                                                                                                          \
   struct __ARIAPython_RecursivelyDefinePythonType<TYPE> {                                                              \
-    void operator()(const Module &module) {                                                                            \
+    void operator()(const python::detail::Module &module) {                                                            \
+      namespace py = python::detail::py;                                                                               \
+                                                                                                                       \
       /*! Alias to `T`, in order to make it able to use `T` in other macros. */                                        \
       /*! For example, `ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, decltype(std::declval<T>().value()));`. */                \
       /*! Here, `T` is the type of some complex ARIA property. */                                                      \
@@ -379,7 +385,9 @@ private:
   /* Specialization for the given template. */                                                                         \
   template <typename... Args>                                                                                          \
   struct __ARIAPython_RecursivelyDefinePythonType<TEMPLATE<Args...>> {                                                 \
-    void operator()(const Module &module) {                                                                            \
+    void operator()(const python::detail::Module &module) {                                                            \
+      namespace py = python::detail::py;                                                                               \
+                                                                                                                       \
       using T = TEMPLATE<Args...>;                                                                                     \
                                                                                                                        \
       static_assert(std::is_same_v<T, std::decay_t<T>>,                                                                \
