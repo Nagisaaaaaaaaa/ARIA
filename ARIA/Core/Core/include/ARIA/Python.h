@@ -195,16 +195,51 @@ using python::detail::Dict;
 //
 //
 //
+/// \brief Define an ARIA property for the given type or template.
+///
+/// \example ```cpp
+/// class Object {
+/// public:
+///   ARIA_PROP(public, public, , std::string, name);
+/// private:
+///   std::string ARIA_PROP_IMPL(name)() const { ... }
+///   void ARIA_PROP_IMPL(name)(const std::string &name) { ... }
+/// };
+///
+/// ARIA_PYTHON_TYPE_BEGIN(Object);
+/// ARIA_PYTHON_TYPE_PROPERTY(name);
+/// ARIA_PYTHON_TYPE_END;
 #define ARIA_PYTHON_TYPE_PROPERTY(name) __ARIA_PYTHON_TYPE_PROPERTY(name)
 
 //
 //
 //
+/// \brief Define a readonly ARIA property for the given type or template.
+///
+/// \example ```cpp
+/// class Object {
+/// public:
+///   ARIA_PROP(public, private, , std::string, name);
+/// private:
+///   std::string ARIA_PROP_IMPL(name)() const { ... }
+/// };
+///
+/// ARIA_PYTHON_TYPE_BEGIN(Object);
+/// ARIA_PYTHON_TYPE_READONLY_PROPERTY(name);
+/// ARIA_PYTHON_TYPE_END;
 #define ARIA_PYTHON_TYPE_READONLY_PROPERTY(name) __ARIA_PYTHON_TYPE_READONLY_PROPERTY(name)
 
 //
 //
 //
+/// \brief Define an unary operator for the given type or template.
+///
+/// \example ```cpp
+/// ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(Vec);
+/// ARIA_PYTHON_TYPE_UNARY_OPERATOR(+); // Enables `b = +a` in Python.
+/// ARIA_PYTHON_TYPE_UNARY_OPERATOR(-); // Enables `b = -a` in Python.
+/// ARIA_PYTHON_TYPE_END;
+/// ```
 #define ARIA_PYTHON_TYPE_UNARY_OPERATOR(op) __ARIA_PYTHON_TYPE_UNARY_OPERATOR(op)
 
 //
