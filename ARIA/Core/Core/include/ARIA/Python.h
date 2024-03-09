@@ -116,24 +116,65 @@ using python::detail::Dict;
 //
 //
 //
-#define ARIA_PYTHON_TYPE_FRIEND __ARIA_PYTHON_TYPE_FRIEND
-
 #define ARIA_PYTHON_TYPE_BEGIN(type) __ARIA_PYTHON_TYPE_BEGIN(type)
 
+//
+//
+//
 #define ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(template_) __ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(template_)
 
+//
+//
+//
+/// \brief We usually want to define private methods to Python,
+/// especially while defining ARIA properties, whose
+/// getters and setters are always private.
+///
+/// This macro should be used to give the Python APIs
+/// accessibility to private methods.
+///
+/// \example ```
+/// class Object {
+/// private:
+///   ...
+///   ARIA_PYTHON_TYPE_FRIEND;
+/// };
+/// ```
+#define ARIA_PYTHON_TYPE_FRIEND __ARIA_PYTHON_TYPE_FRIEND
+
+//
+//
+//
 #define ARIA_PYTHON_TYPE_METHOD /* (specifiers, name, parameters...) */ __ARIA_PYTHON_TYPE_METHOD
 
+//
+//
+//
 #define ARIA_PYTHON_TYPE_PROPERTY(name) __ARIA_PYTHON_TYPE_PROPERTY(name)
 
+//
+//
+//
 #define ARIA_PYTHON_TYPE_READONLY_PROPERTY(name) __ARIA_PYTHON_TYPE_READONLY_PROPERTY(name)
 
+//
+//
+//
 #define ARIA_PYTHON_TYPE_UNARY_OPERATOR(op) __ARIA_PYTHON_TYPE_UNARY_OPERATOR(op)
 
+//
+//
+//
 #define ARIA_PYTHON_TYPE_BINARY_OPERATOR /* (op) or (op, others) */ __ARIA_PYTHON_TYPE_BINARY_OPERATOR
 
+//
+//
+//
 #define ARIA_PYTHON_TYPE_END __ARIA_PYTHON_TYPE_END
 
+//
+//
+//
 #define ARIA_PYTHON_ADD_TYPE /* (type) or (type, module) */ __ARIA_PYTHON_ADD_TYPE
 
 } // namespace ARIA
