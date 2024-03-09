@@ -116,6 +116,19 @@ using python::detail::Dict;
 //
 //
 //
+/// \brief The wrapped APIs allow automatically and recursively defining Python types,
+/// as introduced in the comments of `Dict`.
+/// To make it work, we should define how a C++ class looks like in Python,
+/// for example, which methods and properties should be defined.
+/// This is done within the region of `ARIA_PYTHON_TYPE_BEGIN` and `ARIA_PYTHON_TYPE_END`.
+///
+/// \example ```cpp
+/// class Object { ... };
+///
+/// ARIA_PYTHON_TYPE_BEGIN(Object)
+/// ...
+/// ARIA_PYTHON_TYPE_END
+/// ```
 #define ARIA_PYTHON_TYPE_BEGIN(type) __ARIA_PYTHON_TYPE_BEGIN(type)
 
 //
@@ -170,6 +183,10 @@ using python::detail::Dict;
 //
 //
 //
+/// \brief Finish the definition of how a C++ class looks like in Python.
+/// This macro should be used together with `ARIA_PYTHON_TYPE_BEGIN`.
+///
+/// \see ARIA_PYTHON_TYPE_BEGIN
 #define ARIA_PYTHON_TYPE_END __ARIA_PYTHON_TYPE_END
 
 //
