@@ -1,7 +1,15 @@
 #pragma once
 
 /// \file
-/// \warning `Python` is under developing, interfaces are currently very unstable.
+/// \brief Python is embedded as a script language in ARIA.
+/// You are able to easily run Python scripts in a 100% C++ environment.
+///
+/// `pybind11` is used as raw APIs for basic C++-Python interoperability, while
+/// some APIs are wrapped for easier usage, for example, C++ types can be
+/// automatically and recursively defined in Python, with minimal efforts.
+///
+/// Make sure you are familiar with Python and `pybind11` before continue, see
+/// https://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html#evaluating-python-expressions-from-strings-and-files
 //
 //
 //

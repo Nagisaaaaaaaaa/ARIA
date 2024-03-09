@@ -636,11 +636,12 @@ private:
 //
 //
 //
-// Define for STL types.
+// TODO: Fully define commonly used STL types.
 
 // std::vector
 __ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(std::vector);
 __ARIA_PYTHON_TYPE_METHOD(, clear);
+__ARIA_PYTHON_TYPE_METHOD(const, size);
 __ARIA_PYTHON_TYPE_BINARY_OPERATOR(==);
 __ARIA_PYTHON_TYPE_END;
 
