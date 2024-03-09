@@ -245,6 +245,21 @@ using python::detail::Dict;
 //
 //
 //
+/// \brief Define a binary operator for the given type or template.
+///
+/// \example ```cpp
+/// template <typename T, auto size>
+/// class Vec {
+/// public:
+///   using value_type = T;
+///   ...
+/// };
+///
+/// ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(Vec);
+/// ARIA_PYTHON_TYPE_BINARY_OPERATOR(==); // Only enables `a == b` in Python, `a` and `b` should have the same type.
+/// ARIA_PYTHON_TYPE_BINARY_OPERATOR(*, T::value_type); // Enables `c = a * b`, `c = a * 2`, and `c = 2 * a` in Python.
+/// ARIA_PYTHON_TYPE_END;
+/// ```
 #define ARIA_PYTHON_TYPE_BINARY_OPERATOR /* (op) or (op, others) */ __ARIA_PYTHON_TYPE_BINARY_OPERATOR
 
 //
