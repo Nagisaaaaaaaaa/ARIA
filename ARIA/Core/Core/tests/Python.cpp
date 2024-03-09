@@ -184,12 +184,14 @@ ARIA_PYTHON_TYPE_BEGIN(decltype(std::declval<ARIATestPython_IntProperty>().value
 ARIA_PYTHON_TYPE_METHOD(, value);
 ARIA_PYTHON_TYPE_UNARY_OPERATOR(+);
 ARIA_PYTHON_TYPE_UNARY_OPERATOR(-);
-ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, decltype(std::declval<ARIATestPython_IntProperty>().value().value()));
-ARIA_PYTHON_TYPE_BINARY_OPERATOR(+, decltype(std::declval<ARIATestPython_IntProperty>().value().value()));
-ARIA_PYTHON_TYPE_BINARY_OPERATOR(-, decltype(std::declval<ARIATestPython_IntProperty>().value().value()));
-ARIA_PYTHON_TYPE_BINARY_OPERATOR(*, decltype(std::declval<ARIATestPython_IntProperty>().value().value()));
-ARIA_PYTHON_TYPE_BINARY_OPERATOR(
-    /, decltype(std::declval<ARIATestPython_IntProperty>().value().value())); // Test binary operators with self.
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, decltype(std::declval<T>().value()));
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(+, decltype(std::declval<T>().value()));
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(-, decltype(std::declval<T>().value()));
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(*, decltype(std::declval<T>().value()));
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(/); // Test binary operators with self.
+ARIA_PYTHON_ADD_TYPE(int);
+ARIA_PYTHON_ADD_TYPE(double);
+ARIA_PYTHON_ADD_TYPE(std::string);
 ARIA_PYTHON_TYPE_END;
 
 //
@@ -198,18 +200,26 @@ ARIA_PYTHON_TYPE_END;
 //
 //
 TEST(Python, Base) {
-  ScopedInterpreter guard{};
+  Python::ScopedInterpreter guard{};
 
-  Module main = guard.Import("__main__");
+  Python::Module main = guard.Import("__main__");
+
+  ARIA_PYTHON_ADD_TYPE(int, main);
+  ARIA_PYTHON_ADD_TYPE(double, main);
+  ARIA_PYTHON_ADD_TYPE(std::string, main);
 
   static_assert(main.HasType<int>());
   static_assert(main.HasType<double>());
   static_assert(main.HasType<std::string>());
   static_assert(main.HasType<std::tuple<int, double, std::string>>());
+  EXPECT_FALSE(main.HasType<std::vector<int>>());
   EXPECT_TRUE((main.HasType<std::pair<std::string, std::vector<int>>>()));
   EXPECT_TRUE((main.HasType<std::tuple<int, double, std::string, std::vector<int>>>()));
 
-  Dict local{main};
+  ARIA_PYTHON_ADD_TYPE(std::vector<int>, main);
+  EXPECT_TRUE(main.HasType<std::vector<int>>());
+
+  Python::Dict local{main};
 
   static_assert(std::is_same_v<std::decay_t<decltype("Hello")>, const char *>);
 
@@ -229,11 +239,11 @@ TEST(Python, Base) {
 }
 
 TEST(Python, Function) {
-  ScopedInterpreter guard{};
+  Python::ScopedInterpreter guard{};
 
   // Get scope.
-  Module main = guard.Import("__main__");
-  Dict local{main};
+  Python::Module main = guard.Import("__main__");
+  Python::Dict local{main};
 
   // Define functions.
   local["add"] = py::cpp_function([](const std::vector<int> &a, std::vector<int> &b) {
@@ -252,7 +262,7 @@ TEST(Python, Function) {
   std::vector<int> b = {4, 6, 9};
 
   local["a"] = a;
-  local["b"] = b;
+  local["b"] = &b;
 
   // Execute.
   try {
@@ -271,11 +281,11 @@ TEST(Python, Function) {
 }
 
 TEST(Python, Inheritance) {
-  ScopedInterpreter guard{};
+  Python::ScopedInterpreter guard{};
 
   // Get scope.
-  Module main = guard.Import("__main__");
-  Dict local{main};
+  Python::Module main = guard.Import("__main__");
+  Python::Dict local{main};
 
   // Define variables.
   ARIATestPython_Parent parent0;
@@ -314,11 +324,11 @@ TEST(Python, Const) {
 
   // Bypass const.
   {
-    ScopedInterpreter guard{};
+    Python::ScopedInterpreter guard{};
 
     // Get scope.
-    Module main = guard.Import("__main__");
-    Dict local{main};
+    Python::Module main = guard.Import("__main__");
+    Python::Dict local{main};
 
     // Define variables.
     const ARIATestPython_Parent parent1;
@@ -349,11 +359,11 @@ TEST(Python, Const) {
 
   // Give const version higher priority.
   {
-    ScopedInterpreter guard{};
+    Python::ScopedInterpreter guard{};
 
     // Get scope.
-    Module main = guard.Import("__main__");
-    Dict local{main};
+    Python::Module main = guard.Import("__main__");
+    Python::Dict local{main};
 
     // Define variables.
     const ARIATestPython_OverloadWithConst overloadConst;
@@ -375,11 +385,11 @@ TEST(Python, Const) {
 }
 
 TEST(Python, Overload) {
-  ScopedInterpreter guard{};
+  Python::ScopedInterpreter guard{};
 
   // Get scope.
-  Module main = guard.Import("__main__");
-  Dict local{main};
+  Python::Module main = guard.Import("__main__");
+  Python::Dict local{main};
 
   // Define variables.
   ARIATestPython_OverloadWithParameters overload;
@@ -402,11 +412,11 @@ TEST(Python, Overload) {
 }
 
 TEST(Python, ManyOverloads) {
-  ScopedInterpreter guard{};
+  Python::ScopedInterpreter guard{};
 
   // Get scope.
-  Module main = guard.Import("__main__");
-  Dict local{main};
+  Python::Module main = guard.Import("__main__");
+  Python::Dict local{main};
 
   // Define variables.
   ARIATestPython_ManyOverloads manyOverloads;
@@ -435,11 +445,11 @@ TEST(Python, ManyOverloads) {
 }
 
 TEST(Python, Properties) {
-  ScopedInterpreter guard{};
+  Python::ScopedInterpreter guard{};
 
   // Get scope.
-  Module main = guard.Import("__main__");
-  Dict local{main};
+  Python::Module main = guard.Import("__main__");
+  Python::Dict local{main};
 
   // Define variables.
   std::vector<std::string> nameCase0 = {"Python です喵"};
@@ -514,11 +524,11 @@ TEST(Python, Properties) {
 }
 
 TEST(Python, Operators) {
-  ScopedInterpreter guard{};
+  Python::ScopedInterpreter guard{};
 
   // Get scope.
-  Module main = guard.Import("__main__");
-  Dict local{main};
+  Python::Module main = guard.Import("__main__");
+  Python::Dict local{main};
 
   // Define variables.
   ARIATestPython_IntProperty intP;
