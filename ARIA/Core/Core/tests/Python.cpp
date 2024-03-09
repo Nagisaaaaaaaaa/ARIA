@@ -204,6 +204,10 @@ TEST(Python, Base) {
 
   Python::Module main = guard.Import("__main__");
 
+  ARIA_PYTHON_ADD_TYPE(int, main);
+  ARIA_PYTHON_ADD_TYPE(double, main);
+  ARIA_PYTHON_ADD_TYPE(std::string, main);
+
   static_assert(main.HasType<int>());
   static_assert(main.HasType<double>());
   static_assert(main.HasType<std::string>());
@@ -211,6 +215,9 @@ TEST(Python, Base) {
   EXPECT_FALSE(main.HasType<std::vector<int>>());
   EXPECT_TRUE((main.HasType<std::pair<std::string, std::vector<int>>>()));
   EXPECT_TRUE((main.HasType<std::tuple<int, double, std::string, std::vector<int>>>()));
+
+  ARIA_PYTHON_ADD_TYPE(std::vector<int>, main);
+  EXPECT_TRUE(main.HasType<std::vector<int>>());
 
   Python::Dict local{main};
 

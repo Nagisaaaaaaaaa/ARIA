@@ -274,6 +274,27 @@ using python::detail::Dict;
 //
 //
 //
+/// \brief Manually define the given type in Python.
+/// This macro can be used within the region of
+/// `ARIA_PYTHON_TYPE_BEGIN` and `ARIA_PYTHON_TYPE_END`, or
+/// be called like a function.
+///
+/// \example ```cpp
+/// ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(Vec);
+/// // By adding the following 2 lines, template `Vec` depends on
+/// // both `float16` and `bfloat16`.
+/// // When any instantiated template type `Vec<T, size>` is defined in Python,
+/// // both `float16` and `bfloat16` will be automatically and recursively defined.
+/// ARIA_PYTHON_ADD_TYPE(float16);
+/// ARIA_PYTHON_ADD_TYPE(bfloat16);
+/// ARIA_PYTHON_TYPE_END;
+///
+/// Python::ScopedInterpreter interpreter{};
+/// Python::Module main = interpreter.Import("__main__");
+/// // Define `std::vector<int>` for module `main`.
+/// ARIA_PYTHON_ADD_TYPE(std::vector<int>, main);
+/// EXPECT_TRUE(main.HasType<std::vector<int>>());
+/// ```
 #define ARIA_PYTHON_ADD_TYPE /* (type) or (type, module) */ __ARIA_PYTHON_ADD_TYPE
 
 } // namespace ARIA

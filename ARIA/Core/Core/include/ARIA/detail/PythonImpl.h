@@ -618,11 +618,11 @@ private:
 // Manually add Python types for `module`.
 // This version is helpful when used within `ARIA_PYTHON_TYPE_BEGIN` and `ARIA_PYTHON_TYPE_END`.
 // Eg: ARIA_PYTHON_ADD_TYPE_PARAMS1(Object);
-#define __ARIA_PYTHON_ADD_TYPE_PARAMS1(TYPE) ::ARIA::__ARIAPython_RecursivelyDefinePythonType<T>()(module)
+#define __ARIA_PYTHON_ADD_TYPE_PARAMS1(TYPE) ::ARIA::__ARIAPython_RecursivelyDefinePythonType<TYPE>()(module)
 
 // Manually add Python types for a given module.
 // Eg: ARIA_PYTHON_ADD_TYPE_PARAMS1(Object, module);
-#define __ARIA_PYTHON_ADD_TYPE_PARAMS2(TYPE, MODULE) ::ARIA::__ARIAPython_RecursivelyDefinePythonType<T>()(MODULE)
+#define __ARIA_PYTHON_ADD_TYPE_PARAMS2(TYPE, MODULE) ::ARIA::__ARIAPython_RecursivelyDefinePythonType<TYPE>()(MODULE)
 
 #define __ARIA_PYTHON_ADD_TYPE(...)                                                                                    \
   __ARIA_EXPAND(__ARIA_EXPAND(ARIA_CONCAT(__ARIA_PYTHON_ADD_TYPE_PARAMS, ARIA_NUM_OF(__VA_ARGS__)))(__VA_ARGS__))
