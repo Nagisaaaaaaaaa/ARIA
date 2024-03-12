@@ -6,6 +6,7 @@ namespace ARIA {
 //! 1. http://www.graphics.stanford.edu/~seander/bithacks.html,
 //! 2. https://stackoverflow.com/questions/30539347/2d-morton-code-encode-decode-64bits,
 //! 3. https://stackoverflow.com/questions/1024754/how-to-compute-a-3d-morton-number-interleave-the-bits-of-3-ints.
+//! 4. Feed the encoders to ChatGPT and it will tell you how to implement the decoders.
 //!
 //! Lookup Table (LUT) method is not used to make it easier to work with CUDA.
 
