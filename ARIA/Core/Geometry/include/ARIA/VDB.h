@@ -40,7 +40,7 @@ public:
 private:
   using TCoord = Vec<int, dim>;
 
-  static constexpr size_t toAllocateCapacity = 512;
+  static constexpr size_t toAllocateCapacity = 1024; // TODO: Maybe still too small, who knows.
 
   // Eg: dim: 1    1 << dim: 2    512 / (1 << dim): 256    #cells per block: 256
   //          2              4                      128                      16384
