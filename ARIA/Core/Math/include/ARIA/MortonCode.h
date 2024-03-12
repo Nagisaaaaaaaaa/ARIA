@@ -82,7 +82,7 @@ public:
 
   template <std::integral I>
   [[nodiscard]] static ARIA_HOST_DEVICE constexpr Vec1<I> Decode(const I &code) {
-    return {code};
+    return Vec1<I>{code};
   }
 };
 
