@@ -89,8 +89,20 @@ private:
     return BlockCoord2BlockIdx(CellCoord2BlockCoord(cellCoord));
   }
 
-  ARIA_HOST_DEVICE void MarkBlockOn(const TCoord &blockCoord) {
-    // TODO: Use a GPU unordered set to implement this.
+  ARIA_DEVICE void MarkBlockOnByBlockCoord(const TCoord &blockCoord) {
+    blockIndicesToAllocate_.insert(BlockCoord2BlockIdx(blockCoord));
+  }
+
+  ARIA_DEVICE void MarkBlockOnByCellCoord(const TCoord &cellCoord) {
+    blockIndicesToAllocate_.insert(CellCoord2BlockIdx(cellCoord));
+  }
+
+  void AllocateBlocks() {
+    thrust::host_vector<uint64> indicesH(blockIndicesToAllocate_.size());
+    thrust::copy(blockIndicesToAllocate_.device_range().begin(), blockIndicesToAllocate_.device_range().end(),
+                 indicesH.begin());
+
+    // TODO: Allocate all the corresponding blocks.
   }
 };
 
