@@ -101,6 +101,16 @@ public:
     return coord.x();
   }
 
+  /// \brief Decode Morton code to a 1D coordinate.
+  ///
+  /// \example ```cpp
+  /// using Code = MortonCode<1>; // 1D.
+  ///
+  /// Vec1u coord0 = Code::Decode(0u); // Will be {0}.
+  /// Vec1u coord1 = Code::Decode(1u); //         {1}.
+  /// Vec1u coord2 = Code::Decode(2u); //         {2}.
+  /// Vec1u coord2 = Code::Decode(3u); //         {3}.
+  /// ```
   template <std::integral I>
   [[nodiscard]] static ARIA_HOST_DEVICE constexpr Vec1<I> Decode(const I &code) {
     return Vec1<I>{code};
@@ -127,6 +137,16 @@ public:
   template <std::integral I>
   [[nodiscard]] static ARIA_HOST_DEVICE inline constexpr I Encode(const Vec2<I> &coord);
 
+  /// \brief Decode Morton code to a 2D coordinate.
+  ///
+  /// \example ```cpp
+  /// using Code = MortonCode<2>; // 2D.
+  ///
+  /// Vec2u coord0 = Code::Decode(0u); // Will be {0, 0}.
+  /// Vec2u coord1 = Code::Decode(1u); //         {1, 0}.
+  /// Vec2u coord2 = Code::Decode(2u); //         {0, 1}.
+  /// Vec2u coord3 = Code::Decode(3u); //         {1, 1}.
+  /// ```
   template <std::integral I>
   [[nodiscard]] static ARIA_HOST_DEVICE inline constexpr Vec2<I> Decode(const I &code);
 };
@@ -155,6 +175,20 @@ public:
   template <std::integral I>
   [[nodiscard]] static ARIA_HOST_DEVICE inline constexpr I Encode(const Vec3<I> &coord);
 
+  /// \brief Decode Morton code to a 3D coordinate.
+  ///
+  /// \example ```cpp
+  /// using Code = MortonCode<3>; // 3D.
+  ///
+  /// Vec3u coord0 = Code::Decode(0u); // Will be {0, 0, 0}.
+  /// Vec3u coord1 = Code::Decode(1u); //         {1, 0, 0}.
+  /// Vec3u coord2 = Code::Decode(2u); //         {0, 1, 0}.
+  /// Vec3u coord3 = Code::Decode(3u); //         {1, 1, 0}.
+  /// Vec3u coord4 = Code::Decode(4u); //         {0, 0, 1}.
+  /// Vec3u coord5 = Code::Decode(5u); //         {1, 0, 1}.
+  /// Vec3u coord6 = Code::Decode(6u); //         {0, 1, 1}.
+  /// Vec3u coord7 = Code::Decode(7u); //         {1, 1, 1}.
+  /// ```
   template <std::integral I>
   [[nodiscard]] static ARIA_HOST_DEVICE inline constexpr Vec3<I> Decode(const I &code);
 };
