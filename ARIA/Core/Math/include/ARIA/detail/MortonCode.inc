@@ -103,4 +103,37 @@ template <std::integral I>
   return shift(coord.x()) | (shift(coord.y()) << 1) | (shift(coord.z()) << 2);
 }
 
+template <std::integral I>
+[[nodiscard]] ARIA_HOST_DEVICE inline constexpr Vec3<I> MortonCode<3>::Decode(const I &code) {
+  auto unshift = [](I x) {
+    if constexpr (sizeof(I) == 4) {
+      x &= I{0x9249249U};
+      x = (x ^ (x >> 2)) & I{0x30C30C3U};
+      x = (x ^ (x >> 4)) & I{0x300F00FU};
+      x = (x ^ (x >> 8)) & I{0x30000FFU};
+      x = (x ^ (x >> 16)) & I{0x3FFU};
+      return x;
+    } else if constexpr (sizeof(I) == 8) {
+      x &= I{0x1249249249249249LLU};
+      x = (x ^ (x >> 2)) & I{0x10C30C30C30C30C3LLU};
+      x = (x ^ (x >> 4)) & I{0x100F00F00F00F00FLLU};
+      x = (x ^ (x >> 8)) & I{0x1F0000FF0000FFLLU};
+      x = (x ^ (x >> 16)) & I{0x1F00000000FFFFLLU};
+      x = (x ^ (x >> 32)) & I{0x1FFFFFLLU};
+      return x;
+    } /*else if constexpr (sizeof(I) == 16) {
+      x &= I{0x9249249249249249249249249249249LLLU};
+      x = (x ^ (x >> 2)) & I{0x30C30C30C30C30C30C30C30C30C30C3LLLU};
+      x = (x ^ (x >> 4)) & I{0x300F00F00F00F00F00F00F00F00F00FLLLU};
+      x = (x ^ (x >> 8)) & I{0x30000FF0000FF0000FF0000FF0000FFLLLU};
+      x = (x ^ (x >> 16)) & I{0x3FF00000000FFFF00000000FFFFLLLU};
+      x = (x ^ (x >> 32)) & I{0x3FF0000000000000000FFFFFFFFLLLU};
+      x = (x ^ (x >> 64)) & I{0X3FFFFFFFFFFLLLU};
+      return x;
+    }*/
+  };
+
+  return {unshift(code), unshift(code >> 1), unshift(code >> 2)};
+}
+
 } // namespace ARIA

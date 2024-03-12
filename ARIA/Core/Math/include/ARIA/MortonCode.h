@@ -79,6 +79,11 @@ public:
   [[nodiscard]] static ARIA_HOST_DEVICE constexpr I Encode(const Vec1<I> &coord) {
     return coord.x();
   }
+
+  template <std::integral I>
+  [[nodiscard]] static ARIA_HOST_DEVICE constexpr Vec1<I> Decode(const I &code) {
+    return {code};
+  }
 };
 
 //
@@ -128,6 +133,9 @@ public:
   /// ```
   template <std::integral I>
   [[nodiscard]] static ARIA_HOST_DEVICE inline constexpr I Encode(const Vec3<I> &coord);
+
+  template <std::integral I>
+  [[nodiscard]] static ARIA_HOST_DEVICE inline constexpr Vec3<I> Decode(const I &code);
 };
 
 } // namespace ARIA
