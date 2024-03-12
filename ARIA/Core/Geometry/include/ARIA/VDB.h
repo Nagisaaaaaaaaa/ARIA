@@ -31,14 +31,20 @@ public:
 
   ARIA_COPY_MOVE_ABILITY(VDB, delete, default);
 
-  ~VDB() /*! May raise exceptions. */ { stdgpu::unordered_set<uint64>::destroyDeviceObject(blockIndicesToAllocate_); }
+  ~VDB() noexcept /*Actually, exceptions may be thrown here.*/ {
+    stdgpu::unordered_set<uint64>::destroyDeviceObject(blockIndicesToAllocate_);
+  }
 
 public:
   // TODO: Implement IsValueOn().
   // TODO: Implement GetValue().
 
 private:
+  // Type of the coordinate.
   using TCoord = Vec<int, dim>;
+
+  // The space filling curve encoder and decoder used to hash the block coord to and from the block index.
+  using Code = MortonCode<dim>;
 
   static constexpr size_t toAllocateCapacity = 1024; // TODO: Maybe still too small, who knows.
 
@@ -53,9 +59,6 @@ private:
   thrust::device_vector<uint64> blockIndicesAllocated_;
 
   [[nodiscard]] ARIA_HOST_DEVICE static uint64 BlockCoord2BlockIdx(const TCoord &blockCoord) {
-    // The space filling curve encoder used to hash the block coord to the block index.
-    using Code = MortonCode<dim>;
-
     // Compute the block index.
     uint64 idx = Code::Encode(blockCoord.template cast<Vec<uint64, dim>>());
 
