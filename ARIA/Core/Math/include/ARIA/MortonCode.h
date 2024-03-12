@@ -6,8 +6,9 @@
 /// preserving locality of the data points.
 /// See https://en.wikipedia.org/wiki/Z-order_curve.
 ///
-/// This file introduces a Morton code encoder, which can be used to
-/// encode a N-dimensional integral coordinate to an integer.
+/// This file introduces a Morton code encoder and decoder, which can be used to
+/// encode a N-dimensional integral coordinate to an integer, or
+/// decode an integer to a N-dimensional integral coordinate.
 
 //
 //
@@ -18,8 +19,9 @@
 
 namespace ARIA {
 
-/// \brief A Morton code encoder, which can be used to
-/// encode a N-dimensional integral coordinate to an integer.
+/// \brief A Morton code encoder and decoder, which can be used to
+/// encode a N-dimensional integral coordinate to an integer, or
+/// decode an integer to a N-dimensional integral coordinate.
 /// See https://en.wikipedia.org/wiki/Z-order_curve.
 ///
 /// \tparam d Dimension.
@@ -33,6 +35,11 @@ namespace ARIA {
 /// uint code2 = Code::Encode(Vec1u{2}); //         2.
 /// uint code2 = Code::Encode(Vec1u{3}); //         3.
 ///
+/// Vec1u coord0 = Code::Decode(0u); // Will be {0}.
+/// Vec1u coord1 = Code::Decode(1u); //         {1}.
+/// Vec1u coord2 = Code::Decode(2u); //         {2}.
+/// Vec1u coord2 = Code::Decode(3u); //         {3}.
+///
 /// // 2D.
 /// using Code = MortonCode<2>;
 ///
@@ -40,6 +47,11 @@ namespace ARIA {
 /// uint code1 = Code::Encode(Vec2u{1, 0}); //         1.
 /// uint code2 = Code::Encode(Vec2u{0, 1}); //         2.
 /// uint code3 = Code::Encode(Vec2u{1, 1}); //         3.
+///
+/// Vec2u coord0 = Code::Decode(0u); // Will be {0, 0}.
+/// Vec2u coord1 = Code::Decode(1u); //         {1, 0}.
+/// Vec2u coord2 = Code::Decode(2u); //         {0, 1}.
+/// Vec2u coord3 = Code::Decode(3u); //         {1, 1}.
 ///
 /// // 3D.
 /// using Code = MortonCode<3>;
@@ -52,6 +64,15 @@ namespace ARIA {
 /// uint code5 = Code::Encode(Vec3u{1, 0, 1}); //         5.
 /// uint code6 = Code::Encode(Vec3u{0, 1, 1}); //         6.
 /// uint code7 = Code::Encode(Vec3u{1, 1, 1}); //         7.
+///
+/// Vec3u coord0 = Code::Decode(0u); // Will be {0, 0, 0}.
+/// Vec3u coord1 = Code::Decode(1u); //         {1, 0, 0}.
+/// Vec3u coord2 = Code::Decode(2u); //         {0, 1, 0}.
+/// Vec3u coord3 = Code::Decode(3u); //         {1, 1, 0}.
+/// Vec3u coord4 = Code::Decode(4u); //         {0, 0, 1}.
+/// Vec3u coord5 = Code::Decode(5u); //         {1, 0, 1}.
+/// Vec3u coord6 = Code::Decode(6u); //         {0, 1, 1}.
+/// Vec3u coord7 = Code::Decode(7u); //         {1, 1, 1}.
 /// ```
 template <auto d>
 class MortonCode;
@@ -79,6 +100,21 @@ public:
   [[nodiscard]] static ARIA_HOST_DEVICE constexpr I Encode(const Vec1<I> &coord) {
     return coord.x();
   }
+
+  /// \brief Decode Morton code to a 1D coordinate.
+  ///
+  /// \example ```cpp
+  /// using Code = MortonCode<1>; // 1D.
+  ///
+  /// Vec1u coord0 = Code::Decode(0u); // Will be {0}.
+  /// Vec1u coord1 = Code::Decode(1u); //         {1}.
+  /// Vec1u coord2 = Code::Decode(2u); //         {2}.
+  /// Vec1u coord2 = Code::Decode(3u); //         {3}.
+  /// ```
+  template <std::integral I>
+  [[nodiscard]] static ARIA_HOST_DEVICE constexpr Vec1<I> Decode(const I &code) {
+    return Vec1<I>{code};
+  }
 };
 
 //
@@ -100,6 +136,19 @@ public:
   /// ```
   template <std::integral I>
   [[nodiscard]] static ARIA_HOST_DEVICE inline constexpr I Encode(const Vec2<I> &coord);
+
+  /// \brief Decode Morton code to a 2D coordinate.
+  ///
+  /// \example ```cpp
+  /// using Code = MortonCode<2>; // 2D.
+  ///
+  /// Vec2u coord0 = Code::Decode(0u); // Will be {0, 0}.
+  /// Vec2u coord1 = Code::Decode(1u); //         {1, 0}.
+  /// Vec2u coord2 = Code::Decode(2u); //         {0, 1}.
+  /// Vec2u coord3 = Code::Decode(3u); //         {1, 1}.
+  /// ```
+  template <std::integral I>
+  [[nodiscard]] static ARIA_HOST_DEVICE inline constexpr Vec2<I> Decode(const I &code);
 };
 
 //
@@ -125,6 +174,23 @@ public:
   /// ```
   template <std::integral I>
   [[nodiscard]] static ARIA_HOST_DEVICE inline constexpr I Encode(const Vec3<I> &coord);
+
+  /// \brief Decode Morton code to a 3D coordinate.
+  ///
+  /// \example ```cpp
+  /// using Code = MortonCode<3>; // 3D.
+  ///
+  /// Vec3u coord0 = Code::Decode(0u); // Will be {0, 0, 0}.
+  /// Vec3u coord1 = Code::Decode(1u); //         {1, 0, 0}.
+  /// Vec3u coord2 = Code::Decode(2u); //         {0, 1, 0}.
+  /// Vec3u coord3 = Code::Decode(3u); //         {1, 1, 0}.
+  /// Vec3u coord4 = Code::Decode(4u); //         {0, 0, 1}.
+  /// Vec3u coord5 = Code::Decode(5u); //         {1, 0, 1}.
+  /// Vec3u coord6 = Code::Decode(6u); //         {0, 1, 1}.
+  /// Vec3u coord7 = Code::Decode(7u); //         {1, 1, 1}.
+  /// ```
+  template <std::integral I>
+  [[nodiscard]] static ARIA_HOST_DEVICE inline constexpr Vec3<I> Decode(const I &code);
 };
 
 } // namespace ARIA
