@@ -100,6 +100,9 @@ public:
   /// ```
   template <std::integral I>
   [[nodiscard]] static ARIA_HOST_DEVICE inline constexpr I Encode(const Vec2<I> &coord);
+
+  template <std::integral I>
+  [[nodiscard]] static ARIA_HOST_DEVICE inline constexpr Vec2<I> Decode(const I &code);
 };
 
 //
