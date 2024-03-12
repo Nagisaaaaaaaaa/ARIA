@@ -11,6 +11,8 @@
 #include "ARIA/TensorVector.h"
 #include "ARIA/Vec.h"
 
+#include <stdgpu/unordered_set.cuh>
+
 #include <bitset>
 
 namespace ARIA {
@@ -25,11 +27,20 @@ class VDB;
 template <typename T, auto dim>
 class VDB<T, dim, SpaceDevice> {
 public:
+  VDB() : blockIndicesToAllocate_(stdgpu::unordered_set<uint64>::createDeviceObject(toAllocateCapacity)) {}
+
+  ARIA_COPY_MOVE_ABILITY(VDB, delete, default);
+
+  ~VDB() /*! May raise exceptions. */ { stdgpu::unordered_set<uint64>::destroyDeviceObject(blockIndicesToAllocate_); }
+
+public:
   // TODO: Implement IsValueOn().
   // TODO: Implement GetValue().
 
 private:
   using TCoord = Vec<int, dim>;
+
+  static constexpr size_t toAllocateCapacity = 512;
 
   // Eg: dim: 1    1 << dim: 2    512 / (1 << dim): 256    #cells per block: 256
   //          2              4                      128                      16384
@@ -38,7 +49,8 @@ private:
   static constexpr int blockDim = 512 / (1 << dim);
   static_assert(blockDim > 0, "The given dimension is too large");
 
-  thrust::device_vector<uint64> blockIndices_;
+  stdgpu::unordered_set<uint64> blockIndicesToAllocate_;
+  thrust::device_vector<uint64> blockIndicesAllocated_;
 
   [[nodiscard]] ARIA_HOST_DEVICE static uint64 BlockCoord2BlockIdx(const TCoord &blockCoord) {
     // The space filling curve encoder used to hash the block coord to the block index.
