@@ -26,15 +26,23 @@ private:
   ARIA_PROP(private, private, , bool, operatorBrackets, size_t);
 
 public:
-  auto operator[](const size_t &i) const { return operatorBrackets(i); }
+  explicit BitVector(size_t n = 0) : blocks_((n + nBitsPerBlock - 1) / nBitsPerBlock) {}
 
-  auto operator[](const size_t &i) { return operatorBrackets(i); }
+  auto operator[](size_t i) const { return operatorBrackets(i); }
+
+  auto operator[](size_t i) { return operatorBrackets(i); }
 
 private:
   using TBlock = uint;
   static constexpr uint nBitsPerBlock = sizeof(TBlock) * 8;
 
   std::vector<TBlock> blocks_;
+
+  static std::pair<size_t, uint> i2iBlocksAndiBits(size_t i) {
+    size_t iBlocks = i / nBitsPerBlock;
+    uint iBits = i % nBitsPerBlock;
+    return {iBlocks, iBits};
+  }
 
   static bool GetBit(const TBlock &block, uint iBits) {
     ARIA_ASSERT(iBits < nBitsPerBlock, "The given bit index should be smaller than the number of bits per block");
@@ -52,15 +60,13 @@ private:
     return block = (block & ~mask) | (TBlock{bit} << iBits);
   }
 
-  [[nodiscard]] bool ARIA_PROP_IMPL(operatorBrackets)(const size_t &i) const {
-    size_t iBlocks = i / nBitsPerBlock;
-    size_t iBits = i % nBitsPerBlock;
+  [[nodiscard]] bool ARIA_PROP_IMPL(operatorBrackets)(size_t i) const {
+    auto [iBlocks, iBits] = i2iBlocksAndiBits(i);
     return GetBit(blocks_[iBlocks], iBits);
   }
 
-  void ARIA_PROP_IMPL(operatorBrackets)(const size_t &i, const bool &value) {
-    size_t iBlocks = i / nBitsPerBlock;
-    size_t iBits = i % nBitsPerBlock;
+  void ARIA_PROP_IMPL(operatorBrackets)(size_t i, bool value) {
+    auto [iBlocks, iBits] = i2iBlocksAndiBits(i);
     SetBit(blocks_[iBlocks], iBits, value);
   }
 };
