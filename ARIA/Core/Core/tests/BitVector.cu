@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <thread>
+
 namespace ARIA {
 
 TEST(BitVector, Base) {
@@ -105,6 +107,30 @@ TEST(BitVector, Base) {
       else
         EXPECT_EQ(bitVector[i], true);
     }
+  }
+}
+
+TEST(BitVector, ThreadSafety) {
+  size_t n = 100000;
+  size_t nThreads = 10;
+  BitVector<SpaceHost, ThreadSafe> bitVector(n);
+
+  {
+    std::vector<std::jthread> threads(nThreads);
+
+    for (size_t t = 0; t < nThreads; ++t)
+      threads[t] = std::jthread{[n, nThreads, &bitVector, t]() {
+        size_t tCpy = t;
+        for (size_t i = tCpy; i < n; i += nThreads) {
+          bitVector[i] = true;
+        }
+      }};
+
+    for (auto &t : threads)
+      t.join();
+
+    for (size_t i = 0; i < n; ++i)
+      EXPECT_EQ(bitVector[i], true);
   }
 }
 
