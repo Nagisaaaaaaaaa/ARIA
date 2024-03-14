@@ -34,6 +34,26 @@ void TestThreadSafetyDevice() {
       EXPECT_EQ(bitVector[i], true);
   }
 
+  {
+    BitVector<SpaceDevice, ThreadSafe> bitVector(n);
+
+    for (size_t i = 0; i < n; ++i)
+      if (i % 2 == 0)
+        bitVector[i] = true;
+
+    Launcher(nThreads, [=, span = bitVector.rawSpan()] ARIA_DEVICE(size_t t) mutable {
+      size_t tCpy = t;
+      for (size_t i = tCpy; i < n; i += nThreads) {
+        span.Fill(i);
+      }
+    }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    for (size_t i = 0; i < n; ++i)
+      EXPECT_EQ(bitVector[i], true);
+  }
+
   // Clear.
   {
     BitVector<SpaceDevice, ThreadSafe> bitVector(n);
@@ -43,6 +63,26 @@ void TestThreadSafetyDevice() {
         bitVector[i] = true;
 
     Launcher(nThreads, [=, span = bitVector.span()] ARIA_DEVICE(size_t t) mutable {
+      size_t tCpy = t;
+      for (size_t i = tCpy; i < n; i += nThreads) {
+        span.Clear(i);
+      }
+    }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    for (size_t i = 0; i < n; ++i)
+      EXPECT_EQ(bitVector[i], false);
+  }
+
+  {
+    BitVector<SpaceDevice, ThreadSafe> bitVector(n);
+
+    for (size_t i = 0; i < n; ++i)
+      if (i % 2 == 0)
+        bitVector[i] = true;
+
+    Launcher(nThreads, [=, span = bitVector.rawSpan()] ARIA_DEVICE(size_t t) mutable {
       size_t tCpy = t;
       for (size_t i = tCpy; i < n; i += nThreads) {
         span.Clear(i);
@@ -75,11 +115,50 @@ void TestThreadSafetyDevice() {
   {
     BitVector<SpaceDevice, ThreadSafe> bitVector(n);
 
+    Launcher(nThreads, [=, span = bitVector.rawSpan()] ARIA_DEVICE(size_t t) mutable {
+      size_t tCpy = t;
+      for (size_t i = tCpy; i < n; i += nThreads) {
+        span.Flip(i);
+      }
+    }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    for (size_t i = 0; i < n; ++i)
+      EXPECT_EQ(bitVector[i], true);
+  }
+
+  {
+    BitVector<SpaceDevice, ThreadSafe> bitVector(n);
+
     for (size_t i = 0; i < n; ++i)
       if (i % 2 == 0)
         bitVector[i] = true;
 
     Launcher(nThreads, [=, span = bitVector.span()] ARIA_DEVICE(size_t t) mutable {
+      size_t tCpy = t;
+      for (size_t i = tCpy; i < n; i += nThreads) {
+        span.Flip(i);
+      }
+    }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    for (size_t i = 0; i < n; ++i)
+      if (i % 2 == 0)
+        EXPECT_EQ(bitVector[i], false);
+      else
+        EXPECT_EQ(bitVector[i], true);
+  }
+
+  {
+    BitVector<SpaceDevice, ThreadSafe> bitVector(n);
+
+    for (size_t i = 0; i < n; ++i)
+      if (i % 2 == 0)
+        bitVector[i] = true;
+
+    Launcher(nThreads, [=, span = bitVector.rawSpan()] ARIA_DEVICE(size_t t) mutable {
       size_t tCpy = t;
       for (size_t i = tCpy; i < n; i += nThreads) {
         span.Flip(i);
@@ -324,102 +403,112 @@ TEST(BitVector, Span) {
 }
 
 TEST(BitVector, ThreadSafetyHost) {
-  size_t n = 100000;
-  size_t nThreads = 10;
+  auto getRef = [](BitVector<SpaceHost, ThreadSafe> &v) -> BitVector<SpaceHost, ThreadSafe> & { return v; };
+  auto getSpan = [](BitVector<SpaceHost, ThreadSafe> &v) { return v.span(); };
+  auto getRawSpan = [](BitVector<SpaceHost, ThreadSafe> &v) { return v.rawSpan(); };
 
-  // Fill.
-  {
-    BitVector<SpaceHost, ThreadSafe> bitVector(n);
-    std::vector<std::jthread> threads(nThreads);
+  auto testByGetter = [](const auto &getter) {
+    size_t n = 100000;
+    size_t nThreads = 10;
 
-    for (size_t i = 0; i < n; ++i)
-      if (i % 2 == 0)
-        bitVector[i] = true;
+    // Fill.
+    {
+      BitVector<SpaceHost, ThreadSafe> bitVector(n);
+      std::vector<std::jthread> threads(nThreads);
 
-    for (size_t t = 0; t < nThreads; ++t)
-      threads[t] = std::jthread{[n, nThreads, &bitVector, t]() {
-        size_t tCpy = t;
-        for (size_t i = tCpy; i < n; i += nThreads) {
-          bitVector.Fill(i);
-        }
-      }};
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 0)
+          bitVector[i] = true;
 
-    for (auto &t : threads)
-      t.join();
+      for (size_t t = 0; t < nThreads; ++t)
+        threads[t] = std::jthread{[n, nThreads, &bitVector, t, &getter]() mutable {
+          size_t tCpy = t;
+          for (size_t i = tCpy; i < n; i += nThreads) {
+            getter(bitVector).Fill(i);
+          }
+        }};
 
-    for (size_t i = 0; i < n; ++i)
-      EXPECT_EQ(bitVector[i], true);
-  }
+      for (auto &t : threads)
+        t.join();
 
-  // Clear.
-  {
-    BitVector<SpaceHost, ThreadSafe> bitVector(n);
-    std::vector<std::jthread> threads(nThreads);
-
-    for (size_t i = 0; i < n; ++i)
-      if (i % 2 == 0)
-        bitVector[i] = true;
-
-    for (size_t t = 0; t < nThreads; ++t)
-      threads[t] = std::jthread{[n, nThreads, &bitVector, t]() {
-        size_t tCpy = t;
-        for (size_t i = tCpy; i < n; i += nThreads) {
-          bitVector.Clear(i);
-        }
-      }};
-
-    for (auto &t : threads)
-      t.join();
-
-    for (size_t i = 0; i < n; ++i)
-      EXPECT_EQ(bitVector[i], false);
-  }
-
-  // Flip.
-  {
-    BitVector<SpaceHost, ThreadSafe> bitVector(n);
-    std::vector<std::jthread> threads(nThreads);
-
-    for (size_t t = 0; t < nThreads; ++t)
-      threads[t] = std::jthread{[n, nThreads, &bitVector, t]() {
-        size_t tCpy = t;
-        for (size_t i = tCpy; i < n; i += nThreads) {
-          bitVector.Flip(i);
-        }
-      }};
-
-    for (auto &t : threads)
-      t.join();
-
-    for (size_t i = 0; i < n; ++i)
-      EXPECT_EQ(bitVector[i], true);
-  }
-
-  {
-    BitVector<SpaceHost, ThreadSafe> bitVector(n);
-    std::vector<std::jthread> threads(nThreads);
-
-    for (size_t i = 0; i < n; ++i)
-      if (i % 2 == 0)
-        bitVector[i] = true;
-
-    for (size_t t = 0; t < nThreads; ++t)
-      threads[t] = std::jthread{[n, nThreads, &bitVector, t]() {
-        size_t tCpy = t;
-        for (size_t i = tCpy; i < n; i += nThreads) {
-          bitVector.Flip(i);
-        }
-      }};
-
-    for (auto &t : threads)
-      t.join();
-
-    for (size_t i = 0; i < n; ++i)
-      if (i % 2 == 0)
-        EXPECT_EQ(bitVector[i], false);
-      else
+      for (size_t i = 0; i < n; ++i)
         EXPECT_EQ(bitVector[i], true);
-  }
+    }
+
+    // Clear.
+    {
+      BitVector<SpaceHost, ThreadSafe> bitVector(n);
+      std::vector<std::jthread> threads(nThreads);
+
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 0)
+          bitVector[i] = true;
+
+      for (size_t t = 0; t < nThreads; ++t)
+        threads[t] = std::jthread{[n, nThreads, &bitVector, t, &getter]() mutable {
+          size_t tCpy = t;
+          for (size_t i = tCpy; i < n; i += nThreads) {
+            getter(bitVector).Clear(i);
+          }
+        }};
+
+      for (auto &t : threads)
+        t.join();
+
+      for (size_t i = 0; i < n; ++i)
+        EXPECT_EQ(bitVector[i], false);
+    }
+
+    // Flip.
+    {
+      BitVector<SpaceHost, ThreadSafe> bitVector(n);
+      std::vector<std::jthread> threads(nThreads);
+
+      for (size_t t = 0; t < nThreads; ++t)
+        threads[t] = std::jthread{[n, nThreads, &bitVector, t, &getter]() mutable {
+          size_t tCpy = t;
+          for (size_t i = tCpy; i < n; i += nThreads) {
+            getter(bitVector).Flip(i);
+          }
+        }};
+
+      for (auto &t : threads)
+        t.join();
+
+      for (size_t i = 0; i < n; ++i)
+        EXPECT_EQ(bitVector[i], true);
+    }
+
+    {
+      BitVector<SpaceHost, ThreadSafe> bitVector(n);
+      std::vector<std::jthread> threads(nThreads);
+
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 0)
+          bitVector[i] = true;
+
+      for (size_t t = 0; t < nThreads; ++t)
+        threads[t] = std::jthread{[n, nThreads, &bitVector, t, &getter]() mutable {
+          size_t tCpy = t;
+          for (size_t i = tCpy; i < n; i += nThreads) {
+            getter(bitVector).Flip(i);
+          }
+        }};
+
+      for (auto &t : threads)
+        t.join();
+
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 0)
+          EXPECT_EQ(bitVector[i], false);
+        else
+          EXPECT_EQ(bitVector[i], true);
+    }
+  };
+
+  testByGetter(getRef);
+  testByGetter(getSpan);
+  testByGetter(getRawSpan);
 }
 
 TEST(BitVector, ThreadSafetyDevice) {

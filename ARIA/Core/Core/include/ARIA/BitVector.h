@@ -262,11 +262,13 @@ public:
   }
 
   [[nodiscard]] auto rawSpan() const {
-    return BitVectorSpan<SpaceDevice, TThreadSafety, decltype(thrust::raw_pointer_cast(data()))>{data(), Base::size()};
+    return BitVectorSpan<SpaceDevice, TThreadSafety, decltype(thrust::raw_pointer_cast(data()))>{
+        thrust::raw_pointer_cast(data()), Base::size()};
   }
 
   [[nodiscard]] auto rawSpan() {
-    return BitVectorSpan<SpaceDevice, TThreadSafety, decltype(thrust::raw_pointer_cast(data()))>{data(), Base::size()};
+    return BitVectorSpan<SpaceDevice, TThreadSafety, decltype(thrust::raw_pointer_cast(data()))>{
+        thrust::raw_pointer_cast(data()), Base::size()};
   }
 
 private:
