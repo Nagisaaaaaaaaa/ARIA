@@ -1,6 +1,6 @@
 set(_aria_scene_modules
     Scene
-    Visual
+    #Visual
 )
 
 include(ARIA_AddLibrary)

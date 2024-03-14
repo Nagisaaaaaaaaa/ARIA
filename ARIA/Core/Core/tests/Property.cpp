@@ -2257,77 +2257,27 @@ TEST(Property, Function) {
     static_assert(std::is_same_v<decltype(f1), Vec3<float>>);
   }
 
-  // DecltypeAuto.
+  // Smart reference.
   {
-    static_assert(std::is_reference_v<decltype(DecltypeAuto(t0.forward()))>);
-    static_assert(std::is_rvalue_reference_v<decltype(DecltypeAuto(t0.forward()))>);
-    static_assert(property::detail::PropertyType<std::decay_t<decltype(DecltypeAuto(t0.forward()))>>);
-    Vec3<float> v02 = t0.forward();
-    Vec3<float> v03 = DecltypeAuto(t0.forward());
+    Property auto f0 = t0.forward();
 
-    decltype(auto) f00 = DecltypeAuto(t0.forward());
-    static_assert(std::is_reference_v<decltype(f00)>);
-    static_assert(std::is_rvalue_reference_v<decltype(f00)>);
-    static_assert(property::detail::PropertyType<std::decay_t<decltype(f00)>>);
-    Vec3<float> v00 = f00;
-
-    auto f01 = DecltypeAuto(t0.forward());
-    static_assert(!std::is_reference_v<decltype(f01)>);
-    static_assert(property::detail::PropertyType<decltype(f01)>);
-    Vec3<float> v01 = f00;
-
-    static_assert(std::is_reference_v<decltype(DecltypeAuto(t1.forward()))>);
-    static_assert(std::is_rvalue_reference_v<decltype(DecltypeAuto(t1.forward()))>);
-    static_assert(property::detail::PropertyType<std::decay_t<decltype(DecltypeAuto(t1.forward()))>>);
-    Vec3<float> v12 = t0.forward();
-    Vec3<float> v13 = DecltypeAuto(t0.forward());
-
-    decltype(auto) f10 = DecltypeAuto(t1.forward());
-    static_assert(std::is_reference_v<decltype(f10)>);
-    static_assert(std::is_rvalue_reference_v<decltype(f10)>);
-    static_assert(property::detail::PropertyType<std::decay_t<decltype(f10)>>);
-    Vec3<float> v10 = f10;
-
-    auto f11 = DecltypeAuto(t1.forward());
-    static_assert(!std::is_reference_v<decltype(f11)>);
-    static_assert(property::detail::PropertyType<decltype(f11)>);
-    Vec3<float> v11 = f11;
-
-    f00 = {1.11f, 2.22f, 3.33f};
+    f0 = {1.11f, 2.22f, 3.33f};
     EXPECT_FLOAT_EQ(t0.forward().x(), 1.11f);
     EXPECT_FLOAT_EQ(t0.forward().y(), 2.22f);
     EXPECT_FLOAT_EQ(t0.forward().z(), 3.33f);
-    EXPECT_FLOAT_EQ(f00.x(), 1.11f);
-    EXPECT_FLOAT_EQ(f00.y(), 2.22f);
-    EXPECT_FLOAT_EQ(f00.z(), 3.33f);
+    EXPECT_FLOAT_EQ(f0.x(), 1.11f);
+    EXPECT_FLOAT_EQ(f0.y(), 2.22f);
+    EXPECT_FLOAT_EQ(f0.z(), 3.33f);
 
-    f00.x() = 3.3f;
+    f0.x() = 3.3f;
     EXPECT_FLOAT_EQ(t0.forward().x(), 3.3f);
-    EXPECT_FLOAT_EQ(f00.x(), 3.3f);
-    f00.y() = 2.2f;
+    EXPECT_FLOAT_EQ(f0.x(), 3.3f);
+    f0.y() = 2.2f;
     EXPECT_FLOAT_EQ(t0.forward().y(), 2.2f);
-    EXPECT_FLOAT_EQ(f00.y(), 2.2f);
-    f00.z() = 1.1f;
+    EXPECT_FLOAT_EQ(f0.y(), 2.2f);
+    f0.z() = 1.1f;
     EXPECT_FLOAT_EQ(t0.forward().z(), 1.1f);
-    EXPECT_FLOAT_EQ(f00.z(), 1.1f);
-
-    f01 = {1.11f, 2.22f, 3.33f};
-    EXPECT_FLOAT_EQ(t0.forward().x(), 1.11f);
-    EXPECT_FLOAT_EQ(t0.forward().y(), 2.22f);
-    EXPECT_FLOAT_EQ(t0.forward().z(), 3.33f);
-    EXPECT_FLOAT_EQ(f01.x(), 1.11f);
-    EXPECT_FLOAT_EQ(f01.y(), 2.22f);
-    EXPECT_FLOAT_EQ(f01.z(), 3.33f);
-
-    f01.x() = 3.3f;
-    EXPECT_FLOAT_EQ(t0.forward().x(), 3.3f);
-    EXPECT_FLOAT_EQ(f01.x(), 3.3f);
-    f01.y() = 2.2f;
-    EXPECT_FLOAT_EQ(t0.forward().y(), 2.2f);
-    EXPECT_FLOAT_EQ(f01.y(), 2.2f);
-    f01.z() = 1.1f;
-    EXPECT_FLOAT_EQ(t0.forward().z(), 1.1f);
-    EXPECT_FLOAT_EQ(f01.z(), 1.1f);
+    EXPECT_FLOAT_EQ(f0.z(), 1.1f);
   }
 }
 
@@ -2370,77 +2320,27 @@ TEST(Property, ReferenceProperties) {
     static_assert(std::is_same_v<decltype(f1), Vec3<float>>);
   }
 
-  // DecltypeAuto.
+  // Smart reference.
   {
-    static_assert(std::is_reference_v<decltype(DecltypeAuto(t0.forward()))>);
-    static_assert(std::is_rvalue_reference_v<decltype(DecltypeAuto(t0.forward()))>);
-    static_assert(property::detail::PropertyType<std::decay_t<decltype(DecltypeAuto(t0.forward()))>>);
-    const Vec3<float>& v02 = t0.forward(); //! `const` is required by clang here.
-    const Vec3<float>& v03 = DecltypeAuto(t0.forward()); //! `const` is required by clang here.
+    Property auto f0 = t0.forward();
 
-    decltype(auto) f00 = DecltypeAuto(t0.forward());
-    static_assert(std::is_reference_v<decltype(f00)>);
-    static_assert(std::is_rvalue_reference_v<decltype(f00)>);
-    static_assert(property::detail::PropertyType<std::decay_t<decltype(f00)>>);
-    const Vec3<float>& v00 = f00; //! `const` is required by clang here.
-
-    auto f01 = DecltypeAuto(t0.forward());
-    static_assert(!std::is_reference_v<decltype(f01)>);
-    static_assert(property::detail::PropertyType<decltype(f01)>);
-    const Vec3<float>& v01 = f00; //! `const` is required by clang here.
-
-    static_assert(std::is_reference_v<decltype(DecltypeAuto(t1.forward()))>);
-    static_assert(std::is_rvalue_reference_v<decltype(DecltypeAuto(t1.forward()))>);
-    static_assert(property::detail::PropertyType<std::decay_t<decltype(DecltypeAuto(t1.forward()))>>);
-    const Vec3<float>& v12 = t0.forward();
-    const Vec3<float>& v13 = DecltypeAuto(t0.forward());
-
-    decltype(auto) f10 = DecltypeAuto(t1.forward());
-    static_assert(std::is_reference_v<decltype(f10)>);
-    static_assert(std::is_rvalue_reference_v<decltype(f10)>);
-    static_assert(property::detail::PropertyType<std::decay_t<decltype(f10)>>);
-    const Vec3<float>& v10 = f10;
-
-    auto f11 = DecltypeAuto(t1.forward());
-    static_assert(!std::is_reference_v<decltype(f11)>);
-    static_assert(property::detail::PropertyType<decltype(f11)>);
-    const Vec3<float>& v11 = f11;
-
-    f00 = {1.11f, 2.22f, 3.33f};
+    f0 = {1.11f, 2.22f, 3.33f};
     EXPECT_FLOAT_EQ(t0.forward().x(), 1.11f);
     EXPECT_FLOAT_EQ(t0.forward().y(), 2.22f);
     EXPECT_FLOAT_EQ(t0.forward().z(), 3.33f);
-    EXPECT_FLOAT_EQ(f00.x(), 1.11f);
-    EXPECT_FLOAT_EQ(f00.y(), 2.22f);
-    EXPECT_FLOAT_EQ(f00.z(), 3.33f);
+    EXPECT_FLOAT_EQ(f0.x(), 1.11f);
+    EXPECT_FLOAT_EQ(f0.y(), 2.22f);
+    EXPECT_FLOAT_EQ(f0.z(), 3.33f);
 
-    f00.x() = 3.3f;
+    f0.x() = 3.3f;
     EXPECT_FLOAT_EQ(t0.forward().x(), 3.3f);
-    EXPECT_FLOAT_EQ(f00.x(), 3.3f);
-    f00.y() = 2.2f;
+    EXPECT_FLOAT_EQ(f0.x(), 3.3f);
+    f0.y() = 2.2f;
     EXPECT_FLOAT_EQ(t0.forward().y(), 2.2f);
-    EXPECT_FLOAT_EQ(f00.y(), 2.2f);
-    f00.z() = 1.1f;
+    EXPECT_FLOAT_EQ(f0.y(), 2.2f);
+    f0.z() = 1.1f;
     EXPECT_FLOAT_EQ(t0.forward().z(), 1.1f);
-    EXPECT_FLOAT_EQ(f00.z(), 1.1f);
-
-    f01 = {1.11f, 2.22f, 3.33f};
-    EXPECT_FLOAT_EQ(t0.forward().x(), 1.11f);
-    EXPECT_FLOAT_EQ(t0.forward().y(), 2.22f);
-    EXPECT_FLOAT_EQ(t0.forward().z(), 3.33f);
-    EXPECT_FLOAT_EQ(f01.x(), 1.11f);
-    EXPECT_FLOAT_EQ(f01.y(), 2.22f);
-    EXPECT_FLOAT_EQ(f01.z(), 3.33f);
-
-    f01.x() = 3.3f;
-    EXPECT_FLOAT_EQ(t0.forward().x(), 3.3f);
-    EXPECT_FLOAT_EQ(f01.x(), 3.3f);
-    f01.y() = 2.2f;
-    EXPECT_FLOAT_EQ(t0.forward().y(), 2.2f);
-    EXPECT_FLOAT_EQ(f01.y(), 2.2f);
-    f01.z() = 1.1f;
-    EXPECT_FLOAT_EQ(t0.forward().z(), 1.1f);
-    EXPECT_FLOAT_EQ(f01.z(), 1.1f);
+    EXPECT_FLOAT_EQ(f0.z(), 1.1f);
   }
 }
 

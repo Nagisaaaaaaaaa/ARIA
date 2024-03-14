@@ -4,6 +4,12 @@ project(ARIA LANGUAGES CXX)
 # User options.
 option(ARIA_BUILD_TESTS "Build unit tests" ON)
 option(ARIA_USE_64BIT_REAL "using Real = double;" OFF)
+option(ARIA_ENABLE_CUDA "Enable CUDA or not (MUST be ON for now)" ON)
+
+option(ARIA_SANITIZE_ADDRESS "Enable GCC/Clang address sanitizer or not" OFF) # To catch out-of-bounds accesses.
+option(ARIA_SANITIZE_MEMORY "Enable Clang memory sanitizer or not" OFF) # To catch use of uninitialized memory.
+option(ARIA_SANITIZE_THREAD "Enable GCC/Clang thread sanitizer or not" OFF) # To catch multi-threading issues.
+option(ARIA_SANITIZE_UNDEFINED "Enable GCC/Clang undefined sanitizer or not" OFF) # To catch undefined-behaviors.
 
 list(APPEND CMAKE_MODULE_PATH "${ARIA_SOURCE_DIR}/cmake/modules" "${CMAKE_BINARY_DIR}")
 
@@ -64,6 +70,62 @@ include(cuda)
 # ################################################################################
 if (ARIA_BUILD_TESTS)
   enable_testing()
+endif ()
+
+#
+#
+#
+# ################################################################################
+if ((ARIA_SANITIZE_ADDRESS OR ARIA_SANITIZE_MEMORY OR ARIA_SANITIZE_THREAD OR ARIA_SANITIZE_UNDEFINED) AND
+(CMAKE_CXX_COMPILER_ID MATCHES "(GNU|Clang)"))
+  # Don't optimize too heavily.
+  if (U_CMAKE_BUILD_TYPE MATCHES REL)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O1")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -O1")
+    add_compile_options(-O1 -fno-optimize-sibling-calls)
+  endif ()
+
+  add_compile_options(-fno-omit-frame-pointer)
+
+  if (ARIA_SANITIZE_ADDRESS)
+    if (ARIA_ENABLE_CUDA)
+      message(AUTHOR_WARNING "When address sanitizer is enabled together with CUDA, one should add \"protect_shadow_gap=0:detect_leaks=0\" to ASAN_OPTIONS")
+    endif ()
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fsanitize=address")
+    message(STATUS "ARIA: enabling the address sanitizer.")
+  endif ()
+
+  if (ARIA_SANITIZE_MEMORY)
+    if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+      message(FATAL_ERROR "GCC does not support memory sanitizer. Consider disabling ARIA_SANITIZE_MEMORY or use Clang")
+    endif ()
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=memory")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=memory")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=memory")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fsanitize=memory")
+    message(STATUS "ARIA: enabling the memory sanitizer.")
+  endif ()
+
+  if (ARIA_SANITIZE_THREAD)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=thread")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=thread")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fsanitize=thread")
+    message(STATUS "ARIA: enabling the thread sanitizer.")
+  endif ()
+
+  if (ARIA_SANITIZE_UNDEFINED)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=undefined")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=undefined")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=undefined")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fsanitize=undefined")
+    message(STATUS "ARIA: enabling the undefined sanitizer.")
+  endif ()
 endif ()
 
 add_subdirectory(ARIA)

@@ -1,5 +1,6 @@
-#include "ARIA/Scene/Object.h"
 #include "ARIA/Scene/Components/Transform.h"
+//
+#include "ARIA/Scene/Object.h"
 
 #include <gtest/gtest.h>
 

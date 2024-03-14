@@ -6,6 +6,7 @@ aria_add_module(
     SOURCES SanitizerGTestMain.cpp
     HARD_DEPENDENCIES
     gtest
+    ARIA::Core::Core
     STATIC # No shared library for this.
     ENABLE_IF ARIA_BUILD_TESTS
 )

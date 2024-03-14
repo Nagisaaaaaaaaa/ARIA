@@ -39,6 +39,11 @@ function(aria_add_tests tests_name)
       ${TEST_HARD_DEPENDENCIES} # Add the hard dependencies to the test
   )
 
+  # Add the test to ctest if it is not an independent test case.
+  if (NOT TEST_INDEPENDENT)
+    add_test(NAME ${tests_name} COMMAND ${tests_name})
+  endif ()
+
   # Export all tests to a single test directory so that we can access the test conveniently.
   set_target_properties(${tests_name} PROPERTIES
       RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests")

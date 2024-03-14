@@ -12,7 +12,6 @@
 //
 #include "ARIA/Scene/Component.h"
 #include "ARIA/Scene/Components/detail/TransformImpl.h"
-#include "ARIA/Scene/Object.h"
 
 namespace ARIA {
 
