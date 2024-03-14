@@ -95,6 +95,10 @@ protected:
     return static_cast<bool>((block >> iBits) & TBlock{1});
   }
 
+  [[nodiscard]] static bool GetBit(const thrust::device_reference<const TBlock> &block, uint iBits) {
+    return static_cast<bool>((block >> iBits) & TBlock{1});
+  }
+
   static TBlock &FillBit(TBlock &block, uint iBits) {
     if constexpr (std::is_same_v<TThreadSafety, ThreadUnsafe>) {
       return block |= (TBlock{1} << iBits);
@@ -126,6 +130,11 @@ protected:
   }
 
   static TBlock &SetBit(TBlock &block, uint iBits, bool bit) {
+    TBlock mask = TBlock{1} << iBits;
+    return block = (block & ~mask) | (TBlock{bit} << iBits);
+  }
+
+  static thrust::device_reference<TBlock> SetBit(thrust::device_reference<TBlock> block, uint iBits, bool bit) {
     TBlock mask = TBlock{1} << iBits;
     return block = (block & ~mask) | (TBlock{bit} << iBits);
   }
@@ -216,6 +225,46 @@ private:
   friend Base;
 
   std::vector<typename Base::TBlock> blocks_;
+
+  [[nodiscard]] const auto &storage() const { return blocks_; }
+
+  [[nodiscard]] auto &storage() { return blocks_; }
+};
+
+template <typename TThreadSafety>
+class BitVector<SpaceDevice, TThreadSafety>
+    : public BitVectorStorageAPI<BitVector<SpaceDevice, TThreadSafety>, TThreadSafety> {
+public:
+  explicit BitVector(size_t n = 0) { Base::resize(n); }
+
+  ARIA_COPY_MOVE_ABILITY(BitVector, default, default);
+
+public:
+  [[nodiscard]] auto data() const { return blocks_.data(); }
+
+  [[nodiscard]] auto data() { return blocks_.data(); }
+
+  [[nodiscard]] auto span() const {
+    return BitVectorSpan<SpaceDevice, TThreadSafety, decltype(data())>{data(), Base::size()};
+  }
+
+  [[nodiscard]] auto span() {
+    return BitVectorSpan<SpaceDevice, TThreadSafety, decltype(data())>{data(), Base::size()};
+  }
+
+  [[nodiscard]] auto rawSpan() const {
+    return BitVectorSpan<SpaceDevice, TThreadSafety, decltype(thrust::raw_pointer_cast(data()))>{data(), Base::size()};
+  }
+
+  [[nodiscard]] auto rawSpan() {
+    return BitVectorSpan<SpaceDevice, TThreadSafety, decltype(thrust::raw_pointer_cast(data()))>{data(), Base::size()};
+  }
+
+private:
+  using Base = BitVectorStorageAPI<BitVector<SpaceDevice, TThreadSafety>, TThreadSafety>;
+  friend Base;
+
+  thrust::device_vector<typename Base::TBlock> blocks_;
 
   [[nodiscard]] const auto &storage() const { return blocks_; }
 
