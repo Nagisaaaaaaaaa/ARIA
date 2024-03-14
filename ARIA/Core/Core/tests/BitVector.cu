@@ -7,7 +7,7 @@
 namespace ARIA {
 
 TEST(BitVector, Base) {
-  auto testBitVector = []<typename TSpace, typename TThreadSafety>() {
+  auto testBitVectorBase = []<typename TSpace, typename TThreadSafety>() {
     // Constructors.
     {
       BitVector<TSpace, TThreadSafety> bitVector;
@@ -111,63 +111,124 @@ TEST(BitVector, Base) {
     }
   };
 
-  testBitVector.operator()<SpaceHost, ThreadUnsafe>();
-  testBitVector.operator()<SpaceHost, ThreadSafe>();
-  testBitVector.operator()<SpaceDevice, ThreadUnsafe>();
-  testBitVector.operator()<SpaceDevice, ThreadSafe>();
+  testBitVectorBase.operator()<SpaceHost, ThreadUnsafe>();
+  testBitVectorBase.operator()<SpaceHost, ThreadSafe>();
+  testBitVectorBase.operator()<SpaceDevice, ThreadUnsafe>();
+  testBitVectorBase.operator()<SpaceDevice, ThreadSafe>();
 }
 
 TEST(BitVector, Span) {
-  // Constructors.
-  {
-    BitVector<SpaceHost, ThreadSafe> bitVector;
-    BitVectorSpan bitVectorSpan = bitVector.span();
-    EXPECT_EQ(bitVectorSpan.size(), 0);
-  }
+  auto testBitVectorSpan = []<typename TSpace, typename TThreadSafety>() {
+    // Constructors.
+    {
+      BitVector<SpaceHost, ThreadSafe> bitVector;
+      BitVectorSpan bitVectorSpan = bitVector.span();
+      EXPECT_EQ(bitVectorSpan.size(), 0);
+    }
 
-  for (size_t n = 0; n < 100; ++n) {
-    BitVector<SpaceHost, ThreadSafe> bitVector(n);
-    BitVectorSpan bitVectorSpan = bitVector.span();
-    EXPECT_EQ(bitVectorSpan.size(), n);
+    for (size_t n = 0; n < 100; ++n) {
+      BitVector<SpaceHost, ThreadSafe> bitVector(n);
+      BitVectorSpan bitVectorSpan = bitVector.span();
+      EXPECT_EQ(bitVectorSpan.size(), n);
 
-    for (size_t i = 0; i < n; ++i)
-      EXPECT_EQ(bitVectorSpan[i], false);
-  }
+      for (size_t i = 0; i < n; ++i)
+        EXPECT_EQ(bitVectorSpan[i], false);
+    }
 
-  // Operator[].
-  for (size_t n = 0; n < 100; ++n) {
-    BitVector<SpaceHost, ThreadSafe> bitVector(n);
-    BitVectorSpan bitVectorSpan = bitVector.span();
-    BitVectorSpan bitVectorSpanRaw = bitVector.rawSpan();
+    // Operator[].
+    for (size_t n = 0; n < 100; ++n) {
+      BitVector<SpaceHost, ThreadSafe> bitVector(n);
+      BitVectorSpan bitVectorSpan = bitVector.span();
 
-    for (size_t i = 0; i < n; ++i)
-      if (i % 2 == 0)
-        bitVectorSpan[i] = true;
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 0)
+          bitVectorSpan[i] = true;
 
-    for (size_t i = 0; i < n; ++i)
-      EXPECT_EQ(bitVectorSpan[i], i % 2 == 0 ? true : false);
+      for (size_t i = 0; i < n; ++i)
+        EXPECT_EQ(bitVectorSpan[i], i % 2 == 0 ? true : false);
 
-    for (size_t i = 0; i < n; ++i)
-      if (i % 2 == 1)
-        bitVectorSpanRaw[i] = true;
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 1)
+          bitVectorSpan[i] = true;
 
-    for (size_t i = 0; i < n; ++i)
-      EXPECT_EQ(bitVectorSpanRaw[i], true);
+      for (size_t i = 0; i < n; ++i)
+        EXPECT_EQ(bitVectorSpan[i], true);
 
-    for (size_t i = 0; i < n; ++i)
-      if (i % 2 == 0)
-        bitVectorSpan[i] = false;
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 0)
+          bitVectorSpan[i] = false;
 
-    for (size_t i = 0; i < n; ++i)
-      EXPECT_EQ(bitVectorSpanRaw[i], i % 2 == 0 ? false : true);
+      for (size_t i = 0; i < n; ++i)
+        EXPECT_EQ(bitVectorSpan[i], i % 2 == 0 ? false : true);
 
-    for (size_t i = 0; i < n; ++i)
-      if (i % 2 == 1)
-        bitVectorSpanRaw[i] = false;
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 1)
+          bitVectorSpan[i] = false;
 
-    for (size_t i = 0; i < n; ++i)
-      EXPECT_EQ(bitVectorSpan[i], false);
-  }
+      for (size_t i = 0; i < n; ++i)
+        EXPECT_EQ(bitVectorSpan[i], false);
+    }
+  };
+
+  auto testBitVectorRawSpan = []<typename TSpace, typename TThreadSafety>() {
+    // Constructors.
+    {
+      BitVector<SpaceHost, ThreadSafe> bitVector;
+      BitVectorSpan bitVectorSpan = bitVector.rawSpan();
+      EXPECT_EQ(bitVectorSpan.size(), 0);
+    }
+
+    for (size_t n = 0; n < 100; ++n) {
+      BitVector<SpaceHost, ThreadSafe> bitVector(n);
+      BitVectorSpan bitVectorSpan = bitVector.rawSpan();
+      EXPECT_EQ(bitVectorSpan.size(), n);
+
+      for (size_t i = 0; i < n; ++i)
+        EXPECT_EQ(bitVectorSpan[i], false);
+    }
+
+    // Operator[].
+    for (size_t n = 0; n < 100; ++n) {
+      BitVector<SpaceHost, ThreadSafe> bitVector(n);
+      BitVectorSpan bitVectorSpan = bitVector.rawSpan();
+
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 0)
+          bitVectorSpan[i] = true;
+
+      for (size_t i = 0; i < n; ++i)
+        EXPECT_EQ(bitVectorSpan[i], i % 2 == 0 ? true : false);
+
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 1)
+          bitVectorSpan[i] = true;
+
+      for (size_t i = 0; i < n; ++i)
+        EXPECT_EQ(bitVectorSpan[i], true);
+
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 0)
+          bitVectorSpan[i] = false;
+
+      for (size_t i = 0; i < n; ++i)
+        EXPECT_EQ(bitVectorSpan[i], i % 2 == 0 ? false : true);
+
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 1)
+          bitVectorSpan[i] = false;
+
+      for (size_t i = 0; i < n; ++i)
+        EXPECT_EQ(bitVectorSpan[i], false);
+    }
+  };
+
+  testBitVectorSpan.operator()<SpaceHost, ThreadUnsafe>();
+  testBitVectorSpan.operator()<SpaceHost, ThreadSafe>();
+  testBitVectorSpan.operator()<SpaceDevice, ThreadUnsafe>();
+  testBitVectorSpan.operator()<SpaceDevice, ThreadSafe>();
+
+  testBitVectorRawSpan.operator()<SpaceHost, ThreadUnsafe>();
+  testBitVectorRawSpan.operator()<SpaceHost, ThreadSafe>();
 }
 
 TEST(BitVector, ThreadSafety) {
