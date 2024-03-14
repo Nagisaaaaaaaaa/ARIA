@@ -10,8 +10,8 @@ namespace ARIA {
 namespace {
 
 void TestThreadSafetyDevice() {
-  size_t n = 100000;
-  size_t nThreads = 10;
+  size_t n = 10000;
+  size_t nThreads = 100;
 
   // Fill.
   {
@@ -32,6 +32,67 @@ void TestThreadSafetyDevice() {
 
     for (size_t i = 0; i < n; ++i)
       EXPECT_EQ(bitVector[i], true);
+  }
+
+  // Clear.
+  {
+    BitVector<SpaceDevice, ThreadSafe> bitVector(n);
+
+    for (size_t i = 0; i < n; ++i)
+      if (i % 2 == 0)
+        bitVector[i] = true;
+
+    Launcher(nThreads, [=, span = bitVector.span()] ARIA_DEVICE(size_t t) mutable {
+      size_t tCpy = t;
+      for (size_t i = tCpy; i < n; i += nThreads) {
+        span.Clear(i);
+      }
+    }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    for (size_t i = 0; i < n; ++i)
+      EXPECT_EQ(bitVector[i], false);
+  }
+
+  // Flip.
+  {
+    BitVector<SpaceDevice, ThreadSafe> bitVector(n);
+
+    Launcher(nThreads, [=, span = bitVector.span()] ARIA_DEVICE(size_t t) mutable {
+      size_t tCpy = t;
+      for (size_t i = tCpy; i < n; i += nThreads) {
+        span.Flip(i);
+      }
+    }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    for (size_t i = 0; i < n; ++i)
+      EXPECT_EQ(bitVector[i], true);
+  }
+
+  {
+    BitVector<SpaceDevice, ThreadSafe> bitVector(n);
+
+    for (size_t i = 0; i < n; ++i)
+      if (i % 2 == 0)
+        bitVector[i] = true;
+
+    Launcher(nThreads, [=, span = bitVector.span()] ARIA_DEVICE(size_t t) mutable {
+      size_t tCpy = t;
+      for (size_t i = tCpy; i < n; i += nThreads) {
+        span.Flip(i);
+      }
+    }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    for (size_t i = 0; i < n; ++i)
+      if (i % 2 == 0)
+        EXPECT_EQ(bitVector[i], false);
+      else
+        EXPECT_EQ(bitVector[i], true);
   }
 }
 

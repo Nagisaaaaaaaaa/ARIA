@@ -108,6 +108,10 @@ protected:
     }
   }
 
+  ARIA_HOST_DEVICE static void FillBit(const thrust::device_reference<TBlock> &block, uint iBits) {
+    FillBit(thrust::raw_reference_cast(block), iBits);
+  }
+
   ARIA_HOST_DEVICE static void ClearBit(TBlock &block, uint iBits) {
     if constexpr (std::is_same_v<TThreadSafety, ThreadUnsafe>) {
       block &= ~(TBlock{1} << iBits);
@@ -117,6 +121,10 @@ protected:
     }
   }
 
+  ARIA_HOST_DEVICE static void ClearBit(const thrust::device_reference<TBlock> &block, uint iBits) {
+    ClearBit(thrust::raw_reference_cast(block), iBits);
+  }
+
   ARIA_HOST_DEVICE static void FlipBit(TBlock &block, uint iBits) {
     if constexpr (std::is_same_v<TThreadSafety, ThreadUnsafe>) {
       block ^= (TBlock{1} << iBits);
@@ -124,6 +132,10 @@ protected:
       cuda::atomic_ref atomicBlock{block};
       atomicBlock.fetch_xor(TBlock{1} << iBits);
     }
+  }
+
+  ARIA_HOST_DEVICE static void FlipBit(const thrust::device_reference<TBlock> &block, uint iBits) {
+    FlipBit(thrust::raw_reference_cast(block), iBits);
   }
 
   ARIA_HOST_DEVICE static void SetBit(TBlock &block, uint iBits, bool bit) {
