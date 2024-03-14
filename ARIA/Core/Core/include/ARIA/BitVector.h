@@ -163,19 +163,23 @@ public:
 //
 //
 //
-template <typename TSpace, typename TThreadSafety, auto raw>
-class BitVectorSpan : public BitVectorSpanAPI<BitVectorSpan<TSpace, TThreadSafety, raw>, TThreadSafety> {
+template <typename TSpace, typename TThreadSafety, typename TPtr>
+class BitVectorSpan : public BitVectorSpanAPI<BitVectorSpan<TSpace, TThreadSafety, TPtr>, TThreadSafety> {
 public:
-  // TODO: Implement this.
+  BitVectorSpan(TPtr p, size_t n) : p_(p) { nBits_ = n; }
+
+  ARIA_COPY_MOVE_ABILITY(BitVectorSpan, default, default);
+
+public:
+  [[nodiscard]] auto data() const { return p_; }
+
+  [[nodiscard]] auto data() { return p_; }
 
 private:
-  using Base = BitVectorSpanAPI<BitVectorSpan<TSpace, TThreadSafety, raw>, TThreadSafety>;
+  using Base = BitVectorSpanAPI<BitVectorSpan<TSpace, TThreadSafety, TPtr>, TThreadSafety>;
+  using Base::nBits_;
 
-  using TPtrNonRaw = std::conditional_t<std::is_same_v<TSpace, SpaceHost>,
-                                        typename Base::TBlock *,
-                                        thrust::device_ptr<typename Base::TBlock *>>;
-
-  using TPtr = std::conditional_t<raw, typename Base::TBlock *, TPtrNonRaw>;
+  TPtr p_;
 };
 
 //
@@ -196,6 +200,16 @@ public:
   [[nodiscard]] auto data() const { return blocks_.data(); }
 
   [[nodiscard]] auto data() { return blocks_.data(); }
+
+  [[nodiscard]] auto span() const {
+    return BitVectorSpan<SpaceHost, TThreadSafety, decltype(data())>{data(), Base::size()};
+  }
+
+  [[nodiscard]] auto span() { return BitVectorSpan<SpaceHost, TThreadSafety, decltype(data())>{data(), Base::size()}; }
+
+  [[nodiscard]] auto rawSpan() const { return span(); }
+
+  [[nodiscard]] auto rawSpan() { return span(); }
 
 private:
   using Base = BitVectorStorageAPI<BitVector<SpaceHost, TThreadSafety>, TThreadSafety>;
