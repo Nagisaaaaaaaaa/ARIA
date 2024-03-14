@@ -10,39 +10,44 @@
 #include "ARIA/Property.h"
 
 #include <cuda/atomic>
+#include <thrust/device_vector.h>
 
 namespace ARIA {
 
-template <typename TDerived, typename TThreadUnsafeOrSafe>
-class BitVectorBase {
-private:
-  [[nodiscard]] const TDerived &derived() const {
-    const TDerived &d = *static_cast<const TDerived *>(this);
-    static_assert(std::is_same_v<decltype(d.storage()[0]), const TBlock &>,
-                  "Element type of the storage should be the same as `TBlock`");
-    return d;
-  }
+template <typename TDerived>
+class BitVectorCRTPBase {
+protected:
+  using TBlock = uint;
+  static constexpr uint nBitsPerBlock = sizeof(TBlock) * 8;
 
-  [[nodiscard]] TDerived &derived() {
-    TDerived &d = *static_cast<TDerived *>(this);
-    static_assert(std::is_same_v<decltype(d.storage()[0]), TBlock &>,
-                  "Element type of the storage should be the same as `TBlock`");
-    return d;
-  }
+  [[nodiscard]] const TDerived &derived() const { return *static_cast<const TDerived *>(this); }
+
+  [[nodiscard]] TDerived &derived() { return *static_cast<TDerived *>(this); }
+};
+
+template <typename TDerived, typename TThreadUnsafeOrSafe>
+class BitVectorSpanAPI : public BitVectorCRTPBase<TDerived> {
+protected:
+  using Base = BitVectorCRTPBase<TDerived>;
+  // clang-format off
+  using typename Base::TBlock;
+  using Base::nBitsPerBlock;
+  using Base::derived;
+  // clang-format on
 
 public:
-  BitVectorBase() = default;
+  BitVectorSpanAPI() = default;
 
-  ARIA_COPY_ABILITY(BitVectorBase, default);
+  ARIA_COPY_ABILITY(BitVectorSpanAPI, default);
 
-  friend void swap(BitVectorBase &lhs, BitVectorBase &rhs) ARIA_NOEXCEPT {
+  friend void swap(BitVectorSpanAPI &lhs, BitVectorSpanAPI &rhs) ARIA_NOEXCEPT {
     using std::swap;
     swap(lhs.nBits_, rhs.nBits_);
   }
 
-  BitVectorBase(BitVectorBase &&other) ARIA_NOEXCEPT : BitVectorBase() { swap(*this, other); }
+  BitVectorSpanAPI(BitVectorSpanAPI &&other) ARIA_NOEXCEPT : BitVectorSpanAPI() { swap(*this, other); }
 
-  BitVectorBase &operator=(BitVectorBase &&other) ARIA_NOEXCEPT {
+  BitVectorSpanAPI &operator=(BitVectorSpanAPI &&other) ARIA_NOEXCEPT {
     swap(*this, other);
     return *this;
   }
@@ -57,33 +62,25 @@ public:
 
   TDerived &Fill(size_t i) {
     auto [iBlocks, iBits] = i2iBlocksAndiBits(i);
-    FillBit(derived().storage()[iBlocks], iBits);
+    FillBit(derived().data()[iBlocks], iBits);
     return derived();
   }
 
   TDerived &Clear(size_t i) {
     auto [iBlocks, iBits] = i2iBlocksAndiBits(i);
-    ClearBit(derived().storage()[iBlocks], iBits);
+    ClearBit(derived().data()[iBlocks], iBits);
     return derived();
   }
 
   TDerived &Flip(size_t i) {
     auto [iBlocks, iBits] = i2iBlocksAndiBits(i);
-    FlipBit(derived().storage()[iBlocks], iBits);
+    FlipBit(derived().data()[iBlocks], iBits);
     return derived();
   }
 
   [[nodiscard]] size_t size() const { return nBits_; }
 
-  void resize(size_t n) {
-    derived().storage().resize((n + nBitsPerBlock - 1) / nBitsPerBlock);
-    nBits_ = n;
-  }
-
 protected:
-  using TBlock = uint;
-  static constexpr uint nBitsPerBlock = sizeof(TBlock) * 8;
-
   size_t nBits_ = 0;
 
   [[nodiscard]] std::pair<size_t, uint> i2iBlocksAndiBits(size_t i) const {
@@ -135,13 +132,50 @@ protected:
 
   [[nodiscard]] bool ARIA_PROP_IMPL(at)(size_t i) const {
     auto [iBlocks, iBits] = i2iBlocksAndiBits(i);
-    return GetBit(derived().storage()[iBlocks], iBits);
+    return GetBit(derived().data()[iBlocks], iBits);
   }
 
   void ARIA_PROP_IMPL(at)(size_t i, bool value) {
     auto [iBlocks, iBits] = i2iBlocksAndiBits(i);
-    SetBit(derived().storage()[iBlocks], iBits, value);
+    SetBit(derived().data()[iBlocks], iBits, value);
   }
+};
+
+template <typename TDerived, typename TThreadUnsafeOrSafe>
+class BitVectorStorageAPI : public BitVectorSpanAPI<TDerived, TThreadUnsafeOrSafe> {
+protected:
+  using Base = BitVectorSpanAPI<TDerived, TThreadUnsafeOrSafe>;
+  // clang-format off
+  using typename Base::TBlock;
+  using Base::nBitsPerBlock;
+  using Base::derived;
+
+  using Base::nBits_;
+  // clang-format on
+
+public:
+  void resize(size_t n) {
+    derived().storage().resize((n + nBitsPerBlock - 1) / nBitsPerBlock);
+    nBits_ = n;
+  }
+};
+
+//
+//
+//
+template <typename TSpace, typename TThreadUnsafeOrSafe, auto raw>
+class BitVectorSpan : public BitVectorSpanAPI<BitVectorSpan<TSpace, TThreadUnsafeOrSafe, raw>, TThreadUnsafeOrSafe> {
+public:
+  // TODO: Implement this.
+
+private:
+  using Base = BitVectorSpanAPI<BitVectorSpan<TSpace, TThreadUnsafeOrSafe, raw>, TThreadUnsafeOrSafe>;
+
+  using TPtrNonRaw = std::conditional_t<std::is_same_v<TSpace, SpaceHost>,
+                                        typename Base::TBlock *,
+                                        thrust::device_ptr<typename Base::TBlock *>>;
+
+  using TPtr = std::conditional_t<raw, typename Base::TBlock *, TPtrNonRaw>;
 };
 
 //
@@ -150,22 +184,24 @@ protected:
 template <typename TSpace, typename TThreadUnsafeOrSafe>
 class BitVector;
 
-template <>
-class BitVector<SpaceHost, ThreadUnsafe> : public std::vector<bool> {};
-
-template <>
-class BitVector<SpaceHost, ThreadSafe> : public BitVectorBase<BitVector<SpaceHost, ThreadSafe>, ThreadSafe> {
+template <typename TThreadUnsafeOrSafe>
+class BitVector<SpaceHost, TThreadUnsafeOrSafe>
+    : public BitVectorStorageAPI<BitVector<SpaceHost, TThreadUnsafeOrSafe>, TThreadUnsafeOrSafe> {
 public:
-  using Base = BitVectorBase<BitVector<SpaceHost, ThreadSafe>, ThreadSafe>;
-
-  explicit BitVector(size_t n = 0) { resize(n); }
+  explicit BitVector(size_t n = 0) { Base::resize(n); }
 
   ARIA_COPY_MOVE_ABILITY(BitVector, default, default);
 
+public:
+  [[nodiscard]] auto data() const { return blocks_.data(); }
+
+  [[nodiscard]] auto data() { return blocks_.data(); }
+
 private:
+  using Base = BitVectorStorageAPI<BitVector<SpaceHost, TThreadUnsafeOrSafe>, TThreadUnsafeOrSafe>;
   friend Base;
 
-  std::vector<Base::TBlock> blocks_;
+  std::vector<typename Base::TBlock> blocks_;
 
   [[nodiscard]] const auto &storage() const { return blocks_; }
 
