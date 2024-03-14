@@ -1,10 +1,41 @@
 #include "ARIA/BitVector.h"
+#include "ARIA/Launcher.h"
 
 #include <gtest/gtest.h>
 
 #include <thread>
 
 namespace ARIA {
+
+namespace {
+
+void TestThreadSafetyDevice() {
+  size_t n = 100000;
+  size_t nThreads = 10;
+
+  // Fill.
+  {
+    BitVector<SpaceDevice, ThreadSafe> bitVector(n);
+
+    for (size_t i = 0; i < n; ++i)
+      if (i % 2 == 0)
+        bitVector[i] = true;
+
+    Launcher(nThreads, [=, span = bitVector.span()] ARIA_DEVICE(size_t t) mutable {
+      size_t tCpy = t;
+      for (size_t i = tCpy; i < n; i += nThreads) {
+        span.Fill(i);
+      }
+    }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    for (size_t i = 0; i < n; ++i)
+      EXPECT_EQ(bitVector[i], true);
+  }
+}
+
+} // namespace
 
 TEST(BitVector, Base) {
   auto testBitVectorBase = []<typename TSpace, typename TThreadSafety>() {
@@ -231,7 +262,7 @@ TEST(BitVector, Span) {
   testBitVectorRawSpan.operator()<SpaceHost, ThreadSafe>();
 }
 
-TEST(BitVector, ThreadSafety) {
+TEST(BitVector, ThreadSafetyHost) {
   size_t n = 100000;
   size_t nThreads = 10;
 
@@ -328,6 +359,10 @@ TEST(BitVector, ThreadSafety) {
       else
         EXPECT_EQ(bitVector[i], true);
   }
+}
+
+TEST(BitVector, ThreadSafetyDevice) {
+  TestThreadSafetyDevice();
 }
 
 } // namespace ARIA

@@ -20,9 +20,9 @@ protected:
   using TBlock = uint;
   static constexpr uint nBitsPerBlock = sizeof(TBlock) * 8;
 
-  [[nodiscard]] const TDerived &derived() const { return *static_cast<const TDerived *>(this); }
+  [[nodiscard]] ARIA_HOST_DEVICE const TDerived &derived() const { return *static_cast<const TDerived *>(this); }
 
-  [[nodiscard]] TDerived &derived() { return *static_cast<TDerived *>(this); }
+  [[nodiscard]] ARIA_HOST_DEVICE TDerived &derived() { return *static_cast<TDerived *>(this); }
 };
 
 template <typename TDerived, typename TThreadSafety>
@@ -40,50 +40,50 @@ public:
 
   ARIA_COPY_ABILITY(BitVectorSpanAPI, default);
 
-  friend void swap(BitVectorSpanAPI &lhs, BitVectorSpanAPI &rhs) ARIA_NOEXCEPT {
+  ARIA_HOST_DEVICE friend void swap(BitVectorSpanAPI &lhs, BitVectorSpanAPI &rhs) ARIA_NOEXCEPT {
     using std::swap;
     swap(lhs.nBits_, rhs.nBits_);
   }
 
-  BitVectorSpanAPI(BitVectorSpanAPI &&other) ARIA_NOEXCEPT : BitVectorSpanAPI() { swap(*this, other); }
+  ARIA_HOST_DEVICE BitVectorSpanAPI(BitVectorSpanAPI &&other) ARIA_NOEXCEPT : BitVectorSpanAPI() { swap(*this, other); }
 
-  BitVectorSpanAPI &operator=(BitVectorSpanAPI &&other) ARIA_NOEXCEPT {
+  ARIA_HOST_DEVICE BitVectorSpanAPI &operator=(BitVectorSpanAPI &&other) ARIA_NOEXCEPT {
     swap(*this, other);
     return *this;
   }
 
 public:
-  ARIA_PROP(public, public, , bool, at, size_t);
+  ARIA_PROP(public, public, ARIA_HOST_DEVICE, bool, at, size_t);
 
 public:
-  [[nodiscard]] auto operator[](size_t i) const { return at(i); }
+  [[nodiscard]] ARIA_HOST_DEVICE auto operator[](size_t i) const { return at(i); }
 
-  [[nodiscard]] auto operator[](size_t i) { return at(i); }
+  [[nodiscard]] ARIA_HOST_DEVICE auto operator[](size_t i) { return at(i); }
 
-  TDerived &Fill(size_t i) {
+  ARIA_HOST_DEVICE TDerived &Fill(size_t i) {
     auto [iBlocks, iBits] = i2iBlocksAndiBits(i);
     FillBit(derived().data()[iBlocks], iBits);
     return derived();
   }
 
-  TDerived &Clear(size_t i) {
+  ARIA_HOST_DEVICE TDerived &Clear(size_t i) {
     auto [iBlocks, iBits] = i2iBlocksAndiBits(i);
     ClearBit(derived().data()[iBlocks], iBits);
     return derived();
   }
 
-  TDerived &Flip(size_t i) {
+  ARIA_HOST_DEVICE TDerived &Flip(size_t i) {
     auto [iBlocks, iBits] = i2iBlocksAndiBits(i);
     FlipBit(derived().data()[iBlocks], iBits);
     return derived();
   }
 
-  [[nodiscard]] size_t size() const { return nBits_; }
+  [[nodiscard]] ARIA_HOST_DEVICE size_t size() const { return nBits_; }
 
 protected:
   size_t nBits_ = 0;
 
-  [[nodiscard]] std::pair<size_t, uint> i2iBlocksAndiBits(size_t i) const {
+  [[nodiscard]] ARIA_HOST_DEVICE std::pair<size_t, uint> i2iBlocksAndiBits(size_t i) const {
     ARIA_ASSERT(i < nBits_, "The given bit index should be smaller than the total number of bits");
 
     size_t iBlocks = i / nBitsPerBlock;
@@ -91,60 +91,57 @@ protected:
     return {iBlocks, iBits};
   }
 
-  [[nodiscard]] static bool GetBit(const TBlock &block, uint iBits) {
+  [[nodiscard]] ARIA_HOST_DEVICE static bool GetBit(const TBlock &block, uint iBits) {
     return static_cast<bool>((block >> iBits) & TBlock{1});
   }
 
-  [[nodiscard]] static bool GetBit(const thrust::device_reference<const TBlock> &block, uint iBits) {
+  [[nodiscard]] ARIA_HOST_DEVICE static bool GetBit(const thrust::device_reference<const TBlock> &block, uint iBits) {
     return static_cast<bool>((block >> iBits) & TBlock{1});
   }
 
-  static TBlock &FillBit(TBlock &block, uint iBits) {
+  ARIA_HOST_DEVICE static void FillBit(TBlock &block, uint iBits) {
     if constexpr (std::is_same_v<TThreadSafety, ThreadUnsafe>) {
-      return block |= (TBlock{1} << iBits);
+      block |= (TBlock{1} << iBits);
     } else if constexpr (std::is_same_v<TThreadSafety, ThreadSafe>) {
       cuda::atomic_ref atomicBlock{block};
       atomicBlock.fetch_or(TBlock{1} << iBits);
-      return block;
     }
   }
 
-  static TBlock &ClearBit(TBlock &block, uint iBits) {
+  ARIA_HOST_DEVICE static void ClearBit(TBlock &block, uint iBits) {
     if constexpr (std::is_same_v<TThreadSafety, ThreadUnsafe>) {
-      return block &= ~(TBlock{1} << iBits);
+      block &= ~(TBlock{1} << iBits);
     } else if constexpr (std::is_same_v<TThreadSafety, ThreadSafe>) {
       cuda::atomic_ref atomicBlock{block};
       atomicBlock.fetch_and(~(TBlock{1} << iBits));
-      return block;
     }
   }
 
-  static TBlock &FlipBit(TBlock &block, uint iBits) {
+  ARIA_HOST_DEVICE static void FlipBit(TBlock &block, uint iBits) {
     if constexpr (std::is_same_v<TThreadSafety, ThreadUnsafe>) {
-      return block ^= (TBlock{1} << iBits);
+      block ^= (TBlock{1} << iBits);
     } else if constexpr (std::is_same_v<TThreadSafety, ThreadSafe>) {
       cuda::atomic_ref atomicBlock{block};
       atomicBlock.fetch_xor(TBlock{1} << iBits);
-      return block;
     }
   }
 
-  static TBlock &SetBit(TBlock &block, uint iBits, bool bit) {
+  ARIA_HOST_DEVICE static void SetBit(TBlock &block, uint iBits, bool bit) {
     TBlock mask = TBlock{1} << iBits;
-    return block = (block & ~mask) | (TBlock{bit} << iBits);
+    block = (block & ~mask) | (TBlock{bit} << iBits);
   }
 
-  static thrust::device_reference<TBlock> SetBit(thrust::device_reference<TBlock> block, uint iBits, bool bit) {
+  ARIA_HOST_DEVICE static void SetBit(thrust::device_reference<TBlock> block, uint iBits, bool bit) {
     TBlock mask = TBlock{1} << iBits;
-    return block = (block & ~mask) | (TBlock{bit} << iBits);
+    block = (block & ~mask) | (TBlock{bit} << iBits);
   }
 
-  [[nodiscard]] bool ARIA_PROP_IMPL(at)(size_t i) const {
+  [[nodiscard]] ARIA_HOST_DEVICE bool ARIA_PROP_IMPL(at)(size_t i) const {
     auto [iBlocks, iBits] = i2iBlocksAndiBits(i);
     return GetBit(derived().data()[iBlocks], iBits);
   }
 
-  void ARIA_PROP_IMPL(at)(size_t i, bool value) {
+  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(at)(size_t i, bool value) {
     auto [iBlocks, iBits] = i2iBlocksAndiBits(i);
     SetBit(derived().data()[iBlocks], iBits, value);
   }
@@ -180,9 +177,9 @@ public:
   ARIA_COPY_MOVE_ABILITY(BitVectorSpan, default, default);
 
 public:
-  [[nodiscard]] auto data() const { return p_; }
+  [[nodiscard]] ARIA_HOST_DEVICE auto data() const { return p_; }
 
-  [[nodiscard]] auto data() { return p_; }
+  [[nodiscard]] ARIA_HOST_DEVICE auto data() { return p_; }
 
 private:
   using Base = BitVectorSpanAPI<BitVectorSpan<TSpace, TThreadSafety, TPtr>, TThreadSafety>;
