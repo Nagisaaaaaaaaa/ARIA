@@ -170,11 +170,9 @@
 ///   //
 ///   // After writing the following codes, we will be able to use the smart reference or pointer:
 ///   // ```cpp
-///   // decltype(auto) smartRef = DecltypeAuto(transform.forwardByRef());
+///   // Property auto smartRef = transform.forwardByRef();
 ///   // smartRef.x() = ...; // This will call the setter.
 ///   // ```
-///   //
-///   // See `DecltypeAuto()` in `Auto.h` for the detailed usage.
 ///   ARIA_PROP_BEGIN(public, public, , Vec3<double> &, forwardByRef);
 ///     ARIA_SUB_PROP(, float &, x); //! Since the parent property returns reference, `float&` is allowed here.
 ///     ARIA_SUB_PROP(, float &, y);
@@ -341,6 +339,8 @@
 //
 //
 //
+namespace ARIA {
+
 /// \brief Getter and setter of a property should be defined only with the help of this macro.
 ///
 /// \param propName Name of the property defined by `ARIA_PROP` or `ARIA_PROP_BEGIN`.
@@ -478,3 +478,18 @@
 /// \todo To make life easier, MSVC bugs are simply handled by a copy of the whole codes with a little modifications.
 #define ARIA_PROP_FUNC(access, specifiers, dotOrArrow, funcName)                                                       \
   __ARIA_PROP_FUNC(access, specifiers, dotOrArrow, funcName)
+
+//
+//
+//
+//
+//
+/// \brief Use properties like smart references or smart pointers.
+///
+/// \example ```cpp
+/// Property auto trans = object.transform();
+/// ```
+template <typename T>
+concept Property = property::detail::PropertyType<T>;
+
+} // namespace ARIA

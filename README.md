@@ -145,9 +145,9 @@ This tutorial shows how to integrate ARIA into a simple project with cmake and C
 
    We can use `position()`, `rotation`, `position().x()`, and `rotation.w()` as if these functions return references to the underlying member variables, but actually, these variables do not exist. Now, we are able to write C#-like elegant codes in C++, as if we are using Unity!
 
-4. **Make `auto` and `decltype(auto)` safe in ARIA.**
+4. **Make `auto` safe in ARIA.**
 
-   To make `auto` and `decltype(auto)` safe, ARIA uses `auto + Auto()` and `decltype(auto) + DecltypeAuto()` type deduction:
+   To make `auto` safe, ARIA uses `auto + Auto()` type deduction:
    
    ```c++
    Vec3r a = {1, 2, 3};
@@ -161,7 +161,7 @@ This tutorial shows how to integrate ARIA into a simple project with cmake and C
    auto c1 = Auto(a.cross(b)); // With `auto + Auto()` type deduction, type of `c1` is correctly deduced to `Vec3r`.
    ```
    
-   These two functions, `Auto()` and `DecltypeAuto()`, help better deduce the types from all proxy systems used in ARIA, which makes our codes safe. Read the comments in `Auto.h` and `Property.h` to see how to use them.
+   `Auto()` helps better deduce the types from all proxy systems used in ARIA, which makes our codes safe. Read the comments in `Auto.h` and `Property.h` to see how to use them.
 
 5. **Coding standards.**
 
