@@ -25,7 +25,7 @@ protected:
   [[nodiscard]] TDerived &derived() { return *static_cast<TDerived *>(this); }
 };
 
-template <typename TDerived, typename TThreadUnsafeOrSafe>
+template <typename TDerived, typename TThreadSafety>
 class BitVectorSpanAPI : public BitVectorCRTPBase<TDerived> {
 protected:
   using Base = BitVectorCRTPBase<TDerived>;
@@ -96,9 +96,9 @@ protected:
   }
 
   static TBlock &FillBit(TBlock &block, uint iBits) {
-    if constexpr (std::is_same_v<TThreadUnsafeOrSafe, ThreadUnsafe>) {
+    if constexpr (std::is_same_v<TThreadSafety, ThreadUnsafe>) {
       return block |= (TBlock{1} << iBits);
-    } else if constexpr (std::is_same_v<TThreadUnsafeOrSafe, ThreadSafe>) {
+    } else if constexpr (std::is_same_v<TThreadSafety, ThreadSafe>) {
       cuda::atomic_ref atomicBlock{block};
       atomicBlock.fetch_or(TBlock{1} << iBits);
       return block;
@@ -106,9 +106,9 @@ protected:
   }
 
   static TBlock &ClearBit(TBlock &block, uint iBits) {
-    if constexpr (std::is_same_v<TThreadUnsafeOrSafe, ThreadUnsafe>) {
+    if constexpr (std::is_same_v<TThreadSafety, ThreadUnsafe>) {
       return block &= ~(TBlock{1} << iBits);
-    } else if constexpr (std::is_same_v<TThreadUnsafeOrSafe, ThreadSafe>) {
+    } else if constexpr (std::is_same_v<TThreadSafety, ThreadSafe>) {
       cuda::atomic_ref atomicBlock{block};
       atomicBlock.fetch_and(~(TBlock{1} << iBits));
       return block;
@@ -116,9 +116,9 @@ protected:
   }
 
   static TBlock &FlipBit(TBlock &block, uint iBits) {
-    if constexpr (std::is_same_v<TThreadUnsafeOrSafe, ThreadUnsafe>) {
+    if constexpr (std::is_same_v<TThreadSafety, ThreadUnsafe>) {
       return block ^= (TBlock{1} << iBits);
-    } else if constexpr (std::is_same_v<TThreadUnsafeOrSafe, ThreadSafe>) {
+    } else if constexpr (std::is_same_v<TThreadSafety, ThreadSafe>) {
       cuda::atomic_ref atomicBlock{block};
       atomicBlock.fetch_xor(TBlock{1} << iBits);
       return block;
@@ -141,10 +141,10 @@ protected:
   }
 };
 
-template <typename TDerived, typename TThreadUnsafeOrSafe>
-class BitVectorStorageAPI : public BitVectorSpanAPI<TDerived, TThreadUnsafeOrSafe> {
+template <typename TDerived, typename TThreadSafety>
+class BitVectorStorageAPI : public BitVectorSpanAPI<TDerived, TThreadSafety> {
 protected:
-  using Base = BitVectorSpanAPI<TDerived, TThreadUnsafeOrSafe>;
+  using Base = BitVectorSpanAPI<TDerived, TThreadSafety>;
   // clang-format off
   using typename Base::TBlock;
   using Base::nBitsPerBlock;
@@ -163,13 +163,13 @@ public:
 //
 //
 //
-template <typename TSpace, typename TThreadUnsafeOrSafe, auto raw>
-class BitVectorSpan : public BitVectorSpanAPI<BitVectorSpan<TSpace, TThreadUnsafeOrSafe, raw>, TThreadUnsafeOrSafe> {
+template <typename TSpace, typename TThreadSafety, auto raw>
+class BitVectorSpan : public BitVectorSpanAPI<BitVectorSpan<TSpace, TThreadSafety, raw>, TThreadSafety> {
 public:
   // TODO: Implement this.
 
 private:
-  using Base = BitVectorSpanAPI<BitVectorSpan<TSpace, TThreadUnsafeOrSafe, raw>, TThreadUnsafeOrSafe>;
+  using Base = BitVectorSpanAPI<BitVectorSpan<TSpace, TThreadSafety, raw>, TThreadSafety>;
 
   using TPtrNonRaw = std::conditional_t<std::is_same_v<TSpace, SpaceHost>,
                                         typename Base::TBlock *,
@@ -181,12 +181,12 @@ private:
 //
 //
 //
-template <typename TSpace, typename TThreadUnsafeOrSafe>
+template <typename TSpace, typename TThreadSafety>
 class BitVector;
 
-template <typename TThreadUnsafeOrSafe>
-class BitVector<SpaceHost, TThreadUnsafeOrSafe>
-    : public BitVectorStorageAPI<BitVector<SpaceHost, TThreadUnsafeOrSafe>, TThreadUnsafeOrSafe> {
+template <typename TThreadSafety>
+class BitVector<SpaceHost, TThreadSafety>
+    : public BitVectorStorageAPI<BitVector<SpaceHost, TThreadSafety>, TThreadSafety> {
 public:
   explicit BitVector(size_t n = 0) { Base::resize(n); }
 
@@ -198,7 +198,7 @@ public:
   [[nodiscard]] auto data() { return blocks_.data(); }
 
 private:
-  using Base = BitVectorStorageAPI<BitVector<SpaceHost, TThreadUnsafeOrSafe>, TThreadUnsafeOrSafe>;
+  using Base = BitVectorStorageAPI<BitVector<SpaceHost, TThreadSafety>, TThreadSafety>;
   friend Base;
 
   std::vector<typename Base::TBlock> blocks_;
