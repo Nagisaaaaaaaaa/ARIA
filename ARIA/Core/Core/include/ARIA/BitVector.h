@@ -9,12 +9,11 @@
 //
 #include "ARIA/Property.h"
 
-#include <bitset>
-#include <vector>
+#include <cuda/atomic>
 
 namespace ARIA {
 
-template <typename TDerived>
+template <typename TDerived, typename TThreadUnsafeOrSafe>
 class BitVectorBase {
 private:
   [[nodiscard]] const TDerived &derived() const {
@@ -56,6 +55,12 @@ public:
 
   [[nodiscard]] auto operator[](size_t i) { return at(i); }
 
+  TDerived &Flip(size_t i) {
+    auto [iBlocks, iBits] = i2iBlocksAndiBits(i);
+    FlipBit(derived().storage()[iBlocks], iBits);
+    return derived();
+  }
+
   [[nodiscard]] size_t size() const { return nBits_; }
 
   void resize(size_t n) {
@@ -82,7 +87,14 @@ protected:
 
   static TBlock &FlipBit(TBlock &block, uint iBits) {
     ARIA_ASSERT(iBits < nBitsPerBlock, "The given `iBits` should be smaller than the number of bits per block");
-    return block ^= (TBlock{1} << iBits);
+
+    if constexpr (std::is_same_v<TThreadUnsafeOrSafe, ThreadUnsafe>) {
+      return block ^= (TBlock{1} << iBits);
+    } else if constexpr (std::is_same_v<TThreadUnsafeOrSafe, ThreadSafe>) {
+      cuda::atomic_ref atomicBlock{block};
+      atomicBlock.fetch_xor(TBlock{1} << iBits);
+      return block;
+    }
   }
 
   static TBlock &SetBit(TBlock &block, uint iBits, bool bit) {
@@ -114,9 +126,9 @@ template <>
 class BitVector<SpaceHost, ThreadUnsafe> : public std::vector<bool> {};
 
 template <>
-class BitVector<SpaceHost, ThreadSafe> : public BitVectorBase<BitVector<SpaceHost, ThreadSafe>> {
+class BitVector<SpaceHost, ThreadSafe> : public BitVectorBase<BitVector<SpaceHost, ThreadSafe>, ThreadSafe> {
 public:
-  using Base = BitVectorBase<BitVector<SpaceHost, ThreadSafe>>;
+  using Base = BitVectorBase<BitVector<SpaceHost, ThreadSafe>, ThreadSafe>;
 
   explicit BitVector(size_t n = 0) { resize(n); }
 

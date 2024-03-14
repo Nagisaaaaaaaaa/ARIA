@@ -122,7 +122,7 @@ TEST(BitVector, ThreadSafety) {
       threads[t] = std::jthread{[n, nThreads, &bitVector, t]() {
         size_t tCpy = t;
         for (size_t i = tCpy; i < n; i += nThreads) {
-          bitVector[i] = true;
+          bitVector.Flip(i);
         }
       }};
 
