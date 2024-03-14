@@ -4,11 +4,12 @@ project(ARIA LANGUAGES CXX)
 # User options.
 option(ARIA_BUILD_TESTS "Build unit tests" ON)
 option(ARIA_USE_64BIT_REAL "using Real = double;" OFF)
+option(ARIA_ENABLE_CUDA "Enable CUDA or not (MUST be ON for now)" ON)
 
-option(ARIA_SANITIZE_ADDRESS "Enable GCC/Clang address sanitizer?" OFF) # To catch out-of-bounds accesses.
-option(ARIA_SANITIZE_MEMORY "Enable Clang memory sanitizer?" OFF) # To catch use of uninitialized memory.
-option(ARIA_SANITIZE_THREAD "Enable GCC/Clang thread sanitizer?" OFF) # To catch multi-threading issues.
-option(ARIA_SANITIZE_UNDEFINED "Enable GCC/Clang undefined sanitizer?" OFF) # To catch undefined-behaviors.
+option(ARIA_SANITIZE_ADDRESS "Enable GCC/Clang address sanitizer or not" OFF) # To catch out-of-bounds accesses.
+option(ARIA_SANITIZE_MEMORY "Enable Clang memory sanitizer or not" OFF) # To catch use of uninitialized memory.
+option(ARIA_SANITIZE_THREAD "Enable GCC/Clang thread sanitizer or not" OFF) # To catch multi-threading issues.
+option(ARIA_SANITIZE_UNDEFINED "Enable GCC/Clang undefined sanitizer or not" OFF) # To catch undefined-behaviors.
 
 list(APPEND CMAKE_MODULE_PATH "${ARIA_SOURCE_DIR}/cmake/modules" "${CMAKE_BINARY_DIR}")
 
