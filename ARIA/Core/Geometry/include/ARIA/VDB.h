@@ -7,6 +7,7 @@
 //
 //
 //
+#include "ARIA/BitVector.h"
 #include "ARIA/MortonCode.h"
 #include "ARIA/TensorVector.h"
 #include "ARIA/Vec.h"
@@ -14,6 +15,7 @@
 #include <stdgpu/unordered_set.cuh>
 
 #include <bitset>
+#include <map>
 
 namespace ARIA {
 
@@ -46,6 +48,9 @@ private:
   // The space filling curve encoder and decoder used to hash the block coord to and from the block index.
   using Code = MortonCode<dim>;
 
+  using TActivityBlock = BitVector<SpaceDevice, ThreadSafe>;
+  using TDataBlock = thrust::device_vector<T>;
+
   static constexpr size_t toAllocateCapacity = 1024; // TODO: Maybe still too small, who knows.
 
   // Eg: dim: 1    1 << dim: 2    512 / (1 << dim): 256    #cells per block: 256
@@ -56,7 +61,7 @@ private:
   static_assert(nCellsPerBlockDim > 0, "The given dimension is too large");
 
   stdgpu::unordered_set<uint64> blockIndicesToAllocate_;
-  thrust::device_vector<uint64> blockIndicesAllocated_;
+  std::map<uint64, std::pair<TActivityBlock, TDataBlock>> blockIndicesAllocated_;
 
   [[nodiscard]] ARIA_HOST_DEVICE static uint64 BlockCoord2BlockIdx(const TCoord &blockCoord) {
     // Compute the block index.
@@ -98,11 +103,19 @@ private:
   }
 
   void AllocateBlocks() {
+    if (blockIndicesToAllocate_.empty())
+      return;
+
     thrust::host_vector<uint64> indicesH(blockIndicesToAllocate_.size());
     thrust::copy(blockIndicesToAllocate_.device_range().begin(), blockIndicesToAllocate_.device_range().end(),
                  indicesH.begin());
 
-    // TODO: Allocate all the corresponding blocks.
+    for (const auto &index : indicesH) {
+      if (blockIndicesAllocated_.contains(index))
+        continue;
+
+      blockIndicesAllocated_[index] = std::make_pair(TActivityBlock{}, TDataBlock{});
+    }
   }
 };
 
