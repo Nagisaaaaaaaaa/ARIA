@@ -31,7 +31,7 @@ public:
 
   ARIA_COPY_MOVE_ABILITY(VDB, delete, default);
 
-  ~VDB() noexcept /*Actually, exceptions may be thrown here.*/ {
+  ~VDB() noexcept /* Actually, exceptions may be thrown here. */ {
     stdgpu::unordered_set<uint64>::destroyDeviceObject(blockIndicesToAllocate_);
   }
 
@@ -52,8 +52,8 @@ private:
   //          2              4                      128                      16384
   //          3              8                      64                       262144
   //          4              16                     32                       1048576
-  static constexpr int blockDim = 512 / (1 << dim);
-  static_assert(blockDim > 0, "The given dimension is too large");
+  static constexpr int nCellsPerBlockDim = 512 / (1 << dim);
+  static_assert(nCellsPerBlockDim > 0, "The given dimension is too large");
 
   stdgpu::unordered_set<uint64> blockIndicesToAllocate_;
   thrust::device_vector<uint64> blockIndicesAllocated_;
@@ -82,7 +82,7 @@ private:
   }
 
   [[nodiscard]] ARIA_HOST_DEVICE static TCoord CellCoord2BlockCoord(const TCoord &cellCoord) {
-    return cellCoord / blockDim;
+    return cellCoord / nCellsPerBlockDim;
   }
 
   [[nodiscard]] ARIA_HOST_DEVICE static uint64 CellCoord2BlockIdx(const TCoord &cellCoord) {
