@@ -59,6 +59,7 @@ protected:
   size_t nBits_ = 0;
 
   // Get the CRTP derived class.
+  // All the APIs will be generated based on method `derived().data()`.
   [[nodiscard]] ARIA_HOST_DEVICE const TDerived &derived() const { return *static_cast<const TDerived *>(this); }
 
   [[nodiscard]] ARIA_HOST_DEVICE TDerived &derived() { return *static_cast<TDerived *>(this); }
@@ -359,6 +360,7 @@ private:
   };
 };
 
+// CRTP base class for all span-related APIs and storage-reated APIs.
 template <typename TDerived, typename TThreadSafety>
 class BitVectorStorageAPI : public BitVectorSpanAPI<TDerived, TThreadSafety> {
 protected:
@@ -370,6 +372,8 @@ protected:
 
   using Base::nBits_;
   // clang-format on
+
+  // All the APIs will be generated based on method `derived().storage()`.
 
 public:
   void resize(size_t n) {
