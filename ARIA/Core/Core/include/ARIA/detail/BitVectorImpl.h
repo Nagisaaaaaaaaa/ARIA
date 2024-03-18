@@ -10,6 +10,15 @@ namespace ARIA {
 
 namespace bit_vector::detail {
 
+//! For future developers: Please read the following comments to help you understand the codes.
+//! ! `BitVector` should be implemented similar to `std::vector<bool>`, but
+//! should also support device vectors and thread-safety.
+//! So, there are 4 variants of `BitVector`s:
+//!   1. Host + thread-unsafe,
+//!   2. Host + thread-safe,
+//!   3. Device + thread-unsafe,
+//!   4. Device + thread-safe.
+
 template <typename TDerived>
 class BitVectorCRTPBase {
 protected:
@@ -76,6 +85,24 @@ public:
 
   [[nodiscard]] ARIA_HOST_DEVICE size_t size() const { return nBits_; }
 
+private:
+  // Iterators fwd.
+  template <typename TDerivedMaybeConst>
+  class Iterator;
+
+public:
+  [[nodiscard]] ARIA_HOST_DEVICE auto begin() const { return Iterator<const TDerived>{derived(), 0}; }
+
+  [[nodiscard]] ARIA_HOST_DEVICE auto begin() { return Iterator<TDerived>{derived(), 0}; }
+
+  [[nodiscard]] ARIA_HOST_DEVICE auto end() const { return Iterator<const TDerived>{derived(), nBits_}; }
+
+  [[nodiscard]] ARIA_HOST_DEVICE auto end() { return Iterator<TDerived>{derived(), nBits_}; }
+
+  [[nodiscard]] ARIA_HOST_DEVICE auto cbegin() const { return begin(); }
+
+  [[nodiscard]] ARIA_HOST_DEVICE auto cend() const { return end(); }
+
 protected:
   size_t nBits_ = 0;
 
@@ -92,6 +119,10 @@ protected:
   }
 
   [[nodiscard]] ARIA_HOST_DEVICE static bool GetBit(const thrust::device_reference<const TBlock> &block, uint iBits) {
+    return static_cast<bool>((block >> iBits) & TBlock{1});
+  }
+
+  [[nodiscard]] ARIA_HOST_DEVICE static bool GetBit(const thrust::device_reference<TBlock> &block, uint iBits) {
     return static_cast<bool>((block >> iBits) & TBlock{1});
   }
 
@@ -153,6 +184,72 @@ protected:
     auto [iBlocks, iBits] = i2iBlocksAndiBits(i);
     SetBit(derived().data()[iBlocks], iBits, value);
   }
+
+private:
+  // Iterators implementation.
+  template <typename TDerivedMaybeConst>
+  class Iterator {
+  public:
+    using iterator_category = std::bidirectional_iterator_tag;
+    using difference_type = std::ptrdiff_t;
+    using value_type = bool;
+    // using reference = decltype(std::declval<BitVectorSpanAPI>()[0]);
+    // using pointer = ArrowProxy<reference>;
+
+  public:
+    //! The ranges library requires that iterators should be default constructable.
+    Iterator() noexcept = default;
+
+    ARIA_HOST_DEVICE explicit Iterator(TDerivedMaybeConst &bitVector, size_t i) noexcept
+        : bitVector_(&bitVector), i_(i) {}
+
+    ARIA_COPY_MOVE_ABILITY(Iterator, default, default);
+
+  public:
+    ARIA_HOST_DEVICE auto operator*() const { return (*bitVector_)[i_]; }
+
+    ARIA_HOST_DEVICE auto operator*() { return (*bitVector_)[i_]; }
+
+    ARIA_HOST_DEVICE auto operator->() const noexcept { return ArrowProxy((*bitVector_)[i_]); }
+
+    ARIA_HOST_DEVICE auto operator->() noexcept { return ArrowProxy((*bitVector_)[i_]); }
+
+    // ++it
+    ARIA_HOST_DEVICE Iterator &operator++() {
+      ++i_;
+      return *this;
+    }
+
+    // it++
+    ARIA_HOST_DEVICE Iterator operator++(int) {
+      Iterator tmp = *this;
+      ++(*this);
+      return tmp;
+    }
+
+    // --it
+    ARIA_HOST_DEVICE Iterator &operator--() {
+      --i_;
+      return *this;
+    }
+
+    // it--
+    ARIA_HOST_DEVICE Iterator operator--(int) {
+      Iterator tmp = *this;
+      --(*this);
+      return tmp;
+    }
+
+    ARIA_HOST_DEVICE friend bool operator==(const Iterator &a, const Iterator &b) noexcept {
+      return a.bitVector_ == b.bitVector_ && a.i_ == b.i_;
+    }
+
+    ARIA_HOST_DEVICE friend bool operator!=(const Iterator &a, const Iterator &b) noexcept { return !operator==(a, b); }
+
+  private:
+    TDerivedMaybeConst *bitVector_ = nullptr;
+    size_t i_ = 0;
+  };
 };
 
 template <typename TDerived, typename TThreadSafety>

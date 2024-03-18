@@ -79,12 +79,12 @@ Overload(Ts...) -> Overload<Ts...>;
 template <typename T>
 class ArrowProxy {
 public:
-  ArrowProxy(T &&t) : t(std::move(t)) {}
+  ARIA_HOST_DEVICE ArrowProxy(T &&t) noexcept : t(std::move(t)) {}
 
 public:
-  const T *operator->() const { return &t; }
+  ARIA_HOST_DEVICE const T *operator->() const noexcept { return &t; }
 
-  T *operator->() { return &t; }
+  ARIA_HOST_DEVICE T *operator->() noexcept { return &t; }
 
 private:
   T t;

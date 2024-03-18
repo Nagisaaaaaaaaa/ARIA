@@ -280,6 +280,187 @@ TEST(BitVector, Base) {
           EXPECT_EQ(bitVector[i], true);
       }
     }
+
+    // Non-const `begin` and `end`.
+    {
+      const size_t n = 10;
+      BitVector<TSpace, TThreadSafety> bitVector(n);
+
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 1)
+          bitVector[i] = true;
+
+      size_t i = 0;
+      for (auto it = bitVector.begin(); it != bitVector.end(); ++it, ++i) {
+        bool v = *it;
+
+        if (i % 2 == 1) {
+          EXPECT_TRUE(*it);
+          EXPECT_TRUE(v);
+          EXPECT_TRUE(it->value());
+          EXPECT_EQ(*it, true);
+          EXPECT_EQ(v, true);
+          EXPECT_EQ(it->value(), true);
+        } else {
+          EXPECT_FALSE(*it);
+          EXPECT_FALSE(v);
+          EXPECT_FALSE(it->value());
+          EXPECT_EQ(*it, false);
+          EXPECT_EQ(v, false);
+          EXPECT_EQ(it->value(), false);
+        }
+      }
+      EXPECT_EQ(i, n);
+    }
+
+    // Const `begin` and `end`.
+    {
+      const size_t n = 10;
+      BitVector<TSpace, TThreadSafety> bitVectorNonConst(n);
+
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 1)
+          bitVectorNonConst[i] = true;
+
+      const BitVector<TSpace, TThreadSafety> bitVector = bitVectorNonConst;
+
+      size_t i = 0;
+      for (auto it = bitVector.begin(); it != bitVector.end(); ++it, ++i) {
+        bool v = *it;
+
+        if (i % 2 == 1) {
+          EXPECT_TRUE(*it);
+          EXPECT_TRUE(v);
+          EXPECT_TRUE(it->value());
+          EXPECT_EQ(*it, true);
+          EXPECT_EQ(v, true);
+          EXPECT_EQ(it->value(), true);
+        } else {
+          EXPECT_FALSE(*it);
+          EXPECT_FALSE(v);
+          EXPECT_FALSE(it->value());
+          EXPECT_EQ(*it, false);
+          EXPECT_EQ(v, false);
+          EXPECT_EQ(it->value(), false);
+        }
+      }
+      EXPECT_EQ(i, n);
+    }
+
+    // `cbegin` and `cend`.
+    {
+      const size_t n = 10;
+      BitVector<TSpace, TThreadSafety> bitVectorNonConst(n);
+
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 1)
+          bitVectorNonConst[i] = true;
+
+      const BitVector<TSpace, TThreadSafety> bitVector = bitVectorNonConst;
+
+      size_t i = 0;
+      for (auto it = bitVector.cbegin(); it != bitVector.cend(); ++it, ++i) {
+        bool v = *it;
+
+        if (i % 2 == 1) {
+          EXPECT_TRUE(*it);
+          EXPECT_TRUE(v);
+          EXPECT_TRUE(it->value());
+          EXPECT_EQ(*it, true);
+          EXPECT_EQ(v, true);
+          EXPECT_EQ(it->value(), true);
+        } else {
+          EXPECT_FALSE(*it);
+          EXPECT_FALSE(v);
+          EXPECT_FALSE(it->value());
+          EXPECT_EQ(*it, false);
+          EXPECT_EQ(v, false);
+          EXPECT_EQ(it->value(), false);
+        }
+      }
+      EXPECT_EQ(i, n);
+    }
+
+    // Non-const range-based for.
+    {
+      const size_t n = 10;
+      BitVector<TSpace, TThreadSafety> bitVector(n);
+
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 1)
+          bitVector[i] = true;
+
+      size_t i = 0;
+      for (auto v : bitVector) {
+        if (i % 2 == 1) {
+          EXPECT_TRUE(v);
+          EXPECT_TRUE(v.value());
+          EXPECT_EQ(v, true);
+          EXPECT_EQ(v.value(), true);
+        } else {
+          EXPECT_FALSE(v);
+          EXPECT_FALSE(v.value());
+          EXPECT_EQ(v, false);
+          EXPECT_EQ(v.value(), false);
+        }
+        ++i;
+      }
+      EXPECT_EQ(i, n);
+    }
+
+    // Const range-based for.
+    {
+      const size_t n = 10;
+      BitVector<TSpace, TThreadSafety> bitVectorNonConst(n);
+
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 1)
+          bitVectorNonConst[i] = true;
+
+      const BitVector<TSpace, TThreadSafety> bitVector = bitVectorNonConst;
+
+      size_t i = 0;
+      for (auto v : bitVector) {
+        if (i % 2 == 1) {
+          EXPECT_TRUE(v);
+          EXPECT_TRUE(v.value());
+          EXPECT_EQ(v, true);
+          EXPECT_EQ(v.value(), true);
+        } else {
+          EXPECT_FALSE(v);
+          EXPECT_FALSE(v.value());
+          EXPECT_EQ(v, false);
+          EXPECT_EQ(v.value(), false);
+        }
+        ++i;
+      }
+      EXPECT_EQ(i, n);
+    }
+
+    // Iterator requirements.
+    {
+      BitVector<TSpace, TThreadSafety> t0;
+      auto tSpan0 = t0.span();
+      auto tRawSpan0 = t0.rawSpan();
+
+      const BitVector<TSpace, TThreadSafety> t1;
+      const auto tSpan1 = t1.span();
+      const auto tRawSpan1 = t1.rawSpan();
+
+      auto testIteratorRequirements = [](auto v) {
+        static_assert(std::bidirectional_iterator<decltype(v.begin())>);
+        static_assert(std::bidirectional_iterator<decltype(v.end())>);
+        static_assert(std::bidirectional_iterator<decltype(v.cbegin())>);
+        static_assert(std::bidirectional_iterator<decltype(v.cend())>);
+      };
+
+      testIteratorRequirements(t0);
+      testIteratorRequirements(tSpan0);
+      testIteratorRequirements(tRawSpan0);
+      testIteratorRequirements(t1);
+      testIteratorRequirements(tSpan1);
+      testIteratorRequirements(tRawSpan1);
+    }
   };
 
   testBitVectorBase.operator()<SpaceHost, ThreadUnsafe>();
