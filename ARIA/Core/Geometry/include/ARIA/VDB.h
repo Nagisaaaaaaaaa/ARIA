@@ -12,12 +12,14 @@
 #include "ARIA/TensorVector.h"
 #include "ARIA/Vec.h"
 
-#include <stdgpu/unordered_set.cuh>
+#include <stdgpu/unordered_map.cuh>
 
 #include <bitset>
-#include <map>
 
 namespace ARIA {
+
+template <typename T, auto dim, typename TSpace>
+class VDBAccessor;
 
 template <typename T, auto dim, typename TSpace>
 class VDB;
@@ -25,17 +27,15 @@ class VDB;
 //
 //
 //
-// Device VDB.
+// Device VDB accessor.
 template <typename T, auto dim>
-class VDB<T, dim, SpaceDevice> {
+class VDBAccessor<T, dim, SpaceDevice> {
 public:
-  VDB() : blockIndicesToAllocate_(stdgpu::unordered_set<uint64>::createDeviceObject(toAllocateCapacity)) {}
+  VDBAccessor() : blocks_(TBlocks::createDeviceObject(nBlocksMax)) {}
 
-  ARIA_COPY_MOVE_ABILITY(VDB, delete, default);
+  ARIA_COPY_MOVE_ABILITY(VDBAccessor, delete, default);
 
-  ~VDB() noexcept /* Actually, exceptions may be thrown here. */ {
-    stdgpu::unordered_set<uint64>::destroyDeviceObject(blockIndicesToAllocate_);
-  }
+  // ~VDBAccessor() noexcept /* Actually, exceptions may be thrown here. */ { TBlocks::destroyDeviceObject(blocks_); }
 
 public:
   // TODO: Implement IsValueOn().
@@ -45,14 +45,22 @@ private:
   // Type of the coordinate.
   using TCoord = Vec<int, dim>;
 
-  // The space filling curve encoder and decoder used to hash the block coord to and from the block index.
-  using Code = MortonCode<dim>;
+  // Type of the space filling curve encoder and decoder used to hash the block coord to and from the block index.
+  using TCode = MortonCode<dim>;
 
-  using TActivityBlock = BitVector<SpaceDevice, ThreadSafe>;
+  // Type of the block which contains whether each cell is on or off.
+  using TOnOffBlock = BitVector<SpaceDevice, ThreadSafe>;
+
+  // Type of the block which contains the actual value of each cell.
   using TDataBlock = thrust::device_vector<T>;
 
-  static constexpr size_t toAllocateCapacity = 1024; // TODO: Maybe still too small, who knows.
+  // Type of the sparse blocks tree.
+  using TBlocks = stdgpu::unordered_map<uint64, std::pair<TOnOffBlock, TDataBlock>>;
 
+  // The maximum number of blocks.
+  static constexpr size_t nBlocksMax = 1024; // TODO: Maybe still too small, who knows.
+
+  // Number of cells per dim of each block.
   // Eg: dim: 1    1 << dim: 2    512 / (1 << dim): 256    #cells per block: 256
   //          2              4                      128                      16384
   //          3              8                      64                       262144
@@ -60,12 +68,11 @@ private:
   static constexpr int nCellsPerBlockDim = 512 / (1 << dim);
   static_assert(nCellsPerBlockDim > 0, "The given dimension is too large");
 
-  stdgpu::unordered_set<uint64> blockIndicesToAllocate_;
-  std::map<uint64, std::pair<TActivityBlock, TDataBlock>> blockIndicesAllocated_;
+  TBlocks blocks_;
 
   [[nodiscard]] ARIA_HOST_DEVICE static uint64 BlockCoord2BlockIdx(const TCoord &blockCoord) {
     // Compute the block index.
-    uint64 idx = Code::Encode(blockCoord.template cast<Vec<uint64, dim>>());
+    uint64 idx = TCode::Encode(blockCoord.template cast<Vec<uint64, dim>>());
 
     // Encode the quadrant to the highest bits of the index.
     std::bitset<64> quadrant;
@@ -93,30 +100,16 @@ private:
   [[nodiscard]] ARIA_HOST_DEVICE static uint64 CellCoord2BlockIdx(const TCoord &cellCoord) {
     return BlockCoord2BlockIdx(CellCoord2BlockCoord(cellCoord));
   }
+};
 
-  ARIA_DEVICE void MarkBlockOnByBlockCoord(const TCoord &blockCoord) {
-    blockIndicesToAllocate_.insert(BlockCoord2BlockIdx(blockCoord));
-  }
-
-  ARIA_DEVICE void MarkBlockOnByCellCoord(const TCoord &cellCoord) {
-    blockIndicesToAllocate_.insert(CellCoord2BlockIdx(cellCoord));
-  }
-
-  void AllocateBlocks() {
-    if (blockIndicesToAllocate_.empty())
-      return;
-
-    thrust::host_vector<uint64> indicesH(blockIndicesToAllocate_.size());
-    thrust::copy(blockIndicesToAllocate_.device_range().begin(), blockIndicesToAllocate_.device_range().end(),
-                 indicesH.begin());
-
-    for (const auto &index : indicesH) {
-      if (blockIndicesAllocated_.contains(index))
-        continue;
-
-      blockIndicesAllocated_[index] = std::make_pair(TActivityBlock{}, TDataBlock{});
-    }
-  }
+//
+//
+//
+// Device VDB.
+template <typename T, auto dim>
+class VDB<T, dim, SpaceDevice> {
+public:
+private:
 };
 
 } // namespace ARIA
