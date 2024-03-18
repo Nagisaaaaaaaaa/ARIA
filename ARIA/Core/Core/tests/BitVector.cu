@@ -395,7 +395,7 @@ TEST(BitVector, Base) {
           bitVector[i] = true;
 
       size_t i = 0;
-      for (auto v : bitVector) {
+      for (Property auto v : bitVector) {
         if (i % 2 == 1) {
           EXPECT_TRUE(v);
           EXPECT_TRUE(v.value());
@@ -424,7 +424,7 @@ TEST(BitVector, Base) {
       const BitVector<TSpace, TThreadSafety> bitVector = bitVectorNonConst;
 
       size_t i = 0;
-      for (auto v : bitVector) {
+      for (Property auto v : bitVector) {
         if (i % 2 == 1) {
           EXPECT_TRUE(v);
           EXPECT_TRUE(v.value());
