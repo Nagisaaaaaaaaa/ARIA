@@ -85,39 +85,60 @@ public:
   }
 
 public:
-  // `operator[]` is implemented with the ARIA property system, see Property.h, which is
-  // stronger than both `std::vector<bool>` and `thrust::device_vector`.
-  // `at(i)` will return a property of the i^th bit.
+  // `at(i)` will return an ARIA property of the i^th bit, see Property.h.
+  // `operator[]` simply returns the property `at(i)`.
+  //
+  //! While methods `Fill`, `Clear`, and `Flip` can be easily implemented as atomic,
+  //! `at(i)` and `operator[]` cannot be trivially implemented as atomic, because
+  //! setting a bit requires twice the efforts than filling, clearing, or flipping a bit.
   ARIA_PROP(public, public, ARIA_HOST_DEVICE, bool, at, size_t);
 
 public:
-  // `operator[]` simply returns the property `at(i)`.
+  /// \brief Access the i^th bit.
+  ///
+  /// \warning This method is never atomic even though the `ThreadSafe` policy is used.
   [[nodiscard]] ARIA_HOST_DEVICE auto operator[](size_t i) const { return at(i); }
 
+  /// \brief Access the i^th bit.
+  ///
+  /// \warning This method is never atomic even though the `ThreadSafe` policy is used.
   [[nodiscard]] ARIA_HOST_DEVICE auto operator[](size_t i) { return at(i); }
 
+  /// \brief Fill the i^th bit.
+  ///
+  /// \warning This method is atomic when the `ThreadSafe` policy is used, while
+  /// non-atomic when the `ThreadUnsafe` policy is used.
   ARIA_HOST_DEVICE TDerived &Fill(size_t i) {
     auto [iBlocks, iBits] = i2iBlocksAndiBits(i);
     FillBit(derived().data()[iBlocks], iBits);
     return derived();
   }
 
+  /// \brief Clear the i^th bit.
+  ///
+  /// \warning This method is atomic when the `ThreadSafe` policy is used, while
+  /// non-atomic when the `ThreadUnsafe` policy is used.
   ARIA_HOST_DEVICE TDerived &Clear(size_t i) {
     auto [iBlocks, iBits] = i2iBlocksAndiBits(i);
     ClearBit(derived().data()[iBlocks], iBits);
     return derived();
   }
 
+  /// \brief Flip the i^th bit.
+  ///
+  /// \warning This method is atomic when the `ThreadSafe` policy is used, while
+  /// non-atomic when the `ThreadUnsafe` policy is used.
   ARIA_HOST_DEVICE TDerived &Flip(size_t i) {
     auto [iBlocks, iBits] = i2iBlocksAndiBits(i);
     FlipBit(derived().data()[iBlocks], iBits);
     return derived();
   }
 
+  /// \brief Get the number of bits.
   [[nodiscard]] ARIA_HOST_DEVICE size_t size() const { return nBits_; }
 
 private:
-  // Iterators fwd.
+  // Tailored iterators should be implemented for `BitVector` and `BitVectorSpan`.
   template <typename TDerivedMaybeConst>
   class Iterator;
 
@@ -219,7 +240,7 @@ private:
   template <typename TDerivedMaybeConst>
   class Iterator {
   public:
-    using iterator_category = std::bidirectional_iterator_tag;
+    using iterator_category = std::random_access_iterator_tag;
     using difference_type = std::ptrdiff_t;
     using value_type = bool;
     // using reference = decltype(std::declval<BitVectorSpanAPI>()[0]);
@@ -242,6 +263,12 @@ private:
     ARIA_HOST_DEVICE auto operator->() const noexcept { return ArrowProxy((*bitVector_)[i_]); }
 
     ARIA_HOST_DEVICE auto operator->() noexcept { return ArrowProxy((*bitVector_)[i_]); }
+
+    ARIA_HOST_DEVICE friend bool operator==(const Iterator &a, const Iterator &b) noexcept {
+      return a.bitVector_ == b.bitVector_ && a.i_ == b.i_;
+    }
+
+    ARIA_HOST_DEVICE friend bool operator!=(const Iterator &a, const Iterator &b) noexcept { return !operator==(a, b); }
 
     // ++it
     ARIA_HOST_DEVICE Iterator &operator++() {
@@ -269,11 +296,51 @@ private:
       return tmp;
     }
 
-    ARIA_HOST_DEVICE friend bool operator==(const Iterator &a, const Iterator &b) noexcept {
-      return a.bitVector_ == b.bitVector_ && a.i_ == b.i_;
+    ARIA_HOST_DEVICE Iterator operator+(size_t n) const {
+      Iterator temp = *this;
+      return (temp += n);
+    };
+
+    ARIA_HOST_DEVICE Iterator operator-(size_t n) const {
+      Iterator temp = *this;
+      return (temp -= n);
+    };
+
+    ARIA_HOST_DEVICE friend Iterator operator+(size_t n, const Iterator &it) { return it + n; }
+
+    ARIA_HOST_DEVICE friend Iterator operator-(size_t n, const Iterator &it) { return it - n; }
+
+    ARIA_HOST_DEVICE Iterator &operator+=(size_t n) {
+      i_ += n;
+      return *this;
     }
 
-    ARIA_HOST_DEVICE friend bool operator!=(const Iterator &a, const Iterator &b) noexcept { return !operator==(a, b); }
+    ARIA_HOST_DEVICE Iterator &operator-=(size_t n) {
+      i_ -= n;
+      return *this;
+    }
+
+    ARIA_HOST_DEVICE auto operator[](size_t n) const { return (*bitVector_)[i_ + n]; }
+
+    ARIA_HOST_DEVICE friend difference_type operator-(const Iterator &lhs, const Iterator &rhs) noexcept {
+      return lhs.i_ - rhs.i_;
+    }
+
+    ARIA_HOST_DEVICE friend bool operator<(const Iterator &lhs, const Iterator &rhs) noexcept {
+      return lhs.i_ < rhs.i_;
+    }
+
+    ARIA_HOST_DEVICE friend bool operator<=(const Iterator &lhs, const Iterator &rhs) noexcept {
+      return lhs.i_ <= rhs.i_;
+    }
+
+    ARIA_HOST_DEVICE friend bool operator>(const Iterator &lhs, const Iterator &rhs) noexcept {
+      return lhs.i_ > rhs.i_;
+    }
+
+    ARIA_HOST_DEVICE friend bool operator>=(const Iterator &lhs, const Iterator &rhs) noexcept {
+      return lhs.i_ >= rhs.i_;
+    }
 
   private:
     TDerivedMaybeConst *bitVector_ = nullptr;

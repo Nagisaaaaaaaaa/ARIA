@@ -452,10 +452,10 @@ TEST(BitVector, Base) {
       const auto tRawSpan1 = t1.rawSpan();
 
       auto testIteratorRequirements = [](auto v) {
-        static_assert(std::bidirectional_iterator<decltype(v.begin())>);
-        static_assert(std::bidirectional_iterator<decltype(v.end())>);
-        static_assert(std::bidirectional_iterator<decltype(v.cbegin())>);
-        static_assert(std::bidirectional_iterator<decltype(v.cend())>);
+        static_assert(std::random_access_iterator<decltype(v.begin())>);
+        static_assert(std::random_access_iterator<decltype(v.end())>);
+        static_assert(std::random_access_iterator<decltype(v.cbegin())>);
+        static_assert(std::random_access_iterator<decltype(v.cend())>);
       };
 
       testIteratorRequirements(t0);
