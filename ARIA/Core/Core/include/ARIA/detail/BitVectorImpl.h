@@ -385,6 +385,8 @@ public:
 //
 //
 //
+/// \brief A `BitVectorSpan` is a policy-based non-owning view of a vector containing bits, which
+/// is similar to `std::span<bool>`, but can be thread-unsafe or thread-safe.
 template <typename TSpace, typename TThreadSafety, typename TPtr>
 class BitVectorSpan : public BitVectorSpanAPI<BitVectorSpan<TSpace, TThreadSafety, TPtr>, TThreadSafety> {
 public:
@@ -393,6 +395,7 @@ public:
   ARIA_COPY_MOVE_ABILITY(BitVectorSpan, default, default);
 
 public:
+  // All the APIs will be generated based on method `data()`.
   [[nodiscard]] ARIA_HOST_DEVICE auto data() const { return p_; }
 
   [[nodiscard]] ARIA_HOST_DEVICE auto data() { return p_; }
@@ -407,9 +410,13 @@ private:
 //
 //
 //
+/// \brief A `BitVector` is a policy-based owning vector containing bits, which
+/// is similar to `std::vector<bool>`, but can be
+/// host-storage or device-storage and thread-unsafe or thread-safe.
 template <typename TSpace, typename TThreadSafety>
 class BitVector;
 
+// The host specialization.
 template <typename TThreadSafety>
 class BitVector<SpaceHost, TThreadSafety>
     : public BitVectorStorageAPI<BitVector<SpaceHost, TThreadSafety>, TThreadSafety> {
@@ -419,6 +426,7 @@ public:
   ARIA_COPY_MOVE_ABILITY(BitVector, default, default);
 
 public:
+  // Span-related APIs will be generated based on method `data()`.
   [[nodiscard]] auto data() const { return blocks_.data(); }
 
   [[nodiscard]] auto data() { return blocks_.data(); }
@@ -439,11 +447,13 @@ private:
 
   thrust::host_vector<typename Base::TBlock> blocks_;
 
+  // Storage-related APIs will be generated based on method `data()`.
   [[nodiscard]] const auto &storage() const { return blocks_; }
 
   [[nodiscard]] auto &storage() { return blocks_; }
 };
 
+// The device specialization.
 template <typename TThreadSafety>
 class BitVector<SpaceDevice, TThreadSafety>
     : public BitVectorStorageAPI<BitVector<SpaceDevice, TThreadSafety>, TThreadSafety> {
