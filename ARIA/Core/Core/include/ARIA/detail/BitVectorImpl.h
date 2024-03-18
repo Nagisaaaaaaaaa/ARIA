@@ -156,6 +156,7 @@ public:
   [[nodiscard]] ARIA_HOST_DEVICE auto cend() const { return end(); }
 
 protected:
+  // Definitions: `i`: bit idx, `iBlocks`: block idx, `iBits`: bit idx in block.
   [[nodiscard]] ARIA_HOST_DEVICE std::pair<size_t, uint> i2iBlocksAndiBits(size_t i) const {
     ARIA_ASSERT(i < nBits_, "The given bit index should be smaller than the total number of bits");
 
@@ -164,6 +165,7 @@ protected:
     return {iBlocks, iBits};
   }
 
+  // Get the `iBits`^th bit in `block`.
   [[nodiscard]] ARIA_HOST_DEVICE static bool GetBit(const TBlock &block, uint iBits) {
     return static_cast<bool>((block >> iBits) & TBlock{1});
   }
@@ -176,6 +178,7 @@ protected:
     return static_cast<bool>((block >> iBits) & TBlock{1});
   }
 
+  // Fill the `iBits`^th bit in `block`.
   ARIA_HOST_DEVICE static void FillBit(TBlock &block, uint iBits) {
     if constexpr (std::is_same_v<TThreadSafety, ThreadUnsafe>) {
       block |= (TBlock{1} << iBits);
@@ -189,6 +192,7 @@ protected:
     FillBit(thrust::raw_reference_cast(block), iBits);
   }
 
+  // Clear the `iBits`^th bit in `block`.
   ARIA_HOST_DEVICE static void ClearBit(TBlock &block, uint iBits) {
     if constexpr (std::is_same_v<TThreadSafety, ThreadUnsafe>) {
       block &= ~(TBlock{1} << iBits);
@@ -202,6 +206,7 @@ protected:
     ClearBit(thrust::raw_reference_cast(block), iBits);
   }
 
+  // Flip the `iBits`^th bit in `block`.
   ARIA_HOST_DEVICE static void FlipBit(TBlock &block, uint iBits) {
     if constexpr (std::is_same_v<TThreadSafety, ThreadUnsafe>) {
       block ^= (TBlock{1} << iBits);
@@ -215,6 +220,9 @@ protected:
     FlipBit(thrust::raw_reference_cast(block), iBits);
   }
 
+  // Set the `iBits`^th bit in `block`.
+  //! Now, you may have understand why
+  //! `at(i)` and `operator[]` cannot be trivially implemented as atomic.
   ARIA_HOST_DEVICE static void SetBit(TBlock &block, uint iBits, bool bit) {
     TBlock mask = TBlock{1} << iBits;
     block = (block & ~mask) | (TBlock{bit} << iBits);
@@ -236,13 +244,15 @@ protected:
   }
 
 private:
-  // Iterators implementation.
+  //! The iterator implementation satisfies the `std::random_access_iterator` concept.
   template <typename TDerivedMaybeConst>
   class Iterator {
   public:
     using iterator_category = std::random_access_iterator_tag;
     using difference_type = std::ptrdiff_t;
     using value_type = bool;
+
+    //! Since property is used, types of `reference` and `pointer` are weird.
     // using reference = decltype(std::declval<BitVectorSpanAPI>()[0]);
     // using pointer = ArrowProxy<reference>;
 
