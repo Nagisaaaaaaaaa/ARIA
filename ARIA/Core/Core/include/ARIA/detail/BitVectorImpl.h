@@ -260,22 +260,23 @@ private:
     //! The ranges library requires that iterators should be default constructable.
     Iterator() noexcept = default;
 
-    ARIA_HOST_DEVICE explicit Iterator(TDerivedMaybeConst &bitVector, size_t i) noexcept
-        : bitVector_(&bitVector), i_(i) {}
+    // The iterator stores pointer of the `BitVector` or `BitVectorSpan`, and the bit index.
+    //! Pointer is used instead of reference, to support copy and move.
+    ARIA_HOST_DEVICE explicit Iterator(TDerivedMaybeConst &v, size_t i) noexcept : v_(&v), i_(i) {}
 
     ARIA_COPY_MOVE_ABILITY(Iterator, default, default);
 
   public:
-    ARIA_HOST_DEVICE auto operator*() const { return (*bitVector_)[i_]; }
+    ARIA_HOST_DEVICE auto operator*() const { return (*v_)[i_]; }
 
-    ARIA_HOST_DEVICE auto operator*() { return (*bitVector_)[i_]; }
+    ARIA_HOST_DEVICE auto operator*() { return (*v_)[i_]; }
 
-    ARIA_HOST_DEVICE auto operator->() const noexcept { return ArrowProxy((*bitVector_)[i_]); }
+    ARIA_HOST_DEVICE auto operator->() const noexcept { return ArrowProxy((*v_)[i_]); }
 
-    ARIA_HOST_DEVICE auto operator->() noexcept { return ArrowProxy((*bitVector_)[i_]); }
+    ARIA_HOST_DEVICE auto operator->() noexcept { return ArrowProxy((*v_)[i_]); }
 
     ARIA_HOST_DEVICE friend bool operator==(const Iterator &a, const Iterator &b) noexcept {
-      return a.bitVector_ == b.bitVector_ && a.i_ == b.i_;
+      return a.v_ == b.v_ && a.i_ == b.i_;
     }
 
     ARIA_HOST_DEVICE friend bool operator!=(const Iterator &a, const Iterator &b) noexcept { return !operator==(a, b); }
@@ -330,7 +331,7 @@ private:
       return *this;
     }
 
-    ARIA_HOST_DEVICE auto operator[](size_t n) const { return (*bitVector_)[i_ + n]; }
+    ARIA_HOST_DEVICE auto operator[](size_t n) const { return (*v_)[i_ + n]; }
 
     ARIA_HOST_DEVICE friend difference_type operator-(const Iterator &lhs, const Iterator &rhs) noexcept {
       return lhs.i_ - rhs.i_;
@@ -353,7 +354,7 @@ private:
     }
 
   private:
-    TDerivedMaybeConst *bitVector_ = nullptr;
+    TDerivedMaybeConst *v_ = nullptr;
     size_t i_ = 0;
   };
 };
