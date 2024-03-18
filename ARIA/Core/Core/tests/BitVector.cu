@@ -46,6 +46,10 @@ void TestThreadSafetyDevice() {
       for (size_t i = tCpy; i < n; i += nThreads) {
         span.Fill(i);
       }
+
+      // Test compile.
+      for (auto it = span.begin(); it != ++span.begin(); ++it)
+        ;
     }).Launch();
 
     cuda::device::current::get().synchronize();
