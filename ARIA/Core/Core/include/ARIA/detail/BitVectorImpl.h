@@ -11,40 +11,67 @@ namespace ARIA {
 namespace bit_vector::detail {
 
 //! For future developers: Please read the following comments to help you understand the codes.
-//! ! `BitVector` should be implemented similar to `std::vector<bool>`, but
+//!
+//! `BitVector` should be implemented similar to `std::vector<bool>`, but
 //! should also support device vectors and thread-safety.
 //! So, there are 4 variants of `BitVector`s:
 //!   1. Host + thread-unsafe,
 //!   2. Host + thread-safe,
 //!   3. Device + thread-unsafe,
 //!   4. Device + thread-safe.
+//!
+//! Also, we should implement both `BitVector` and `BitVectorSpan`, which
+//! share many APIs such as `Fill`, `Clear`, and `Flip`.
+//! However, `BitVector` should have more APIs than `BitVectorSpan`, for example, `resize`.
+//! That is, APIs of `BitVectorSpan` is a subset of `BitVector`'s.
+//! So, there are totally 8 variants.
+//!
+//! To implement this with few codes, CRTP is intensively used here:
+//!   1. CRTP is used to generate APIs for `BitVectorSpan` and `BitVector`, because
+//!      the difference among the 4 variants are actually tiny.
+//!      We only need to use `if constexpr` to implement different bit operations.
+//!   2. `BitVectorSpanAPI` contains all the APIs for `BitVectorSpan`.
+//!   3. `BitVectorStorageAPI` contains all the APIs for `BitVector`.
+//!      Since APIs of `BitVectorSpan` is a subset of `BitVector`'s,
+//!      `BitVectorStorageAPI` should be a child class of `BitVectorSpanAPI`.
+//!   4. `BitVectorSpanAPI` generates all the APIs based on method `derived().data()`, while
+//!      `BitVectorStorageAPI` generates all the remaining APIs based on `derived().storage()`.
+//!   5. Host and device `BitVector` respectively use `thrust::host_vector` and `thrust::device_vector`
+//!      as storages, so, template class specializations should be created and
+//!      different versions of `data()` and `storage()` should be implemented.
 
-template <typename TDerived>
-class BitVectorCRTPBase {
+// CRTP base class for all span-related APIs.
+template <typename TDerived, typename TThreadSafety>
+class BitVectorSpanAPI {
 protected:
+  // A "block" is a minimum unit of storage, where atomic operations can be performed on.
+  // The binary representations of blocks are the bits we are interested in.
   using TBlock = uint;
+
+  // Number of bits per block.
   static constexpr uint nBitsPerBlock = sizeof(TBlock) * 8;
 
+  // The total number of bits contained in the `BitVector` or `BitVectorSpan`.
+  // This field is necessary because for example,
+  // `nBitsPerBlock` is 32, and we calls `bitVector.resize(63)`,
+  // 2 blocks will be allocated, but `nBits_` will still be 63, not 64.
+  // The access to `bitVector[63]` is considered as undefined behavior.
+  size_t nBits_ = 0;
+
+  // Get the CRTP derived class.
   [[nodiscard]] ARIA_HOST_DEVICE const TDerived &derived() const { return *static_cast<const TDerived *>(this); }
 
   [[nodiscard]] ARIA_HOST_DEVICE TDerived &derived() { return *static_cast<TDerived *>(this); }
-};
-
-template <typename TDerived, typename TThreadSafety>
-class BitVectorSpanAPI : public BitVectorCRTPBase<TDerived> {
-protected:
-  using Base = BitVectorCRTPBase<TDerived>;
-  // clang-format off
-  using typename Base::TBlock;
-  using Base::nBitsPerBlock;
-  using Base::derived;
-  // clang-format on
 
 public:
   BitVectorSpanAPI() = default;
 
   ARIA_COPY_ABILITY(BitVectorSpanAPI, default);
 
+  //! Move is manually implemented here with the copy-and-swap idiom.
+  //! See https://stackoverflow.com/questions/3279543/what-is-the-copy-and-swap-idiom for more details.
+  //! This is necessary, because after a `BitVector` or `BitVectorSpan` is moved,
+  //! `nBits_` should be set to 0, to avoid dangerous undefined behaviors.
   ARIA_HOST_DEVICE friend void swap(BitVectorSpanAPI &lhs, BitVectorSpanAPI &rhs) ARIA_NOEXCEPT {
     using std::swap;
     swap(lhs.nBits_, rhs.nBits_);
@@ -58,9 +85,13 @@ public:
   }
 
 public:
+  // `operator[]` is implemented with the ARIA property system, see Property.h, which is
+  // stronger than both `std::vector<bool>` and `thrust::device_vector`.
+  // `at(i)` will return a property of the i^th bit.
   ARIA_PROP(public, public, ARIA_HOST_DEVICE, bool, at, size_t);
 
 public:
+  // `operator[]` simply returns the property `at(i)`.
   [[nodiscard]] ARIA_HOST_DEVICE auto operator[](size_t i) const { return at(i); }
 
   [[nodiscard]] ARIA_HOST_DEVICE auto operator[](size_t i) { return at(i); }
@@ -104,8 +135,6 @@ public:
   [[nodiscard]] ARIA_HOST_DEVICE auto cend() const { return end(); }
 
 protected:
-  size_t nBits_ = 0;
-
   [[nodiscard]] ARIA_HOST_DEVICE std::pair<size_t, uint> i2iBlocksAndiBits(size_t i) const {
     ARIA_ASSERT(i < nBits_, "The given bit index should be smaller than the total number of bits");
 
