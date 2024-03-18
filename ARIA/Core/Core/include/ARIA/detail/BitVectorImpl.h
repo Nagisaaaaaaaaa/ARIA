@@ -360,6 +360,9 @@ private:
   };
 };
 
+//
+//
+//
 // CRTP base class for all span-related APIs and storage-reated APIs.
 template <typename TDerived, typename TThreadSafety>
 class BitVectorStorageAPI : public BitVectorSpanAPI<TDerived, TThreadSafety> {
@@ -385,6 +388,8 @@ public:
 //
 //
 //
+//
+//
 /// \brief A `BitVectorSpan` is a policy-based non-owning view of a vector containing bits, which
 /// is similar to `std::span<bool>`, but can be thread-unsafe or thread-safe.
 template <typename TSpace, typename TThreadSafety, typename TPtr>
@@ -407,6 +412,8 @@ private:
   TPtr p_;
 };
 
+//
+//
 //
 //
 //
@@ -453,6 +460,9 @@ private:
   [[nodiscard]] auto &storage() { return blocks_; }
 };
 
+//
+//
+//
 // The device specialization.
 template <typename TThreadSafety>
 class BitVector<SpaceDevice, TThreadSafety>
