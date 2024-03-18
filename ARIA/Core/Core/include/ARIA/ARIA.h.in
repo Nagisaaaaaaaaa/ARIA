@@ -70,6 +70,29 @@ Overload(Ts...) -> Overload<Ts...>;
 //
 //
 //
+/// \brief A type wrapper which converts all "dot" calls to "arrow" calls.
+///
+/// \example ```
+/// ArrowProxy v{std::vector<int>{1, 2, 3}};
+/// std::cout << v->size() << std::endl;
+/// ```
+template <typename T>
+class ArrowProxy {
+public:
+  ARIA_HOST_DEVICE ArrowProxy(T &&t) noexcept : t(std::move(t)) {}
+
+public:
+  ARIA_HOST_DEVICE const T *operator->() const noexcept { return &t; }
+
+  ARIA_HOST_DEVICE T *operator->() noexcept { return &t; }
+
+private:
+  T t;
+};
+
+//
+//
+//
 /// \brief A commonly-used policy, means whether the class is for host use.
 struct SpaceHost {};
 
