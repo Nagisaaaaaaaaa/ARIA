@@ -130,7 +130,7 @@ public:
       cuda::std::atomic_ref barrier{barrier_};
 
       // Spin until the barrier is ready.
-      while (!barrier.load(cuda::std::memory_order_acquire)) {
+      while (barrier.load(cuda::std::memory_order_acquire)) {
 #if ARIA_IS_HOST_CODE
   #if ARIA_ICC || ARIA_MSVC
         _mm_pause();
@@ -208,25 +208,25 @@ private:
     // but only one unique thread will succeed.
     auto res = blocks_.emplace(CellCoord2BlockIdx(cellCoord), TBlock{});
 
-    // If success, get reference to the emplaced block.
-    TBlock &block = res.first->second;
+    // If success, get pointer to the emplaced block.
+    TBlock *block = &res.first->second;
 
     if (res.second) { // For the unique thread which succeeded to emplace the block:
       // Allocate the block storage.
-      block.p = new TBlockStorage();
+      block->p = new TBlockStorage();
 
       // Mark the storage as ready.
-      block.arrive();
+      block->arrive();
     } else { // For other threads which failed:
       // Get reference to the emplaced block.
-      block = blocks_.find(CellCoord2BlockIdx(cellCoord))->second;
+      block = &blocks_.find(CellCoord2BlockIdx(cellCoord))->second;
 
       // Wait for the storage being ready.
-      block.wait();
+      block->wait();
     }
 
     // For now, all threads have access to the emplaced block.
-    return block;
+    return *block;
   }
 
 public:

@@ -11,7 +11,7 @@ void TestVDBHandle() {
   using Handle = VDBHandle<float, 2, SpaceDevice>;
   Handle handle = Handle::Create();
 
-  const size_t n = 1;
+  const size_t n = 10000;
 
   Launcher(n, [=] ARIA_DEVICE(size_t i) mutable { handle.value({i, 0}) = 233; }).Launch();
 
