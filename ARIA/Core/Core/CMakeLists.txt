@@ -69,6 +69,7 @@ set(core_core_headers
     ARIA/ARIA.h
     ARIA/Auto.h
     ARIA/BFloat16.h
+    ARIA/BitArray.h
     ARIA/BitVector.h
     ARIA/Constant.h
     ARIA/DisjointSet.h
