@@ -17,6 +17,9 @@
 namespace ARIA {
 
 template <typename T, auto dim, typename TSpace>
+class VDBHandle;
+
+template <typename T, auto dim, typename TSpace>
 class VDBAccessor;
 
 template <typename T, auto dim, typename TSpace>
@@ -40,10 +43,15 @@ ARIA_HOST_DEVICE static int consteval powN(int x) {
 
 } // namespace vdb::detail
 
-// VDB handle.
+//
+//
+//
+// Device VDB handle.
 template <typename T, auto dim>
-class VDBHandle {
+class VDBHandle<T, dim, SpaceDevice> {
 public:
+  VDBHandle() = default;
+
   ARIA_COPY_MOVE_ABILITY(VDBHandle, default, default);
 
   [[nodiscard]] static VDBHandle Create() {
@@ -175,7 +183,7 @@ private:
   }
 
 public:
-  ARIA_HOST_DEVICE TBlock &Access(const TCoord &cellCoord) {
+  ARIA_DEVICE TBlock &block(const TCoord &cellCoord) {
     // Each thread is trying to insert an empty block into the unordered map,
     // but only one unique thread will succeed.
     auto res = blocks_.emplace(CellCoord2BlockIdx(cellCoord), TBlock{});
@@ -200,16 +208,12 @@ public:
     // For now, all threads have access to the emplaced block.
     return block;
   }
-};
 
-//
-//
-//
-// Device VDB.
-template <typename T, auto dim>
-class VDB<T, dim, SpaceDevice> {
-public:
-private:
+  ARIA_DEVICE T &value(const TCoord &cellCoord) {
+    // TODO: Return an ARIA Property:
+    //       Getter: Assert that the block should exist and the cell should be on.
+    //       Setter: Assert that the block should exist and set the block.
+  }
 };
 
 } // namespace ARIA
