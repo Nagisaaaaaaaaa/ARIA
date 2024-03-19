@@ -8,6 +8,9 @@ namespace ARIA {
 namespace {
 
 void TestVDBHandle() {
+  size_t size = 1LLU * 1024LLU * 1024LLU * 1024LLU; // 1GB
+  EXPECT_EQ(cudaDeviceSetLimit(cudaLimitMallocHeapSize, size), cudaSuccess);
+
   using Handle = VDBHandle<float, 2, SpaceDevice>;
   Handle handle = Handle::Create();
 
