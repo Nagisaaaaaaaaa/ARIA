@@ -3,6 +3,8 @@
 #include "ARIA/Launcher.h"
 
 #include <gtest/gtest.h>
+#include <thrust/device_vector.h>
+#include <thrust/host_vector.h>
 
 namespace ARIA {
 
@@ -14,167 +16,96 @@ void TestThreadSafetyDevice() {
 
   // Fill.
   {
-    BitArray<n, ThreadSafe> bitArray;
+    thrust::host_vector<BitArray<n, ThreadSafe>> bitArraysH(1);
+    thrust::device_vector<BitArray<n, ThreadSafe>> bitArraysD(1);
 
     for (size_t i = 0; i < n; ++i)
       if (i % 2 == 0)
-        bitArray[i] = true;
+        bitArraysH[0][i] = true;
 
-    Launcher(nThreads, [=, span = bitArray.span()] ARIA_DEVICE(size_t t) mutable {
+    bitArraysD = bitArraysH;
+    Launcher(nThreads, [=, span = bitArraysD.data()] ARIA_DEVICE(size_t t) mutable {
       size_t tCpy = t;
       for (size_t i = tCpy; i < n; i += nThreads) {
-        span.Fill(i);
+        span->Fill(i);
       }
     }).Launch();
 
     cuda::device::current::get().synchronize();
 
+    bitArraysH = bitArraysD;
     for (size_t i = 0; i < n; ++i)
-      EXPECT_EQ(bitArray[i], true);
-  }
-
-  {
-    BitArray<n, ThreadSafe> bitArray;
-
-    for (size_t i = 0; i < n; ++i)
-      if (i % 2 == 0)
-        bitArray[i] = true;
-
-    Launcher(nThreads, [=, span = bitArray.rawSpan()] ARIA_DEVICE(size_t t) mutable {
-      size_t tCpy = t;
-      for (size_t i = tCpy; i < n; i += nThreads) {
-        span.Fill(i);
-      }
-
-      // Test compile.
-      for (auto it = span.begin(); it != ++span.begin(); ++it)
-        ;
-    }).Launch();
-
-    cuda::device::current::get().synchronize();
-
-    for (size_t i = 0; i < n; ++i)
-      EXPECT_EQ(bitArray[i], true);
+      EXPECT_EQ(bitArraysH[0][i], true);
   }
 
   // Clear.
   {
-    BitArray<n, ThreadSafe> bitArray;
+    thrust::host_vector<BitArray<n, ThreadSafe>> bitArraysH(1);
+    thrust::device_vector<BitArray<n, ThreadSafe>> bitArraysD(1);
 
     for (size_t i = 0; i < n; ++i)
       if (i % 2 == 0)
-        bitArray[i] = true;
+        bitArraysH[0][i] = true;
 
-    Launcher(nThreads, [=, span = bitArray.span()] ARIA_DEVICE(size_t t) mutable {
+    bitArraysD = bitArraysH;
+    Launcher(nThreads, [=, span = bitArraysD.data()] ARIA_DEVICE(size_t t) mutable {
       size_t tCpy = t;
       for (size_t i = tCpy; i < n; i += nThreads) {
-        span.Clear(i);
+        span->Clear(i);
       }
     }).Launch();
 
     cuda::device::current::get().synchronize();
 
+    bitArraysH = bitArraysD;
     for (size_t i = 0; i < n; ++i)
-      EXPECT_EQ(bitArray[i], false);
-  }
-
-  {
-    BitArray<n, ThreadSafe> bitArray;
-
-    for (size_t i = 0; i < n; ++i)
-      if (i % 2 == 0)
-        bitArray[i] = true;
-
-    Launcher(nThreads, [=, span = bitArray.rawSpan()] ARIA_DEVICE(size_t t) mutable {
-      size_t tCpy = t;
-      for (size_t i = tCpy; i < n; i += nThreads) {
-        span.Clear(i);
-      }
-    }).Launch();
-
-    cuda::device::current::get().synchronize();
-
-    for (size_t i = 0; i < n; ++i)
-      EXPECT_EQ(bitArray[i], false);
+      EXPECT_EQ(bitArraysH[0][i], false);
   }
 
   // Flip.
   {
-    BitArray<n, ThreadSafe> bitArray;
+    thrust::host_vector<BitArray<n, ThreadSafe>> bitArraysH(1);
+    thrust::device_vector<BitArray<n, ThreadSafe>> bitArraysD(1);
 
-    Launcher(nThreads, [=, span = bitArray.span()] ARIA_DEVICE(size_t t) mutable {
+    bitArraysD = bitArraysH;
+    Launcher(nThreads, [=, span = bitArraysD.data()] ARIA_DEVICE(size_t t) mutable {
       size_t tCpy = t;
       for (size_t i = tCpy; i < n; i += nThreads) {
-        span.Flip(i);
+        span->Flip(i);
       }
     }).Launch();
 
     cuda::device::current::get().synchronize();
 
+    bitArraysH = bitArraysD;
     for (size_t i = 0; i < n; ++i)
-      EXPECT_EQ(bitArray[i], true);
+      EXPECT_EQ(bitArraysH[0][i], true);
   }
 
   {
-    BitArray<n, ThreadSafe> bitArray;
+    thrust::host_vector<BitArray<n, ThreadSafe>> bitArraysH(1);
+    thrust::device_vector<BitArray<n, ThreadSafe>> bitArraysD(1);
 
-    Launcher(nThreads, [=, span = bitArray.rawSpan()] ARIA_DEVICE(size_t t) mutable {
+    for (size_t i = 0; i < n; ++i)
+      if (i % 2 == 0)
+        bitArraysH[0][i] = true;
+
+    bitArraysD = bitArraysH;
+    Launcher(nThreads, [=, span = bitArraysD.data()] ARIA_DEVICE(size_t t) mutable {
       size_t tCpy = t;
       for (size_t i = tCpy; i < n; i += nThreads) {
-        span.Flip(i);
+        span->Flip(i);
       }
     }).Launch();
 
     cuda::device::current::get().synchronize();
 
-    for (size_t i = 0; i < n; ++i)
-      EXPECT_EQ(bitArray[i], true);
-  }
-
-  {
-    BitArray<n, ThreadSafe> bitArray;
-
+    bitArraysH = bitArraysD;
     for (size_t i = 0; i < n; ++i)
       if (i % 2 == 0)
-        bitArray[i] = true;
-
-    Launcher(nThreads, [=, span = bitArray.span()] ARIA_DEVICE(size_t t) mutable {
-      size_t tCpy = t;
-      for (size_t i = tCpy; i < n; i += nThreads) {
-        span.Flip(i);
-      }
-    }).Launch();
-
-    cuda::device::current::get().synchronize();
-
-    for (size_t i = 0; i < n; ++i)
-      if (i % 2 == 0)
-        EXPECT_EQ(bitArray[i], false);
+        EXPECT_EQ(bitArraysH[0][i], false);
       else
-        EXPECT_EQ(bitArray[i], true);
-  }
-
-  {
-    BitArray<n, ThreadSafe> bitArray;
-
-    for (size_t i = 0; i < n; ++i)
-      if (i % 2 == 0)
-        bitArray[i] = true;
-
-    Launcher(nThreads, [=, span = bitArray.rawSpan()] ARIA_DEVICE(size_t t) mutable {
-      size_t tCpy = t;
-      for (size_t i = tCpy; i < n; i += nThreads) {
-        span.Flip(i);
-      }
-    }).Launch();
-
-    cuda::device::current::get().synchronize();
-
-    for (size_t i = 0; i < n; ++i)
-      if (i % 2 == 0)
-        EXPECT_EQ(bitArray[i], false);
-      else
-        EXPECT_EQ(bitArray[i], true);
+        EXPECT_EQ(bitArraysH[0][i], true);
   }
 }
 

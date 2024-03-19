@@ -101,7 +101,7 @@ private:
 private:
   // Definitions: `i`: bit idx, `iBlocks`: block idx, `iBits`: bit idx in block.
   [[nodiscard]] ARIA_HOST_DEVICE std::pair<size_t, uint> i2iBlocksAndiBits(size_t i) const {
-    ARIA_ASSERT(i < nBits_, "The given bit index should be smaller than the total number of bits");
+    ARIA_ASSERT(i < nBits, "The given bit index should be smaller than the total number of bits");
 
     size_t iBlocks = i / nBitsPerBlock;
     uint iBits = i % nBitsPerBlock;
