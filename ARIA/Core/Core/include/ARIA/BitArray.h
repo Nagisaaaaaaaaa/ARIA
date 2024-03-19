@@ -1,5 +1,17 @@
 #pragma once
 
+/// \file
+/// \brief A `BitArray` is a policy-based owning array containing bits, which
+/// is similar to `std::bitset`, but can be
+/// used at host or device sides and thread-unsafe or thread-safe.
+///
+/// It is especially helpful when you want to save GPU memory, because
+/// there are very few open-sourced GPU bit array implementations.
+//
+//
+//
+//
+//
 #include "ARIA/Property.h"
 
 #include <cuda/std/array>
@@ -7,21 +19,52 @@
 
 namespace ARIA {
 
+/// \brief A `BitArray` is a policy-based owning array containing bits, which
+/// is similar to `std::bitset`, but can be
+/// used at host or device sides and thread-unsafe or thread-safe.
+///
+/// \example ```cpp
+/// using Bits = BitArray<100, ThreadSafe>;
+///
+/// Bits bits;
+/// constexpr size_t size = bits.size();
+///
+/// bits.Fill(0);
+/// bits.Clear(0);
+/// bits.Flip(99);
+///
+/// bool bit0 = bits[99];
+/// bits[99] = false;
+/// bool bit1 = bits.at(99);
+/// bits.at(99) = true;
+/// ```
+///
+/// \warning `at(i)` and `operator[]` are never atomic even though the `ThreadSafe` policy is used.
+/// Since setting a bit requires twice the efforts than filling, clearing, or flipping a bit,
+/// developers should try to use `Fill`, `Clear`, and `Flip` instead.
+///
+/// \note Implementation of `BitArray` is much simpler than `BitVector`, so,
+/// codes of `BitArray` are not explained in detail.
+/// If you are interested in the implementation details, please
+/// first read the implementation of `BitVector`, see `BitVector.h`.
 template <size_t nBits, typename TThreadSafety>
 class BitArray {
 public:
+  /// \brief Construct a `BitArray` with all bits cleared.
   ARIA_HOST_DEVICE BitArray() { storage_.fill(0); }
 
-  //! Move is forbidden because it is unable to clear the array being moved.
-  //! This will make the move semantics weird.
+  //! Copy is allowed but move is forbidden because it is unable to clear the array being moved.
+  //! Allowing move will make the semantics weird.
   //! So, users should always use copy instead of move.
   ARIA_COPY_MOVE_ABILITY(BitArray, default, delete);
 
+  //
+  //
+  //
 public:
-  // Implementation of `BitArray` is much simpler than `BitVector`, so,
-  // codes of `BitArray` are not explained in detail.
-  // If you are interested in the implementation details, please
-  // first read the implementation of `BitVector`, see `BitVector.h`.
+  /// \brief Access the i^th bit.
+  ///
+  /// \warning This method is never atomic even though the `ThreadSafe` policy is used.
   ARIA_PROP(public, public, ARIA_HOST_DEVICE, bool, at, size_t);
 
 public:
@@ -35,6 +78,9 @@ public:
   /// \warning This method is never atomic even though the `ThreadSafe` policy is used.
   [[nodiscard]] ARIA_HOST_DEVICE auto operator[](size_t i) { return at(i); }
 
+  //
+  //
+  //
   /// \brief Fill the i^th bit.
   ///
   /// \warning This method is atomic when the `ThreadSafe` policy is used, while
@@ -68,6 +114,9 @@ public:
   /// \brief Get the number of bits.
   [[nodiscard]] ARIA_HOST_DEVICE consteval size_t size() const { return nBits; }
 
+  //
+  //
+  //
 private:
   template <typename BitArrayMaybeConst>
   class Iterator;
@@ -85,6 +134,15 @@ public:
 
   [[nodiscard]] ARIA_HOST_DEVICE auto cend() const { return end(); }
 
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
 private:
   // A "block" is a minimum unit of storage, where atomic operations can be performed on.
   // The binary representations of blocks are the bits we are interested in.
