@@ -1,86 +1,261 @@
 #include "ARIA/BitArray.h"
 #include "ARIA/ForEach.h"
+#include "ARIA/Launcher.h"
 
 #include <gtest/gtest.h>
 
 namespace ARIA {
 
+namespace {
+
+void TestThreadSafetyDevice() {
+  constexpr size_t n = 10000;
+  size_t nThreads = 100;
+
+  // Fill.
+  {
+    BitArray<n, ThreadSafe> bitArray;
+
+    for (size_t i = 0; i < n; ++i)
+      if (i % 2 == 0)
+        bitArray[i] = true;
+
+    Launcher(nThreads, [=, span = bitArray.span()] ARIA_DEVICE(size_t t) mutable {
+      size_t tCpy = t;
+      for (size_t i = tCpy; i < n; i += nThreads) {
+        span.Fill(i);
+      }
+    }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    for (size_t i = 0; i < n; ++i)
+      EXPECT_EQ(bitArray[i], true);
+  }
+
+  {
+    BitArray<n, ThreadSafe> bitArray;
+
+    for (size_t i = 0; i < n; ++i)
+      if (i % 2 == 0)
+        bitArray[i] = true;
+
+    Launcher(nThreads, [=, span = bitArray.rawSpan()] ARIA_DEVICE(size_t t) mutable {
+      size_t tCpy = t;
+      for (size_t i = tCpy; i < n; i += nThreads) {
+        span.Fill(i);
+      }
+
+      // Test compile.
+      for (auto it = span.begin(); it != ++span.begin(); ++it)
+        ;
+    }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    for (size_t i = 0; i < n; ++i)
+      EXPECT_EQ(bitArray[i], true);
+  }
+
+  // Clear.
+  {
+    BitArray<n, ThreadSafe> bitArray;
+
+    for (size_t i = 0; i < n; ++i)
+      if (i % 2 == 0)
+        bitArray[i] = true;
+
+    Launcher(nThreads, [=, span = bitArray.span()] ARIA_DEVICE(size_t t) mutable {
+      size_t tCpy = t;
+      for (size_t i = tCpy; i < n; i += nThreads) {
+        span.Clear(i);
+      }
+    }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    for (size_t i = 0; i < n; ++i)
+      EXPECT_EQ(bitArray[i], false);
+  }
+
+  {
+    BitArray<n, ThreadSafe> bitArray;
+
+    for (size_t i = 0; i < n; ++i)
+      if (i % 2 == 0)
+        bitArray[i] = true;
+
+    Launcher(nThreads, [=, span = bitArray.rawSpan()] ARIA_DEVICE(size_t t) mutable {
+      size_t tCpy = t;
+      for (size_t i = tCpy; i < n; i += nThreads) {
+        span.Clear(i);
+      }
+    }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    for (size_t i = 0; i < n; ++i)
+      EXPECT_EQ(bitArray[i], false);
+  }
+
+  // Flip.
+  {
+    BitArray<n, ThreadSafe> bitArray;
+
+    Launcher(nThreads, [=, span = bitArray.span()] ARIA_DEVICE(size_t t) mutable {
+      size_t tCpy = t;
+      for (size_t i = tCpy; i < n; i += nThreads) {
+        span.Flip(i);
+      }
+    }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    for (size_t i = 0; i < n; ++i)
+      EXPECT_EQ(bitArray[i], true);
+  }
+
+  {
+    BitArray<n, ThreadSafe> bitArray;
+
+    Launcher(nThreads, [=, span = bitArray.rawSpan()] ARIA_DEVICE(size_t t) mutable {
+      size_t tCpy = t;
+      for (size_t i = tCpy; i < n; i += nThreads) {
+        span.Flip(i);
+      }
+    }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    for (size_t i = 0; i < n; ++i)
+      EXPECT_EQ(bitArray[i], true);
+  }
+
+  {
+    BitArray<n, ThreadSafe> bitArray;
+
+    for (size_t i = 0; i < n; ++i)
+      if (i % 2 == 0)
+        bitArray[i] = true;
+
+    Launcher(nThreads, [=, span = bitArray.span()] ARIA_DEVICE(size_t t) mutable {
+      size_t tCpy = t;
+      for (size_t i = tCpy; i < n; i += nThreads) {
+        span.Flip(i);
+      }
+    }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    for (size_t i = 0; i < n; ++i)
+      if (i % 2 == 0)
+        EXPECT_EQ(bitArray[i], false);
+      else
+        EXPECT_EQ(bitArray[i], true);
+  }
+
+  {
+    BitArray<n, ThreadSafe> bitArray;
+
+    for (size_t i = 0; i < n; ++i)
+      if (i % 2 == 0)
+        bitArray[i] = true;
+
+    Launcher(nThreads, [=, span = bitArray.rawSpan()] ARIA_DEVICE(size_t t) mutable {
+      size_t tCpy = t;
+      for (size_t i = tCpy; i < n; i += nThreads) {
+        span.Flip(i);
+      }
+    }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    for (size_t i = 0; i < n; ++i)
+      if (i % 2 == 0)
+        EXPECT_EQ(bitArray[i], false);
+      else
+        EXPECT_EQ(bitArray[i], true);
+  }
+}
+
+} // namespace
+
 TEST(BitArray, Base) {
   auto testBitArrayBase = []<typename TThreadSafety>() {
     // Constructors.
     {
-      BitArray<0, TThreadSafety> bitVector;
-      static_assert(bitVector.size() == 0);
+      BitArray<0, TThreadSafety> bitArray;
+      static_assert(bitArray.size() == 0);
     }
 
     ForEach<100>([]<auto n>() {
-      BitArray<n, TThreadSafety> bitVector;
-      static_assert(bitVector.size() == n);
+      BitArray<n, TThreadSafety> bitArray;
+      static_assert(bitArray.size() == n);
 
       for (size_t i = 0; i < n; ++i)
-        EXPECT_EQ(bitVector[i], false);
+        EXPECT_EQ(bitArray[i], false);
     });
 
     // Operator[].
     ForEach<100>([]<auto n>() {
-      BitArray<n, TThreadSafety> bitVector;
+      BitArray<n, TThreadSafety> bitArray;
 
       for (size_t i = 0; i < n; ++i)
         if (i % 2 == 0)
-          bitVector[i] = true;
+          bitArray[i] = true;
 
       for (size_t i = 0; i < n; ++i)
-        EXPECT_EQ(bitVector[i], i % 2 == 0 ? true : false);
+        EXPECT_EQ(bitArray[i], i % 2 == 0 ? true : false);
 
       for (size_t i = 0; i < n; ++i)
         if (i % 2 == 1)
-          bitVector[i] = true;
+          bitArray[i] = true;
 
       for (size_t i = 0; i < n; ++i)
-        EXPECT_EQ(bitVector[i], true);
+        EXPECT_EQ(bitArray[i], true);
 
       for (size_t i = 0; i < n; ++i)
         if (i % 2 == 0)
-          bitVector[i] = false;
+          bitArray[i] = false;
 
       for (size_t i = 0; i < n; ++i)
-        EXPECT_EQ(bitVector[i], i % 2 == 0 ? false : true);
+        EXPECT_EQ(bitArray[i], i % 2 == 0 ? false : true);
 
       for (size_t i = 0; i < n; ++i)
         if (i % 2 == 1)
-          bitVector[i] = false;
+          bitArray[i] = false;
 
       for (size_t i = 0; i < n; ++i)
-        EXPECT_EQ(bitVector[i], false);
+        EXPECT_EQ(bitArray[i], false);
     });
 
     // Copy.
     {
       constexpr size_t n = 10;
-      BitArray<n, TThreadSafety> bitVector0;
+      BitArray<n, TThreadSafety> bitArray0;
       for (size_t i = 0; i < n; ++i)
-        bitVector0[i] = true;
+        bitArray0[i] = true;
 
-      auto bitVector1 = bitVector0;
-      EXPECT_EQ(bitVector0.size(), n);
-      EXPECT_EQ(bitVector1.size(), n);
+      auto bitArray1 = bitArray0;
+      EXPECT_EQ(bitArray0.size(), n);
+      EXPECT_EQ(bitArray1.size(), n);
       for (size_t i = 0; i < n; ++i)
-        EXPECT_EQ(bitVector0[i], true);
+        EXPECT_EQ(bitArray0[i], true);
       for (size_t i = 0; i < n; ++i)
-        EXPECT_EQ(bitVector1[i], true);
+        EXPECT_EQ(bitArray1[i], true);
     }
 
     // Non-const `begin` and `end`.
     {
       constexpr size_t n = 10;
-      BitArray<n, TThreadSafety> bitVector;
+      BitArray<n, TThreadSafety> bitArray;
 
       for (size_t i = 0; i < n; ++i)
         if (i % 2 == 1)
-          bitVector[i] = true;
+          bitArray[i] = true;
 
       size_t i = 0;
-      for (auto it = bitVector.begin(); it != bitVector.end(); ++it, ++i) {
+      for (auto it = bitArray.begin(); it != bitArray.end(); ++it, ++i) {
         bool v = *it;
 
         if (i % 2 == 1) {
@@ -105,16 +280,16 @@ TEST(BitArray, Base) {
     // Const `begin` and `end`.
     {
       constexpr size_t n = 10;
-      BitArray<n, TThreadSafety> bitVectorNonConst;
+      BitArray<n, TThreadSafety> bitArrayNonConst;
 
       for (size_t i = 0; i < n; ++i)
         if (i % 2 == 1)
-          bitVectorNonConst[i] = true;
+          bitArrayNonConst[i] = true;
 
-      const BitArray<n, TThreadSafety> bitVector = bitVectorNonConst;
+      const BitArray<n, TThreadSafety> bitArray = bitArrayNonConst;
 
       size_t i = 0;
-      for (auto it = bitVector.begin(); it != bitVector.end(); ++it, ++i) {
+      for (auto it = bitArray.begin(); it != bitArray.end(); ++it, ++i) {
         bool v = *it;
 
         if (i % 2 == 1) {
@@ -139,16 +314,16 @@ TEST(BitArray, Base) {
     // `cbegin` and `cend`.
     {
       constexpr size_t n = 10;
-      BitArray<n, TThreadSafety> bitVectorNonConst;
+      BitArray<n, TThreadSafety> bitArrayNonConst;
 
       for (size_t i = 0; i < n; ++i)
         if (i % 2 == 1)
-          bitVectorNonConst[i] = true;
+          bitArrayNonConst[i] = true;
 
-      const BitArray<n, TThreadSafety> bitVector = bitVectorNonConst;
+      const BitArray<n, TThreadSafety> bitArray = bitArrayNonConst;
 
       size_t i = 0;
-      for (auto it = bitVector.cbegin(); it != bitVector.cend(); ++it, ++i) {
+      for (auto it = bitArray.cbegin(); it != bitArray.cend(); ++it, ++i) {
         bool v = *it;
 
         if (i % 2 == 1) {
@@ -173,14 +348,14 @@ TEST(BitArray, Base) {
     // Non-const range-based for.
     {
       constexpr size_t n = 10;
-      BitArray<n, TThreadSafety> bitVector;
+      BitArray<n, TThreadSafety> bitArray;
 
       for (size_t i = 0; i < n; ++i)
         if (i % 2 == 1)
-          bitVector[i] = true;
+          bitArray[i] = true;
 
       size_t i = 0;
-      for (Property auto v : bitVector) {
+      for (Property auto v : bitArray) {
         if (i % 2 == 1) {
           EXPECT_TRUE(v);
           EXPECT_TRUE(v.value());
@@ -200,16 +375,16 @@ TEST(BitArray, Base) {
     // Const range-based for.
     {
       constexpr size_t n = 10;
-      BitArray<n, TThreadSafety> bitVectorNonConst;
+      BitArray<n, TThreadSafety> bitArrayNonConst;
 
       for (size_t i = 0; i < n; ++i)
         if (i % 2 == 1)
-          bitVectorNonConst[i] = true;
+          bitArrayNonConst[i] = true;
 
-      const BitArray<n, TThreadSafety> bitVector = bitVectorNonConst;
+      const BitArray<n, TThreadSafety> bitArray = bitArrayNonConst;
 
       size_t i = 0;
-      for (Property auto v : bitVector) {
+      for (Property auto v : bitArray) {
         if (i % 2 == 1) {
           EXPECT_TRUE(v);
           EXPECT_TRUE(v.value());
@@ -245,6 +420,116 @@ TEST(BitArray, Base) {
 
   testBitArrayBase.operator()<ThreadUnsafe>();
   testBitArrayBase.operator()<ThreadSafe>();
+}
+
+TEST(BitArray, ThreadSafetyHost) {
+  constexpr size_t n = 100000;
+
+  auto getRef = [](BitArray<n, ThreadSafe> &v) -> BitArray<n, ThreadSafe> & { return v; };
+
+  auto testByGetter = [](const auto &getter) {
+    size_t nThreads = 10;
+
+    // Fill.
+    {
+      BitArray<n, ThreadSafe> bitArray;
+      std::vector<std::jthread> threads(nThreads);
+
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 0)
+          bitArray[i] = true;
+
+      for (size_t t = 0; t < nThreads; ++t)
+        threads[t] = std::jthread{[nThreads, &bitArray, t, &getter]() mutable {
+          size_t tCpy = t;
+          for (size_t i = tCpy; i < n; i += nThreads) {
+            getter(bitArray).Fill(i);
+          }
+        }};
+
+      for (auto &t : threads)
+        t.join();
+
+      for (size_t i = 0; i < n; ++i)
+        EXPECT_EQ(bitArray[i], true);
+    }
+
+    // Clear.
+    {
+      BitArray<n, ThreadSafe> bitArray;
+      std::vector<std::jthread> threads(nThreads);
+
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 0)
+          bitArray[i] = true;
+
+      for (size_t t = 0; t < nThreads; ++t)
+        threads[t] = std::jthread{[nThreads, &bitArray, t, &getter]() mutable {
+          size_t tCpy = t;
+          for (size_t i = tCpy; i < n; i += nThreads) {
+            getter(bitArray).Clear(i);
+          }
+        }};
+
+      for (auto &t : threads)
+        t.join();
+
+      for (size_t i = 0; i < n; ++i)
+        EXPECT_EQ(bitArray[i], false);
+    }
+
+    // Flip.
+    {
+      BitArray<n, ThreadSafe> bitArray;
+      std::vector<std::jthread> threads(nThreads);
+
+      for (size_t t = 0; t < nThreads; ++t)
+        threads[t] = std::jthread{[nThreads, &bitArray, t, &getter]() mutable {
+          size_t tCpy = t;
+          for (size_t i = tCpy; i < n; i += nThreads) {
+            getter(bitArray).Flip(i);
+          }
+        }};
+
+      for (auto &t : threads)
+        t.join();
+
+      for (size_t i = 0; i < n; ++i)
+        EXPECT_EQ(bitArray[i], true);
+    }
+
+    {
+      BitArray<n, ThreadSafe> bitArray;
+      std::vector<std::jthread> threads(nThreads);
+
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 0)
+          bitArray[i] = true;
+
+      for (size_t t = 0; t < nThreads; ++t)
+        threads[t] = std::jthread{[nThreads, &bitArray, t, &getter]() mutable {
+          size_t tCpy = t;
+          for (size_t i = tCpy; i < n; i += nThreads) {
+            getter(bitArray).Flip(i);
+          }
+        }};
+
+      for (auto &t : threads)
+        t.join();
+
+      for (size_t i = 0; i < n; ++i)
+        if (i % 2 == 0)
+          EXPECT_EQ(bitArray[i], false);
+        else
+          EXPECT_EQ(bitArray[i], true);
+    }
+  };
+
+  testByGetter(getRef);
+}
+
+TEST(BitArray, ThreadSafetyDevice) {
+  TestThreadSafetyDevice();
 }
 
 } // namespace ARIA
