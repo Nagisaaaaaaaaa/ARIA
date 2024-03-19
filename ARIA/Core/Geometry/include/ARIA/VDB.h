@@ -8,7 +8,7 @@
 //
 //
 #include "ARIA/BitArray.h"
-#include "ARIA/ForEach.h"
+#include "ARIA/Launcher.h"
 #include "ARIA/MortonCode.h"
 #include "ARIA/Vec.h"
 
@@ -60,7 +60,17 @@ public:
     return handle;
   }
 
-  void Destroy() noexcept /* Actually, exceptions may be thrown here. */ { TBlocks::destroyDeviceObject(blocks_); }
+  void Destroy() noexcept /* Actually, exceptions may be thrown here. */ {
+    Launcher(1, [r = blocks_.device_range()] ARIA_DEVICE(size_t i) {
+      for (auto &b : r) {
+        delete b.second.p;
+      }
+    }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    TBlocks::destroyDeviceObject(blocks_);
+  }
 
   //
   //
@@ -83,6 +93,7 @@ private:
   //
   //
   //
+public:
   // Type of the coordinate.
   using TCoord = Vec<int, dim>;
 
@@ -141,11 +152,13 @@ private:
   //   Value: The block.
   using TBlocks = stdgpu::unordered_map<uint64, TBlock>;
 
+private:
   TBlocks blocks_;
 
   //
   //
   //
+private:
   [[nodiscard]] ARIA_HOST_DEVICE static uint64 BlockCoord2BlockIdx(TCoord blockCoord) {
     // Compute the quadrant.
     uint64 quadrant = 0;
@@ -183,7 +196,8 @@ private:
   }
 
   [[nodiscard]] ARIA_HOST_DEVICE static uint64 CellCoord2CellIdxInBlock(const TCoord &cellCoord) {
-    TCoord cellCoordInBlock = cellCoord % nCellsPerBlockDim;
+    TCoord cellCoordInBlock;
+    ForEach<dim>([&]<auto d>() { cellCoordInBlock[d] = cellCoord[d] % nCellsPerBlockDim; });
     // TODO: It is better to use CuTe::Layout.
     return TCode::Encode(Auto(cellCoordInBlock.template cast<uint64>()));
   }
