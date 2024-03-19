@@ -25,6 +25,21 @@ class VDB;
 //
 //
 //
+namespace vdb::detail {
+
+template <int N>
+ARIA_HOST_DEVICE static int consteval powN(int x) {
+  static_assert(N >= 0);
+
+  if constexpr (N > 0) {
+    return x * powN<N - 1>(x);
+  } else {
+    return 1;
+  }
+}
+
+} // namespace vdb::detail
+
 // Device VDB accessor.
 template <typename T, auto dim>
 class VDBAccessor<T, dim, SpaceDevice> {
@@ -35,18 +50,9 @@ public:
 
   ~VDBAccessor() noexcept /* Actually, exceptions may be thrown here. */ { TBlocks::destroyDeviceObject(blocks_); }
 
-private:
-  template <int N>
-  static int constexpr powN(int x) {
-    static_assert(N >= 0);
-
-    if constexpr (N > 0) {
-      return x * powN<N - 1>(x);
-    } else {
-      return 1;
-    }
-  }
-
+  //
+  //
+  //
 public:
   // The maximum number of blocks.
   static constexpr size_t nBlocksMax = 1024; // TODO: Maybe still too small, who knows.
@@ -60,29 +66,33 @@ public:
   static_assert(nCellsPerBlockDim > 0, "The given dimension is too large");
 
   // Number of cells per block.
-  static constexpr int nCellsPerBlock = powN<dim>(nCellsPerBlockDim);
+  static constexpr int nCellsPerBlock = vdb::detail::powN<dim>(nCellsPerBlockDim);
 
+  //
+  //
+  //
   // Type of the coordinate.
   using TCoord = Vec<int, dim>;
 
   // Type of the space filling curve encoder and decoder used to hash the block coord to and from the block index.
   using TCode = MortonCode<dim>;
 
-  // Type of the block which contains whether each cell is on or off.
-  using TOnOffBlock = BitArray<nCellsPerBlock, ThreadSafe>;
+  // Type of the block storage which contains whether each cell is on or off.
+  using TOnOffBlockStorage = BitArray<nCellsPerBlock, ThreadSafe>;
 
-  // Type of the block which contains the actual value of each cell.
-  using TDataBlock = cuda::std::array<T, nCellsPerBlock>;
+  // Type of the block storage which contains the actual value of each cell.
+  using TDataBlockStroage = cuda::std::array<T, nCellsPerBlock>;
 
-  // Type of the block.
-  struct TBlock {
-    TOnOffBlock onOff;
-    TDataBlock data;
+  // Type of the block storage which contains all things of a block.
+  struct TBlockStorage {
+    TOnOffBlockStorage onOff;
+    TDataBlockStroage data;
   };
 
-  class TThreadSafeBlock {
+  // Type of the block.
+  class TBlock {
   public:
-    TBlock *ptr = nullptr;
+    TBlockStorage *p = nullptr;
 
     ARIA_HOST_DEVICE inline void wait() noexcept {
       cuda::std::atomic_ref lockRef{lock_};
@@ -102,7 +112,6 @@ public:
     }
 
     ARIA_HOST_DEVICE inline void go() noexcept {
-
       cuda::std::atomic_ref lockRef{lock_};
 
       lockRef.store(0, cuda::std::memory_order_release);
@@ -113,7 +122,7 @@ public:
   };
 
   // Type of the sparse blocks tree.
-  using TBlocks = stdgpu::unordered_map<uint64, TThreadSafeBlock>;
+  using TBlocks = stdgpu::unordered_map<uint64, TBlock>;
 
   TBlocks blocks_;
 
@@ -151,24 +160,21 @@ public:
 
 public:
   ARIA_HOST_DEVICE void Allocate(const TCoord &cellCoord) {
-    auto res = blocks_.emplace(CellCoord2BlockIdx(cellCoord), TThreadSafeBlock{});
+    auto res = blocks_.emplace(CellCoord2BlockIdx(cellCoord), TBlock{});
 
     if (res.second) {
-      TThreadSafeBlock &block = res.first->second;
+      TBlock &block = res.first->second;
 
       block.ptr = new TBlock();
 
       block.go();
     } else {
-      TThreadSafeBlock &block = blocks_.find(CellCoord2BlockIdx(cellCoord))->second;
+      TBlock &block = blocks_.find(CellCoord2BlockIdx(cellCoord))->second;
 
+      // Wait until the block is allocated.
       block.wait();
-
-      // TODO: Do something.
     }
   }
-
-  ARIA_HOST_DEVICE void SetValue(const TCoord &cellCoord, const T &value) {}
 };
 
 //
