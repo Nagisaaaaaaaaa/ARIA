@@ -7,15 +7,20 @@
 //
 //
 //
+#include "ARIA/BitArray.h"
+#include "ARIA/Launcher.h"
 #include "ARIA/MortonCode.h"
-#include "ARIA/TensorVector.h"
 #include "ARIA/Vec.h"
 
-#include <stdgpu/unordered_set.cuh>
-
-#include <bitset>
+#include <stdgpu/unordered_map.cuh>
 
 namespace ARIA {
+
+template <typename T, auto dim, typename TSpace>
+class VDBHandle;
+
+template <typename T, auto dim, typename TSpace>
+class VDBAccessor;
 
 template <typename T, auto dim, typename TSpace>
 class VDB;
@@ -23,57 +28,154 @@ class VDB;
 //
 //
 //
-// Device VDB.
+namespace vdb::detail {
+
+template <int N>
+ARIA_HOST_DEVICE static int consteval powN(int x) {
+  static_assert(N >= 0);
+
+  if constexpr (N > 0) {
+    return x * powN<N - 1>(x);
+  } else {
+    return 1;
+  }
+}
+
+} // namespace vdb::detail
+
+//
+//
+//
+// Device VDB handle.
 template <typename T, auto dim>
-class VDB<T, dim, SpaceDevice> {
+class VDBHandle<T, dim, SpaceDevice> {
 public:
-  VDB() : blockIndicesToAllocate_(stdgpu::unordered_set<uint64>::createDeviceObject(toAllocateCapacity)) {}
+  VDBHandle() = default;
 
-  ARIA_COPY_MOVE_ABILITY(VDB, delete, default);
+  ARIA_COPY_MOVE_ABILITY(VDBHandle, default, default);
 
-  ~VDB() noexcept /*Actually, exceptions may be thrown here.*/ {
-    stdgpu::unordered_set<uint64>::destroyDeviceObject(blockIndicesToAllocate_);
+  [[nodiscard]] static VDBHandle Create() {
+    VDBHandle handle;
+    handle.blocks_ = TBlocks::createDeviceObject(nBlocksMax);
+    return handle;
   }
 
-public:
-  // TODO: Implement IsValueOn().
-  // TODO: Implement GetValue().
+  void Destroy() noexcept /* Actually, exceptions may be thrown here. */ {
+    Launcher(1, [r = blocks_.device_range()] ARIA_DEVICE(size_t i) {
+      for (auto &b : r) {
+        delete b.second.p;
+      }
+    }).Launch();
 
+    cuda::device::current::get().synchronize();
+
+    TBlocks::destroyDeviceObject(blocks_);
+  }
+
+  //
+  //
+  //
 private:
+  // Maximum number of blocks.
+  static constexpr size_t nBlocksMax = 512; // TODO: Maybe still too small, who knows.
+
+  // Number of cells per dim of each block.
+  // Eg: dim: 1    1 << dim: 2    nCellsPerBlockDim: 256    nCellsPerBlock: 256
+  //          2              4                       128                    16384
+  //          3              8                       64                     262144
+  //          4              16                      32                     1048576
+  //          5                                      32                     33554432
+  static constexpr int nCellsPerBlockDim = std::max(512 / (1 << dim), 32);
+
+  // Number of cells per block.
+  static constexpr int nCellsPerBlock = vdb::detail::powN<dim>(nCellsPerBlockDim); // = nCellsPerBlockDim^dim
+
+  //
+  //
+  //
+public:
   // Type of the coordinate.
   using TCoord = Vec<int, dim>;
 
-  // The space filling curve encoder and decoder used to hash the block coord to and from the block index.
-  using Code = MortonCode<dim>;
+  // Type of the space filling curve encoder and decoder, which
+  // is used to hash the block coord to and from the block index.
+  using TCode = MortonCode<dim>;
 
-  static constexpr size_t toAllocateCapacity = 1024; // TODO: Maybe still too small, who knows.
+  // Type of the block storage part, which contains whether each cell is on or off.
+  using TBlockStorageOnOff = BitArray<nCellsPerBlock, ThreadSafe>;
 
-  // Eg: dim: 1    1 << dim: 2    512 / (1 << dim): 256    #cells per block: 256
-  //          2              4                      128                      16384
-  //          3              8                      64                       262144
-  //          4              16                     32                       1048576
-  static constexpr int blockDim = 512 / (1 << dim);
-  static_assert(blockDim > 0, "The given dimension is too large");
+  // Type of the block storage part, which contains the actual value of each cell.
+  using TBlockStorageData = cuda::std::array<T, nCellsPerBlock>;
 
-  stdgpu::unordered_set<uint64> blockIndicesToAllocate_;
-  thrust::device_vector<uint64> blockIndicesAllocated_;
+  // Type of the block storage.
+  struct TBlockStorage {
+    TBlockStorageOnOff onOff;
+    TBlockStorageData data;
+  };
 
-  [[nodiscard]] ARIA_HOST_DEVICE static uint64 BlockCoord2BlockIdx(const TCoord &blockCoord) {
-    // Compute the block index.
-    uint64 idx = Code::Encode(blockCoord.template cast<Vec<uint64, dim>>());
+  // Type of the block, which contains the block storage pointer and a barrier.
+  class TBlock {
+  public:
+    TBlockStorage *p = nullptr;
 
-    // Encode the quadrant to the highest bits of the index.
-    std::bitset<64> quadrant;
+    // A thread calls this method to mark the storage as ready.
+    ARIA_HOST_DEVICE inline void arrive() noexcept {
+      cuda::std::atomic_ref barrier{barrier_};
+
+      barrier.store(0, cuda::std::memory_order_release);
+    }
+
+    // A thread calls this method to wait for the storage being ready.
+    ARIA_HOST_DEVICE inline void wait() noexcept {
+      cuda::std::atomic_ref barrier{barrier_};
+
+      // Spin until the barrier is ready.
+      while (barrier.load(cuda::std::memory_order_acquire)) {
+#if ARIA_IS_HOST_CODE
+  #if ARIA_ICC || ARIA_MSVC
+        _mm_pause();
+  #else
+        __builtin_ia32_pause();
+  #endif
+#else
+        __nanosleep(2);
+#endif
+      }
+    }
+
+  private:
+    uint barrier_ = 1;
+  };
+
+  // Type of the sparse blocks tree:
+  //   Key  : Code of the block coord (defined by TCode).
+  //   Value: The block.
+  using TBlocks = stdgpu::unordered_map<uint64, TBlock>;
+
+private:
+  TBlocks blocks_;
+
+  //
+  //
+  //
+private:
+  [[nodiscard]] ARIA_HOST_DEVICE static uint64 BlockCoord2BlockIdx(TCoord blockCoord) {
+    // Compute the quadrant.
+    uint64 quadrant = 0;
     ForEach<dim>([&]<auto id>() {
       int &axis = blockCoord[id];
 
       if (axis < 0) {
         axis = -axis;
-        quadrant.set(id, true);
+        quadrant |= (1 << id); // Fill the `id`^th bit.
       }
     });
 
-    ARIA_ASSERT((idx & (std::bitset<64>().flip() << (64 - dim))) == 0,
+    // Compute the block index.
+    uint64 idx = TCode::Encode(Auto(blockCoord.template cast<uint64>()));
+
+    // Encode the quadrant to the highest bits of the index.
+    ARIA_ASSERT((idx & ((~uint64{0}) << (64 - dim))) == 0,
                 "The given block coord excesses the representation of the encoder, "
                 "please use a larger encoder instead");
     idx |= quadrant << (64 - dim);
@@ -82,27 +184,64 @@ private:
   }
 
   [[nodiscard]] ARIA_HOST_DEVICE static TCoord CellCoord2BlockCoord(const TCoord &cellCoord) {
-    return cellCoord / blockDim;
+    // TODO: Compiler bug here: `nCellsPerBlockDim` is not defined in device code.
+    // return cellCoord / nCellsPerBlockDim;
+
+    constexpr auto n = nCellsPerBlockDim;
+    return cellCoord / n;
   }
 
   [[nodiscard]] ARIA_HOST_DEVICE static uint64 CellCoord2BlockIdx(const TCoord &cellCoord) {
     return BlockCoord2BlockIdx(CellCoord2BlockCoord(cellCoord));
   }
 
-  ARIA_DEVICE void MarkBlockOnByBlockCoord(const TCoord &blockCoord) {
-    blockIndicesToAllocate_.insert(BlockCoord2BlockIdx(blockCoord));
+  [[nodiscard]] ARIA_HOST_DEVICE static uint64 CellCoord2CellIdxInBlock(const TCoord &cellCoord) {
+    TCoord cellCoordInBlock;
+    ForEach<dim>([&]<auto d>() { cellCoordInBlock[d] = cellCoord[d] % nCellsPerBlockDim; });
+    // TODO: It is better to use CuTe::Layout.
+    return TCode::Encode(Auto(cellCoordInBlock.template cast<uint64>()));
   }
 
-  ARIA_DEVICE void MarkBlockOnByCellCoord(const TCoord &cellCoord) {
-    blockIndicesToAllocate_.insert(CellCoord2BlockIdx(cellCoord));
+private:
+  ARIA_DEVICE TBlock &block(const TCoord &cellCoord) {
+    // Each thread is trying to insert an empty block into the unordered map,
+    // but only one unique thread will succeed.
+    auto res = blocks_.emplace(CellCoord2BlockIdx(cellCoord), TBlock{});
+
+    // If success, get pointer to the emplaced block.
+    TBlock *block = &res.first->second;
+
+    if (res.second) { // For the unique thread which succeeded to emplace the block:
+      // Allocate the block storage.
+      block->p = new TBlockStorage();
+
+      // Mark the storage as ready.
+      block->arrive();
+    } else { // For other threads which failed:
+      // Get reference to the emplaced block.
+      block = &blocks_.find(CellCoord2BlockIdx(cellCoord))->second;
+
+      // Wait for the storage being ready.
+      block->wait();
+    }
+
+    // For now, all threads have access to the emplaced block.
+    return *block;
   }
 
-  void AllocateBlocks() {
-    thrust::host_vector<uint64> indicesH(blockIndicesToAllocate_.size());
-    thrust::copy(blockIndicesToAllocate_.device_range().begin(), blockIndicesToAllocate_.device_range().end(),
-                 indicesH.begin());
+public:
+  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value, TCoord);
 
-    // TODO: Allocate all the corresponding blocks.
+private:
+  [[nodiscard]] ARIA_DEVICE T ARIA_PROP_IMPL(value)(const TCoord &cellCoord) const {
+    TBlock &b = block(cellCoord);
+    ARIA_ASSERT(b.p->onOff[CellCoord2CellIdxInBlock(cellCoord)]);
+    return b.p->data[CellCoord2CellIdxInBlock(cellCoord)];
+  }
+
+  ARIA_DEVICE void ARIA_PROP_IMPL(value)(const TCoord &cellCoord, const T &value) {
+    TBlock &b = block(cellCoord);
+    b.p->data[CellCoord2CellIdxInBlock(cellCoord)] = value;
   }
 };
 

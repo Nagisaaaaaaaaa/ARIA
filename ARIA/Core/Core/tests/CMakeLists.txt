@@ -5,6 +5,7 @@ if (ARIA_BUILD_TESTS)
       #experimental/Lua.cpp
       Auto.cpp
       BFloat16.cu
+      BitArray.cu
       BitVector.cu
       Constant.cpp
       DisjointSet.cu

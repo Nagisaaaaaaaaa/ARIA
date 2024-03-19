@@ -15,7 +15,7 @@
 //
 #include "ARIA/ARIA.h"
 
-#include <atomic>
+#include <cuda/std/atomic>
 
 namespace ARIA {
 
@@ -42,13 +42,13 @@ namespace ARIA {
 class SpinLock {
 public:
   /// \brief Locks the mutex, blocks if the mutex is not available.
-  inline void lock() noexcept;
+  ARIA_HOST_DEVICE inline void lock() noexcept;
 
   /// \brief Unlocks the mutex.
-  inline void unlock() noexcept;
+  ARIA_HOST_DEVICE inline void unlock() noexcept;
 
   /// \brief Tries to lock the mutex, returns if the mutex is not available.
-  [[nodiscard]] inline bool try_lock() noexcept;
+  [[nodiscard]] ARIA_HOST_DEVICE inline bool try_lock() noexcept;
 
   //
 public:
@@ -60,7 +60,7 @@ public:
   //
   //
 private:
-  std::atomic<bool> lock_{false};
+  cuda::std::atomic<bool> lock_{false};
 };
 
 } // namespace ARIA

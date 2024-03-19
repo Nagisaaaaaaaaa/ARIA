@@ -13,15 +13,15 @@ public:
   ARIA_COPY_MOVE_ABILITY(BrokenMutex, delete, delete);
 
 public:
-  void lock() noexcept {
+  ARIA_HOST_DEVICE void lock() noexcept {
     // Do nothing.
   }
 
-  void unlock() noexcept {
+  ARIA_HOST_DEVICE void unlock() noexcept {
     // Do nothing.
   }
 
-  bool try_lock() noexcept {
+  ARIA_HOST_DEVICE bool try_lock() noexcept {
     // Do nothing.
     return true;
   }
