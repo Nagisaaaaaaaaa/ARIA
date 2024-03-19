@@ -182,7 +182,13 @@ private:
     return BlockCoord2BlockIdx(CellCoord2BlockCoord(cellCoord));
   }
 
-public:
+  [[nodiscard]] ARIA_HOST_DEVICE static uint64 CellCoord2CellIdxInBlock(const TCoord &cellCoord) {
+    TCoord cellCoordInBlock = cellCoord % nCellsPerBlockDim;
+    // TODO: It is better to use CuTe::Layout.
+    return TCode::Encode(Auto(cellCoordInBlock.template cast<uint64>()));
+  }
+
+private:
   ARIA_DEVICE TBlock &block(const TCoord &cellCoord) {
     // Each thread is trying to insert an empty block into the unordered map,
     // but only one unique thread will succeed.
@@ -209,10 +215,19 @@ public:
     return block;
   }
 
-  ARIA_DEVICE T &value(const TCoord &cellCoord) {
-    // TODO: Return an ARIA Property:
-    //       Getter: Assert that the block should exist and the cell should be on.
-    //       Setter: Assert that the block should exist and set the block.
+public:
+  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value, TCoord);
+
+private:
+  [[nodiscard]] ARIA_DEVICE T ARIA_PROP_IMPL(value)(const TCoord &cellCoord) const {
+    TBlock &b = block(cellCoord);
+    ARIA_ASSERT(b.p->onOff[CellCoord2CellIdxInBlock(cellCoord)]);
+    return b.p->data[CellCoord2CellIdxInBlock(cellCoord)];
+  }
+
+  ARIA_DEVICE void ARIA_PROP_IMPL(value)(const TCoord &cellCoord, const T &value) {
+    TBlock &b = block(cellCoord);
+    b.p->data[CellCoord2CellIdxInBlock(cellCoord)] = value;
   }
 };
 
