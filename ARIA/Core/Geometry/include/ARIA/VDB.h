@@ -151,7 +151,8 @@ public:
   }
 
   [[nodiscard]] ARIA_HOST_DEVICE static TCoord CellCoord2BlockCoord(const TCoord &cellCoord) {
-    return cellCoord / nCellsPerBlockDim;
+    constexpr auto n = nCellsPerBlockDim; // TODO: Compiler bug here.
+    return cellCoord / n;
   }
 
   [[nodiscard]] ARIA_HOST_DEVICE static uint64 CellCoord2BlockIdx(const TCoord &cellCoord) {
@@ -165,7 +166,7 @@ public:
     if (res.second) {
       TBlock &block = res.first->second;
 
-      block.ptr = new TBlock();
+      block.p = new TBlockStorage();
 
       block.go();
     } else {
