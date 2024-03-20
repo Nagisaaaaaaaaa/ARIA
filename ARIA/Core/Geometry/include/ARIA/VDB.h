@@ -275,6 +275,36 @@ private:
 };
 
 //
+template <typename T>
+struct is_vdb_handle : std::false_type {};
+
+template <typename T, auto dim, typename TSpace>
+struct is_vdb_handle<VDBHandle<T, dim, TSpace>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_vdb_handle_v = is_vdb_handle<T>::value;
+
+//
+template <typename T>
+struct is_host_vdb_handle : std::false_type {};
+
+template <typename T, auto dim>
+struct is_host_vdb_handle<VDBHandle<T, dim, SpaceHost>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_host_vdb_handle_v = is_host_vdb_handle<T>::value;
+
+//
+template <typename T>
+struct is_device_vdb_handle : std::false_type {};
+
+template <typename T, auto dim>
+struct is_device_vdb_handle<VDBHandle<T, dim, SpaceDevice>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_device_vdb_handle_v = is_device_vdb_handle<T>::value;
+
+//
 //
 //
 template <typename T, auto dim, typename TSpace>
@@ -405,5 +435,9 @@ using VDBWriteAccessor = typename VDB::WriteAccessor;
 
 template <typename VDB>
 using VDBReadAccessor = typename VDB::ReadAccessor;
+
+//
+//
+//
 
 } // namespace ARIA
