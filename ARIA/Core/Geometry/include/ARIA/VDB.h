@@ -16,18 +16,6 @@
 
 namespace ARIA {
 
-template <typename T, auto dim, typename TSpace>
-class VDBHandle;
-
-template <typename T, auto dim, typename TSpace>
-class VDBAccessor;
-
-template <typename T, auto dim, typename TSpace>
-class VDB;
-
-//
-//
-//
 namespace vdb::detail {
 
 template <int N>
@@ -46,6 +34,9 @@ ARIA_HOST_DEVICE static int consteval powN(int x) {
 //
 //
 //
+template <typename T, auto dim, typename TSpace>
+class VDBHandle;
+
 // Device VDB handle.
 template <typename T, auto dim>
 class VDBHandle<T, dim, SpaceDevice> {
@@ -281,6 +272,103 @@ private:
     ARIA_STATIC_ASSERT_FALSE("This method should not be called at host side");
 #endif
   }
+};
+
+//
+//
+//
+template <typename T, auto dim, typename TSpace>
+class VDB;
+
+//
+//
+//
+struct AllocateWrite {};
+
+struct Write {};
+
+struct Read {};
+
+template <typename T, auto dim, typename TSpace, typename TAccessor>
+class VDBAccessor;
+
+// Write or allocate-write accessor.
+template <typename T, auto dim, typename TSpace, typename TAccessor>
+  requires(std::is_same_v<TAccessor, Write> || std::is_same_v<TAccessor, AllocateWrite>)
+class VDBAccessor<T, dim, TSpace, TAccessor> {
+private:
+  using THandle = VDBHandle<T, dim, TSpace>;
+  using TCoord = THandle::TCoord;
+
+  static constexpr bool allocateIfNotExist = std::is_same_v<TAccessor, AllocateWrite>;
+
+public:
+  // friend class VDB<T, dim, TSpace>;
+
+  ARIA_HOST_DEVICE explicit VDBAccessor(THandle handle) : handle_(std::move(handle)) {}
+
+public:
+  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCoord &cellCoord) {
+    if constexpr (allocateIfNotExist)
+      return handle_.value_AllocateIfNotExist(cellCoord);
+    else
+      return handle_.value_AssumeExist(cellCoord);
+  }
+
+  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCoord &cellCoord) const {
+    if constexpr (allocateIfNotExist)
+      return handle_.value_AllocateIfNotExist(cellCoord);
+    else
+      return handle_.value_AssumeExist(cellCoord);
+  }
+
+private:
+  THandle handle_;
+};
+
+// Read accessor.
+template <typename T, auto dim, typename TSpace, typename TAccessor>
+  requires(std::is_same_v<TAccessor, Read>)
+class VDBAccessor<T, dim, TSpace, TAccessor> {
+private:
+  using THandle = VDBHandle<T, dim, TSpace>;
+  using TCoord = THandle::TCoord;
+
+  static constexpr bool allocateIfNotExist = false;
+
+public:
+  // friend class VDB<T, dim, TSpace>;
+
+  ARIA_HOST_DEVICE explicit VDBAccessor(THandle handle) : handle_(std::move(handle)) {}
+
+public:
+  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCoord &cellCoord) const {
+    if constexpr (allocateIfNotExist)
+      return handle_.value_AllocateIfNotExist(cellCoord);
+    else
+      return handle_.value_AssumeExist(cellCoord);
+  }
+
+private:
+  THandle handle_;
+};
+
+template <typename T, auto dim, typename TSpace>
+using VDBAllocateWriteAccessor = VDBAccessor<T, dim, TSpace, AllocateWrite>;
+
+template <typename T, auto dim, typename TSpace>
+using VDBWriteAccessor = VDBAccessor<T, dim, TSpace, Write>;
+
+template <typename T, auto dim, typename TSpace>
+using VDBReadAccessor = VDBAccessor<T, dim, TSpace, Read>;
+
+//
+//
+//
+template <typename T, auto dim, typename TSpace>
+class VDB {
+public:
+  // TODO: Implement this.
 };
 
 } // namespace ARIA
