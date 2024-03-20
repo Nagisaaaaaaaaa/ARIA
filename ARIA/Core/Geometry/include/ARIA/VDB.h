@@ -84,6 +84,26 @@ private:
   //
   //
   //
+private:
+  // See the comments below.
+  template <uint n, typename... Values>
+  static decltype(auto) MakeLayoutMajorWithNValuesImpl(Values &&...values) {
+    if constexpr (n == 0)
+      return make_layout_major(std::forward<Values>(values)...);
+    else
+      return MakeLayoutMajorWithNValuesImpl<n - 1>(C<nCellsPerBlockDim>{}, std::forward<Values>(values)...);
+  }
+
+  // A function wrapper which calls `make_layout_major` with `n` compile-time values, that is,
+  // `make_layout_major(C<nCellsPerBlockDim>{}, C<nCellsPerBlockDim>{}, ..., C<nCellsPerBlockDim>{})`.
+  template <uint n>
+  static decltype(auto) MakeLayoutMajorWithNValues() {
+    return MakeLayoutMajorWithNValuesImpl<n>();
+  }
+
+  //
+  //
+  //
 public:
   // Type of the coordinate.
   using TCoord = Vec<int, dim>;
@@ -91,6 +111,10 @@ public:
   // Type of the space filling curve encoder and decoder, which
   // is used to hash the block coord to and from the block index.
   using TCode = MortonCode<dim>;
+
+  // Type of the layout of each block.
+  using TBlockLayout = decltype(MakeLayoutMajorWithNValues<dim>());
+  static_assert(is_static_v<TBlockLayout>, "The layout of each block should be determained at compile time");
 
   // Type of the block storage part, which contains whether each cell is on or off.
   using TBlockStorageOnOff = BitArray<nCellsPerBlock, ThreadSafe>;
@@ -143,6 +167,26 @@ public:
   //   Value: The block.
   using TBlocks = stdgpu::unordered_map<uint64, TBlock>;
 
+  //
+  //
+  //
+private:
+  // See the comments below.
+  template <uint n, typename... Values>
+  ARIA_HOST_DEVICE static decltype(auto) MakeCoordWithNValuesImpl(const TCoord &coord, Values &&...values) {
+    if constexpr (n == 0)
+      return make_coord(std::forward<Values>(values)...);
+    else
+      return MakeCoordWithNValuesImpl<n - 1>(coord, coord[n - 1], std::forward<Values>(values)...);
+  }
+
+  // A function wrapper which calls `make_coord` with `n` runtime values, that is,
+  // `make_coord(coord[0], coord[1], ..., coord[n - 1])`.
+  template <uint n>
+  ARIA_HOST_DEVICE static decltype(auto) MakeCoordWithNValues(const TCoord &coord) {
+    return MakeCoordWithNValuesImpl<n>(coord);
+  }
+
 private:
   TBlocks blocks_;
 
@@ -189,8 +233,7 @@ private:
   [[nodiscard]] ARIA_HOST_DEVICE static uint64 CellCoord2CellIdxInBlock(const TCoord &cellCoord) {
     TCoord cellCoordInBlock;
     ForEach<dim>([&]<auto d>() { cellCoordInBlock[d] = cellCoord[d] % nCellsPerBlockDim; });
-    // TODO: It is better to use CuTe::Layout.
-    return TCode::Encode(Auto(cellCoordInBlock.template cast<uint64>()));
+    return TBlockLayout()(MakeCoordWithNValues<dim>(cellCoordInBlock));
   }
 
 private:
