@@ -203,7 +203,12 @@ private:
   }
 
 private:
-  ARIA_DEVICE TBlock &block(const TCoord &cellCoord) {
+  ARIA_DEVICE const TBlock &block_AssumeExist(const TCoord &cellCoord) const {
+    // Get reference to the already emplaced block.
+    return blocks_.find(CellCoord2BlockIdx(cellCoord))->second;
+  }
+
+  ARIA_DEVICE TBlock &block_AllocateIfNotExist(const TCoord &cellCoord) {
     // Each thread is trying to insert an empty block into the unordered map,
     // but only one unique thread will succeed.
     auto res = blocks_.emplace(CellCoord2BlockIdx(cellCoord), TBlock{});
@@ -230,17 +235,30 @@ private:
   }
 
 public:
-  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value, TCoord);
+  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AssumeExist, TCoord);
+
+  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AllocateIfNotExist, TCoord);
 
 private:
-  [[nodiscard]] ARIA_DEVICE T ARIA_PROP_IMPL(value)(const TCoord &cellCoord) const {
-    TBlock &b = block(cellCoord);
+  [[nodiscard]] ARIA_DEVICE T ARIA_PROP_IMPL(value_AssumeExist)(const TCoord &cellCoord) const {
+    const TBlock &b = block_AssumeExist(cellCoord);
     ARIA_ASSERT(b.p->onOff[CellCoord2CellIdxInBlock(cellCoord)]);
     return b.p->data[CellCoord2CellIdxInBlock(cellCoord)];
   }
 
-  ARIA_DEVICE void ARIA_PROP_IMPL(value)(const TCoord &cellCoord, const T &value) {
-    TBlock &b = block(cellCoord);
+  ARIA_DEVICE void ARIA_PROP_IMPL(value_AssumeExist)(const TCoord &cellCoord, const T &value) {
+    const TBlock &b = block_AssumeExist(cellCoord);
+    b.p->onOff.Fill(CellCoord2CellIdxInBlock(cellCoord));
+    b.p->data[CellCoord2CellIdxInBlock(cellCoord)] = value;
+  }
+
+  [[nodiscard]] ARIA_DEVICE T ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TCoord &cellCoord) const {
+    return ARIA_PROP_IMPL(value_AssumeExist)(cellCoord);
+  }
+
+  ARIA_DEVICE void ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TCoord &cellCoord, const T &value) {
+    TBlock &b = block_AllocateIfNotExist(cellCoord);
+    b.p->onOff.Fill(CellCoord2CellIdxInBlock(cellCoord));
     b.p->data[CellCoord2CellIdxInBlock(cellCoord)] = value;
   }
 };

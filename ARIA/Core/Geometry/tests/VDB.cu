@@ -16,7 +16,11 @@ void TestVDBHandle() {
 
   const size_t n = 10000;
 
-  Launcher(n, [=] ARIA_DEVICE(size_t i) mutable { handle.value({i, 0}) = 233; }).Launch();
+  Launcher(n, [=] ARIA_DEVICE(size_t i) mutable { handle.value_AllocateIfNotExist({i, 0}) = i; }).Launch();
+
+  Launcher(n, [=] ARIA_DEVICE(size_t i) mutable {
+    ARIA_ASSERT(handle.value_AllocateIfNotExist({i, 0}) == i);
+  }).Launch();
 
   cuda::device::current::get().synchronize();
 
