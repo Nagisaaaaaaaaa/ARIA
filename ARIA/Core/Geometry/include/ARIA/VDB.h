@@ -284,6 +284,9 @@ struct is_vdb_handle<VDBHandle<T, dim, TSpace>> : std::true_type {};
 template <typename T>
 static constexpr bool is_vdb_handle_v = is_vdb_handle<T>::value;
 
+template <typename T>
+concept VDBHandleType = is_vdb_handle_v<T>;
+
 //
 template <typename T>
 struct is_host_vdb_handle : std::false_type {};
@@ -294,6 +297,9 @@ struct is_host_vdb_handle<VDBHandle<T, dim, SpaceHost>> : std::true_type {};
 template <typename T>
 static constexpr bool is_host_vdb_handle_v = is_host_vdb_handle<T>::value;
 
+template <typename T>
+concept HostVDBHandleType = is_host_vdb_handle_v<T>;
+
 //
 template <typename T>
 struct is_device_vdb_handle : std::false_type {};
@@ -303,6 +309,9 @@ struct is_device_vdb_handle<VDBHandle<T, dim, SpaceDevice>> : std::true_type {};
 
 template <typename T>
 static constexpr bool is_device_vdb_handle_v = is_device_vdb_handle<T>::value;
+
+template <typename T>
+concept DeviceVDBHandleType = is_device_vdb_handle_v<T>;
 
 //
 //
@@ -439,5 +448,35 @@ using VDBReadAccessor = typename VDB::ReadAccessor;
 //
 //
 //
+#if 0
+template <DeviceVDBHandleType THandle, typename F>
+class Launcher<THandle, F> : public launcher::detail::LauncherBase<Launcher<THandle, F>> {
+private:
+  using Base = launcher::detail::LauncherBase<Launcher<THandle, F>>;
+
+public:
+  Launcher(const THandle &handle, const F &f) : handle_(handle), f_(f) {
+    Base::overallSize(cosize_safe(theLayoutInEachBlock));
+  }
+
+  ARIA_COPY_MOVE_ABILITY(Launcher, default, default);
+
+public:
+  using Base::blockSize;
+
+  void Launch() {
+    for (eachVDBBlock) {
+      // Compute cell coord offset
+      THandle::TCoord cellCoordOffset = ...;
+      Base::Launch(launcher::detail::KernelLaunchVDBBlock<THandle, F>, handle_, cosize_safe(handle_), f_,
+                   cellCoordOffset);
+    }
+  }
+
+private:
+  THandle handle_;
+  F f_;
+};
+#endif
 
 } // namespace ARIA

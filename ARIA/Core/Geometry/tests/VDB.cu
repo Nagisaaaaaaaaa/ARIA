@@ -1,4 +1,3 @@
-#include "ARIA/Launcher.h"
 #include "ARIA/VDB.h"
 
 #include <gtest/gtest.h>
