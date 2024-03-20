@@ -203,12 +203,17 @@ private:
   }
 
 private:
-  ARIA_DEVICE const TBlock &block_AssumeExist(const TCoord &cellCoord) const {
+  ARIA_HOST_DEVICE const TBlock &block_AssumeExist(const TCoord &cellCoord) const {
+#if ARIA_IS_DEVICE_CODE
     // Get reference to the already emplaced block.
     return blocks_.find(CellCoord2BlockIdx(cellCoord))->second;
+#else
+    ARIA_STATIC_ASSERT_FALSE("This method should not be called at host side");
+#endif
   }
 
-  ARIA_DEVICE TBlock &block_AllocateIfNotExist(const TCoord &cellCoord) {
+  ARIA_HOST_DEVICE TBlock &block_AllocateIfNotExist(const TCoord &cellCoord) {
+#if ARIA_IS_DEVICE_CODE
     // Each thread is trying to insert an empty block into the unordered map,
     // but only one unique thread will succeed.
     auto res = blocks_.emplace(CellCoord2BlockIdx(cellCoord), TBlock{});
@@ -232,6 +237,9 @@ private:
 
     // For now, all threads have access to the emplaced block.
     return *block;
+#else
+    ARIA_STATIC_ASSERT_FALSE("This method should not be called at host side");
+#endif
   }
 
 public:
@@ -240,26 +248,38 @@ public:
   ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AllocateIfNotExist, TCoord);
 
 private:
-  [[nodiscard]] ARIA_DEVICE T ARIA_PROP_IMPL(value_AssumeExist)(const TCoord &cellCoord) const {
+  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AssumeExist)(const TCoord &cellCoord) const {
+#if ARIA_IS_DEVICE_CODE
     const TBlock &b = block_AssumeExist(cellCoord);
     ARIA_ASSERT(b.p->onOff[CellCoord2CellIdxInBlock(cellCoord)]);
     return b.p->data[CellCoord2CellIdxInBlock(cellCoord)];
+#else
+    ARIA_STATIC_ASSERT_FALSE("This method should not be called at host side");
+#endif
   }
 
-  ARIA_DEVICE void ARIA_PROP_IMPL(value_AssumeExist)(const TCoord &cellCoord, const T &value) {
+  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AssumeExist)(const TCoord &cellCoord, const T &value) {
+#if ARIA_IS_DEVICE_CODE
     const TBlock &b = block_AssumeExist(cellCoord);
     b.p->onOff.Fill(CellCoord2CellIdxInBlock(cellCoord));
     b.p->data[CellCoord2CellIdxInBlock(cellCoord)] = value;
+#else
+    ARIA_STATIC_ASSERT_FALSE("This method should not be called at host side");
+#endif
   }
 
-  [[nodiscard]] ARIA_DEVICE T ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TCoord &cellCoord) const {
+  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TCoord &cellCoord) const {
     return ARIA_PROP_IMPL(value_AssumeExist)(cellCoord);
   }
 
-  ARIA_DEVICE void ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TCoord &cellCoord, const T &value) {
+  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TCoord &cellCoord, const T &value) {
+#if ARIA_IS_DEVICE_CODE
     TBlock &b = block_AllocateIfNotExist(cellCoord);
     b.p->onOff.Fill(CellCoord2CellIdxInBlock(cellCoord));
     b.p->data[CellCoord2CellIdxInBlock(cellCoord)] = value;
+#else
+    ARIA_STATIC_ASSERT_FALSE("This method should not be called at host side");
+#endif
   }
 };
 
