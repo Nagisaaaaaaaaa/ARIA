@@ -303,7 +303,12 @@ private:
   static constexpr bool allocateIfNotExist = std::is_same_v<TAccessor, AllocateWrite>;
 
 public:
-  // friend class VDB<T, dim, TSpace>;
+  VDBAccessor() = default;
+
+  ARIA_COPY_MOVE_ABILITY(VDBAccessor, default, default);
+
+private:
+  friend class VDB<T, dim, TSpace>;
 
   ARIA_HOST_DEVICE explicit VDBAccessor(THandle handle) : handle_(std::move(handle)) {}
 
@@ -334,33 +339,24 @@ private:
   using THandle = VDBHandle<T, dim, TSpace>;
   using TCoord = THandle::TCoord;
 
-  static constexpr bool allocateIfNotExist = false;
-
 public:
-  // friend class VDB<T, dim, TSpace>;
+  VDBAccessor() = default;
+
+  ARIA_COPY_MOVE_ABILITY(VDBAccessor, default, default);
+
+private:
+  friend class VDB<T, dim, TSpace>;
 
   ARIA_HOST_DEVICE explicit VDBAccessor(THandle handle) : handle_(std::move(handle)) {}
 
 public:
   [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCoord &cellCoord) const {
-    if constexpr (allocateIfNotExist)
-      return handle_.value_AllocateIfNotExist(cellCoord);
-    else
-      return handle_.value_AssumeExist(cellCoord);
+    return handle_.value_AssumeExist(cellCoord);
   }
 
 private:
   THandle handle_;
 };
-
-template <typename T, auto dim, typename TSpace>
-using VDBAllocateWriteAccessor = VDBAccessor<T, dim, TSpace, AllocateWrite>;
-
-template <typename T, auto dim, typename TSpace>
-using VDBWriteAccessor = VDBAccessor<T, dim, TSpace, Write>;
-
-template <typename T, auto dim, typename TSpace>
-using VDBReadAccessor = VDBAccessor<T, dim, TSpace, Read>;
 
 //
 //
@@ -368,7 +364,46 @@ using VDBReadAccessor = VDBAccessor<T, dim, TSpace, Read>;
 template <typename T, auto dim, typename TSpace>
 class VDB {
 public:
-  // TODO: Implement this.
+  VDB() : handle_(std::make_unique<THandle>(THandle::Create())) {}
+
+  ARIA_COPY_MOVE_ABILITY(VDB, delete, default);
+
+  ~VDB() noexcept {
+    if (handle_)
+      handle_->Destroy();
+  }
+
+public:
+  using value_type = T;
+
+  using AllocateWriteAccessor = VDBAccessor<T, dim, TSpace, AllocateWrite>;
+  using WriteAccessor = VDBAccessor<T, dim, TSpace, Write>;
+  using ReadAccessor = VDBAccessor<T, dim, TSpace, Read>;
+
+public:
+  [[nodiscard]] AllocateWriteAccessor allocateWriteAccessor() { return AllocateWriteAccessor{*handle_}; }
+
+  [[nodiscard]] WriteAccessor writeAccessor() { return WriteAccessor{*handle_}; }
+
+  [[nodiscard]] ReadAccessor readAccessor() const { return ReadAccessor{*handle_}; }
+
+private:
+  using THandle = VDBHandle<T, dim, TSpace>;
+  using TCoord = THandle::TCoord;
+
+  std::unique_ptr<THandle> handle_;
 };
+
+//
+//
+//
+template <typename VDB>
+using VDBAllocateWriteAccessor = typename VDB::AllocateWriteAccessor;
+
+template <typename VDB>
+using VDBWriteAccessor = typename VDB::WriteAccessor;
+
+template <typename VDB>
+using VDBReadAccessor = typename VDB::ReadAccessor;
 
 } // namespace ARIA

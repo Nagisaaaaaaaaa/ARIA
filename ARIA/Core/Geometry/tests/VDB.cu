@@ -7,7 +7,7 @@ namespace ARIA {
 
 namespace {
 
-void TestVDBHandle() {
+void TestVDBHandleKernels() {
   using Handle = VDBHandle<float, 2, SpaceDevice>;
 
   Handle handle = Handle::Create();
@@ -25,16 +25,20 @@ void TestVDBHandle() {
   handle.Destroy();
 }
 
-void TestVDBAccessor() {
-  using Handle = VDBHandle<float, 2, SpaceDevice>;
-  using AllocateWriteAccessor = VDBAllocateWriteAccessor<float, 2, SpaceDevice>;
-  using WriteAccessor = VDBWriteAccessor<float, 2, SpaceDevice>;
-  using ReadAccessor = VDBReadAccessor<float, 2, SpaceDevice>;
+void TestVDBKernels() {
+  using V = VDB<float, 2, SpaceDevice>;
+  using AllocateWriteAccessor = VDBAllocateWriteAccessor<V>;
+  using WriteAccessor = VDBWriteAccessor<V>;
+  using ReadAccessor = VDBReadAccessor<V>;
 
-  Handle handle = Handle::Create();
-  AllocateWriteAccessor allocateWriteAccessor{handle};
-  WriteAccessor writeAccessor{handle};
-  ReadAccessor readAccessor{handle};
+  V v;
+  VDBAccessor allocateWriteAccessor = v.allocateWriteAccessor(); // Test CTAD.
+  VDBAccessor writeAccessor = v.writeAccessor();                 // Test CTAD.
+  VDBAccessor readAccessor = v.readAccessor();                   // Test CTAD.
+
+  static_assert(std::is_same_v<decltype(allocateWriteAccessor), AllocateWriteAccessor>);
+  static_assert(std::is_same_v<decltype(writeAccessor), WriteAccessor>);
+  static_assert(std::is_same_v<decltype(readAccessor), ReadAccessor>);
 
   const size_t n = 10000;
 
@@ -51,18 +55,16 @@ void TestVDBAccessor() {
   Launcher(n, [=] ARIA_DEVICE(size_t i) mutable { ARIA_ASSERT(readAccessor.value({i, 0}) == -i); }).Launch();
 
   cuda::device::current::get().synchronize();
-
-  handle.Destroy();
 }
 
 } // namespace
 
-TEST(VDB, Handle) {
+TEST(VDB, Kernels) {
   size_t size = 1LLU * 1024LLU * 1024LLU * 1024LLU; // 1GB
-  EXPECT_EQ(cudaDeviceSetLimit(cudaLimitMallocHeapSize, size), cudaSuccess);
+  cuda::device::current::get().set_limit(CU_LIMIT_MALLOC_HEAP_SIZE, size);
 
-  TestVDBHandle();
-  TestVDBAccessor();
+  TestVDBHandleKernels();
+  TestVDBKernels();
 }
 
 } // namespace ARIA
