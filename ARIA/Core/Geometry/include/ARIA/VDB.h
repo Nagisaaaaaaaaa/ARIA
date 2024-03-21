@@ -13,6 +13,7 @@
 #include "ARIA/Vec.h"
 
 #include <stdgpu/unordered_map.cuh>
+#include <thrust/host_vector.h>
 
 namespace ARIA {
 
@@ -188,6 +189,9 @@ private:
   }
 
 private:
+  template <typename... Ts>
+  friend class Launcher;
+
   TBlocks blocks_;
 
   //
@@ -195,14 +199,14 @@ private:
   //
 private:
   [[nodiscard]] ARIA_HOST_DEVICE static uint64 BlockCoord2BlockIdx(TCoord blockCoord) {
-    // Compute the quadrant.
-    uint64 quadrant = 0;
+    // Compute the quadrant bits.
+    uint64 quadrantBits = 0;
     ForEach<dim>([&]<auto id>() {
       int &axis = blockCoord[id];
 
       if (axis < 0) {
         axis = -axis;
-        quadrant |= (1 << id); // Fill the `id`^th bit.
+        quadrantBits |= (1 << id); // Fill the `id`^th bit.
       }
     });
 
@@ -213,9 +217,27 @@ private:
     ARIA_ASSERT((idx & ((~uint64{0}) << (64 - dim))) == 0,
                 "The given block coord excesses the representation of the encoder, "
                 "please use a larger encoder instead");
-    idx |= quadrant << (64 - dim);
+    idx |= quadrantBits << (64 - dim);
 
     return idx;
+  }
+
+  [[nodiscard]] ARIA_HOST_DEVICE static TCoord BlockIdx2BlockCoord(const uint64 &blockIdx) {
+    TCoord quadrant;
+    quadrant.fill(1);
+
+    // Compute the quadrant.
+    uint64 quadrantBits = blockIdx >> (64 - dim);
+
+    ForEach<dim>([&]<auto id>() {
+      if (quadrantBits & (1 << id)) {
+        quadrant[id] = -quadrant[id];
+      }
+    });
+
+    // Compute the block coord.
+    uint64 idx = blockIdx & ((~uint64{0}) >> dim);
+    return TCode::Decode(idx).template cast<typename TCoord::Scalar>().cwiseProduct(quadrant);
   }
 
   [[nodiscard]] ARIA_HOST_DEVICE static TCoord CellCoord2BlockCoord(const TCoord &cellCoord) {
@@ -226,6 +248,14 @@ private:
     return cellCoord / n;
   }
 
+  [[nodiscard]] ARIA_HOST_DEVICE static TCoord BlockCoord2CellCoordOffset(const TCoord &blockCoord) {
+    // TODO: Compiler bug here: `nCellsPerBlockDim` is not defined in device code.
+    // return cellCoord * nCellsPerBlockDim;
+
+    constexpr auto n = nCellsPerBlockDim;
+    return blockCoord * n;
+  }
+
   [[nodiscard]] ARIA_HOST_DEVICE static uint64 CellCoord2BlockIdx(const TCoord &cellCoord) {
     return BlockCoord2BlockIdx(CellCoord2BlockCoord(cellCoord));
   }
@@ -233,7 +263,7 @@ private:
   [[nodiscard]] ARIA_HOST_DEVICE static uint64 CellCoord2CellIdxInBlock(const TCoord &cellCoord) {
     TCoord cellCoordInBlock;
     ForEach<dim>([&]<auto d>() { cellCoordInBlock[d] = cellCoord[d] % nCellsPerBlockDim; });
-    return TBlockLayout()(MakeCoordWithNValues<dim>(cellCoordInBlock));
+    return TBlockLayout{}(MakeCoordWithNValues<dim>(cellCoordInBlock));
   }
 
 private:
@@ -491,7 +521,7 @@ using VDBReadAccessor = typename VDB::ReadAccessor;
 //
 //
 //
-#if 0
+// Launcher.
 template <DeviceVDBHandleType THandle, typename F>
 class Launcher<THandle, F> : public launcher::detail::LauncherBase<Launcher<THandle, F>> {
 private:
@@ -499,7 +529,7 @@ private:
 
 public:
   Launcher(const THandle &handle, const F &f) : handle_(handle), f_(f) {
-    Base::overallSize(cosize_safe(theLayoutInEachBlock));
+    Base::overallSize(cosize_safe_v<TBlockLayout>);
   }
 
   ARIA_COPY_MOVE_ABILITY(Launcher, default, default);
@@ -508,18 +538,30 @@ public:
   using Base::blockSize;
 
   void Launch() {
-    for (eachVDBBlock) {
-      // Compute cell coord offset
-      THandle::TCoord cellCoordOffset = ...;
-      Base::Launch(launcher::detail::KernelLaunchVDBBlock<THandle, F>, handle_, cosize_safe(handle_), f_,
-                   cellCoordOffset);
+    auto range = handle_.blocks_.device_range();
+    thrust::host_vector<stdgpu::pair<uint64, TBlock>> rangeH(range.size());
+    thrust::copy(range.begin(), range.end(), rangeH.begin());
+
+    for (auto &block : rangeH) {
+      // Compute block coord from block idx.
+      TCoord blockCoord = handle_.BlockIdx2BlockCoord(block.first);
+      TCoord cellCoordOffset = handle_.BlockCoord2CellCoordOffset(blockCoord);
+
+      // Base::Launch(launcher::detail::KernelLaunchVDBBlock<THandle, F>, handle_, cosize_safe(handle_), f_,
+      //              cellCoordOffset);
     }
   }
 
 private:
+  using TCoord = THandle::TCoord;
+  using TBlock = THandle::TBlock;
+  using TBlockLayout = THandle::TBlockLayout;
+
   THandle handle_;
   F f_;
 };
-#endif
+
+template <DeviceVDBHandleType THandle, typename F>
+Launcher(const THandle &layout, const F &f) -> Launcher<THandle, F>;
 
 } // namespace ARIA
