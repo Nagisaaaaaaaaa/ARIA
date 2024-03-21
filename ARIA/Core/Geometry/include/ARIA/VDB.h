@@ -39,8 +39,12 @@ template <typename T, auto dim, typename TSpace>
 class VDBHandle;
 
 // Device VDB handle.
-template <typename T, auto dim>
-class VDBHandle<T, dim, SpaceDevice> {
+template <typename T, auto dim_>
+class VDBHandle<T, dim_, SpaceDevice> {
+public:
+  using value_type = T;
+  static constexpr auto dim = dim_;
+
 public:
   VDBHandle() = default;
 
@@ -168,26 +172,6 @@ public:
   //   Value: The block.
   using TBlocks = stdgpu::unordered_map<uint64, TBlock>;
 
-  //
-  //
-  //
-private:
-  // See the comments below.
-  template <uint n, typename... Values>
-  ARIA_HOST_DEVICE static decltype(auto) MakeCoordWithNValuesImpl(const TCoord &coord, Values &&...values) {
-    if constexpr (n == 0)
-      return make_coord(std::forward<Values>(values)...);
-    else
-      return MakeCoordWithNValuesImpl<n - 1>(coord, coord[n - 1], std::forward<Values>(values)...);
-  }
-
-  // A function wrapper which calls `make_coord` with `n` runtime values, that is,
-  // `make_coord(coord[0], coord[1], ..., coord[n - 1])`.
-  template <uint n>
-  ARIA_HOST_DEVICE static decltype(auto) MakeCoordWithNValues(const TCoord &coord) {
-    return MakeCoordWithNValuesImpl<n>(coord);
-  }
-
 private:
   template <typename... Ts>
   friend class Launcher;
@@ -263,7 +247,7 @@ private:
   [[nodiscard]] ARIA_HOST_DEVICE static uint64 CellCoord2CellIdxInBlock(const TCoord &cellCoord) {
     TCoord cellCoordInBlock;
     ForEach<dim>([&]<auto d>() { cellCoordInBlock[d] = cellCoord[d] % nCellsPerBlockDim; });
-    return TBlockLayout{}(MakeCoordWithNValues<dim>(cellCoordInBlock));
+    return TBlockLayout{}(ToCoord(cellCoordInBlock));
   }
 
 private:
@@ -523,6 +507,25 @@ using VDBReadAccessor = typename VDB::ReadAccessor;
 //
 // Launcher.
 template <DeviceVDBHandleType THandle, typename F>
+ARIA_KERNEL static void KernelLaunchVDBBlock(typename THandle::TBlock block,
+                                             decltype(ToCoord(typename THandle::TCoord{})) cellCoordOffset,
+                                             F f) {
+  using TCoord = typename THandle::TCoord;
+  using TBlockLayout = typename THandle::TBlockLayout;
+  static constexpr auto dim = THandle::dim;
+
+  int i = static_cast<int>(threadIdx.x) + static_cast<int>(blockIdx.x) * static_cast<int>(blockDim.x);
+  if (i >= cosize_safe_v<TBlockLayout>)
+    return;
+
+  auto cellCoordInBlock = Auto(TBlockLayout{}.get_hier_coord(i));
+  TCoord cellCoord = ToVec(cellCoordOffset + cellCoordInBlock);
+
+  if (block.p->onOff[i])
+    f(cellCoord);
+}
+
+template <DeviceVDBHandleType THandle, typename F>
 class Launcher<THandle, F> : public launcher::detail::LauncherBase<Launcher<THandle, F>> {
 private:
   using Base = launcher::detail::LauncherBase<Launcher<THandle, F>>;
@@ -547,8 +550,8 @@ public:
       TCoord blockCoord = handle_.BlockIdx2BlockCoord(block.first);
       TCoord cellCoordOffset = handle_.BlockCoord2CellCoordOffset(blockCoord);
 
-      // Base::Launch(launcher::detail::KernelLaunchVDBBlock<THandle, F>, handle_, cosize_safe(handle_), f_,
-      //              cellCoordOffset);
+      // Launch.
+      Base::Launch(KernelLaunchVDBBlock<THandle, F>, block.second, ToCoord(cellCoordOffset), f_);
     }
   }
 

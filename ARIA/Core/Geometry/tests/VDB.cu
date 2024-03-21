@@ -19,6 +19,12 @@ void TestVDBHandleKernels() {
     ARIA_ASSERT(handle.value_AllocateIfNotExist({i, 0}) == i);
   }).Launch();
 
+  Launcher(handle, [=] ARIA_DEVICE(const Vec2i &coord) mutable { handle.value_AssumeExist(coord) *= -1; }).Launch();
+
+  Launcher(handle, [=] ARIA_DEVICE(const Vec2i &coord) mutable {
+    ARIA_ASSERT(handle.value_AssumeExist(coord) == -coord.x());
+  }).Launch();
+
   cuda::device::current::get().synchronize();
 
   handle.Destroy();
