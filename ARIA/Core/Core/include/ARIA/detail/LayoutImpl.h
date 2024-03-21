@@ -12,6 +12,8 @@ namespace layout::detail {
 
 using cute::Coord;
 
+using cute::make_coord;
+
 //
 //
 //

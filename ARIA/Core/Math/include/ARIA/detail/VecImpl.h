@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ARIA/Layout.h"
 #include "ARIA/detail/MatImpl.h"
 
 namespace ARIA {
@@ -60,6 +61,39 @@ static constexpr bool is_vec_s_v = is_vec_s<T, s>::value;
   ARIA_SUB_PROP_BEGIN(specifiers, type, propName);                                                                     \
   __ARIA_PROP_AND_SUB_PROP_PREFAB_MEMBERS_VEC(specifiers, type);                                                       \
   ARIA_PROP_END
+
+//
+//
+//
+//
+//
+// Cast `Vec` to `Coord`.
+template <typename T, auto n, auto i, typename... TValues>
+ARIA_HOST_DEVICE static inline constexpr decltype(auto) ToCoordImpl(const Vec<T, n> &vec, TValues &&...values) {
+  if constexpr (i == 0)
+    return make_coord(std::forward<TValues>(values)...);
+  else
+    return ToCoordImpl<T, n, i - 1>(vec, vec[i - 1], std::forward<TValues>(values)...);
+}
+
+template <typename T, auto n>
+ARIA_HOST_DEVICE static inline constexpr decltype(auto) ToCoord(const Vec<T, n> &vec) {
+  return ToCoordImpl<T, n, n>(vec);
+}
+
+//
+//
+//
+// Cast `Coord` to `Vec`.
+template <typename T, typename... Ts>
+ARIA_HOST_DEVICE static inline constexpr decltype(auto) ToVec(const Coord<T, Ts...> &coord) {
+  static_assert((std::is_same_v<T, Ts> && ...), "Element types of `Coord` should be the same");
+  constexpr auto n = sizeof...(Ts) + 1;
+
+  Vec<T, n> vec;
+  ForEach<n>([&]<auto i>() { vec[i] = get<i>(coord); });
+  return vec;
+}
 
 } // namespace vec::detail
 
