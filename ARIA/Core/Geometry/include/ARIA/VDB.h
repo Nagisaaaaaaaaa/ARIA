@@ -332,45 +332,6 @@ private:
 };
 
 //
-template <typename T>
-struct is_vdb_handle : std::false_type {};
-
-template <typename T, auto dim, typename TSpace>
-struct is_vdb_handle<VDBHandle<T, dim, TSpace>> : std::true_type {};
-
-template <typename T>
-static constexpr bool is_vdb_handle_v = is_vdb_handle<T>::value;
-
-template <typename T>
-concept VDBHandleType = is_vdb_handle_v<T>;
-
-//
-template <typename T>
-struct is_host_vdb_handle : std::false_type {};
-
-template <typename T, auto dim>
-struct is_host_vdb_handle<VDBHandle<T, dim, SpaceHost>> : std::true_type {};
-
-template <typename T>
-static constexpr bool is_host_vdb_handle_v = is_host_vdb_handle<T>::value;
-
-template <typename T>
-concept HostVDBHandleType = is_host_vdb_handle_v<T>;
-
-//
-template <typename T>
-struct is_device_vdb_handle : std::false_type {};
-
-template <typename T, auto dim>
-struct is_device_vdb_handle<VDBHandle<T, dim, SpaceDevice>> : std::true_type {};
-
-template <typename T>
-static constexpr bool is_device_vdb_handle_v = is_device_vdb_handle<T>::value;
-
-template <typename T>
-concept DeviceVDBHandleType = is_device_vdb_handle_v<T>;
-
-//
 //
 //
 template <typename T, auto dim, typename TSpace>
@@ -488,7 +449,51 @@ private:
   using TCoord = THandle::TCoord;
 
   std::unique_ptr<THandle> handle_;
+
+  template <typename... Ts>
+  friend class Launcher;
 };
+
+//
+//
+//
+template <typename T>
+struct is_vdb : std::false_type {};
+
+template <typename T, auto dim, typename TSpace>
+struct is_vdb<VDB<T, dim, TSpace>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_vdb_v = is_vdb<T>::value;
+
+template <typename T>
+concept VDBType = is_vdb_v<T>;
+
+//
+template <typename T>
+struct is_host_vdb : std::false_type {};
+
+template <typename T, auto dim>
+struct is_host_vdb<VDB<T, dim, SpaceHost>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_host_vdb_v = is_host_vdb<T>::value;
+
+template <typename T>
+concept HostVDBType = is_host_vdb_v<T>;
+
+//
+template <typename T>
+struct is_device_vdb : std::false_type {};
+
+template <typename T, auto dim>
+struct is_device_vdb<VDB<T, dim, SpaceDevice>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_device_vdb_v = is_device_vdb<T>::value;
+
+template <typename T>
+concept DeviceVDBType = is_device_vdb_v<T>;
 
 //
 //
@@ -506,7 +511,7 @@ using VDBReadAccessor = typename VDB::ReadAccessor;
 //
 //
 // Launcher.
-template <DeviceVDBHandleType THandle, typename F>
+template <typename THandle, typename F>
 ARIA_KERNEL static void KernelLaunchVDBBlock(typename THandle::TBlock block,
                                              decltype(ToCoord(typename THandle::TCoord{})) cellCoordOffset,
                                              F f) {
@@ -525,13 +530,13 @@ ARIA_KERNEL static void KernelLaunchVDBBlock(typename THandle::TBlock block,
     f(cellCoord);
 }
 
-template <DeviceVDBHandleType THandle, typename F>
-class Launcher<THandle, F> : public launcher::detail::LauncherBase<Launcher<THandle, F>> {
+template <DeviceVDBType TVDB, typename F>
+class Launcher<TVDB, F> : public launcher::detail::LauncherBase<Launcher<TVDB, F>> {
 private:
-  using Base = launcher::detail::LauncherBase<Launcher<THandle, F>>;
+  using Base = launcher::detail::LauncherBase<Launcher<TVDB, F>>;
 
 public:
-  Launcher(const THandle &handle, const F &f) : handle_(handle), f_(f) {
+  Launcher(const TVDB &vdb, const F &f) : handle_(*vdb.handle_), f_(f) {
     Base::overallSize(cosize_safe_v<TBlockLayout>);
   }
 
@@ -556,6 +561,7 @@ public:
   }
 
 private:
+  using THandle = TVDB::THandle;
   using TCoord = THandle::TCoord;
   using TBlock = THandle::TBlock;
   using TBlockLayout = THandle::TBlockLayout;
@@ -564,7 +570,7 @@ private:
   F f_;
 };
 
-template <DeviceVDBHandleType THandle, typename F>
-Launcher(const THandle &layout, const F &f) -> Launcher<THandle, F>;
+template <DeviceVDBType TVDB, typename F>
+Launcher(const TVDB &vdb, const F &f) -> Launcher<TVDB, F>;
 
 } // namespace ARIA

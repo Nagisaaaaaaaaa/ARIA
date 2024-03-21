@@ -19,12 +19,6 @@ void TestVDBHandleKernels() {
     ARIA_ASSERT(handle.value_AllocateIfNotExist({i, 0}) == i);
   }).Launch();
 
-  Launcher(handle, [=] ARIA_DEVICE(const Vec2i &coord) mutable { handle.value_AssumeExist(coord) *= -1; }).Launch();
-
-  Launcher(handle, [=] ARIA_DEVICE(const Vec2i &coord) mutable {
-    ARIA_ASSERT(handle.value_AssumeExist(coord) == -coord.x());
-  }).Launch();
-
   cuda::device::current::get().synchronize();
 
   handle.Destroy();
@@ -58,6 +52,12 @@ void TestVDBKernels() {
   // Launcher(n, [=] ARIA_DEVICE(size_t i) mutable { readAccessor.value({i, 0}) = -i; }).Launch();
 
   Launcher(n, [=] ARIA_DEVICE(size_t i) mutable { ARIA_ASSERT(readAccessor.value({i, 0}) == -i); }).Launch();
+
+  Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable { writeAccessor.value(coord) *= -1; }).Launch();
+
+  Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable {
+    ARIA_ASSERT(writeAccessor.value(coord) == coord.x());
+  }).Launch();
 
   cuda::device::current::get().synchronize();
 }
