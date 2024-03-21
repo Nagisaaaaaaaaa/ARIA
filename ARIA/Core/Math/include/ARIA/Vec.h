@@ -78,4 +78,23 @@ using Vec4r = Vec4<Real>;
 /// ```
 #define ARIA_SUB_PROP_PREFAB_VEC(specifiers, type, propName) __ARIA_SUB_PROP_PREFAB_VEC(specifiers, type, propName)
 
+//
+//
+//
+//
+//
+/// \brief Cast `Vec` to `Coord`.
+///
+/// \example ```cpp
+/// Coord<int, int> coord = ToCoord(Vec2i{5, 6});
+/// ```
+using vec::detail::ToCoord;
+
+/// \brief Cast `Coord` to `Vec`.
+///
+/// \example ```cpp
+/// Vec2i vec = ToVec(make_coord(5, 6));
+/// ```
+using vec::detail::ToVec;
+
 } // namespace ARIA

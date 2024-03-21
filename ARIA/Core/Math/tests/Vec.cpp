@@ -48,4 +48,50 @@ TEST(Vec, Base) {
   }
 }
 
+TEST(Vec, Cast) {
+  // To `Coord`.
+  {
+    static_assert(std::is_same_v<decltype(ToCoord(Vec1u{5})), Coord<uint>>);
+    Coord<uint> c = ToCoord(Vec1u{5});
+    EXPECT_EQ(get<0>(c), 5);
+  }
+
+  {
+    static_assert(std::is_same_v<decltype(ToCoord(Vec2i{5, 6})), Coord<int, int>>);
+    Coord<int, int> c = ToCoord(Vec2i{5, 6});
+    EXPECT_EQ(get<0>(c), 5);
+    EXPECT_EQ(get<1>(c), 6);
+  }
+
+  {
+    static_assert(std::is_same_v<decltype(ToCoord(Vec3<size_t>{5, 6, 30})), Coord<size_t, size_t, size_t>>);
+    Coord<size_t, size_t, size_t> c = ToCoord(Vec3<size_t>{5, 6, 30});
+    EXPECT_EQ(get<0>(c), 5);
+    EXPECT_EQ(get<1>(c), 6);
+    EXPECT_EQ(get<2>(c), 30);
+  }
+
+  // To `Vec`.
+  {
+    static_assert(std::is_same_v<decltype(ToVec(make_coord(5u))), Vec1u>);
+    Vec1u v = ToVec(make_coord(5u));
+    EXPECT_EQ(v.x(), 5);
+  }
+
+  {
+    static_assert(std::is_same_v<decltype(ToVec(make_coord(5, 6))), Vec2i>);
+    Vec2i v = ToVec(make_coord(5, 6));
+    EXPECT_EQ(v.x(), 5);
+    EXPECT_EQ(v.y(), 6);
+  }
+
+  {
+    static_assert(std::is_same_v<decltype(ToVec(make_coord(size_t{5}, size_t{6}, size_t{30}))), Vec3<size_t>>);
+    Vec3<size_t> v = ToVec(make_coord(size_t{5}, size_t{6}, size_t{30}));
+    EXPECT_EQ(v.x(), 5);
+    EXPECT_EQ(v.y(), 6);
+    EXPECT_EQ(v.z(), 30);
+  }
+}
+
 } // namespace ARIA
