@@ -299,31 +299,23 @@ private:
   //
   //
 private:
-  ARIA_HOST_DEVICE const TBlock &block_AssumeExist(const TVec &cellCoord) const {
-#if ARIA_IS_DEVICE_CODE
-    // Get reference to the already emplaced block.
-    return blocks_.find(CellCoord2BlockIdx(cellCoord))->second;
-#else
-    ARIA_STATIC_ASSERT_FALSE("This method should not be called at host side");
-#endif
-  }
-
+  // Get reference to the block, which the `cellCoord` is located in.
+  // Assume that the block may not exist, so,
+  // dynamic memory allocation may be performed here.
   ARIA_HOST_DEVICE TBlock &block_AllocateIfNotExist(const TVec &cellCoord) {
 #if ARIA_IS_DEVICE_CODE
-    // Each thread is trying to insert an empty block into the unordered map,
+    // Each thread is trying to insert a block with zero storage into the unordered map,
     // but only one unique thread will succeed.
-    auto res = blocks_.emplace(CellCoord2BlockIdx(cellCoord), TBlock{});
-
-    // If success, get pointer to the emplaced block.
+    auto res = Auto(blocks_.emplace(CellCoord2BlockIdx(cellCoord), TBlock{}));
     TBlock *block = &res.first->second;
 
-    if (res.second) { // For the unique thread which succeeded to emplace the block:
+    if (res.second) { // For the unique thread which succeeded in emplacing the block, `block` points to that block.
       // Allocate the block storage.
       block->storage() = new TBlockStorage();
 
       // Mark the storage as ready.
       block->arrive();
-    } else { // For other threads which failed:
+    } else { // For other threads which failed to emplace the block, `block` points to an undefined memory.
       // Get reference to the emplaced block.
       block = &blocks_.find(CellCoord2BlockIdx(cellCoord))->second;
 
@@ -334,10 +326,24 @@ private:
     // For now, all threads have access to the emplaced block.
     return *block;
 #else
-    ARIA_STATIC_ASSERT_FALSE("This method should not be called at host side");
+    ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
 #endif
   }
 
+  // Get reference to the block, which the `cellCoord` is located in.
+  // Assume that the block is already exist.
+  ARIA_HOST_DEVICE const TBlock &block_AssumeExist(const TVec &cellCoord) const {
+#if ARIA_IS_DEVICE_CODE
+    // Get reference to the already emplaced block.
+    return blocks_.find(CellCoord2BlockIdx(cellCoord))->second;
+#else
+    ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
+#endif
+  }
+
+  //
+  //
+  //
 public:
   ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AssumeExist, TVec);
 
@@ -350,7 +356,7 @@ private:
     ARIA_ASSERT(b.storage()->onOff[CellCoord2CellIdxInBlock(cellCoord)]);
     return b.storage()->data[CellCoord2CellIdxInBlock(cellCoord)];
 #else
-    ARIA_STATIC_ASSERT_FALSE("This method should not be called at host side");
+    ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
 #endif
   }
 
@@ -360,7 +366,7 @@ private:
     b.storage()->onOff.Fill(CellCoord2CellIdxInBlock(cellCoord));
     b.storage()->data[CellCoord2CellIdxInBlock(cellCoord)] = value;
 #else
-    ARIA_STATIC_ASSERT_FALSE("This method should not be called at host side");
+    ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
 #endif
   }
 
@@ -374,7 +380,7 @@ private:
     b.storage()->onOff.Fill(CellCoord2CellIdxInBlock(cellCoord));
     b.storage()->data[CellCoord2CellIdxInBlock(cellCoord)] = value;
 #else
-    ARIA_STATIC_ASSERT_FALSE("This method should not be called at host side");
+    ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
 #endif
   }
 
