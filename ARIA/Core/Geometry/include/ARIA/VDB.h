@@ -19,8 +19,9 @@ namespace ARIA {
 
 namespace vdb::detail {
 
-template <int N>
-ARIA_HOST_DEVICE static int consteval powN(int x) {
+// Compute $x^N$ at compile time.
+template <int N, typename T>
+ARIA_HOST_DEVICE static T consteval powN(T x) {
   static_assert(N >= 0);
 
   if constexpr (N > 0) {
@@ -35,6 +36,19 @@ ARIA_HOST_DEVICE static int consteval powN(int x) {
 //
 //
 //
+//
+//
+// A VDB handle is a lowest-level C-like VDB resource manager, which
+// implements all things needed by C++ VDB classes.
+// The relationship between `VDBHandle` and `VDB` is similar to that of
+// `std::coroutine_handle` and `cppcoro::Task`.
+//
+// Introducing a handle class is necessary because
+// we not only need to implement an owning `VDB`, but also need to
+// implement non-owning `VDBAccessor`s.
+// It is OK to implement them with CRTP, like `BitVector` and `TensorVector`, but
+// such an implementation will be extremely complex for this case.
+// Thus, a more C-like handle-based design is used here.
 template <typename T, auto dim, typename TSpace>
 class VDBHandle;
 
@@ -44,22 +58,32 @@ class VDBHandle<T, dim_, SpaceDevice> {
 public:
   using value_type = T;
   static constexpr auto dim = dim_;
+  using TSpace = SpaceDevice;
 
 public:
+  // `VDBHandle` is something like (actually not) a pointer.
+  // It is constructed to something like `nullptr` by default.
   VDBHandle() = default;
 
+  // Like pointers, copy and move are trivial.
   ARIA_COPY_MOVE_ABILITY(VDBHandle, default, default);
 
+  // Create a `VDBHandle` which points to some resource.
   [[nodiscard]] static VDBHandle Create() {
     VDBHandle handle;
     handle.blocks_ = TBlocks::createDeviceObject(nBlocksMax);
     return handle;
   }
 
-  void Destroy() noexcept /* Actually, exceptions may be thrown here. */ {
-    Launcher(1, [r = blocks_.device_range()] ARIA_DEVICE(size_t i) {
-      for (auto &b : r) {
-        delete b.second.p;
+  // Destroy the resource which the `VDBHandle` points to.
+  void Destroy() noexcept /*! Actually, exceptions may be thrown here. */ {
+    Launcher(1, [range = blocks_.device_range()] ARIA_DEVICE(size_t i) {
+      // `block.first`  : the block index, defined by `TCode`.
+      // `block.second` : the block storage, whose type is `TBlockStorage`.
+      for (auto &block : range) {
+        //! Device memory is dynamically allocated with `new`, so,
+        //! `delete` should be called to free the memory.
+        delete block.second.p;
       }
     }).Launch();
 
@@ -92,18 +116,18 @@ private:
 private:
   // See the comments below.
   template <uint n, typename... Values>
-  static decltype(auto) MakeLayoutMajorWithNValuesImpl(Values &&...values) {
+  static decltype(auto) MakeBlockLayoutImpl(Values &&...values) {
     if constexpr (n == 0)
       return make_layout_major(std::forward<Values>(values)...);
     else
-      return MakeLayoutMajorWithNValuesImpl<n - 1>(C<nCellsPerBlockDim>{}, std::forward<Values>(values)...);
+      return MakeBlockLayoutImpl<n - 1>(C<nCellsPerBlockDim>{}, std::forward<Values>(values)...);
   }
 
-  // A function wrapper which calls `make_layout_major` with `n` compile-time values, that is,
+  // A function wrapper which calls `make_layout_major` with `n` `nCellsPerBlockDim`s, that is,
   // `make_layout_major(C<nCellsPerBlockDim>{}, C<nCellsPerBlockDim>{}, ..., C<nCellsPerBlockDim>{})`.
   template <uint n>
-  static decltype(auto) MakeLayoutMajorWithNValues() {
-    return MakeLayoutMajorWithNValuesImpl<n>();
+  static decltype(auto) MakeBlockLayout() {
+    return MakeBlockLayoutImpl<n>();
   }
 
   //
@@ -118,8 +142,8 @@ public:
   using TCode = MortonCode<dim>;
 
   // Type of the layout of each block.
-  using TBlockLayout = decltype(MakeLayoutMajorWithNValues<dim>());
-  static_assert(is_static_v<TBlockLayout>, "The layout of each block should be determained at compile time");
+  using TBlockLayout = decltype(MakeBlockLayout<dim>());
+  static_assert(is_static_v<TBlockLayout>, "The block layout should be a static layout");
 
   // Type of the block storage part, which contains whether each cell is on or off.
   using TBlockStorageOnOff = BitArray<nCellsPerBlock, ThreadSafe>;
