@@ -78,12 +78,12 @@ public:
   // Destroy the resource which the `VDBHandle` points to.
   void Destroy() noexcept /*! Actually, exceptions may be thrown here. */ {
     Launcher(1, [range = blocks_.device_range()] ARIA_DEVICE(size_t i) {
-      // `block.first`  : the block index, defined by `TCode`.
-      // `block.second` : the block storage, whose type is `TBlockStorage`.
+      // `block.first`  : Code of the block coord, defined by `TCode`.
+      // `block.second` : The block, whose type is `TBlock`.
       for (auto &block : range) {
         //! Device memory is dynamically allocated with `new`, so,
         //! `delete` should be called to free the memory.
-        delete block.second.p;
+        delete block.second.storage();
       }
     }).Launch();
 
@@ -158,10 +158,23 @@ public:
   };
 
   // Type of the block, which contains the block storage pointer and a barrier.
+  //
+  //! When many threads simultaneously access an unallocated block,
+  //! only one thread will get the right to allocate the block storage.
+  //! Every thread knows whether it is the winner, and at the same time,
+  //! a barrier is constructed to "ON".
+  //!
+  //! For the winner thread, it allocates and initialize the block storage.
+  //! After that, it calls `arrive` to mark the storage as ready.
+  //!
+  //! For other threads, they calls `wait` to wait for the storage being ready.
+  //! After `arrive` is called by the winner, they are able to access the storage.
   class TBlock {
   public:
-    TBlockStorage *p = nullptr;
+    // The block storage pointer.
+    ARIA_REF_PROP(public, ARIA_HOST_DEVICE, storage, storage_);
 
+  public:
     // A thread calls this method to mark the storage as ready.
     ARIA_HOST_DEVICE inline void arrive() noexcept {
       cuda::std::atomic_ref barrier{barrier_};
@@ -188,25 +201,24 @@ public:
     }
 
   private:
-    uint barrier_ = 1;
+    TBlockStorage *storage_ = nullptr;
+    uint barrier_ = 1; // Constructed to "ON".
   };
 
-  // Type of the sparse blocks tree:
-  //   Key  : Code of the block coord (defined by TCode).
+  // Type of the sparse blocks tree, which is a device unordered map:
+  //   Key  : Code of the block coord, defined by `TCode`.
   //   Value: The block.
   using TBlocks = stdgpu::unordered_map<uint64, TBlock>;
 
 private:
-  template <typename... Ts>
-  friend class Launcher;
-
+  // Something like a pointer.
   TBlocks blocks_;
 
   //
   //
   //
 private:
-  [[nodiscard]] ARIA_HOST_DEVICE static uint64 BlockCoord2BlockIdx(const TVec &blockCoord) {
+  [[nodiscard]] ARIA_HOST_DEVICE static uint64 BlockCoord2BlockIdx(TVec blockCoord) {
     // Compute the quadrant bits.
     uint64 quadrantBits = 0;
     ForEach<dim>([&]<auto id>() {
@@ -295,7 +307,7 @@ private:
 
     if (res.second) { // For the unique thread which succeeded to emplace the block:
       // Allocate the block storage.
-      block->p = new TBlockStorage();
+      block->storage() = new TBlockStorage();
 
       // Mark the storage as ready.
       block->arrive();
@@ -323,8 +335,8 @@ private:
   [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord) const {
 #if ARIA_IS_DEVICE_CODE
     const TBlock &b = block_AssumeExist(cellCoord);
-    ARIA_ASSERT(b.p->onOff[CellCoord2CellIdxInBlock(cellCoord)]);
-    return b.p->data[CellCoord2CellIdxInBlock(cellCoord)];
+    ARIA_ASSERT(b.storage()->onOff[CellCoord2CellIdxInBlock(cellCoord)]);
+    return b.storage()->data[CellCoord2CellIdxInBlock(cellCoord)];
 #else
     ARIA_STATIC_ASSERT_FALSE("This method should not be called at host side");
 #endif
@@ -333,8 +345,8 @@ private:
   ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord, const T &value) {
 #if ARIA_IS_DEVICE_CODE
     const TBlock &b = block_AssumeExist(cellCoord);
-    b.p->onOff.Fill(CellCoord2CellIdxInBlock(cellCoord));
-    b.p->data[CellCoord2CellIdxInBlock(cellCoord)] = value;
+    b.storage()->onOff.Fill(CellCoord2CellIdxInBlock(cellCoord));
+    b.storage()->data[CellCoord2CellIdxInBlock(cellCoord)] = value;
 #else
     ARIA_STATIC_ASSERT_FALSE("This method should not be called at host side");
 #endif
@@ -347,12 +359,19 @@ private:
   ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord, const T &value) {
 #if ARIA_IS_DEVICE_CODE
     TBlock &b = block_AllocateIfNotExist(cellCoord);
-    b.p->onOff.Fill(CellCoord2CellIdxInBlock(cellCoord));
-    b.p->data[CellCoord2CellIdxInBlock(cellCoord)] = value;
+    b.storage()->onOff.Fill(CellCoord2CellIdxInBlock(cellCoord));
+    b.storage()->data[CellCoord2CellIdxInBlock(cellCoord)] = value;
 #else
     ARIA_STATIC_ASSERT_FALSE("This method should not be called at host side");
 #endif
   }
+
+  //
+  //
+  //
+private:
+  template <typename... Ts>
+  friend class Launcher;
 };
 
 //
@@ -549,7 +568,7 @@ KernelLaunchVDBBlock(typename THandle::TBlock block, decltype(ToCoord(typename T
   auto cellCoordInBlock = Auto(TBlockLayout{}.get_hier_coord(i));
   TVec cellCoord = ToVec(cellCoordOffset + cellCoordInBlock);
 
-  if (block.p->onOff[i])
+  if (block.storage()->onOff[i])
     f(cellCoord);
 }
 
