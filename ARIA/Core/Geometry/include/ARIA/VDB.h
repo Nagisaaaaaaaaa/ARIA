@@ -31,10 +31,6 @@ ARIA_HOST_DEVICE static T consteval powN(T x) {
   }
 }
 
-} // namespace vdb::detail
-
-//
-//
 //
 //
 //
@@ -401,6 +397,10 @@ private:
   friend class Launcher;
 };
 
+} // namespace vdb::detail
+
+//
+//
 //
 //
 //
@@ -424,7 +424,7 @@ template <typename T, auto dim, typename TSpace, typename TAccessor>
   requires(std::is_same_v<TAccessor, Write> || std::is_same_v<TAccessor, AllocateWrite>)
 class VDBAccessor<T, dim, TSpace, TAccessor> {
 private:
-  using THandle = VDBHandle<T, dim, TSpace>;
+  using THandle = vdb::detail::VDBHandle<T, dim, TSpace>;
   using TVec = THandle::TVec;
 
   static constexpr bool allocateIfNotExist = std::is_same_v<TAccessor, AllocateWrite>;
@@ -463,7 +463,7 @@ template <typename T, auto dim, typename TSpace, typename TAccessor>
   requires(std::is_same_v<TAccessor, Read>)
 class VDBAccessor<T, dim, TSpace, TAccessor> {
 private:
-  using THandle = VDBHandle<T, dim, TSpace>;
+  using THandle = vdb::detail::VDBHandle<T, dim, TSpace>;
   using TVec = THandle::TVec;
 
 public:
@@ -515,7 +515,7 @@ public:
   [[nodiscard]] ReadAccessor readAccessor() const { return ReadAccessor{*handle_}; }
 
 private:
-  using THandle = VDBHandle<T, dim, TSpace>;
+  using THandle = vdb::detail::VDBHandle<T, dim, TSpace>;
   using TVec = THandle::TVec;
 
   std::unique_ptr<THandle> handle_;

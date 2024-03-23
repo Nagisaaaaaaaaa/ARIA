@@ -7,7 +7,7 @@ namespace ARIA {
 namespace {
 
 void TestVDBHandleKernels() {
-  using Handle = VDBHandle<float, 2, SpaceDevice>;
+  using Handle = vdb::detail::VDBHandle<float, 2, SpaceDevice>;
 
   Handle handle = Handle::Create();
 
