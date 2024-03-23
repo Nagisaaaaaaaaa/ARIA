@@ -330,7 +330,6 @@ private:
 #endif
   }
 
-  // Get reference to the block, which the `cellCoord` is located in.
   // Assume that the block is already exist.
   ARIA_HOST_DEVICE const TBlock &block_AssumeExist(const TVec &cellCoord) const {
 #if ARIA_IS_DEVICE_CODE
@@ -345,14 +344,14 @@ private:
   //
   //
 public:
+  // Get or set the value at `cellCoord`.
   ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AllocateIfNotExist, TVec);
 
   ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AssumeExist, TVec);
 
-  //
-  //
-  //
 private:
+  //! It is considered undefined behavior to get the value which has not been set yet.
+  //! So, the getter of `value_AllocateIfNotExist` can be implemented the same as `value_AssumeExist`'s.
   [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord) const {
     return ARIA_PROP_IMPL(value_AssumeExist)(cellCoord);
   }
@@ -360,8 +359,10 @@ private:
   ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord, const T &value) {
 #if ARIA_IS_DEVICE_CODE
     TBlock &b = block_AllocateIfNotExist(cellCoord);
-    b.storage()->onOff.Fill(CellCoord2CellIdxInBlock(cellCoord));
-    b.storage()->data[CellCoord2CellIdxInBlock(cellCoord)] = value;
+
+    auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
+    b.storage()->onOff.Fill(cellIdxInBlock);
+    b.storage()->data[cellIdxInBlock] = value;
 #else
     ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
 #endif
@@ -370,8 +371,11 @@ private:
   [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord) const {
 #if ARIA_IS_DEVICE_CODE
     const TBlock &b = block_AssumeExist(cellCoord);
-    ARIA_ASSERT(b.storage()->onOff[CellCoord2CellIdxInBlock(cellCoord)]);
-    return b.storage()->data[CellCoord2CellIdxInBlock(cellCoord)];
+
+    auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
+    ARIA_ASSERT(b.storage()->onOff[cellIdxInBlock],
+                "It is considered undefined behavior to get the value which has not been set yet");
+    return b.storage()->data[cellIdxInBlock];
 #else
     ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
 #endif
@@ -380,8 +384,10 @@ private:
   ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord, const T &value) {
 #if ARIA_IS_DEVICE_CODE
     const TBlock &b = block_AssumeExist(cellCoord);
-    b.storage()->onOff.Fill(CellCoord2CellIdxInBlock(cellCoord));
-    b.storage()->data[CellCoord2CellIdxInBlock(cellCoord)] = value;
+
+    auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
+    b.storage()->onOff.Fill(cellIdxInBlock);
+    b.storage()->data[cellIdxInBlock] = value;
 #else
     ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
 #endif
