@@ -217,9 +217,10 @@ private:
   //
   //
   //
+  // Conversion between different coordinate systems.
 private:
   [[nodiscard]] ARIA_HOST_DEVICE static uint64 BlockCoord2BlockIdx(TVec blockCoord) {
-    // Compute the quadrant bits.
+    // Compute the quadrant bits and remove the signs.
     uint64 quadrantBits = 0;
     ForEach<dim>([&]<auto id>() {
       int &axis = blockCoord[id];
@@ -236,7 +237,7 @@ private:
     // Encode the quadrant to the highest bits of the index.
     ARIA_ASSERT((idx & ((~uint64{0}) << (64 - dim))) == 0,
                 "The given block coord excesses the representation of the encoder, "
-                "please use a larger encoder instead");
+                "please contact the developers and use a larger encoder instead");
     idx |= quadrantBits << (64 - dim);
 
     return idx;
@@ -250,14 +251,17 @@ private:
     uint64 quadrantBits = blockIdx >> (64 - dim);
 
     ForEach<dim>([&]<auto id>() {
-      if (quadrantBits & (1 << id)) {
+      if (quadrantBits & (1 << id)) { // Check the `id`^th bit.
         quadrant[id] = -quadrant[id];
       }
     });
 
-    // Compute the block coord.
+    // Decode the quadrant from the highest bits of the index.
     uint64 idx = blockIdx & ((~uint64{0}) >> dim);
-    return TCode::Decode(idx).template cast<typename TVec::Scalar>().cwiseProduct(quadrant);
+
+    // Compute the block coord and add the signs.
+    TVec blockCoord = TCode::Decode(idx).template cast<typename TVec::Scalar>();
+    return blockCoord.cwiseProduct(quadrant);
   }
 
   [[nodiscard]] ARIA_HOST_DEVICE static TVec CellCoord2BlockCoord(const TVec &cellCoord) {
@@ -268,6 +272,13 @@ private:
     return cellCoord / n;
   }
 
+  [[nodiscard]] ARIA_HOST_DEVICE static TVec CellCoord2CellCoordInBlock(const TVec &cellCoord) {
+    TVec cellCoordInBlock;
+    ForEach<dim>([&]<auto id>() { cellCoordInBlock[id] = cellCoord[id] % nCellsPerBlockDim; });
+    return cellCoordInBlock;
+  }
+
+  // `cellCoord` = `CellCoordOffset` + `cellCoordInBlock`.
   [[nodiscard]] ARIA_HOST_DEVICE static TVec BlockCoord2CellCoordOffset(const TVec &blockCoord) {
     // TODO: Compiler bug here: `nCellsPerBlockDim` is not defined in device code.
     // return cellCoord * nCellsPerBlockDim;
@@ -281,11 +292,12 @@ private:
   }
 
   [[nodiscard]] ARIA_HOST_DEVICE static uint64 CellCoord2CellIdxInBlock(const TVec &cellCoord) {
-    TVec cellCoordInBlock;
-    ForEach<dim>([&]<auto d>() { cellCoordInBlock[d] = cellCoord[d] % nCellsPerBlockDim; });
-    return TBlockLayout{}(ToCoord(cellCoordInBlock));
+    return TBlockLayout{}(ToCoord(CellCoord2CellCoordInBlock(cellCoord)));
   }
 
+  //
+  //
+  //
 private:
   ARIA_HOST_DEVICE const TBlock &block_AssumeExist(const TVec &cellCoord) const {
 #if ARIA_IS_DEVICE_CODE
