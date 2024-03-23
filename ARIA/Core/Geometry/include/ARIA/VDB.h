@@ -34,6 +34,8 @@ ARIA_HOST_DEVICE static T consteval powN(T x) {
 //
 //
 //
+//
+//
 // A VDB handle is a lowest-level C-like VDB resource manager, which
 // implements all things needed by C++ VDB classes.
 // The relationship between `VDBHandle` and `VDB` is similar to that of
@@ -397,132 +399,14 @@ private:
   friend class Launcher;
 };
 
-} // namespace vdb::detail
-
 //
 //
 //
 //
 //
+// Fwd.
 template <typename T, auto dim, typename TSpace>
 class VDB;
-
-//
-//
-//
-struct AllocateWrite {};
-
-struct Write {};
-
-struct Read {};
-
-template <typename T, auto dim, typename TSpace, typename TAccessor>
-class VDBAccessor;
-
-// Write or allocate-write accessor.
-template <typename T, auto dim, typename TSpace, typename TAccessor>
-  requires(std::is_same_v<TAccessor, Write> || std::is_same_v<TAccessor, AllocateWrite>)
-class VDBAccessor<T, dim, TSpace, TAccessor> {
-private:
-  using THandle = vdb::detail::VDBHandle<T, dim, TSpace>;
-  using TVec = THandle::TVec;
-
-  static constexpr bool allocateIfNotExist = std::is_same_v<TAccessor, AllocateWrite>;
-
-public:
-  VDBAccessor() = default;
-
-  ARIA_COPY_MOVE_ABILITY(VDBAccessor, default, default);
-
-private:
-  friend class VDB<T, dim, TSpace>;
-
-  ARIA_HOST_DEVICE explicit VDBAccessor(THandle handle) : handle_(std::move(handle)) {}
-
-public:
-  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TVec &cellCoord) {
-    if constexpr (allocateIfNotExist)
-      return handle_.value_AllocateIfNotExist(cellCoord);
-    else
-      return handle_.value_AssumeExist(cellCoord);
-  }
-
-  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TVec &cellCoord) const {
-    if constexpr (allocateIfNotExist)
-      return handle_.value_AllocateIfNotExist(cellCoord);
-    else
-      return handle_.value_AssumeExist(cellCoord);
-  }
-
-private:
-  THandle handle_;
-};
-
-// Read accessor.
-template <typename T, auto dim, typename TSpace, typename TAccessor>
-  requires(std::is_same_v<TAccessor, Read>)
-class VDBAccessor<T, dim, TSpace, TAccessor> {
-private:
-  using THandle = vdb::detail::VDBHandle<T, dim, TSpace>;
-  using TVec = THandle::TVec;
-
-public:
-  VDBAccessor() = default;
-
-  ARIA_COPY_MOVE_ABILITY(VDBAccessor, default, default);
-
-private:
-  friend class VDB<T, dim, TSpace>;
-
-  ARIA_HOST_DEVICE explicit VDBAccessor(THandle handle) : handle_(std::move(handle)) {}
-
-public:
-  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TVec &cellCoord) const {
-    return handle_.value_AssumeExist(cellCoord);
-  }
-
-private:
-  THandle handle_;
-};
-
-//
-//
-//
-template <typename T, auto dim, typename TSpace>
-class VDB {
-public:
-  VDB() : handle_(std::make_unique<THandle>(THandle::Create())) {}
-
-  ARIA_COPY_MOVE_ABILITY(VDB, delete, default);
-
-  ~VDB() noexcept {
-    if (handle_)
-      handle_->Destroy();
-  }
-
-public:
-  using value_type = T;
-
-  using AllocateWriteAccessor = VDBAccessor<T, dim, TSpace, AllocateWrite>;
-  using WriteAccessor = VDBAccessor<T, dim, TSpace, Write>;
-  using ReadAccessor = VDBAccessor<T, dim, TSpace, Read>;
-
-public:
-  [[nodiscard]] AllocateWriteAccessor allocateWriteAccessor() { return AllocateWriteAccessor{*handle_}; }
-
-  [[nodiscard]] WriteAccessor writeAccessor() { return WriteAccessor{*handle_}; }
-
-  [[nodiscard]] ReadAccessor readAccessor() const { return ReadAccessor{*handle_}; }
-
-private:
-  using THandle = vdb::detail::VDBHandle<T, dim, TSpace>;
-  using TVec = THandle::TVec;
-
-  std::unique_ptr<THandle> handle_;
-
-  template <typename... Ts>
-  friend class Launcher;
-};
 
 //
 //
@@ -568,15 +452,133 @@ concept DeviceVDBType = is_device_vdb_v<T>;
 //
 //
 //
-template <typename VDB>
-using VDBAllocateWriteAccessor = typename VDB::AllocateWriteAccessor;
+//
+//
+// Accessor policies.
+struct AllocateWrite {};
 
-template <typename VDB>
-using VDBWriteAccessor = typename VDB::WriteAccessor;
+struct Write {};
 
-template <typename VDB>
-using VDBReadAccessor = typename VDB::ReadAccessor;
+struct Read {};
 
+//
+//
+//
+// A `VDBAccessor` is a non-owning view of a `VDB`.
+template <typename T, auto dim, typename TSpace, typename TAccessor>
+class VDBAccessor;
+
+// Allocate-write or write accessor.
+template <typename T, auto dim, typename TSpace, typename TAccessor>
+  requires(std::is_same_v<TAccessor, AllocateWrite> || std::is_same_v<TAccessor, Write>)
+class VDBAccessor<T, dim, TSpace, TAccessor> {
+private:
+  using THandle = VDBHandle<T, dim, TSpace>;
+  using TVec = THandle::TVec;
+
+public:
+  VDBAccessor() = default;
+
+  ARIA_COPY_MOVE_ABILITY(VDBAccessor, default, default);
+
+private:
+  friend class VDB<T, dim, TSpace>;
+
+  // This constructor should only be called by `VDB`.
+  ARIA_HOST_DEVICE explicit VDBAccessor(THandle handle) : handle_(std::move(handle)) {}
+
+public:
+  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TVec &cellCoord) {
+    if constexpr (allocateIfNotExist)
+      return handle_.value_AllocateIfNotExist(cellCoord);
+    else
+      return handle_.value_AssumeExist(cellCoord);
+  }
+
+  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TVec &cellCoord) const {
+    if constexpr (allocateIfNotExist)
+      return handle_.value_AllocateIfNotExist(cellCoord);
+    else
+      return handle_.value_AssumeExist(cellCoord);
+  }
+
+private:
+  THandle handle_;
+
+  static constexpr bool allocateIfNotExist = std::is_same_v<TAccessor, AllocateWrite>;
+};
+
+// Read accessor.
+template <typename T, auto dim, typename TSpace, typename TAccessor>
+  requires(std::is_same_v<TAccessor, Read>)
+class VDBAccessor<T, dim, TSpace, TAccessor> {
+private:
+  using THandle = VDBHandle<T, dim, TSpace>;
+  using TVec = THandle::TVec;
+
+public:
+  VDBAccessor() = default;
+
+  ARIA_COPY_MOVE_ABILITY(VDBAccessor, default, default);
+
+private:
+  friend class VDB<T, dim, TSpace>;
+
+  ARIA_HOST_DEVICE explicit VDBAccessor(THandle handle) : handle_(std::move(handle)) {}
+
+public:
+  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TVec &cellCoord) const {
+    return handle_.value_AssumeExist(cellCoord);
+  }
+
+private:
+  THandle handle_;
+};
+
+//
+//
+//
+//
+//
+// A `VDB` is an owning object which can generate non-owning `VDBAccessor`s.
+template <typename T, auto dim, typename TSpace>
+class VDB {
+public:
+  VDB() : handle_(std::make_unique<THandle>(THandle::Create())) {}
+
+  ARIA_COPY_MOVE_ABILITY(VDB, delete, default);
+
+  ~VDB() noexcept {
+    if (handle_)
+      handle_->Destroy();
+  }
+
+public:
+  using value_type = T;
+
+  using AllocateWriteAccessor = VDBAccessor<T, dim, TSpace, AllocateWrite>;
+  using WriteAccessor = VDBAccessor<T, dim, TSpace, Write>;
+  using ReadAccessor = VDBAccessor<T, dim, TSpace, Read>;
+
+public:
+  [[nodiscard]] AllocateWriteAccessor allocateWriteAccessor() { return AllocateWriteAccessor{*handle_}; }
+
+  [[nodiscard]] WriteAccessor writeAccessor() { return WriteAccessor{*handle_}; }
+
+  [[nodiscard]] ReadAccessor readAccessor() const { return ReadAccessor{*handle_}; }
+
+private:
+  using THandle = VDBHandle<T, dim, TSpace>;
+
+  std::unique_ptr<THandle> handle_;
+
+private:
+  template <typename... Ts>
+  friend class Launcher;
+};
+
+//
+//
 //
 //
 //
@@ -599,7 +601,33 @@ KernelLaunchVDBBlock(typename THandle::TBlock block, decltype(ToCoord(typename T
     f(cellCoord);
 }
 
-template <DeviceVDBType TVDB, typename F>
+} // namespace vdb::detail
+
+//
+//
+//
+//
+//
+using vdb::detail::VDBAccessor;
+
+template <typename VDB>
+using VDBAllocateWriteAccessor = typename VDB::AllocateWriteAccessor;
+
+template <typename VDB>
+using VDBWriteAccessor = typename VDB::WriteAccessor;
+
+template <typename VDB>
+using VDBReadAccessor = typename VDB::ReadAccessor;
+
+//
+//
+//
+using vdb::detail::VDB;
+
+//
+//
+//
+template <vdb::detail::DeviceVDBType TVDB, typename F>
 class Launcher<TVDB, F> : public launcher::detail::LauncherBase<Launcher<TVDB, F>> {
 private:
   using Base = launcher::detail::LauncherBase<Launcher<TVDB, F>>;
@@ -625,7 +653,7 @@ public:
       TVec cellCoordOffset = handle_.BlockCoord2CellCoordOffset(blockCoord);
 
       // Launch.
-      Base::Launch(KernelLaunchVDBBlock<THandle, F>, block.second, ToCoord(cellCoordOffset), f_);
+      Base::Launch(vdb::detail::KernelLaunchVDBBlock<THandle, F>, block.second, ToCoord(cellCoordOffset), f_);
     }
   }
 
@@ -639,7 +667,7 @@ private:
   F f_;
 };
 
-template <DeviceVDBType TVDB, typename F>
+template <vdb::detail::DeviceVDBType TVDB, typename F>
 Launcher(const TVDB &vdb, const F &f) -> Launcher<TVDB, F>;
 
 } // namespace ARIA
