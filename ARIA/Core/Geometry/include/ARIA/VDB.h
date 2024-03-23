@@ -135,7 +135,7 @@ private:
   //
 public:
   // Type of the coordinate.
-  using TCoord = Vec<int, dim>;
+  using TVec = Vec<int, dim>;
 
   // Type of the space filling curve encoder and decoder, which
   // is used to hash the block coord to and from the block index.
@@ -206,7 +206,7 @@ private:
   //
   //
 private:
-  [[nodiscard]] ARIA_HOST_DEVICE static uint64 BlockCoord2BlockIdx(TCoord blockCoord) {
+  [[nodiscard]] ARIA_HOST_DEVICE static uint64 BlockCoord2BlockIdx(const TVec &blockCoord) {
     // Compute the quadrant bits.
     uint64 quadrantBits = 0;
     ForEach<dim>([&]<auto id>() {
@@ -230,8 +230,8 @@ private:
     return idx;
   }
 
-  [[nodiscard]] ARIA_HOST_DEVICE static TCoord BlockIdx2BlockCoord(const uint64 &blockIdx) {
-    TCoord quadrant;
+  [[nodiscard]] ARIA_HOST_DEVICE static TVec BlockIdx2BlockCoord(const uint64 &blockIdx) {
+    TVec quadrant;
     quadrant.fill(1);
 
     // Compute the quadrant.
@@ -245,10 +245,10 @@ private:
 
     // Compute the block coord.
     uint64 idx = blockIdx & ((~uint64{0}) >> dim);
-    return TCode::Decode(idx).template cast<typename TCoord::Scalar>().cwiseProduct(quadrant);
+    return TCode::Decode(idx).template cast<typename TVec::Scalar>().cwiseProduct(quadrant);
   }
 
-  [[nodiscard]] ARIA_HOST_DEVICE static TCoord CellCoord2BlockCoord(const TCoord &cellCoord) {
+  [[nodiscard]] ARIA_HOST_DEVICE static TVec CellCoord2BlockCoord(const TVec &cellCoord) {
     // TODO: Compiler bug here: `nCellsPerBlockDim` is not defined in device code.
     // return cellCoord / nCellsPerBlockDim;
 
@@ -256,7 +256,7 @@ private:
     return cellCoord / n;
   }
 
-  [[nodiscard]] ARIA_HOST_DEVICE static TCoord BlockCoord2CellCoordOffset(const TCoord &blockCoord) {
+  [[nodiscard]] ARIA_HOST_DEVICE static TVec BlockCoord2CellCoordOffset(const TVec &blockCoord) {
     // TODO: Compiler bug here: `nCellsPerBlockDim` is not defined in device code.
     // return cellCoord * nCellsPerBlockDim;
 
@@ -264,18 +264,18 @@ private:
     return blockCoord * n;
   }
 
-  [[nodiscard]] ARIA_HOST_DEVICE static uint64 CellCoord2BlockIdx(const TCoord &cellCoord) {
+  [[nodiscard]] ARIA_HOST_DEVICE static uint64 CellCoord2BlockIdx(const TVec &cellCoord) {
     return BlockCoord2BlockIdx(CellCoord2BlockCoord(cellCoord));
   }
 
-  [[nodiscard]] ARIA_HOST_DEVICE static uint64 CellCoord2CellIdxInBlock(const TCoord &cellCoord) {
-    TCoord cellCoordInBlock;
+  [[nodiscard]] ARIA_HOST_DEVICE static uint64 CellCoord2CellIdxInBlock(const TVec &cellCoord) {
+    TVec cellCoordInBlock;
     ForEach<dim>([&]<auto d>() { cellCoordInBlock[d] = cellCoord[d] % nCellsPerBlockDim; });
     return TBlockLayout{}(ToCoord(cellCoordInBlock));
   }
 
 private:
-  ARIA_HOST_DEVICE const TBlock &block_AssumeExist(const TCoord &cellCoord) const {
+  ARIA_HOST_DEVICE const TBlock &block_AssumeExist(const TVec &cellCoord) const {
 #if ARIA_IS_DEVICE_CODE
     // Get reference to the already emplaced block.
     return blocks_.find(CellCoord2BlockIdx(cellCoord))->second;
@@ -284,7 +284,7 @@ private:
 #endif
   }
 
-  ARIA_HOST_DEVICE TBlock &block_AllocateIfNotExist(const TCoord &cellCoord) {
+  ARIA_HOST_DEVICE TBlock &block_AllocateIfNotExist(const TVec &cellCoord) {
 #if ARIA_IS_DEVICE_CODE
     // Each thread is trying to insert an empty block into the unordered map,
     // but only one unique thread will succeed.
@@ -315,12 +315,12 @@ private:
   }
 
 public:
-  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AssumeExist, TCoord);
+  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AssumeExist, TVec);
 
-  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AllocateIfNotExist, TCoord);
+  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AllocateIfNotExist, TVec);
 
 private:
-  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AssumeExist)(const TCoord &cellCoord) const {
+  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord) const {
 #if ARIA_IS_DEVICE_CODE
     const TBlock &b = block_AssumeExist(cellCoord);
     ARIA_ASSERT(b.p->onOff[CellCoord2CellIdxInBlock(cellCoord)]);
@@ -330,7 +330,7 @@ private:
 #endif
   }
 
-  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AssumeExist)(const TCoord &cellCoord, const T &value) {
+  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord, const T &value) {
 #if ARIA_IS_DEVICE_CODE
     const TBlock &b = block_AssumeExist(cellCoord);
     b.p->onOff.Fill(CellCoord2CellIdxInBlock(cellCoord));
@@ -340,11 +340,11 @@ private:
 #endif
   }
 
-  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TCoord &cellCoord) const {
+  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord) const {
     return ARIA_PROP_IMPL(value_AssumeExist)(cellCoord);
   }
 
-  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TCoord &cellCoord, const T &value) {
+  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord, const T &value) {
 #if ARIA_IS_DEVICE_CODE
     TBlock &b = block_AllocateIfNotExist(cellCoord);
     b.p->onOff.Fill(CellCoord2CellIdxInBlock(cellCoord));
@@ -379,7 +379,7 @@ template <typename T, auto dim, typename TSpace, typename TAccessor>
 class VDBAccessor<T, dim, TSpace, TAccessor> {
 private:
   using THandle = VDBHandle<T, dim, TSpace>;
-  using TCoord = THandle::TCoord;
+  using TVec = THandle::TVec;
 
   static constexpr bool allocateIfNotExist = std::is_same_v<TAccessor, AllocateWrite>;
 
@@ -394,14 +394,14 @@ private:
   ARIA_HOST_DEVICE explicit VDBAccessor(THandle handle) : handle_(std::move(handle)) {}
 
 public:
-  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCoord &cellCoord) {
+  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TVec &cellCoord) {
     if constexpr (allocateIfNotExist)
       return handle_.value_AllocateIfNotExist(cellCoord);
     else
       return handle_.value_AssumeExist(cellCoord);
   }
 
-  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCoord &cellCoord) const {
+  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TVec &cellCoord) const {
     if constexpr (allocateIfNotExist)
       return handle_.value_AllocateIfNotExist(cellCoord);
     else
@@ -418,7 +418,7 @@ template <typename T, auto dim, typename TSpace, typename TAccessor>
 class VDBAccessor<T, dim, TSpace, TAccessor> {
 private:
   using THandle = VDBHandle<T, dim, TSpace>;
-  using TCoord = THandle::TCoord;
+  using TVec = THandle::TVec;
 
 public:
   VDBAccessor() = default;
@@ -431,7 +431,7 @@ private:
   ARIA_HOST_DEVICE explicit VDBAccessor(THandle handle) : handle_(std::move(handle)) {}
 
 public:
-  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCoord &cellCoord) const {
+  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TVec &cellCoord) const {
     return handle_.value_AssumeExist(cellCoord);
   }
 
@@ -470,7 +470,7 @@ public:
 
 private:
   using THandle = VDBHandle<T, dim, TSpace>;
-  using TCoord = THandle::TCoord;
+  using TVec = THandle::TVec;
 
   std::unique_ptr<THandle> handle_;
 
@@ -536,10 +536,9 @@ using VDBReadAccessor = typename VDB::ReadAccessor;
 //
 // Launcher.
 template <typename THandle, typename F>
-ARIA_KERNEL static void KernelLaunchVDBBlock(typename THandle::TBlock block,
-                                             decltype(ToCoord(typename THandle::TCoord{})) cellCoordOffset,
-                                             F f) {
-  using TCoord = typename THandle::TCoord;
+ARIA_KERNEL static void
+KernelLaunchVDBBlock(typename THandle::TBlock block, decltype(ToCoord(typename THandle::TVec{})) cellCoordOffset, F f) {
+  using TVec = typename THandle::TVec;
   using TBlockLayout = typename THandle::TBlockLayout;
   static constexpr auto dim = THandle::dim;
 
@@ -548,7 +547,7 @@ ARIA_KERNEL static void KernelLaunchVDBBlock(typename THandle::TBlock block,
     return;
 
   auto cellCoordInBlock = Auto(TBlockLayout{}.get_hier_coord(i));
-  TCoord cellCoord = ToVec(cellCoordOffset + cellCoordInBlock);
+  TVec cellCoord = ToVec(cellCoordOffset + cellCoordInBlock);
 
   if (block.p->onOff[i])
     f(cellCoord);
@@ -576,8 +575,8 @@ public:
 
     for (auto &block : rangeH) {
       // Compute block coord from block idx.
-      TCoord blockCoord = handle_.BlockIdx2BlockCoord(block.first);
-      TCoord cellCoordOffset = handle_.BlockCoord2CellCoordOffset(blockCoord);
+      TVec blockCoord = handle_.BlockIdx2BlockCoord(block.first);
+      TVec cellCoordOffset = handle_.BlockCoord2CellCoordOffset(blockCoord);
 
       // Launch.
       Base::Launch(KernelLaunchVDBBlock<THandle, F>, block.second, ToCoord(cellCoordOffset), f_);
@@ -586,7 +585,7 @@ public:
 
 private:
   using THandle = TVDB::THandle;
-  using TCoord = THandle::TCoord;
+  using TVec = THandle::TVec;
   using TBlock = THandle::TBlock;
   using TBlockLayout = THandle::TBlockLayout;
 
