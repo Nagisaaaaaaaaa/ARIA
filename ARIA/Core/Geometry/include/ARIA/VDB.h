@@ -345,11 +345,28 @@ private:
   //
   //
 public:
-  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AssumeExist, TVec);
-
   ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AllocateIfNotExist, TVec);
 
+  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AssumeExist, TVec);
+
+  //
+  //
+  //
 private:
+  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord) const {
+    return ARIA_PROP_IMPL(value_AssumeExist)(cellCoord);
+  }
+
+  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord, const T &value) {
+#if ARIA_IS_DEVICE_CODE
+    TBlock &b = block_AllocateIfNotExist(cellCoord);
+    b.storage()->onOff.Fill(CellCoord2CellIdxInBlock(cellCoord));
+    b.storage()->data[CellCoord2CellIdxInBlock(cellCoord)] = value;
+#else
+    ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
+#endif
+  }
+
   [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord) const {
 #if ARIA_IS_DEVICE_CODE
     const TBlock &b = block_AssumeExist(cellCoord);
@@ -363,20 +380,6 @@ private:
   ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord, const T &value) {
 #if ARIA_IS_DEVICE_CODE
     const TBlock &b = block_AssumeExist(cellCoord);
-    b.storage()->onOff.Fill(CellCoord2CellIdxInBlock(cellCoord));
-    b.storage()->data[CellCoord2CellIdxInBlock(cellCoord)] = value;
-#else
-    ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
-#endif
-  }
-
-  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord) const {
-    return ARIA_PROP_IMPL(value_AssumeExist)(cellCoord);
-  }
-
-  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord, const T &value) {
-#if ARIA_IS_DEVICE_CODE
-    TBlock &b = block_AllocateIfNotExist(cellCoord);
     b.storage()->onOff.Fill(CellCoord2CellIdxInBlock(cellCoord));
     b.storage()->data[CellCoord2CellIdxInBlock(cellCoord)] = value;
 #else
