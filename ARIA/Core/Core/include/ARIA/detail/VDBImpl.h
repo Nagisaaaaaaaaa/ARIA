@@ -438,9 +438,17 @@ private:
   //
   //
   //
+public:
+  void ShrinkToFit() {
+    // TODO: Implement this.
+  }
+
+  //
+  //
+  //
 private:
   template <typename... Ts>
-  friend class Launcher;
+  friend class ARIA::Launcher;
 };
 
 //
@@ -624,7 +632,7 @@ private:
 
 private:
   template <typename... Ts>
-  friend class Launcher;
+  friend class ARIA::Launcher;
 };
 
 //
