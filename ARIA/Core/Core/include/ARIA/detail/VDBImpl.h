@@ -6,6 +6,7 @@
 #include "ARIA/Vec.h"
 
 #include <stdgpu/unordered_map.cuh>
+#include <thrust/device_vector.h>
 #include <thrust/host_vector.h>
 
 namespace ARIA {
@@ -26,6 +27,13 @@ ARIA_HOST_DEVICE static T consteval powN(T x) {
 
 //
 //
+//
+//
+//
+// Fwd.
+template <typename T, auto dim, typename TSpace>
+class VDB;
+
 //
 //
 //
@@ -438,68 +446,12 @@ private:
   //
   //
   //
-public:
-  void ShrinkToFit() {
-    // TODO: Implement this.
-  }
-
-  //
-  //
-  //
 private:
+  friend class VDB<T, dim, TSpace>;
+
   template <typename... Ts>
   friend class ARIA::Launcher;
 };
-
-//
-//
-//
-//
-//
-// Fwd.
-template <typename T, auto dim, typename TSpace>
-class VDB;
-
-//
-//
-//
-template <typename T>
-struct is_vdb : std::false_type {};
-
-template <typename T, auto dim, typename TSpace>
-struct is_vdb<VDB<T, dim, TSpace>> : std::true_type {};
-
-template <typename T>
-static constexpr bool is_vdb_v = is_vdb<T>::value;
-
-template <typename T>
-concept VDBType = is_vdb_v<T>;
-
-//
-template <typename T>
-struct is_host_vdb : std::false_type {};
-
-template <typename T, auto dim>
-struct is_host_vdb<VDB<T, dim, SpaceHost>> : std::true_type {};
-
-template <typename T>
-static constexpr bool is_host_vdb_v = is_host_vdb<T>::value;
-
-template <typename T>
-concept HostVDBType = is_host_vdb_v<T>;
-
-//
-template <typename T>
-struct is_device_vdb : std::false_type {};
-
-template <typename T, auto dim>
-struct is_device_vdb<VDB<T, dim, SpaceDevice>> : std::true_type {};
-
-template <typename T>
-static constexpr bool is_device_vdb_v = is_device_vdb<T>::value;
-
-template <typename T>
-concept DeviceVDBType = is_device_vdb_v<T>;
 
 //
 //
@@ -625,6 +577,9 @@ public:
   /// \brief Get the read accessor.
   [[nodiscard]] ReadAccessor readAccessor() const { return ReadAccessor{*handle_}; }
 
+public:
+  void ShrinkToFit() {}
+
 private:
   using THandle = VDBHandle<T, dim, TSpace>;
 
@@ -634,6 +589,47 @@ private:
   template <typename... Ts>
   friend class ARIA::Launcher;
 };
+
+//
+//
+//
+template <typename T>
+struct is_vdb : std::false_type {};
+
+template <typename T, auto dim, typename TSpace>
+struct is_vdb<VDB<T, dim, TSpace>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_vdb_v = is_vdb<T>::value;
+
+template <typename T>
+concept VDBType = is_vdb_v<T>;
+
+//
+template <typename T>
+struct is_host_vdb : std::false_type {};
+
+template <typename T, auto dim>
+struct is_host_vdb<VDB<T, dim, SpaceHost>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_host_vdb_v = is_host_vdb<T>::value;
+
+template <typename T>
+concept HostVDBType = is_host_vdb_v<T>;
+
+//
+template <typename T>
+struct is_device_vdb : std::false_type {};
+
+template <typename T, auto dim>
+struct is_device_vdb<VDB<T, dim, SpaceDevice>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_device_vdb_v = is_device_vdb<T>::value;
+
+template <typename T>
+concept DeviceVDBType = is_device_vdb_v<T>;
 
 //
 //
