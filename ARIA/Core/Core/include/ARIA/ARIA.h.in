@@ -109,9 +109,9 @@ struct ThreadSafe {};
 //
 //
 /// \brief A commonly-used parameter type, means whether something should be set to "on".
-struct On {}
+struct On {};
 
 /// \brief A commonly-used parameter type, means whether something should be set to "off".
-struct Off {}
+struct Off {};
 
 } // namespace ARIA

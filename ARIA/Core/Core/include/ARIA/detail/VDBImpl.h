@@ -334,6 +334,31 @@ private:
 #endif
   }
 
+  // Get the block only if it exists, else, return `nullptr`.
+  ARIA_HOST_DEVICE const TBlock *block_GetIfExist(const TVec &cellCoord) const {
+#if ARIA_IS_DEVICE_CODE
+    auto it = Auto(blocks_.find(CellCoord2BlockIdx(cellCoord)));
+    if (it == blocks_.end())
+      return nullptr;
+
+    return &it->second;
+#else
+    ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
+#endif
+  }
+
+  ARIA_HOST_DEVICE TBlock *block_GetIfExist(const TVec &cellCoord) {
+#if ARIA_IS_DEVICE_CODE
+    auto it = Auto(blocks_.find(CellCoord2BlockIdx(cellCoord)));
+    if (it == blocks_.end())
+      return nullptr;
+
+    return &it->second;
+#else
+    ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
+#endif
+  }
+
   //
   //
   //
@@ -362,6 +387,11 @@ private:
 #endif
   }
 
+  // Set the value at `cellCoord` to off.
+  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord, const Off &off) {
+    ARIA_PROP_IMPL(value_AssumeExist)(cellCoord, off);
+  }
+
   [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord) const {
 #if ARIA_IS_DEVICE_CODE
     const TBlock &b = block_AssumeExist(cellCoord);
@@ -382,6 +412,24 @@ private:
     auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
     b.storage()->onOff.Fill(cellIdxInBlock);
     b.storage()->data[cellIdxInBlock] = value;
+#else
+    ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
+#endif
+  }
+
+  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord, const Off &off) {
+#if ARIA_IS_DEVICE_CODE
+    // Try and get the block.
+    TBlock *b = block_GetIfExist(cellCoord);
+
+    // If the block does not exist, it is already "off", do nothing and return.
+    if (!b)
+      return;
+
+    // If the block exists, clear the storage.
+    auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
+    b->storage()->onOff.Clear(cellIdxInBlock);
+    b->storage()->data[cellIdxInBlock] = T{};
 #else
     ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
 #endif
