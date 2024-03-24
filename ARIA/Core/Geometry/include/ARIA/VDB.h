@@ -11,6 +11,28 @@
 
 namespace ARIA {
 
+/// \brief A light-weighted `VDB` implementation.
+/// See https://www.openvdb.org/ if you are not familiar with "vdb".
+///
+/// For readonly cases, `VDB` is mush slower than `openvdb` and `nanovdb`, but
+/// it support dynamic memory allocations, even for GPU memory, which
+/// makes it easier to handle dynamic cases.
+///
+/// \example ```cpp
+/// ```
+///
+/// \todo Support host VDB.
+using vdb::detail::VDB;
+
+template <typename T, auto dim>
+using HostVDB = VDB<T, dim, SpaceHost>;
+
+template <typename T, auto dim>
+using DeviceVDB = VDB<T, dim, SpaceDevice>;
+
+//
+//
+//
 using vdb::detail::VDBAccessor;
 
 template <typename VDB>
@@ -21,11 +43,6 @@ using VDBWriteAccessor = typename VDB::WriteAccessor;
 
 template <typename VDB>
 using VDBReadAccessor = typename VDB::ReadAccessor;
-
-//
-//
-//
-using vdb::detail::VDB;
 
 //
 //
