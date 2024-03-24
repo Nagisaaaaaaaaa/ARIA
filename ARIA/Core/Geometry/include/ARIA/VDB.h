@@ -132,8 +132,11 @@ private:
   //
   //
 public:
-  // Type of the coordinate.
+  // Type of the coordinate, represented with `Vec`.
   using TVec = Vec<int, dim>;
+
+  // Type of the coordinate, represented with `Coord`.
+  using TCoord = decltype(ToCoord(TVec{}));
 
   // Type of the space filling curve encoder and decoder, which
   // is used to hash the block coord to and from the block index.
@@ -488,6 +491,7 @@ private:
   ARIA_HOST_DEVICE explicit VDBAccessor(THandle handle) : handle_(std::move(handle)) {}
 
 public:
+  /// \brief Get or set the value at `cellCoord`.
   [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TVec &cellCoord) {
     if constexpr (allocateIfNotExist)
       return handle_.value_AllocateIfNotExist(cellCoord);
@@ -495,6 +499,7 @@ public:
       return handle_.value_AssumeExist(cellCoord);
   }
 
+  /// \brief Get or set the value at `cellCoord`.
   [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TVec &cellCoord) const {
     if constexpr (allocateIfNotExist)
       return handle_.value_AllocateIfNotExist(cellCoord);
@@ -527,6 +532,7 @@ private:
   ARIA_HOST_DEVICE explicit VDBAccessor(THandle handle) : handle_(std::move(handle)) {}
 
 public:
+  /// \brief Get or set the value at `cellCoord`.
   [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TVec &cellCoord) const {
     return handle_.value_AssumeExist(cellCoord);
   }
@@ -561,10 +567,13 @@ public:
   using ReadAccessor = VDBAccessor<T, dim, TSpace, Read>;
 
 public:
+  /// \brief Get the allocate-write accessor.
   [[nodiscard]] AllocateWriteAccessor allocateWriteAccessor() { return AllocateWriteAccessor{*handle_}; }
 
+  /// \brief Get the write accessor.
   [[nodiscard]] WriteAccessor writeAccessor() { return WriteAccessor{*handle_}; }
 
+  /// \brief Get the read accessor.
   [[nodiscard]] ReadAccessor readAccessor() const { return ReadAccessor{*handle_}; }
 
 private:
@@ -582,22 +591,22 @@ private:
 //
 //
 //
-// Launcher.
+// Launch kernel for each cell coord with value on.
 template <typename THandle, typename F>
 ARIA_KERNEL static void
-KernelLaunchVDBBlock(typename THandle::TBlock block, decltype(ToCoord(typename THandle::TVec{})) cellCoordOffset, F f) {
+KernelLaunchVDBBlock(typename THandle::TBlock block, typename THandle::TCoord cellCoordOffset, F f) {
   using TVec = typename THandle::TVec;
+  using TCoord = typename THandle::TCoord;
   using TBlockLayout = typename THandle::TBlockLayout;
-  static constexpr auto dim = THandle::dim;
 
-  int i = static_cast<int>(threadIdx.x) + static_cast<int>(blockIdx.x) * static_cast<int>(blockDim.x);
-  if (i >= cosize_safe_v<TBlockLayout>)
+  int cellIdxInBlock = static_cast<int>(threadIdx.x) + static_cast<int>(blockIdx.x) * static_cast<int>(blockDim.x);
+  if (cellIdxInBlock >= cosize_safe_v<TBlockLayout>)
     return;
 
-  auto cellCoordInBlock = Auto(TBlockLayout{}.get_hier_coord(i));
+  TCoord cellCoordInBlock = TBlockLayout{}.get_hier_coord(cellIdxInBlock);
   TVec cellCoord = ToVec(cellCoordOffset + cellCoordInBlock);
 
-  if (block.storage()->onOff[i])
+  if (block.storage()->onOff[cellIdxInBlock])
     f(cellCoord);
 }
 
