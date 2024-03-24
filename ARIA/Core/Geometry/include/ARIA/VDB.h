@@ -652,12 +652,14 @@ public:
   using Base::blockSize;
 
   void Launch() {
-    auto range = handle_.blocks_.device_range();
-    thrust::host_vector<stdgpu::pair<uint64, TBlock>> rangeH(range.size());
-    thrust::copy(range.begin(), range.end(), rangeH.begin());
+    // Shallow-copy blocks from device to host.
+    auto blocks = handle_.blocks_.device_range();
+    thrust::host_vector<stdgpu::pair<uint64, TBlock>> blocksH(blocks.size());
+    thrust::copy(blocks.begin(), blocks.end(), blocksH.begin());
 
-    for (auto &block : rangeH) {
-      // Compute block coord from block idx.
+    // For each block.
+    for (auto &block : blocksH) {
+      // Compute `cellCoordOffset` for this block.
       TVec blockCoord = handle_.BlockIdx2BlockCoord(block.first);
       TVec cellCoordOffset = handle_.BlockCoord2CellCoordOffset(blockCoord);
 
