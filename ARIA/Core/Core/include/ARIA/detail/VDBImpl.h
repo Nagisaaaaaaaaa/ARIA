@@ -446,12 +446,85 @@ private:
   //
   //
   //
+public:
+  void ShrinkToFit() {
+    // This variable contains whether each block should be preserved (should not be erased).
+    thrust::device_vector<bool> shouldPreserveD(blocks_.max_size());
+
+    // If there exists one `cellCoord` which is "on" within this block, mark the block as preserved.
+    Launcher(*this, [=, *this, shouldPreserve = shouldPreserveD.data()] ARIA_DEVICE(const TVec &cellCoord) {
+      // In `[0, max_size())`.
+      size_t blockIdxInMap = blocks_.find(CellCoord2BlockIdx(cellCoord)) - blocks_.begin();
+      shouldPreserve[blockIdxInMap] = true;
+    }).Launch();
+
+    // Erase all the blocks which should not be preserved.
+    Launcher(blocks_.max_size(), [=, *this, shouldPreserve = shouldPreserveD.data()] ARIA_DEVICE(size_t i) mutable {
+      // Return if this block should be preserved.
+      if (shouldPreserve[i])
+        return;
+
+      auto block = Auto(blocks_.begin() + i);
+
+      // Delete the storage.
+      delete block->second.storage();
+      // Erase from unordered map.
+      blocks_.erase(block->first);
+    }).Launch();
+
+    cuda::device::current::get().synchronize();
+  }
+
+  //
+  //
+  //
 private:
   friend class VDB<T, dim, TSpace>;
 
   template <typename... Ts>
   friend class ARIA::Launcher;
 };
+
+//
+//
+//
+template <typename T>
+struct is_vdb_handle : std::false_type {};
+
+template <typename T, auto dim, typename TSpace>
+struct is_vdb_handle<VDBHandle<T, dim, TSpace>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_vdb_handle_v = is_vdb_handle<T>::value;
+
+template <typename T>
+concept VDBHandleType = is_vdb_handle_v<T>;
+
+//
+template <typename T>
+struct is_host_vdb_handle : std::false_type {};
+
+template <typename T, auto dim>
+struct is_host_vdb_handle<VDBHandle<T, dim, SpaceHost>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_host_vdb_handle_v = is_host_vdb_handle<T>::value;
+
+template <typename T>
+concept HostVDBHandleType = is_host_vdb_handle_v<T>;
+
+//
+template <typename T>
+struct is_device_vdb_handle : std::false_type {};
+
+template <typename T, auto dim>
+struct is_device_vdb_handle<VDBHandle<T, dim, SpaceDevice>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_device_vdb_handle_v = is_device_vdb_handle<T>::value;
+
+template <typename T>
+concept DeviceVDBHandleType = is_device_vdb_handle_v<T>;
 
 //
 //
@@ -578,39 +651,7 @@ public:
   [[nodiscard]] ReadAccessor readAccessor() const { return ReadAccessor{*handle_}; }
 
 public:
-  void ShrinkToFit() {
-    if constexpr (std::is_same_v<TSpace, SpaceDevice>) {
-      // This variable contains whether each block should be preserved (should not be erased).
-      thrust::device_vector<bool> shouldPreserveD(handle_->blocks_.max_size());
-
-      // If there exists one `cellCoord` which is "on" within this block, mark the block as preserved.
-      Launcher(*this,
-               [=, handle = *handle_, shouldPreserve = shouldPreserveD.data()] ARIA_DEVICE(const TVec &cellCoord) {
-        // In `[0, max_size())`.
-        size_t blockIdxInMap = handle.blocks_.find(THandle::CellCoord2BlockIdx(cellCoord)) - handle.blocks_.begin();
-        shouldPreserve[blockIdxInMap] = true;
-      }).Launch();
-
-      // Erase all the blocks which should not be preserved.
-      Launcher(handle_->blocks_.max_size(),
-               [=, handle = *handle_, shouldPreserve = shouldPreserveD.data()] ARIA_DEVICE(size_t i) mutable {
-        // Return if this block should be preserved.
-        if (shouldPreserve[i])
-          return;
-
-        auto block = Auto(handle.blocks_.begin() + i);
-
-        // Delete the storage.
-        delete block->second.storage();
-        // Erase from unordered map.
-        handle.blocks_.erase(block->first);
-      }).Launch();
-
-      cuda::device::current::get().synchronize();
-    } else {
-      ARIA_STATIC_ASSERT_FALSE("`HostVDB` has not been implemented yet");
-    }
-  }
+  void ShrinkToFit() { handle_->ShrinkToFit(); }
 
 private:
   using THandle = VDBHandle<T, dim, TSpace>;
@@ -670,7 +711,7 @@ concept DeviceVDBType = is_device_vdb_v<T>;
 //
 //
 // Launch kernel for each cell coord with value on.
-template <typename THandle, typename F>
+template <vdb::detail::DeviceVDBHandleType THandle, typename F>
 ARIA_KERNEL static void
 KernelLaunchVDBBlock(typename THandle::TBlock block, typename THandle::TCoord cellCoordOffset, F f) {
   using TVec = typename THandle::TVec;
@@ -689,5 +730,52 @@ KernelLaunchVDBBlock(typename THandle::TBlock block, typename THandle::TCoord ce
 }
 
 } // namespace vdb::detail
+
+//
+//
+//
+template <vdb::detail::DeviceVDBHandleType THandle, typename F>
+class Launcher<THandle, F> : public launcher::detail::LauncherBase<Launcher<THandle, F>> {
+private:
+  using Base = launcher::detail::LauncherBase<Launcher<THandle, F>>;
+
+public:
+  Launcher(const THandle &handle, const F &f) : handle_(handle), f_(f) {
+    Base::overallSize(cosize_safe_v<TBlockLayout>);
+  }
+
+  ARIA_COPY_MOVE_ABILITY(Launcher, default, default);
+
+public:
+  using Base::blockSize;
+
+  void Launch() {
+    // Shallow-copy blocks from device to host.
+    auto blocks = handle_.blocks_.device_range();
+    thrust::host_vector<stdgpu::pair<uint64, TBlock>> blocksH(blocks.size());
+    thrust::copy(blocks.begin(), blocks.end(), blocksH.begin());
+
+    // For each block.
+    for (auto &block : blocksH) {
+      // Compute `cellCoordOffset` for this block.
+      TVec blockCoord = handle_.BlockIdx2BlockCoord(block.first);
+      TVec cellCoordOffset = handle_.BlockCoord2CellCoordOffset(blockCoord);
+
+      // Launch.
+      Base::Launch(vdb::detail::KernelLaunchVDBBlock<THandle, F>, block.second, ToCoord(cellCoordOffset), f_);
+    }
+  }
+
+private:
+  using TVec = THandle::TVec;
+  using TBlock = THandle::TBlock;
+  using TBlockLayout = THandle::TBlockLayout;
+
+  THandle handle_;
+  F f_;
+};
+
+template <vdb::detail::DeviceVDBHandleType THandle, typename F>
+Launcher(const THandle &handle, const F &f) -> Launcher<THandle, F>;
 
 } // namespace ARIA

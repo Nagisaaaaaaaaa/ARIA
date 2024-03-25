@@ -48,45 +48,14 @@ using VDBReadAccessor = typename VDB::ReadAccessor;
 //
 //
 template <vdb::detail::DeviceVDBType TVDB, typename F>
-class Launcher<TVDB, F> : public launcher::detail::LauncherBase<Launcher<TVDB, F>> {
+class Launcher<TVDB, F> : public Launcher<typename TVDB::THandle, F> {
 private:
-  using Base = launcher::detail::LauncherBase<Launcher<TVDB, F>>;
+  using Base = Launcher<typename TVDB::THandle, F>;
 
 public:
-  Launcher(const TVDB &vdb, const F &f) : handle_(*vdb.handle_), f_(f) {
-    Base::overallSize(cosize_safe_v<TBlockLayout>);
-  }
+  Launcher(const TVDB &vdb, const F &f) : Base(*vdb.handle_, f) {}
 
   ARIA_COPY_MOVE_ABILITY(Launcher, default, default);
-
-public:
-  using Base::blockSize;
-
-  void Launch() {
-    // Shallow-copy blocks from device to host.
-    auto blocks = handle_.blocks_.device_range();
-    thrust::host_vector<stdgpu::pair<uint64, TBlock>> blocksH(blocks.size());
-    thrust::copy(blocks.begin(), blocks.end(), blocksH.begin());
-
-    // For each block.
-    for (auto &block : blocksH) {
-      // Compute `cellCoordOffset` for this block.
-      TVec blockCoord = handle_.BlockIdx2BlockCoord(block.first);
-      TVec cellCoordOffset = handle_.BlockCoord2CellCoordOffset(blockCoord);
-
-      // Launch.
-      Base::Launch(vdb::detail::KernelLaunchVDBBlock<THandle, F>, block.second, ToCoord(cellCoordOffset), f_);
-    }
-  }
-
-private:
-  using THandle = TVDB::THandle;
-  using TVec = THandle::TVec;
-  using TBlock = THandle::TBlock;
-  using TBlockLayout = THandle::TBlockLayout;
-
-  THandle handle_;
-  F f_;
 };
 
 template <vdb::detail::DeviceVDBType TVDB, typename F>
