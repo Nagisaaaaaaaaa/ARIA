@@ -578,10 +578,43 @@ public:
   [[nodiscard]] ReadAccessor readAccessor() const { return ReadAccessor{*handle_}; }
 
 public:
-  void ShrinkToFit() {}
+  void ShrinkToFit() {
+    if constexpr (std::is_same_v<TSpace, SpaceDevice>) {
+      // This variable contains whether each block should be preserved (should not be erased).
+      thrust::device_vector<bool> shouldPreserveD(handle_->blocks_.max_size());
+
+      // If there exists one `cellCoord` which is "on" within this block, mark the block as preserved.
+      Launcher(*this,
+               [=, handle = *handle_, shouldPreserve = shouldPreserveD.data()] ARIA_DEVICE(const TVec &cellCoord) {
+        // In `[0, max_size())`.
+        size_t blockIdxInMap = handle.blocks_.find(THandle::CellCoord2BlockIdx(cellCoord)) - handle.blocks_.begin();
+        shouldPreserve[blockIdxInMap] = true;
+      }).Launch();
+
+      // Erase all the blocks which should not be preserved.
+      Launcher(handle_->blocks_.max_size(),
+               [=, handle = *handle_, shouldPreserve = shouldPreserveD.data()] ARIA_DEVICE(size_t i) mutable {
+        // Return if this block should be preserved.
+        if (shouldPreserve[i])
+          return;
+
+        auto block = Auto(handle.blocks_.begin() + i);
+
+        // Delete the storage.
+        delete block->second.storage();
+        // Erase from unordered map.
+        handle.blocks_.erase(block->first);
+      }).Launch();
+
+      cuda::device::current::get().synchronize();
+    } else {
+      ARIA_STATIC_ASSERT_FALSE("`VDB` with `SpaceHost` has not been implemented yet");
+    }
+  }
 
 private:
   using THandle = VDBHandle<T, dim, TSpace>;
+  using TVec = THandle::TVec;
 
   std::unique_ptr<THandle> handle_;
 
