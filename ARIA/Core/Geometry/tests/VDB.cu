@@ -6,59 +6,76 @@ namespace ARIA {
 
 namespace {
 
-void TestVDBHandleKernels() {
+void Test2DVDBHandleKernels() {
   using Handle = vdb::detail::VDBHandle<float, 2, SpaceDevice>;
 
-  const int n = 10000;
+  const Layout layout = make_layout_major(200, 300);
+  const int n = 20000;
+  const int nHalf = n / 2;
 
   // Dense accesses.
   {
-    // TODO: Test this.
+    Handle handle = Handle::Create();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      handle.value_AllocateIfNotExist(ToVec(coord)) = layout(coord);
+    }).Launch();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      ARIA_ASSERT(handle.value_AllocateIfNotExist(ToVec(coord)) == layout(coord));
+    }).Launch();
+    cuda::device::current::get().synchronize();
+    handle.Destroy();
   }
 
-  // clang-format off
+  // Checkerboard accesses.
+  {
+    Handle handle = Handle::Create();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      if ((get<0>(coord) + get<1>(coord)) % 2 == 0)
+        handle.value_AllocateIfNotExist(ToVec(coord)) = layout(coord);
+    }).Launch();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      if ((get<0>(coord) + get<1>(coord)) % 2 == 0)
+        ARIA_ASSERT(handle.value_AssumeExist(ToVec(coord)) == layout(coord));
+    }).Launch();
+    cuda::device::current::get().synchronize();
+    handle.Destroy();
+  }
+
   // Sparse accesses, 1D.
-  { // +x.
+  // clang-format off
+  { // x.
     Handle handle = Handle::Create();
-    Launcher(n, [=] ARIA_DEVICE(int i) mutable { handle.value_AllocateIfNotExist({i, 0}) = i; }).Launch();
-    Launcher(n, [=] ARIA_DEVICE(int i) mutable { ARIA_ASSERT(handle.value_AllocateIfNotExist({i, 0}) == i); }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { handle.value_AllocateIfNotExist({i - nHalf, 0}) = i - nHalf; }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { ARIA_ASSERT(handle.value_AllocateIfNotExist({i - nHalf, 0}) == i - nHalf); }).Launch();
     cuda::device::current::get().synchronize();
     handle.Destroy();
   }
-  { // +y.
+  { // y.
     Handle handle = Handle::Create();
-    Launcher(n, [=] ARIA_DEVICE(int i) mutable { handle.value_AllocateIfNotExist({0, i}) = -i; }).Launch();
-    Launcher(n, [=] ARIA_DEVICE(int i) mutable { ARIA_ASSERT(handle.value_AllocateIfNotExist({0, i}) == -i); }).Launch();
-    cuda::device::current::get().synchronize();
-    handle.Destroy();
-  }
-  { // -x.
-    Handle handle = Handle::Create();
-    Launcher(n, [=] ARIA_DEVICE(int i) mutable { handle.value_AllocateIfNotExist({-i, 0}) = -i; }).Launch();
-    Launcher(n, [=] ARIA_DEVICE(int i) mutable { ARIA_ASSERT(handle.value_AllocateIfNotExist({-i, 0}) == -i); }).Launch();
-    cuda::device::current::get().synchronize();
-    handle.Destroy();
-  }
-  { // -y.
-    Handle handle = Handle::Create();
-    Launcher(n, [=] ARIA_DEVICE(int i) mutable { handle.value_AllocateIfNotExist({0, -i}) = i; }).Launch();
-    Launcher(n, [=] ARIA_DEVICE(int i) mutable { ARIA_ASSERT(handle.value_AllocateIfNotExist({0, -i}) == i); }).Launch();
-    cuda::device::current::get().synchronize();
-    handle.Destroy();
-  }
-
-  // Sparse accesses, 2D.
-  { // (+x, +y).
-    Handle handle = Handle::Create();
-    Launcher(n, [=] ARIA_DEVICE(int i) mutable { handle.value_AllocateIfNotExist({i, i}) = i; }).Launch();
-    Launcher(n, [=] ARIA_DEVICE(int i) mutable { ARIA_ASSERT(handle.value_AllocateIfNotExist({i, i}) == i); }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { handle.value_AllocateIfNotExist({0, nHalf - i}) = i - nHalf; }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { ARIA_ASSERT(handle.value_AssumeExist({0, nHalf - i}) == i - nHalf); }).Launch();
     cuda::device::current::get().synchronize();
     handle.Destroy();
   }
   // clang-format on
+
+  // Sparse accesses, 2D.
+  { // (x, y).
+    Handle handle = Handle::Create();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      handle.value_AllocateIfNotExist({i - nHalf, i - nHalf}) = i - nHalf;
+      handle.value_AllocateIfNotExist({i - nHalf, nHalf - i}) = i - nHalf;
+    }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(handle.value_AllocateIfNotExist({i - nHalf, i - nHalf}) == i - nHalf);
+      ARIA_ASSERT(handle.value_AssumeExist({i - nHalf, nHalf - i}) == i - nHalf);
+    }).Launch();
+    cuda::device::current::get().synchronize();
+    handle.Destroy();
+  }
 }
 
-void TestVDBAccessorsKernels() {
+void Test2DVDBAccessorsKernels() {
   using V = VDB<float, 2, SpaceDevice>;
   using AllocateWriteAccessor = VDBAllocateWriteAccessor<V>;
   using WriteAccessor = VDBWriteAccessor<V>;
@@ -102,8 +119,7 @@ TEST(VDB, Base) {
   size_t size = 1LLU * 1024LLU * 1024LLU * 1024LLU; // 1GB
   cuda::device::current::get().set_limit(CU_LIMIT_MALLOC_HEAP_SIZE, size);
 
-  // Device VDB.
-  {
+  auto testVDBBase = []<auto dim>() {
     using V = DeviceVDB<float, 2>;
     using AllocateWriteAccessor = VDBAllocateWriteAccessor<V>;
     using WriteAccessor = VDBWriteAccessor<V>;
@@ -167,11 +183,16 @@ TEST(VDB, Base) {
     }
 
     // Destructor.
-  }
+  };
+
+  testVDBBase.operator()<1>();
+  testVDBBase.operator()<2>();
+  testVDBBase.operator()<3>();
+  testVDBBase.operator()<4>();
 }
 
 TEST(VDB, Handle) {
-  // Device VDB handle.
+  // 2D device VDB handle.
   {
     using Handle = vdb::detail::VDBHandle<float, 2, SpaceDevice>;
 
@@ -190,12 +211,12 @@ TEST(VDB, Handle) {
     // Destructor and destroy.
     handle1.Destroy();
 
-    TestVDBHandleKernels();
+    Test2DVDBHandleKernels();
   }
 }
 
 TEST(VDB, Accessors) {
-  TestVDBAccessorsKernels();
+  Test2DVDBAccessorsKernels();
 }
 
 } // namespace ARIA
