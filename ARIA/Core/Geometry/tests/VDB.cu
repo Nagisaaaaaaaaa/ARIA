@@ -137,7 +137,27 @@ TEST(VDB, Base) {
 }
 
 TEST(VDB, Handle) {
-  TestVDBHandleKernels();
+  // Device VDB handle.
+  {
+    using Handle = vdb::detail::VDBHandle<float, 2, SpaceDevice>;
+
+    // Constructors and create.
+    Handle handle0;
+    Handle handle1 = Handle::Create();
+
+    // Copy.
+    Handle handle2 = handle0;
+    Handle handle3 = handle1;
+
+    // Move.
+    Handle handle4 = std::move(handle0);
+    Handle handle5 = std::move(handle1);
+
+    // Destructor and destroy.
+    handle1.Destroy();
+
+    TestVDBHandleKernels();
+  }
 }
 
 TEST(VDB, Accessors) {
