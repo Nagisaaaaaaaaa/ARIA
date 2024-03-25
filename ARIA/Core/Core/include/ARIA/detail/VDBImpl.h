@@ -608,7 +608,7 @@ public:
 
       cuda::device::current::get().synchronize();
     } else {
-      ARIA_STATIC_ASSERT_FALSE("`VDB` with `SpaceHost` has not been implemented yet");
+      ARIA_STATIC_ASSERT_FALSE("`HostVDB` has not been implemented yet");
     }
   }
 
