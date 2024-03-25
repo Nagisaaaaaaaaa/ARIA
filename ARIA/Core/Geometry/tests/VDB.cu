@@ -118,7 +118,7 @@ void Test3DVDBHandleKernels() {
   using Handle = vdb::detail::VDBHandle<float, 3, SpaceDevice>;
 
   const Layout layout = make_layout_major(50, 100, 150);
-  const int n = 10000;
+  const int n = 1000;
   const int nHalf = n / 2;
 
   // Dense accesses.
@@ -134,16 +134,15 @@ void Test3DVDBHandleKernels() {
     handle.Destroy();
   }
 
-#if 0
   // Checkerboard accesses.
   {
     Handle handle = Handle::Create();
-    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
-      if ((get<0>(coord) + get<1>(coord)) % 2 == 0)
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
+      if ((get<0>(coord) + get<1>(coord) + get<2>(coord)) % 2 == 0)
         handle.value_AllocateIfNotExist(ToVec(coord)) = layout(coord);
     }).Launch();
-    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
-      if ((get<0>(coord) + get<1>(coord)) % 2 == 0)
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
+      if ((get<0>(coord) + get<1>(coord) + get<2>(coord)) % 2 == 0)
         ARIA_ASSERT(handle.value_AssumeExist(ToVec(coord)) == layout(coord));
     }).Launch();
     cuda::device::current::get().synchronize();
@@ -154,10 +153,10 @@ void Test3DVDBHandleKernels() {
   { // x.
     Handle handle = Handle::Create();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      handle.value_AllocateIfNotExist({i - nHalf, 0}) = i - nHalf;
+      handle.value_AllocateIfNotExist({i - nHalf, 0, 0}) = i - nHalf;
     }).Launch();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      ARIA_ASSERT(handle.value_AllocateIfNotExist({i - nHalf, 0}) == i - nHalf);
+      ARIA_ASSERT(handle.value_AllocateIfNotExist({i - nHalf, 0, 0}) == i - nHalf);
     }).Launch();
     cuda::device::current::get().synchronize();
     handle.Destroy();
@@ -165,10 +164,10 @@ void Test3DVDBHandleKernels() {
   { // y.
     Handle handle = Handle::Create();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      handle.value_AllocateIfNotExist({0, nHalf - i}) = i - nHalf;
+      handle.value_AllocateIfNotExist({0, nHalf - i, 0}) = i - nHalf;
     }).Launch();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      ARIA_ASSERT(handle.value_AssumeExist({0, nHalf - i}) == i - nHalf);
+      ARIA_ASSERT(handle.value_AssumeExist({0, nHalf - i, 0}) == i - nHalf);
     }).Launch();
     cuda::device::current::get().synchronize();
     handle.Destroy();
@@ -178,17 +177,16 @@ void Test3DVDBHandleKernels() {
   { // (x, y).
     Handle handle = Handle::Create();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      handle.value_AllocateIfNotExist({i - nHalf, i - nHalf}) = i - nHalf;
-      handle.value_AllocateIfNotExist({i - nHalf, nHalf - i}) = i - nHalf;
+      handle.value_AllocateIfNotExist({i - nHalf, i - nHalf, 0}) = i - nHalf;
+      handle.value_AllocateIfNotExist({i - nHalf, nHalf - i, 0}) = i - nHalf;
     }).Launch();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      ARIA_ASSERT(handle.value_AllocateIfNotExist({i - nHalf, i - nHalf}) == i - nHalf);
-      ARIA_ASSERT(handle.value_AssumeExist({i - nHalf, nHalf - i}) == i - nHalf);
+      ARIA_ASSERT(handle.value_AllocateIfNotExist({i - nHalf, i - nHalf, 0}) == i - nHalf);
+      ARIA_ASSERT(handle.value_AssumeExist({i - nHalf, nHalf - i, 0}) == i - nHalf);
     }).Launch();
     cuda::device::current::get().synchronize();
     handle.Destroy();
   }
-#endif
 }
 
 void Test2DVDBAccessorsKernels() {
