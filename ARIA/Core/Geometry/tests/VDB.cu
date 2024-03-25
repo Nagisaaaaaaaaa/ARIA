@@ -42,22 +42,28 @@ void Test2DVDBHandleKernels() {
   }
 
   // Sparse accesses, 1D.
-  // clang-format off
   { // x.
     Handle handle = Handle::Create();
-    Launcher(n, [=] ARIA_DEVICE(int i) mutable { handle.value_AllocateIfNotExist({i - nHalf, 0}) = i - nHalf; }).Launch();
-    Launcher(n, [=] ARIA_DEVICE(int i) mutable { ARIA_ASSERT(handle.value_AllocateIfNotExist({i - nHalf, 0}) == i - nHalf); }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      handle.value_AllocateIfNotExist({i - nHalf, 0}) = i - nHalf;
+    }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(handle.value_AllocateIfNotExist({i - nHalf, 0}) == i - nHalf);
+    }).Launch();
     cuda::device::current::get().synchronize();
     handle.Destroy();
   }
   { // y.
     Handle handle = Handle::Create();
-    Launcher(n, [=] ARIA_DEVICE(int i) mutable { handle.value_AllocateIfNotExist({0, nHalf - i}) = i - nHalf; }).Launch();
-    Launcher(n, [=] ARIA_DEVICE(int i) mutable { ARIA_ASSERT(handle.value_AssumeExist({0, nHalf - i}) == i - nHalf); }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      handle.value_AllocateIfNotExist({0, nHalf - i}) = i - nHalf;
+    }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(handle.value_AssumeExist({0, nHalf - i}) == i - nHalf);
+    }).Launch();
     cuda::device::current::get().synchronize();
     handle.Destroy();
   }
-  // clang-format on
 
   // Sparse accesses, 2D.
   { // (x, y).
@@ -120,7 +126,7 @@ TEST(VDB, Base) {
   cuda::device::current::get().set_limit(CU_LIMIT_MALLOC_HEAP_SIZE, size);
 
   auto testVDBBase = []<auto dim>() {
-    using V = DeviceVDB<float, 2>;
+    using V = DeviceVDB<float, dim>;
     using AllocateWriteAccessor = VDBAllocateWriteAccessor<V>;
     using WriteAccessor = VDBWriteAccessor<V>;
     using ReadAccessor = VDBReadAccessor<V>;
@@ -192,9 +198,8 @@ TEST(VDB, Base) {
 }
 
 TEST(VDB, Handle) {
-  // 2D device VDB handle.
-  {
-    using Handle = vdb::detail::VDBHandle<float, 2, SpaceDevice>;
+  auto testVDBHandleBase = []<auto dim>() {
+    using Handle = vdb::detail::VDBHandle<float, dim, SpaceDevice>;
 
     // Constructors and create.
     Handle handle0;
@@ -210,9 +215,14 @@ TEST(VDB, Handle) {
 
     // Destructor and destroy.
     handle1.Destroy();
+  };
 
-    Test2DVDBHandleKernels();
-  }
+  testVDBHandleBase.operator()<1>();
+  testVDBHandleBase.operator()<2>();
+  testVDBHandleBase.operator()<3>();
+  testVDBHandleBase.operator()<4>();
+
+  Test2DVDBHandleKernels();
 }
 
 TEST(VDB, Accessors) {
