@@ -268,23 +268,21 @@ private:
 
   [[nodiscard]] ARIA_HOST_DEVICE static TVec CellCoord2BlockCoord(const TVec &cellCoord) {
     // TODO: Compiler bug here: `nCellsPerBlockDim` is not defined in device code.
-    // return cellCoord / nCellsPerBlockDim;
-
     constexpr auto n = nCellsPerBlockDim;
-    return cellCoord / n;
+
+    TVec blockCoord;
+    ForEach<dim>(
+        [&]<auto id>() { blockCoord[id] = cellCoord[id] >= 0 ? (cellCoord[id] / n) : ((cellCoord[id] - n + 1) / n); });
+    return blockCoord;
   }
 
   [[nodiscard]] ARIA_HOST_DEVICE static TVec CellCoord2CellCoordInBlock(const TVec &cellCoord) {
-    TVec cellCoordInBlock;
-    ForEach<dim>([&]<auto id>() { cellCoordInBlock[id] = cellCoord[id] % nCellsPerBlockDim; });
-    return cellCoordInBlock;
+    constexpr auto n = nCellsPerBlockDim;
+    return cellCoord - CellCoord2BlockCoord(cellCoord) * n;
   }
 
   // `cellCoord` = `CellCoordOffset` + `cellCoordInBlock`.
   [[nodiscard]] ARIA_HOST_DEVICE static TVec BlockCoord2CellCoordOffset(const TVec &blockCoord) {
-    // TODO: Compiler bug here: `nCellsPerBlockDim` is not defined in device code.
-    // return cellCoord * nCellsPerBlockDim;
-
     constexpr auto n = nCellsPerBlockDim;
     return blockCoord * n;
   }
