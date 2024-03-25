@@ -6,6 +6,39 @@ namespace ARIA {
 
 namespace {
 
+void Test1DVDBHandleKernels() {
+  using Handle = vdb::detail::VDBHandle<float, 1, SpaceDevice>;
+
+  const int n = 10000;
+  const int nHalf = n / 2;
+
+  // Dense accesses.
+  {
+    Handle handle = Handle::Create();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      handle.value_AllocateIfNotExist(Vec1i{i - nHalf}) = i - nHalf;
+    }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(handle.value_AllocateIfNotExist(Vec1i{i - nHalf}) == i - nHalf);
+    }).Launch();
+    cuda::device::current::get().synchronize();
+    handle.Destroy();
+  }
+
+  // Checkerboard accesses.
+  {
+    Handle handle = Handle::Create();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      handle.value_AllocateIfNotExist(Vec1i{i - nHalf} * 2) = nHalf - i;
+    }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(handle.value_AssumeExist(Vec1i{i - nHalf} * 2) == nHalf - i);
+    }).Launch();
+    cuda::device::current::get().synchronize();
+    handle.Destroy();
+  }
+}
+
 void Test2DVDBHandleKernels() {
   using Handle = vdb::detail::VDBHandle<float, 2, SpaceDevice>;
 
@@ -222,6 +255,7 @@ TEST(VDB, Handle) {
   testVDBHandleBase.operator()<3>();
   testVDBHandleBase.operator()<4>();
 
+  Test1DVDBHandleKernels();
   Test2DVDBHandleKernels();
 }
 
