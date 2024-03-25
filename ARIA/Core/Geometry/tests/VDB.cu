@@ -24,7 +24,7 @@ void TestVDBHandleKernels() {
   handle.Destroy();
 }
 
-void TestVDBKernels() {
+void TestVDBAccessorsKernels() {
   using V = VDB<float, 2, SpaceDevice>;
   using AllocateWriteAccessor = VDBAllocateWriteAccessor<V>;
   using WriteAccessor = VDBWriteAccessor<V>;
@@ -136,9 +136,12 @@ TEST(VDB, Base) {
   }
 }
 
-TEST(VDB, Kernels) {
+TEST(VDB, Handle) {
   TestVDBHandleKernels();
-  TestVDBKernels();
+}
+
+TEST(VDB, Accessors) {
+  TestVDBAccessorsKernels();
 }
 
 } // namespace ARIA
