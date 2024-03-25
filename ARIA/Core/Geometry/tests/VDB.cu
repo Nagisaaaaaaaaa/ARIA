@@ -9,19 +9,53 @@ namespace {
 void TestVDBHandleKernels() {
   using Handle = vdb::detail::VDBHandle<float, 2, SpaceDevice>;
 
-  Handle handle = Handle::Create();
+  const int n = 10000;
 
-  const size_t n = 10000;
+  // Dense accesses.
+  {
+    // TODO: Test this.
+  }
 
-  Launcher(n, [=] ARIA_DEVICE(size_t i) mutable { handle.value_AllocateIfNotExist({i, 0}) = i; }).Launch();
+  // clang-format off
+  // Sparse accesses, 1D.
+  { // +x.
+    Handle handle = Handle::Create();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { handle.value_AllocateIfNotExist({i, 0}) = i; }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { ARIA_ASSERT(handle.value_AllocateIfNotExist({i, 0}) == i); }).Launch();
+    cuda::device::current::get().synchronize();
+    handle.Destroy();
+  }
+  { // +y.
+    Handle handle = Handle::Create();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { handle.value_AllocateIfNotExist({0, i}) = -i; }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { ARIA_ASSERT(handle.value_AllocateIfNotExist({0, i}) == -i); }).Launch();
+    cuda::device::current::get().synchronize();
+    handle.Destroy();
+  }
+  { // -x.
+    Handle handle = Handle::Create();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { handle.value_AllocateIfNotExist({-i, 0}) = -i; }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { ARIA_ASSERT(handle.value_AllocateIfNotExist({-i, 0}) == -i); }).Launch();
+    cuda::device::current::get().synchronize();
+    handle.Destroy();
+  }
+  { // -y.
+    Handle handle = Handle::Create();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { handle.value_AllocateIfNotExist({0, -i}) = i; }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { ARIA_ASSERT(handle.value_AllocateIfNotExist({0, -i}) == i); }).Launch();
+    cuda::device::current::get().synchronize();
+    handle.Destroy();
+  }
 
-  Launcher(n, [=] ARIA_DEVICE(size_t i) mutable {
-    ARIA_ASSERT(handle.value_AllocateIfNotExist({i, 0}) == i);
-  }).Launch();
-
-  cuda::device::current::get().synchronize();
-
-  handle.Destroy();
+  // Sparse accesses, 2D.
+  { // (+x, +y).
+    Handle handle = Handle::Create();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { handle.value_AllocateIfNotExist({i, i}) = i; }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { ARIA_ASSERT(handle.value_AllocateIfNotExist({i, i}) == i); }).Launch();
+    cuda::device::current::get().synchronize();
+    handle.Destroy();
+  }
+  // clang-format on
 }
 
 void TestVDBAccessorsKernels() {
