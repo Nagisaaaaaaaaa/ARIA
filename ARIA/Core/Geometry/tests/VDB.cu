@@ -64,10 +64,79 @@ void TestVDBKernels() {
 
 } // namespace
 
-TEST(VDB, Kernels) {
+TEST(VDB, Base) {
   size_t size = 1LLU * 1024LLU * 1024LLU * 1024LLU; // 1GB
   cuda::device::current::get().set_limit(CU_LIMIT_MALLOC_HEAP_SIZE, size);
 
+  // Device VDB.
+  {
+    using V = DeviceVDB<float, 2>;
+    using AllocateWriteAccessor = VDBAllocateWriteAccessor<V>;
+    using WriteAccessor = VDBWriteAccessor<V>;
+    using ReadAccessor = VDBReadAccessor<V>;
+
+    // Constructors.
+    V v0{};
+
+    // Move.
+    V v = std::move(v0);
+
+    // Allocate-write accessor.
+    {
+      // Constructors.
+      AllocateWriteAccessor accessor0;
+      AllocateWriteAccessor accessor1 = v.allocateWriteAccessor();
+
+      // Copy.
+      AllocateWriteAccessor accessor2 = accessor0;
+      AllocateWriteAccessor accessor3 = accessor1;
+
+      // Move.
+      AllocateWriteAccessor accessor4 = std::move(accessor0);
+      AllocateWriteAccessor accessor5 = std::move(accessor1);
+
+      // Destructor.
+    }
+
+    // Write accessor.
+    {
+      // Constructors.
+      WriteAccessor accessor0;
+      WriteAccessor accessor1 = v.writeAccessor();
+
+      // Copy.
+      WriteAccessor accessor2 = accessor0;
+      WriteAccessor accessor3 = accessor1;
+
+      // Move.
+      WriteAccessor accessor4 = std::move(accessor0);
+      WriteAccessor accessor5 = std::move(accessor1);
+
+      // Destructor.
+    }
+
+    // Read accessor.
+    {
+      // Constructors.
+      ReadAccessor accessor0;
+      ReadAccessor accessor1 = v.readAccessor();
+
+      // Copy.
+      ReadAccessor accessor2 = accessor0;
+      ReadAccessor accessor3 = accessor1;
+
+      // Move.
+      ReadAccessor accessor4 = std::move(accessor0);
+      ReadAccessor accessor5 = std::move(accessor1);
+
+      // Destructor.
+    }
+
+    // Destructor.
+  }
+}
+
+TEST(VDB, Kernels) {
   TestVDBHandleKernels();
   TestVDBKernels();
 }
