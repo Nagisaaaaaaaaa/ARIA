@@ -44,12 +44,12 @@ namespace ARIA {
 /// // Launch for each coord in the VDB whose value is "on".
 /// Launcher(volume, [=] ARIA_DEVICE(const VCoord &coord) mutable {
 ///   // A `WriteAccessor` assumes the memory of the value has always been allocated before.
-///   writeAccessor.value(coord) *= -2;
+///   writeAccessor.value(coord) *= 2;
 /// }).Launch();
 ///
 /// Launcher(volume, [=] ARIA_DEVICE(const VCoord &coord) {
 ///   // A `ReadAccessor` can only get and cannot set the values.
-///   ARIA_ASSERT(readAccessor.value(coord) == layout(coord) * (-2));
+///   ARIA_ASSERT(readAccessor.value(coord) == layout(coord) * 2);
 /// }).Launch();
 /// ```
 ///
@@ -116,6 +116,24 @@ using VDBReadAccessor = typename VDB::ReadAccessor;
 //
 //
 //
+/// \brief Launch a functor or a lambda function with
+/// all the coordinates of a `VDB`, whose values are currently "on".
+///
+/// \example ```cpp
+/// using Volume = DeviceVDB<float, 2>;
+/// using VCoord = Coord<int, int>;
+///
+/// Volume volume;
+/// ...
+///
+/// Launcher(volume, [=, accessor = volume.writeAccessor()] ARIA_DEVICE(const VCoord &coord) mutable {
+///   accessor.value(coord) *= 2;
+/// }).Launch();
+///
+/// Launcher(volume, [=, accessor = volume.readAccessor()] ARIA_DEVICE(const VCoord &coord) {
+///   ARIA_ASSERT(accessor.value(coord) == layout(coord) * 2);
+/// }).Launch();
+/// ```
 template <vdb::detail::DeviceVDBType TVDB, typename F>
 class Launcher<TVDB, F> : public Launcher<typename TVDB::THandle, F> {
 private:
