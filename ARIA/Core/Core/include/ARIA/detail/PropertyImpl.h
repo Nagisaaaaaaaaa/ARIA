@@ -405,7 +405,8 @@ private:
       /* This check is performed to restrict behavior of the user-defined setter. */                                   \
       /* For example, users should not set a dog to a cat, */                                                          \
       /* even though their setters can handle this case. */                                                            \
-      static_assert(std::convertible_to<decltype(value), std::decay_t<Type>>,                                          \
+      static_assert(std::convertible_to<decltype(value), std::decay_t<Type>> ||                                        \
+                        std::is_same_v<std::decay_t<TUVW>, On> || std::is_same_v<std::decay_t<TUVW>, Off>,             \
                     "The value given to the setter should be convertible to the given property value type");           \
                                                                                                                        \
       /* Calls the user-defined setter. */                                                                             \
@@ -529,7 +530,8 @@ private:
     }                                                                                                                  \
     template <typename TUVW>                                                                                           \
     static SPECIFIERS void Set(TObject &object, const T0 &t0, TUVW &&value) {                                          \
-      static_assert(std::convertible_to<decltype(value), std::decay_t<Type>>,                                          \
+      static_assert(std::convertible_to<decltype(value), std::decay_t<Type>> ||                                        \
+                        std::is_same_v<std::decay_t<TUVW>, On> || std::is_same_v<std::decay_t<TUVW>, Off>,             \
                     "The value given to the setter should be convertible to the given property value type");           \
                                                                                                                        \
       object.__ARIA_PROP_IMPL(PROP_NAME)(t0, std::forward<TUVW>(value));                                               \
@@ -719,7 +721,8 @@ public:                                                                         
     }                                                                                                                  \
     template <typename TUVW>                                                                                           \
     static SPECIFIERS void Set(TObject &object, TUVW &&value) {                                                        \
-      static_assert(std::convertible_to<decltype(value), std::decay_t<Type>>,                                          \
+      static_assert(std::convertible_to<decltype(value), std::decay_t<Type>> ||                                        \
+                        std::is_same_v<std::decay_t<TUVW>, On> || std::is_same_v<std::decay_t<TUVW>, Off>,             \
                     "The value given to the setter should be convertible to the given property value type");           \
                                                                                                                        \
       decltype(auto) tmp = TPropertyBase::Get(object);                                                                 \

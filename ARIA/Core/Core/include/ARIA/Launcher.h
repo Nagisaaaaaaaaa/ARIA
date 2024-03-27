@@ -25,6 +25,8 @@ namespace ARIA {
 ///
 /// `Launcher` is implemented with template specialization.
 /// There are many ways to launch a kernel, see the following examples.
+///
+/// \todo Conditionally add name to a kernel and handle it with NVTX.
 template <typename... Ts>
 class Launcher;
 

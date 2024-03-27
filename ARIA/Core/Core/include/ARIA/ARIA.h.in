@@ -105,4 +105,13 @@ struct ThreadUnsafe {};
 /// \brief A commonly-used policy, means whether the class is thread-safe.
 struct ThreadSafe {};
 
+//
+//
+//
+/// \brief A commonly-used parameter type, means whether something should be set to "on".
+struct On {};
+
+/// \brief A commonly-used parameter type, means whether something should be set to "off".
+struct Off {};
+
 } // namespace ARIA

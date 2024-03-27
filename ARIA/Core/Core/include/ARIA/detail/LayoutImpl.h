@@ -234,6 +234,25 @@ concept CoLayout = is_co_layout_v<TLayout>;
 //
 //
 // Arithmetic operators for coords.
+
+namespace layout::detail {
+
+// Fill a `Coord` with a same value.
+template <typename... Coords>
+[[nodiscard]] ARIA_HOST_DEVICE constexpr layout::detail::Coord<Coords...>
+FillCoords(const std::decay_t<decltype(get<0>(std::declval<layout::detail::Coord<Coords...>>()))> &v) {
+  layout::detail::Coord<Coords...> c;
+  ForEach<sizeof...(Coords)>([&]<auto i>() {
+    static_assert(std::is_same_v<std::decay_t<decltype(cute::get<i>(c))>, std::decay_t<decltype(v)>>,
+                  "Element types of the `Coord` should be the same");
+    cute::get<i>(c) = v;
+  });
+
+  return c;
+}
+
+} // namespace layout::detail
+
 template <typename... Coords>
 [[nodiscard]] ARIA_HOST_DEVICE constexpr layout::detail::Coord<Coords...>
 operator+(const layout::detail::Coord<Coords...> &lhs, const layout::detail::Coord<Coords...> &rhs) {
@@ -256,6 +275,48 @@ operator*(const layout::detail::Coord<Coords...> &lhs, const layout::detail::Coo
   layout::detail::Coord<Coords...> res;
   ForEach<sizeof...(Coords)>([&]<auto i>() { cute::get<i>(res) = cute::get<i>(lhs) * cute::get<i>(rhs); });
   return res;
+}
+
+template <typename... Coords>
+[[nodiscard]] ARIA_HOST_DEVICE constexpr layout::detail::Coord<Coords...>
+operator+(const layout::detail::Coord<Coords...> &lhs,
+          const std::decay_t<decltype(get<0>(std::declval<layout::detail::Coord<Coords...>>()))> &rhs) {
+  return lhs + layout::detail::FillCoords<Coords...>(rhs);
+}
+
+template <typename... Coords>
+[[nodiscard]] ARIA_HOST_DEVICE constexpr layout::detail::Coord<Coords...>
+operator+(const std::decay_t<decltype(get<0>(std::declval<layout::detail::Coord<Coords...>>()))> &lhs,
+          const layout::detail::Coord<Coords...> &rhs) {
+  return layout::detail::FillCoords<Coords...>(lhs) + rhs;
+}
+
+template <typename... Coords>
+[[nodiscard]] ARIA_HOST_DEVICE constexpr layout::detail::Coord<Coords...>
+operator-(const layout::detail::Coord<Coords...> &lhs,
+          const std::decay_t<decltype(get<0>(std::declval<layout::detail::Coord<Coords...>>()))> &rhs) {
+  return lhs - layout::detail::FillCoords<Coords...>(rhs);
+}
+
+template <typename... Coords>
+[[nodiscard]] ARIA_HOST_DEVICE constexpr layout::detail::Coord<Coords...>
+operator-(const std::decay_t<decltype(get<0>(std::declval<layout::detail::Coord<Coords...>>()))> &lhs,
+          const layout::detail::Coord<Coords...> &rhs) {
+  return layout::detail::FillCoords<Coords...>(lhs) - rhs;
+}
+
+template <typename... Coords>
+[[nodiscard]] ARIA_HOST_DEVICE constexpr layout::detail::Coord<Coords...>
+operator*(const layout::detail::Coord<Coords...> &lhs,
+          const std::decay_t<decltype(get<0>(std::declval<layout::detail::Coord<Coords...>>()))> &rhs) {
+  return lhs * layout::detail::FillCoords<Coords...>(rhs);
+}
+
+template <typename... Coords>
+[[nodiscard]] ARIA_HOST_DEVICE constexpr layout::detail::Coord<Coords...>
+operator*(const std::decay_t<decltype(get<0>(std::declval<layout::detail::Coord<Coords...>>()))> &lhs,
+          const layout::detail::Coord<Coords...> &rhs) {
+  return layout::detail::FillCoords<Coords...>(lhs) * rhs;
 }
 
 } // namespace ARIA
