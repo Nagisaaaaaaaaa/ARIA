@@ -11,12 +11,12 @@
 
 namespace ARIA {
 
-/// \brief A light-weighted `VDB` implementation.
+/// \brief A light-weighted policy-based `VDB` implementation.
 /// See https://www.openvdb.org/ if you are not familiar with "vdb".
 ///
-/// For readonly cases, `VDB` is mush slower than `openvdb` and `nanovdb`, but
-/// it support dynamic memory allocations, even for GPU memory, which
-/// makes it easier to handle dynamic cases.
+/// Compared with `openvdb` and `nanovdb`, even though this one is not that fast,
+/// it supports dynamic memory allocations, even for GPU memory, which
+/// makes it much easier to handle dynamic cases.
 ///
 /// \example ```cpp
 /// // Define the volume type and the coordinate type.
@@ -79,14 +79,37 @@ using DeviceVDB = VDB<T, dim, SpaceDevice>;
 //
 //
 //
+/// \brief A `VDBAccessor` is a host or device view of a `VDB`.
+///
+/// \example ```cpp
+/// VDBAccessor allocateWriteAccessor = volume.allocateWriteAccessor();
+/// VDBAccessor writeAccessor = volume.writeAccessor();
+/// VDBAccessor readAccessor = volume.readAccessor();
+/// ```
 using vdb::detail::VDBAccessor;
 
+/// \brief A `VDBAllocateWriteAccessor` will automatically allocate memory when
+/// value of an unallocated coord is set.
+///
+/// \example ```cpp
+/// VDBAllocateWriteAccessor allocateWriteAccessor = volume.allocateWriteAccessor();
+/// ```
 template <typename VDB>
 using VDBAllocateWriteAccessor = typename VDB::AllocateWriteAccessor;
 
+/// \brief A `VDBWriteAccessor` assumes the memory of the value has always been allocated before.
+///
+/// \example ```cpp
+/// VDBWriteAccessor writeAccessor = volume.writeAccessor();
+/// ```
 template <typename VDB>
 using VDBWriteAccessor = typename VDB::WriteAccessor;
 
+/// \brief A `VDBReadAccessor` can only get and cannot set the values.
+///
+/// \example ```cpp
+/// VDBReadAccessor readAccessor = volume.readAccessor();
+/// ```
 template <typename VDB>
 using VDBReadAccessor = typename VDB::ReadAccessor;
 
