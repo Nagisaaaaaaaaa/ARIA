@@ -261,6 +261,11 @@ void Test1DVDBKernels() {
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
       ARIA_ASSERT(readAccessor.value(Vec1i{i - nHalf}) == (i - nHalf) * (-2));
     }).Launch();
+
+    Launcher(v, [=] ARIA_DEVICE(const Vec1i &coord) mutable { writeAccessor.value(coord) += 233; }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Vec1i &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == coord.x() * (-2) + 233);
+    }).Launch();
   }
 
   // Checkerboard accesses.
@@ -284,6 +289,11 @@ void Test1DVDBKernels() {
 
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
       ARIA_ASSERT(readAccessor.value(Vec1i{i - nHalf} * 2) == (nHalf - i) * (-2));
+    }).Launch();
+
+    Launcher(v, [=] ARIA_DEVICE(const Vec1i &coord) mutable { writeAccessor.value(coord) -= 233; }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Vec1i &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == coord.x() - 233);
     }).Launch();
   }
 
@@ -336,6 +346,11 @@ void Test2DVDBKernels() {
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
       ARIA_ASSERT(readAccessor.value(ToVec(coord)) == -layout(coord));
     }).Launch();
+
+    Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable { writeAccessor.value(coord) += 233; }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == -layout(ToCoord(coord)) + 233);
+    }).Launch();
   }
 
   // Checkerboard accesses.
@@ -367,6 +382,11 @@ void Test2DVDBKernels() {
       if ((get<0>(coord) + get<1>(coord)) % 2 == 0)
         ARIA_ASSERT(readAccessor.value(ToVec(coord)) == -layout(coord));
     }).Launch();
+
+    Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable { writeAccessor.value(coord) += 233; }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == -layout(ToCoord(coord)) + 233);
+    }).Launch();
   }
 
   // Sparse accesses, 1D.
@@ -389,6 +409,11 @@ void Test2DVDBKernels() {
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
       ARIA_ASSERT(readAccessor.value({i - nHalf, 0}) == (i - nHalf) * (-2));
     }).Launch();
+
+    Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable { writeAccessor.value(coord) *= (-3); }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == coord.x() * 6);
+    }).Launch();
   }
   { // y.
     V v;
@@ -408,6 +433,11 @@ void Test2DVDBKernels() {
 
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
       ARIA_ASSERT(readAccessor.value({0, i - nHalf}) == (nHalf - i) * (-2));
+    }).Launch();
+
+    Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable { writeAccessor.value(coord) *= (-3); }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == coord.y() * (-6));
     }).Launch();
   }
 
@@ -442,6 +472,13 @@ void Test2DVDBKernels() {
       ARIA_ASSERT(readAccessor.value({i - nHalf, i - nHalf}) == (i - nHalf) * (-3));
       if (i - nHalf != nHalf - i)
         ARIA_ASSERT(readAccessor.value({i - nHalf, nHalf - i}) == (i - nHalf) * (-3));
+    }).Launch();
+
+    Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable { writeAccessor.value(coord) *= (-2); }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(readAccessor.value({i - nHalf, i - nHalf}) == (i - nHalf) * 6);
+      if (i - nHalf != nHalf - i)
+        ARIA_ASSERT(readAccessor.value({i - nHalf, nHalf - i}) == (i - nHalf) * 6);
     }).Launch();
   }
 
@@ -494,6 +531,11 @@ void Test3DVDBKernels() {
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
       ARIA_ASSERT(readAccessor.value(ToVec(coord)) == -layout(coord));
     }).Launch();
+
+    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable { writeAccessor.value(coord) += 233; }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == -layout(ToCoord(coord)) + 233);
+    }).Launch();
   }
 
   // Checkerboard accesses.
@@ -525,6 +567,11 @@ void Test3DVDBKernels() {
       if ((get<0>(coord) + get<1>(coord) + get<2>(coord)) % 2 == 0)
         ARIA_ASSERT(readAccessor.value(ToVec(coord)) == -layout(coord));
     }).Launch();
+
+    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable { writeAccessor.value(coord) += 233; }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == -layout(ToCoord(coord)) + 233);
+    }).Launch();
   }
 
   // Sparse accesses, 1D.
@@ -549,6 +596,11 @@ void Test3DVDBKernels() {
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
       ARIA_ASSERT(readAccessor.value({i - nHalf, 0, 0}) == (i - nHalf) * (-2));
     }).Launch();
+
+    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable { writeAccessor.value(coord) *= (-3); }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == coord.x() * 6);
+    }).Launch();
   }
   { // y.
     V v;
@@ -571,6 +623,11 @@ void Test3DVDBKernels() {
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
       ARIA_ASSERT(readAccessor.value({0, i - nHalf, 0}) == (nHalf - i) * (-2));
     }).Launch();
+
+    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable { writeAccessor.value(coord) *= (-3); }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == coord.y() * (-6));
+    }).Launch();
   }
   { // z.
     V v;
@@ -592,6 +649,11 @@ void Test3DVDBKernels() {
 
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
       ARIA_ASSERT(readAccessor.value({0, 0, i - nHalf}) == (nHalf - i) * (-2));
+    }).Launch();
+
+    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable { writeAccessor.value(coord) *= (-3); }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == coord.z() * (-6));
     }).Launch();
   }
 
@@ -680,6 +742,21 @@ void Test3DVDBKernels() {
       ARIA_ASSERT(writeAccessor.value({0, i - nHalf, i - nHalf}) == (i - nHalf) * (-3));
       if (i - nHalf != nHalf - i)
         ARIA_ASSERT(writeAccessor.value({0, i - nHalf, nHalf - i}) == (i - nHalf) * (-3));
+    }).Launch();
+
+    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable { writeAccessor.value(coord) *= (-2); }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(writeAccessor.value({i - nHalf, i - nHalf, 0}) == (i - nHalf) * 6);
+      if (i - nHalf != nHalf - i)
+        ARIA_ASSERT(writeAccessor.value({i - nHalf, nHalf - i, 0}) == (i - nHalf) * 6);
+
+      ARIA_ASSERT(writeAccessor.value({i - nHalf, 0, i - nHalf}) == (i - nHalf) * 6);
+      if (i - nHalf != nHalf - i)
+        ARIA_ASSERT(writeAccessor.value({i - nHalf, 0, nHalf - i}) == (i - nHalf) * 6);
+
+      ARIA_ASSERT(writeAccessor.value({0, i - nHalf, i - nHalf}) == (i - nHalf) * 6);
+      if (i - nHalf != nHalf - i)
+        ARIA_ASSERT(writeAccessor.value({0, i - nHalf, nHalf - i}) == (i - nHalf) * 6);
     }).Launch();
   }
 
@@ -798,13 +875,6 @@ TEST(VDB, VDB) {
   Test1DVDBKernels();
   Test2DVDBKernels();
   Test3DVDBKernels();
-
-  // TODO: Test launcher.
-  // Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable { writeAccessor.value(coord) *= -1; }).Launch();
-  //
-  // Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable {
-  //   ARIA_ASSERT(writeAccessor.value(coord) == coord.x());
-  // }).Launch();
 }
 
 } // namespace ARIA
