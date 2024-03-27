@@ -804,13 +804,60 @@ void Test2DVDBSetOffAndShrinkKernels() {
     EXPECT_EQ(*counter, n);
     *counter = 0;
 
-    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable { ARIA_ASSERT(false); }).Launch();
-    v.ShrinkToFit();
-    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable { ARIA_ASSERT(false); }).Launch();
-    v.ShrinkToFit();
+    for (int round = 0; round < 3; ++round) {
+      Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable { ARIA_ASSERT(false); }).Launch();
+      v.ShrinkToFit();
+    }
   }
 
   // Checkerboard accesses.
+  {
+    V v;
+
+    VDBAccessor accessor = v.allocateWriteAccessor();
+    v.ShrinkToFit();
+
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable { accessor.value(coord) = 0; }).Launch();
+    v.ShrinkToFit();
+
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      if ((get<0>(coord) + get<1>(coord)) % 2 == 0) {
+        accessor.value(coord) = Off{};
+        atomicAdd(counter.get(), 1);
+      }
+    }).Launch();
+    cuda::device::current::get().synchronize();
+    EXPECT_EQ(*counter, n / 2);
+    *counter = 0;
+
+    for (int round = 0; round < 3; ++round) {
+      Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+        if ((get<0>(coord) + get<1>(coord)) % 2 == 0)
+          ARIA_ASSERT(false);
+        else
+          atomicAdd(counter.get(), 1);
+      }).Launch();
+      cuda::device::current::get().synchronize();
+      EXPECT_EQ(*counter, n / 2);
+      *counter = 0;
+      v.ShrinkToFit();
+    }
+
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      if ((get<0>(coord) + get<1>(coord)) % 2 != 0) {
+        accessor.value(coord) = Off{};
+        atomicAdd(counter.get(), 1);
+      }
+    }).Launch();
+    cuda::device::current::get().synchronize();
+    EXPECT_EQ(*counter, n / 2);
+    *counter = 0;
+
+    for (int round = 0; round < 3; ++round) {
+      Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable { ARIA_ASSERT(false); }).Launch();
+      v.ShrinkToFit();
+    }
+  }
 }
 
 } // namespace
