@@ -9,7 +9,7 @@ namespace {
 void Test1DVDBHandleKernels() {
   using Handle = vdb::detail::VDBHandle<float, 1, SpaceDevice>;
 
-  const int n = 10000;
+  const int n = 20000;
   const int nHalf = n / 2;
 
   // Dense accesses.
@@ -210,6 +210,76 @@ void Test3DVDBHandleKernels() {
   }
 }
 
+void Test1DVDBKernels() {
+  using V = DeviceVDB<int, 1>;
+  using AllocateWriteAccessor = VDBAllocateWriteAccessor<V>;
+  using WriteAccessor = VDBWriteAccessor<V>;
+  using ReadAccessor = VDBReadAccessor<V>;
+
+  const int n = 20000;
+  const int nHalf = n / 2;
+
+  // CTAD.
+  {
+    V v;
+    VDBAccessor allocateWriteAccessor = v.allocateWriteAccessor();
+    VDBAccessor writeAccessor = v.writeAccessor();
+    VDBAccessor readAccessor = v.readAccessor();
+
+    static_assert(std::is_same_v<decltype(allocateWriteAccessor), AllocateWriteAccessor>);
+    static_assert(std::is_same_v<decltype(writeAccessor), WriteAccessor>);
+    static_assert(std::is_same_v<decltype(readAccessor), ReadAccessor>);
+  }
+
+  // Dense accesses.
+  {
+    V v;
+    VDBAccessor allocateWriteAccessor = v.allocateWriteAccessor();
+    VDBAccessor writeAccessor = v.writeAccessor();
+    VDBAccessor readAccessor = v.readAccessor();
+
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { allocateWriteAccessor.value(Vec1i{i - nHalf}) = i - nHalf; }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(allocateWriteAccessor.value(Vec1i{i - nHalf}) == i - nHalf);
+    }).Launch();
+
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { writeAccessor.value(Vec1i{i - nHalf}) *= -2; }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(writeAccessor.value(Vec1i{i - nHalf}) == (i - nHalf) * (-2));
+    }).Launch();
+
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(readAccessor.value(Vec1i{i - nHalf}) == (i - nHalf) * (-2));
+    }).Launch();
+  }
+
+  // Checkerboard accesses.
+  {
+    V v;
+    VDBAccessor allocateWriteAccessor = v.allocateWriteAccessor();
+    VDBAccessor writeAccessor = v.writeAccessor();
+    VDBAccessor readAccessor = v.readAccessor();
+
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      allocateWriteAccessor.value(Vec1i{i - nHalf} * 2) = nHalf - i;
+    }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(allocateWriteAccessor.value(Vec1i{i - nHalf} * 2) == nHalf - i);
+    }).Launch();
+
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { writeAccessor.value(Vec1i{i - nHalf} * 2) *= -2; }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(writeAccessor.value(Vec1i{i - nHalf} * 2) == (nHalf - i) * (-2));
+    }).Launch();
+
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(readAccessor.value(Vec1i{i - nHalf} * 2) == (nHalf - i) * (-2));
+    }).Launch();
+  }
+
+  cuda::device::current::get().synchronize();
+}
+
 void Test2DVDBKernels() {
   using V = DeviceVDB<int, 2>;
   using AllocateWriteAccessor = VDBAllocateWriteAccessor<V>;
@@ -368,6 +438,8 @@ void Test2DVDBKernels() {
   cuda::device::current::get().synchronize();
 }
 
+void Test3DVDBKernels() {}
+
 } // namespace
 
 TEST(VDB, Base) {
@@ -477,6 +549,7 @@ TEST(VDB, Handle) {
 }
 
 TEST(VDB, VDB) {
+  Test1DVDBKernels();
   Test2DVDBKernels();
 
   // TODO: Test launcher.
