@@ -172,17 +172,38 @@ void Test3DVDBHandleKernels() {
     cuda::device::current::get().synchronize();
     handle.Destroy();
   }
+  { // z.
+    Handle handle = Handle::Create();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      handle.value_AllocateIfNotExist({0, 0, nHalf - i}) = i - nHalf;
+    }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(handle.value_AssumeExist({0, 0, nHalf - i}) == i - nHalf);
+    }).Launch();
+    cuda::device::current::get().synchronize();
+    handle.Destroy();
+  }
 
-  // Sparse accesses, 2D.
-  { // (x, y).
+  // Sparse accesses, 3D.
+  { // (x, y, z).
     Handle handle = Handle::Create();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
       handle.value_AllocateIfNotExist({i - nHalf, i - nHalf, 0}) = i - nHalf;
       handle.value_AllocateIfNotExist({i - nHalf, nHalf - i, 0}) = i - nHalf;
+
+      handle.value_AllocateIfNotExist({i - nHalf, 0, i - nHalf}) = i - nHalf;
+      handle.value_AllocateIfNotExist({i - nHalf, 0, nHalf - i}) = i - nHalf;
+
+      handle.value_AllocateIfNotExist({0, i - nHalf, i - nHalf}) = i - nHalf;
+      handle.value_AllocateIfNotExist({0, i - nHalf, nHalf - i}) = i - nHalf;
     }).Launch();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
       ARIA_ASSERT(handle.value_AllocateIfNotExist({i - nHalf, i - nHalf, 0}) == i - nHalf);
       ARIA_ASSERT(handle.value_AssumeExist({i - nHalf, nHalf - i, 0}) == i - nHalf);
+      ARIA_ASSERT(handle.value_AllocateIfNotExist({i - nHalf, 0, i - nHalf}) == i - nHalf);
+      ARIA_ASSERT(handle.value_AssumeExist({i - nHalf, 0, nHalf - i}) == i - nHalf);
+      ARIA_ASSERT(handle.value_AllocateIfNotExist({0, i - nHalf, i - nHalf}) == i - nHalf);
+      ARIA_ASSERT(handle.value_AssumeExist({0, i - nHalf, nHalf - i}) == i - nHalf);
     }).Launch();
     cuda::device::current::get().synchronize();
     handle.Destroy();
@@ -210,6 +231,9 @@ void Test2DVDBKernels() {
     static_assert(std::is_same_v<decltype(readAccessor), ReadAccessor>);
   }
 
+  // TODO: Test dense accesses.
+  {}
+
   // Sparse accesses, 1D.
   { // x.
     V v;
@@ -218,13 +242,11 @@ void Test2DVDBKernels() {
     VDBAccessor readAccessor = v.readAccessor();
 
     Launcher(n, [=] ARIA_DEVICE(int i) mutable { allocateWriteAccessor.value({i - nHalf, 0}) = i - nHalf; }).Launch();
-
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
       ARIA_ASSERT(allocateWriteAccessor.value({i - nHalf, 0}) == i - nHalf);
     }).Launch();
 
     Launcher(n, [=] ARIA_DEVICE(int i) mutable { writeAccessor.value({i - nHalf, 0}) *= -2; }).Launch();
-
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
       ARIA_ASSERT(writeAccessor.value({i - nHalf, 0}) == (i - nHalf) * (-2));
     }).Launch();
@@ -240,19 +262,51 @@ void Test2DVDBKernels() {
     VDBAccessor readAccessor = v.readAccessor();
 
     Launcher(n, [=] ARIA_DEVICE(int i) mutable { allocateWriteAccessor.value({0, i - nHalf}) = nHalf - i; }).Launch();
-
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
       ARIA_ASSERT(allocateWriteAccessor.value({0, i - nHalf}) == nHalf - i);
     }).Launch();
 
     Launcher(n, [=] ARIA_DEVICE(int i) mutable { writeAccessor.value({0, i - nHalf}) *= -2; }).Launch();
-
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
       ARIA_ASSERT(writeAccessor.value({0, i - nHalf}) == (nHalf - i) * (-2));
     }).Launch();
 
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
       ARIA_ASSERT(readAccessor.value({0, i - nHalf}) == (nHalf - i) * (-2));
+    }).Launch();
+  }
+
+  // Sparse accesses, 2D.
+  {
+    V v;
+    VDBAccessor allocateWriteAccessor = v.allocateWriteAccessor();
+    VDBAccessor writeAccessor = v.writeAccessor();
+    VDBAccessor readAccessor = v.readAccessor();
+
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      allocateWriteAccessor.value({i - nHalf, i - nHalf}) = i - nHalf;
+      allocateWriteAccessor.value({i - nHalf, nHalf - i}) = i - nHalf;
+    }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(allocateWriteAccessor.value({i - nHalf, i - nHalf}) == i - nHalf);
+      ARIA_ASSERT(allocateWriteAccessor.value({i - nHalf, nHalf - i}) == i - nHalf);
+    }).Launch();
+
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      writeAccessor.value({i - nHalf, i - nHalf}) *= -3;
+      if (i - nHalf != nHalf - i)
+        writeAccessor.value({i - nHalf, nHalf - i}) *= -3;
+    }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(writeAccessor.value({i - nHalf, i - nHalf}) == (i - nHalf) * (-3));
+      if (i - nHalf != nHalf - i)
+        ARIA_ASSERT(writeAccessor.value({i - nHalf, nHalf - i}) == (i - nHalf) * (-3));
+    }).Launch();
+
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(readAccessor.value({i - nHalf, i - nHalf}) == (i - nHalf) * (-3));
+      if (i - nHalf != nHalf - i)
+        ARIA_ASSERT(readAccessor.value({i - nHalf, nHalf - i}) == (i - nHalf) * (-3));
     }).Launch();
   }
 
