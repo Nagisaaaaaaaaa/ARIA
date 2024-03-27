@@ -450,9 +450,9 @@ public:
     thrust::device_vector<bool> shouldPreserveD(blocks_.max_size());
 
     // If there exists one `cellCoord` which is "on" within this block, mark the block as preserved.
-    Launcher(*this, [=, *this, shouldPreserve = shouldPreserveD.data()] ARIA_DEVICE(const TVec &cellCoord) {
+    Launcher(*this, [=, *this, shouldPreserve = shouldPreserveD.data()] ARIA_DEVICE(const TCoord &cellCoord) {
       // In `[0, max_size())`.
-      size_t blockIdxInMap = blocks_.find(CellCoord2BlockIdx(cellCoord)) - blocks_.begin();
+      size_t blockIdxInMap = blocks_.find(CellCoord2BlockIdx(ToVec(cellCoord))) - blocks_.begin();
       shouldPreserve[blockIdxInMap] = true;
     }).Launch();
 
@@ -462,10 +462,14 @@ public:
       if (shouldPreserve[i])
         return;
 
+      // Return if this block is already empty.
       auto block = Auto(blocks_.begin() + i);
+      if (!block->second.storage())
+        return;
 
       // Delete the storage.
       delete block->second.storage();
+      block->second.storage() = nullptr;
       // Erase from unordered map.
       blocks_.erase(block->first);
     }).Launch();

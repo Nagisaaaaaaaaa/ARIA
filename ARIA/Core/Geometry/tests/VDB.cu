@@ -777,6 +777,42 @@ void Test3DVDBKernels() {
   cuda::device::current::get().synchronize();
 }
 
+void Test2DVDBSetOffAndShrinkKernels() {
+  using V = DeviceVDB<int, 2>;
+
+  const Layout layout = make_layout_major(200, 300);
+  const int n = size(layout);
+
+  thrust::device_vector<int> counterD(1);
+  thrust::device_ptr counter = counterD.data();
+
+  // Dense off accesses.
+  {
+    V v;
+
+    VDBAccessor accessor = v.allocateWriteAccessor();
+    v.ShrinkToFit();
+
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable { accessor.value(coord) = 0; }).Launch();
+    v.ShrinkToFit();
+
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      accessor.value(coord) = Off{};
+      atomicAdd(counter.get(), 1);
+    }).Launch();
+    cuda::device::current::get().synchronize();
+    EXPECT_EQ(*counter, n);
+    *counter = 0;
+
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable { ARIA_ASSERT(false); }).Launch();
+    v.ShrinkToFit();
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable { ARIA_ASSERT(false); }).Launch();
+    v.ShrinkToFit();
+  }
+
+  // Checkerboard accesses.
+}
+
 } // namespace
 
 TEST(VDB, Base) {
@@ -889,6 +925,10 @@ TEST(VDB, VDB) {
   Test1DVDBKernels();
   Test2DVDBKernels();
   Test3DVDBKernels();
+}
+
+TEST(VDB, SetOffAndShrink) {
+  Test2DVDBSetOffAndShrinkKernels();
 }
 
 } // namespace ARIA
