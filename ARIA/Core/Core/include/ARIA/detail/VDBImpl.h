@@ -441,6 +441,25 @@ private:
 #endif
   }
 
+public:
+  // Whether the value at `cellCoord` is "on" or "off".
+  [[nodiscard]] ARIA_HOST_DEVICE bool IsValueOn(const TVec &cellCoord) const {
+#if ARIA_IS_DEVICE_CODE
+    // Try and get the block.
+    const TBlock *b = block_GetIfExist(cellCoord);
+
+    // If the block does not exist, it is already "off", return false.
+    if (!b)
+      return false;
+
+    // If the block exists, get and return the bit from `onOff`.
+    auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
+    return b->storage()->onOff[cellIdxInBlock];
+#else
+    ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
+#endif
+  }
+
   //
   //
   //
@@ -583,6 +602,11 @@ public:
       return handle_.value_AssumeExist(ToVec(cellCoord));
   }
 
+  /// \brief Whether the value at `cellCoord` is "on" or "off".
+  [[nodiscard]] ARIA_HOST_DEVICE bool IsValueOn(const TCoord &cellCoord) const {
+    return handle_.IsValueOn(ToVec(cellCoord));
+  }
+
 private:
   THandle handle_;
 
@@ -611,6 +635,11 @@ public:
   /// \brief Get or set the value at `cellCoord`.
   [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCoord &cellCoord) const {
     return handle_.value_AssumeExist(ToVec(cellCoord));
+  }
+
+  /// \brief Whether the value at `cellCoord` is "on" or "off".
+  [[nodiscard]] ARIA_HOST_DEVICE bool IsValueOn(const TCoord &cellCoord) const {
+    return handle_.IsValueOn(ToVec(cellCoord));
   }
 
 private:

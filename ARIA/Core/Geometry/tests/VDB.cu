@@ -791,14 +791,23 @@ void Test1DVDBSetOffAndShrinkKernels() {
     V v;
 
     VDBAccessor accessor = v.allocateWriteAccessor();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int> &coord) mutable {
+      ARIA_ASSERT(!accessor.IsValueOn(coord));
+    }).Launch();
     v.ShrinkToFit();
 
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int> &coord) mutable { accessor.value(coord) = 0; }).Launch();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int> &coord) mutable {
+      ARIA_ASSERT(accessor.IsValueOn(coord));
+    }).Launch();
     v.ShrinkToFit();
 
     Launcher(v, [=] ARIA_DEVICE(const Coord<int> &coord) mutable {
       accessor.value(coord) = Off{};
       atomicAdd(counter.get(), 1);
+    }).Launch();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int> &coord) mutable {
+      ARIA_ASSERT(!accessor.IsValueOn(coord));
     }).Launch();
     cuda::device::current::get().synchronize();
     EXPECT_EQ(*counter, n);
@@ -832,6 +841,12 @@ void Test1DVDBSetOffAndShrinkKernels() {
         atomicAdd(counter.get(), 1);
       }
     }).Launch();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int> &coord) mutable {
+      if (get<0>(coord) % 2 == 0)
+        ARIA_ASSERT(!accessor.IsValueOn(coord));
+      else
+        ARIA_ASSERT(accessor.IsValueOn(coord));
+    }).Launch();
     cuda::device::current::get().synchronize();
     EXPECT_EQ(*counter, n / 2);
     *counter = 0;
@@ -852,6 +867,9 @@ void Test1DVDBSetOffAndShrinkKernels() {
     Launcher(v, [=] ARIA_DEVICE(const Coord<int> &coord) mutable {
       accessor.value(coord) = Off{};
       atomicAdd(counter.get(), 1);
+    }).Launch();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int> &coord) mutable {
+      ARIA_ASSERT(!accessor.IsValueOn(coord));
     }).Launch();
     cuda::device::current::get().synchronize();
     EXPECT_EQ(*counter, n / 2);
@@ -878,14 +896,23 @@ void Test2DVDBSetOffAndShrinkKernels() {
     V v;
 
     VDBAccessor accessor = v.allocateWriteAccessor();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      ARIA_ASSERT(!accessor.IsValueOn(coord));
+    }).Launch();
     v.ShrinkToFit();
 
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable { accessor.value(coord) = 0; }).Launch();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      ARIA_ASSERT(accessor.IsValueOn(coord));
+    }).Launch();
     v.ShrinkToFit();
 
     Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
       accessor.value(coord) = Off{};
       atomicAdd(counter.get(), 1);
+    }).Launch();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      ARIA_ASSERT(!accessor.IsValueOn(coord));
     }).Launch();
     cuda::device::current::get().synchronize();
     EXPECT_EQ(*counter, n);
@@ -919,6 +946,12 @@ void Test2DVDBSetOffAndShrinkKernels() {
         atomicAdd(counter.get(), 1);
       }
     }).Launch();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      if ((get<0>(coord) + get<1>(coord)) % 2 == 0)
+        ARIA_ASSERT(!accessor.IsValueOn(coord));
+      else
+        ARIA_ASSERT(accessor.IsValueOn(coord));
+    }).Launch();
     cuda::device::current::get().synchronize();
     EXPECT_EQ(*counter, n / 2);
     *counter = 0;
@@ -939,6 +972,9 @@ void Test2DVDBSetOffAndShrinkKernels() {
     Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
       accessor.value(coord) = Off{};
       atomicAdd(counter.get(), 1);
+    }).Launch();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      ARIA_ASSERT(!accessor.IsValueOn(coord));
     }).Launch();
     cuda::device::current::get().synchronize();
     EXPECT_EQ(*counter, n / 2);
@@ -965,16 +1001,25 @@ void Test3DVDBSetOffAndShrinkKernels() {
     V v;
 
     VDBAccessor accessor = v.allocateWriteAccessor();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
+      ARIA_ASSERT(!accessor.IsValueOn(coord));
+    }).Launch();
     v.ShrinkToFit();
 
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
       accessor.value(coord) = 0;
+    }).Launch();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
+      ARIA_ASSERT(accessor.IsValueOn(coord));
     }).Launch();
     v.ShrinkToFit();
 
     Launcher(v, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
       accessor.value(coord) = Off{};
       atomicAdd(counter.get(), 1);
+    }).Launch();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
+      ARIA_ASSERT(!accessor.IsValueOn(coord));
     }).Launch();
     cuda::device::current::get().synchronize();
     EXPECT_EQ(*counter, n);
@@ -1012,6 +1057,12 @@ void Test3DVDBSetOffAndShrinkKernels() {
         atomicAdd(counter.get(), 1);
       }
     }).Launch();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
+      if ((get<0>(coord) + get<1>(coord) + get<2>(coord)) % 2 == 0)
+        ARIA_ASSERT(!accessor.IsValueOn(coord));
+      else
+        ARIA_ASSERT(accessor.IsValueOn(coord));
+    }).Launch();
     cuda::device::current::get().synchronize();
     EXPECT_EQ(*counter, n / 2);
     *counter = 0;
@@ -1032,6 +1083,9 @@ void Test3DVDBSetOffAndShrinkKernels() {
     Launcher(v, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
       accessor.value(coord) = Off{};
       atomicAdd(counter.get(), 1);
+    }).Launch();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
+      ARIA_ASSERT(!accessor.IsValueOn(coord));
     }).Launch();
     cuda::device::current::get().synchronize();
     EXPECT_EQ(*counter, n / 2);
