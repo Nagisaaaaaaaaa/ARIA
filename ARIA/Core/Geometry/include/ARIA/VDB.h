@@ -1,7 +1,12 @@
 #pragma once
 
 /// \file
-/// \warning `VDB` is under developing, interfaces are currently very unstable.
+/// \brief A light-weighted policy-based `VDB` implementation.
+/// See https://www.openvdb.org/ if you are not familiar with "vdb".
+///
+/// Compared with `openvdb` and `nanovdb`, even though this one is not that fast,
+/// it supports dynamic memory allocations, even for GPU memory, which
+/// makes it much easier to handle dynamic cases.
 //
 //
 //
