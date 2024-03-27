@@ -189,40 +189,72 @@ void Test3DVDBHandleKernels() {
   }
 }
 
-void Test2DVDBAccessorsKernels() {
-  using V = VDB<float, 2, SpaceDevice>;
+void Test2DVDBKernels() {
+  using V = DeviceVDB<int, 2>;
   using AllocateWriteAccessor = VDBAllocateWriteAccessor<V>;
   using WriteAccessor = VDBWriteAccessor<V>;
   using ReadAccessor = VDBReadAccessor<V>;
 
-  V v;
-  VDBAccessor allocateWriteAccessor = v.allocateWriteAccessor(); // Test CTAD.
-  VDBAccessor writeAccessor = v.writeAccessor();                 // Test CTAD.
-  VDBAccessor readAccessor = v.readAccessor();                   // Test CTAD.
+  const int n = 10000;
+  const int nHalf = n / 2;
 
-  static_assert(std::is_same_v<decltype(allocateWriteAccessor), AllocateWriteAccessor>);
-  static_assert(std::is_same_v<decltype(writeAccessor), WriteAccessor>);
-  static_assert(std::is_same_v<decltype(readAccessor), ReadAccessor>);
+  // CTAD.
+  {
+    V v;
+    VDBAccessor allocateWriteAccessor = v.allocateWriteAccessor();
+    VDBAccessor writeAccessor = v.writeAccessor();
+    VDBAccessor readAccessor = v.readAccessor();
 
-  const size_t n = 10000;
+    static_assert(std::is_same_v<decltype(allocateWriteAccessor), AllocateWriteAccessor>);
+    static_assert(std::is_same_v<decltype(writeAccessor), WriteAccessor>);
+    static_assert(std::is_same_v<decltype(readAccessor), ReadAccessor>);
+  }
 
-  Launcher(n, [=] ARIA_DEVICE(size_t i) mutable { allocateWriteAccessor.value({i, 0}) = i; }).Launch();
+  // Sparse accesses, 1D.
+  { // x.
+    V v;
+    VDBAccessor allocateWriteAccessor = v.allocateWriteAccessor();
+    VDBAccessor writeAccessor = v.writeAccessor();
+    VDBAccessor readAccessor = v.readAccessor();
 
-  Launcher(n, [=] ARIA_DEVICE(size_t i) mutable { ARIA_ASSERT(allocateWriteAccessor.value({i, 0}) == i); }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { allocateWriteAccessor.value({i - nHalf, 0}) = i - nHalf; }).Launch();
 
-  Launcher(n, [=] ARIA_DEVICE(size_t i) mutable { writeAccessor.value({i, 0}) *= -1; }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(allocateWriteAccessor.value({i - nHalf, 0}) == i - nHalf);
+    }).Launch();
 
-  Launcher(n, [=] ARIA_DEVICE(size_t i) mutable { ARIA_ASSERT(writeAccessor.value({i, 0}) == -float(i)); }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { writeAccessor.value({i - nHalf, 0}) *= -2; }).Launch();
 
-  // Launcher(n, [=] ARIA_DEVICE(size_t i) mutable { readAccessor.value({i, 0}) *= -1; }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(writeAccessor.value({i - nHalf, 0}) == (i - nHalf) * (-2));
+    }).Launch();
 
-  Launcher(n, [=] ARIA_DEVICE(size_t i) mutable { ARIA_ASSERT(readAccessor.value({i, 0}) == -float(i)); }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(readAccessor.value({i - nHalf, 0}) == (i - nHalf) * (-2));
+    }).Launch();
+  }
+  { // y.
+    V v;
+    VDBAccessor allocateWriteAccessor = v.allocateWriteAccessor();
+    VDBAccessor writeAccessor = v.writeAccessor();
+    VDBAccessor readAccessor = v.readAccessor();
 
-  Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable { writeAccessor.value(coord) *= -1; }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { allocateWriteAccessor.value({0, i - nHalf}) = nHalf - i; }).Launch();
 
-  Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable {
-    ARIA_ASSERT(writeAccessor.value(coord) == coord.x());
-  }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(allocateWriteAccessor.value({0, i - nHalf}) == nHalf - i);
+    }).Launch();
+
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { writeAccessor.value({0, i - nHalf}) *= -2; }).Launch();
+
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(writeAccessor.value({0, i - nHalf}) == (nHalf - i) * (-2));
+    }).Launch();
+
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(readAccessor.value({0, i - nHalf}) == (nHalf - i) * (-2));
+    }).Launch();
+  }
 
   cuda::device::current::get().synchronize();
 }
@@ -335,8 +367,15 @@ TEST(VDB, Handle) {
   Test3DVDBHandleKernels();
 }
 
-TEST(VDB, Accessors) {
-  Test2DVDBAccessorsKernels();
+TEST(VDB, VDB) {
+  Test2DVDBKernels();
+
+  // TODO: Test launcher.
+  // Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable { writeAccessor.value(coord) *= -1; }).Launch();
+  //
+  // Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable {
+  //   ARIA_ASSERT(writeAccessor.value(coord) == coord.x());
+  // }).Launch();
 }
 
 } // namespace ARIA
