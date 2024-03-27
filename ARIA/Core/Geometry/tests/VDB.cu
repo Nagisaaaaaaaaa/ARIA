@@ -808,6 +808,12 @@ void Test2DVDBSetOffAndShrinkKernels() {
       Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable { ARIA_ASSERT(false); }).Launch();
       v.ShrinkToFit();
     }
+
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable { accessor.value(coord) = Off{}; }).Launch();
+    for (int round = 0; round < 3; ++round) {
+      Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable { ARIA_ASSERT(false); }).Launch();
+      v.ShrinkToFit();
+    }
   }
 
   // Checkerboard accesses.
@@ -844,10 +850,8 @@ void Test2DVDBSetOffAndShrinkKernels() {
     }
 
     Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
-      if ((get<0>(coord) + get<1>(coord)) % 2 != 0) {
-        accessor.value(coord) = Off{};
-        atomicAdd(counter.get(), 1);
-      }
+      accessor.value(coord) = Off{};
+      atomicAdd(counter.get(), 1);
     }).Launch();
     cuda::device::current::get().synchronize();
     EXPECT_EQ(*counter, n / 2);
