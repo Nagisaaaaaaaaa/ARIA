@@ -19,14 +19,60 @@ namespace ARIA {
 /// makes it easier to handle dynamic cases.
 ///
 /// \example ```cpp
+/// // Define the volume type and the coordinate type.
+/// using Volume = DeviceVDB<float, 2>;
+/// using VCoord = Coord<int, int>;
+///
+/// // Instantiate a volume.
+/// Volume volume;
+///
+/// // Instantiate a layout, whose size is 200 * 300.
+/// const Layout layout = make_layout_major(200, 300);
+///
+/// // Get the `VDB` accessors, there are 3 types.
+/// VDBAccessor allocateWriteAccessor = volume.allocateWriteAccessor();
+/// VDBAccessor writeAccessor = volume.writeAccessor();
+/// VDBAccessor readAccessor = volume.readAccessor();
+///
+/// // Launch for each coord in the layout.
+/// Launcher(layout, [=] ARIA_DEVICE(const VCoord &coord) mutable {
+///   // An `AllocateWriteAccessor` will automatically allocate memory when
+///   // value of an unallocated coord is set.
+///   allocateWriteAccessor.value(coord) = static_cast<float>(layout(coord));
+/// }).Launch();
+///
+/// // Launch for each coord in the VDB whose value is "on".
+/// Launcher(volume, [=] ARIA_DEVICE(const VCoord &coord) mutable {
+///   // A `WriteAccessor` assumes the memory of the value has always been allocated before.
+///   writeAccessor.value(coord) *= -2;
+/// }).Launch();
+///
+/// Launcher(volume, [=] ARIA_DEVICE(const VCoord &coord) {
+///   // A `ReadAccessor` can only get and cannot set the values.
+///   ARIA_ASSERT(readAccessor.value(coord) == layout(coord) * (-2));
+/// }).Launch();
 /// ```
 ///
-/// \todo Support host VDB.
+/// \todo `HostVDB`s have not been implemented yet.
 using vdb::detail::VDB;
 
+/// \brief A `HostVDB` is a `VDB` whose values are contained in host storages, and
+/// CPU accesses are allowed.
+///
+/// \example ```cpp
+/// using Volume = HostVDB<float, 2>;
+/// Volume volume;
+/// ```
 template <typename T, auto dim>
 using HostVDB = VDB<T, dim, SpaceHost>;
 
+/// \brief A `DeviceVDB` is a `VDB` whose values are contained in device storages, and
+/// GPU accesses are allowed.
+///
+/// \example ```cpp
+/// using Volume = DeviceVDB<float, 2>;
+/// Volume volume;
+/// ```
 template <typename T, auto dim>
 using DeviceVDB = VDB<T, dim, SpaceDevice>;
 
