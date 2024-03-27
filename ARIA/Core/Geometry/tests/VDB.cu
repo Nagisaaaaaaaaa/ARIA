@@ -216,7 +216,8 @@ void Test2DVDBKernels() {
   using WriteAccessor = VDBWriteAccessor<V>;
   using ReadAccessor = VDBReadAccessor<V>;
 
-  const int n = 10000;
+  const Layout layout = make_layout_major(200, 300);
+  const int n = 20000;
   const int nHalf = n / 2;
 
   // CTAD.
@@ -231,8 +232,62 @@ void Test2DVDBKernels() {
     static_assert(std::is_same_v<decltype(readAccessor), ReadAccessor>);
   }
 
-  // TODO: Test dense accesses.
-  {}
+  // Dense accesses.
+  {
+    V v;
+    VDBAccessor allocateWriteAccessor = v.allocateWriteAccessor();
+    VDBAccessor writeAccessor = v.writeAccessor();
+    VDBAccessor readAccessor = v.readAccessor();
+
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      allocateWriteAccessor.value(ToVec(coord)) = layout(coord);
+    }).Launch();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      ARIA_ASSERT(allocateWriteAccessor.value(ToVec(coord)) == layout(coord));
+    }).Launch();
+
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      writeAccessor.value(ToVec(coord)) *= -1;
+    }).Launch();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      ARIA_ASSERT(writeAccessor.value(ToVec(coord)) == -layout(coord));
+    }).Launch();
+
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(ToVec(coord)) == -layout(coord));
+    }).Launch();
+  }
+
+  // Checkerboard accesses.
+  {
+    V v;
+    VDBAccessor allocateWriteAccessor = v.allocateWriteAccessor();
+    VDBAccessor writeAccessor = v.writeAccessor();
+    VDBAccessor readAccessor = v.readAccessor();
+
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      if ((get<0>(coord) + get<1>(coord)) % 2 == 0)
+        allocateWriteAccessor.value(ToVec(coord)) = layout(coord);
+    }).Launch();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      if ((get<0>(coord) + get<1>(coord)) % 2 == 0)
+        ARIA_ASSERT(allocateWriteAccessor.value(ToVec(coord)) == layout(coord));
+    }).Launch();
+
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      if ((get<0>(coord) + get<1>(coord)) % 2 == 0)
+        writeAccessor.value(ToVec(coord)) *= -1;
+    }).Launch();
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      if ((get<0>(coord) + get<1>(coord)) % 2 == 0)
+        ARIA_ASSERT(writeAccessor.value(ToVec(coord)) == -layout(coord));
+    }).Launch();
+
+    Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      if ((get<0>(coord) + get<1>(coord)) % 2 == 0)
+        ARIA_ASSERT(readAccessor.value(ToVec(coord)) == -layout(coord));
+    }).Launch();
+  }
 
   // Sparse accesses, 1D.
   { // x.
