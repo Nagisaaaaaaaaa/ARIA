@@ -549,7 +549,7 @@ template <typename T, auto dim, typename TSpace, typename TAccessor>
 class VDBAccessor<T, dim, TSpace, TAccessor> {
 private:
   using THandle = VDBHandle<T, dim, TSpace>;
-  using TVec = THandle::TVec;
+  using TCoord = THandle::TCoord;
 
 public:
   VDBAccessor() = default;
@@ -564,19 +564,19 @@ private:
 
 public:
   /// \brief Get or set the value at `cellCoord`.
-  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TVec &cellCoord) {
+  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCoord &cellCoord) {
     if constexpr (allocateIfNotExist)
-      return handle_.value_AllocateIfNotExist(cellCoord);
+      return handle_.value_AllocateIfNotExist(ToVec(cellCoord));
     else
-      return handle_.value_AssumeExist(cellCoord);
+      return handle_.value_AssumeExist(ToVec(cellCoord));
   }
 
   /// \brief Get or set the value at `cellCoord`.
-  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TVec &cellCoord) const {
+  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCoord &cellCoord) const {
     if constexpr (allocateIfNotExist)
-      return handle_.value_AllocateIfNotExist(cellCoord);
+      return handle_.value_AllocateIfNotExist(ToVec(cellCoord));
     else
-      return handle_.value_AssumeExist(cellCoord);
+      return handle_.value_AssumeExist(ToVec(cellCoord));
   }
 
 private:
@@ -591,7 +591,7 @@ template <typename T, auto dim, typename TSpace, typename TAccessor>
 class VDBAccessor<T, dim, TSpace, TAccessor> {
 private:
   using THandle = VDBHandle<T, dim, TSpace>;
-  using TVec = THandle::TVec;
+  using TCoord = THandle::TCoord;
 
 public:
   VDBAccessor() = default;
@@ -605,8 +605,8 @@ private:
 
 public:
   /// \brief Get or set the value at `cellCoord`.
-  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TVec &cellCoord) const {
-    return handle_.value_AssumeExist(cellCoord);
+  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCoord &cellCoord) const {
+    return handle_.value_AssumeExist(ToVec(cellCoord));
   }
 
 private:
@@ -712,7 +712,6 @@ concept DeviceVDBType = is_device_vdb_v<T>;
 template <vdb::detail::DeviceVDBHandleType THandle, typename F>
 ARIA_KERNEL static void
 KernelLaunchVDBBlock(typename THandle::TBlock block, typename THandle::TCoord cellCoordOffset, F f) {
-  using TVec = typename THandle::TVec;
   using TCoord = typename THandle::TCoord;
   using TBlockLayout = typename THandle::TBlockLayout;
 
@@ -721,7 +720,7 @@ KernelLaunchVDBBlock(typename THandle::TBlock block, typename THandle::TCoord ce
     return;
 
   TCoord cellCoordInBlock = TBlockLayout{}.get_hier_coord(cellIdxInBlock);
-  TVec cellCoord = ToVec(cellCoordOffset + cellCoordInBlock);
+  TCoord cellCoord = cellCoordOffset + cellCoordInBlock;
 
   if (block.storage()->onOff[cellIdxInBlock])
     f(cellCoord);

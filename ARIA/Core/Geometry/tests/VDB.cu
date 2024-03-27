@@ -248,23 +248,25 @@ void Test1DVDBKernels() {
     VDBAccessor writeAccessor = v.writeAccessor();
     VDBAccessor readAccessor = v.readAccessor();
 
-    Launcher(n, [=] ARIA_DEVICE(int i) mutable { allocateWriteAccessor.value(Vec1i{i - nHalf}) = i - nHalf; }).Launch();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      ARIA_ASSERT(allocateWriteAccessor.value(Vec1i{i - nHalf}) == i - nHalf);
+      allocateWriteAccessor.value(make_coord(i - nHalf)) = i - nHalf;
+    }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable {
+      ARIA_ASSERT(allocateWriteAccessor.value(make_coord(i - nHalf)) == i - nHalf);
     }).Launch();
 
-    Launcher(n, [=] ARIA_DEVICE(int i) mutable { writeAccessor.value(Vec1i{i - nHalf}) *= -2; }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { writeAccessor.value(make_coord(i - nHalf)) *= -2; }).Launch();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      ARIA_ASSERT(writeAccessor.value(Vec1i{i - nHalf}) == (i - nHalf) * (-2));
+      ARIA_ASSERT(writeAccessor.value(make_coord(i - nHalf)) == (i - nHalf) * (-2));
     }).Launch();
 
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      ARIA_ASSERT(readAccessor.value(Vec1i{i - nHalf}) == (i - nHalf) * (-2));
+      ARIA_ASSERT(readAccessor.value(make_coord(i - nHalf)) == (i - nHalf) * (-2));
     }).Launch();
 
-    Launcher(v, [=] ARIA_DEVICE(const Vec1i &coord) mutable { writeAccessor.value(coord) += 233; }).Launch();
-    Launcher(v, [=] ARIA_DEVICE(const Vec1i &coord) mutable {
-      ARIA_ASSERT(readAccessor.value(coord) == coord.x() * (-2) + 233);
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int> &coord) mutable { writeAccessor.value(coord) += 233; }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int> &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == get<0>(coord) * (-2) + 233);
     }).Launch();
   }
 
@@ -276,24 +278,24 @@ void Test1DVDBKernels() {
     VDBAccessor readAccessor = v.readAccessor();
 
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      allocateWriteAccessor.value(Vec1i{i - nHalf} * 2) = nHalf - i;
+      allocateWriteAccessor.value(make_coord(i - nHalf) * 2) = nHalf - i;
     }).Launch();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      ARIA_ASSERT(allocateWriteAccessor.value(Vec1i{i - nHalf} * 2) == nHalf - i);
+      ARIA_ASSERT(allocateWriteAccessor.value(make_coord(i - nHalf) * 2) == nHalf - i);
     }).Launch();
 
-    Launcher(n, [=] ARIA_DEVICE(int i) mutable { writeAccessor.value(Vec1i{i - nHalf} * 2) *= -2; }).Launch();
+    Launcher(n, [=] ARIA_DEVICE(int i) mutable { writeAccessor.value(make_coord(i - nHalf) * 2) *= -2; }).Launch();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      ARIA_ASSERT(writeAccessor.value(Vec1i{i - nHalf} * 2) == (nHalf - i) * (-2));
+      ARIA_ASSERT(writeAccessor.value(make_coord(i - nHalf) * 2) == (nHalf - i) * (-2));
     }).Launch();
 
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      ARIA_ASSERT(readAccessor.value(Vec1i{i - nHalf} * 2) == (nHalf - i) * (-2));
+      ARIA_ASSERT(readAccessor.value(make_coord(i - nHalf) * 2) == (nHalf - i) * (-2));
     }).Launch();
 
-    Launcher(v, [=] ARIA_DEVICE(const Vec1i &coord) mutable { writeAccessor.value(coord) -= 233; }).Launch();
-    Launcher(v, [=] ARIA_DEVICE(const Vec1i &coord) mutable {
-      ARIA_ASSERT(readAccessor.value(coord) == coord.x() - 233);
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int> &coord) mutable { writeAccessor.value(coord) -= 233; }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int> &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == get<0>(coord) - 233);
     }).Launch();
   }
 
@@ -330,26 +332,26 @@ void Test2DVDBKernels() {
     VDBAccessor readAccessor = v.readAccessor();
 
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
-      allocateWriteAccessor.value(ToVec(coord)) = layout(coord);
+      allocateWriteAccessor.value(coord) = layout(coord);
     }).Launch();
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
-      ARIA_ASSERT(allocateWriteAccessor.value(ToVec(coord)) == layout(coord));
+      ARIA_ASSERT(allocateWriteAccessor.value(coord) == layout(coord));
     }).Launch();
 
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
-      writeAccessor.value(ToVec(coord)) *= -1;
+      writeAccessor.value(coord) *= -1;
     }).Launch();
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
-      ARIA_ASSERT(writeAccessor.value(ToVec(coord)) == -layout(coord));
+      ARIA_ASSERT(writeAccessor.value(coord) == -layout(coord));
     }).Launch();
 
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
-      ARIA_ASSERT(readAccessor.value(ToVec(coord)) == -layout(coord));
+      ARIA_ASSERT(readAccessor.value(coord) == -layout(coord));
     }).Launch();
 
-    Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable { writeAccessor.value(coord) += 233; }).Launch();
-    Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable {
-      ARIA_ASSERT(readAccessor.value(coord) == -layout(ToCoord(coord)) + 233);
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable { writeAccessor.value(coord) += 233; }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == -layout(coord) + 233);
     }).Launch();
   }
 
@@ -362,30 +364,30 @@ void Test2DVDBKernels() {
 
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
       if ((get<0>(coord) + get<1>(coord)) % 2 == 0)
-        allocateWriteAccessor.value(ToVec(coord)) = layout(coord);
+        allocateWriteAccessor.value(coord) = layout(coord);
     }).Launch();
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
       if ((get<0>(coord) + get<1>(coord)) % 2 == 0)
-        ARIA_ASSERT(allocateWriteAccessor.value(ToVec(coord)) == layout(coord));
+        ARIA_ASSERT(allocateWriteAccessor.value(coord) == layout(coord));
     }).Launch();
 
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
       if ((get<0>(coord) + get<1>(coord)) % 2 == 0)
-        writeAccessor.value(ToVec(coord)) *= -1;
+        writeAccessor.value(coord) *= -1;
     }).Launch();
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
       if ((get<0>(coord) + get<1>(coord)) % 2 == 0)
-        ARIA_ASSERT(writeAccessor.value(ToVec(coord)) == -layout(coord));
+        ARIA_ASSERT(writeAccessor.value(coord) == -layout(coord));
     }).Launch();
 
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
       if ((get<0>(coord) + get<1>(coord)) % 2 == 0)
-        ARIA_ASSERT(readAccessor.value(ToVec(coord)) == -layout(coord));
+        ARIA_ASSERT(readAccessor.value(coord) == -layout(coord));
     }).Launch();
 
-    Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable { writeAccessor.value(coord) += 233; }).Launch();
-    Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable {
-      ARIA_ASSERT(readAccessor.value(coord) == -layout(ToCoord(coord)) + 233);
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable { writeAccessor.value(coord) += 233; }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == -layout(coord) + 233);
     }).Launch();
   }
 
@@ -410,9 +412,9 @@ void Test2DVDBKernels() {
       ARIA_ASSERT(readAccessor.value({i - nHalf, 0}) == (i - nHalf) * (-2));
     }).Launch();
 
-    Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable { writeAccessor.value(coord) *= (-3); }).Launch();
-    Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable {
-      ARIA_ASSERT(readAccessor.value(coord) == coord.x() * 6);
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable { writeAccessor.value(coord) *= (-3); }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == get<0>(coord) * 6);
     }).Launch();
   }
   { // y.
@@ -435,9 +437,9 @@ void Test2DVDBKernels() {
       ARIA_ASSERT(readAccessor.value({0, i - nHalf}) == (nHalf - i) * (-2));
     }).Launch();
 
-    Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable { writeAccessor.value(coord) *= (-3); }).Launch();
-    Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable {
-      ARIA_ASSERT(readAccessor.value(coord) == coord.y() * (-6));
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable { writeAccessor.value(coord) *= (-3); }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == get<1>(coord) * (-6));
     }).Launch();
   }
 
@@ -474,7 +476,7 @@ void Test2DVDBKernels() {
         ARIA_ASSERT(readAccessor.value({i - nHalf, nHalf - i}) == (i - nHalf) * (-3));
     }).Launch();
 
-    Launcher(v, [=] ARIA_DEVICE(const Vec2i &coord) mutable { writeAccessor.value(coord) *= (-2); }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int> &coord) mutable { writeAccessor.value(coord) *= (-2); }).Launch();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
       ARIA_ASSERT(readAccessor.value({i - nHalf, i - nHalf}) == (i - nHalf) * 6);
       if (i - nHalf != nHalf - i)
@@ -515,26 +517,28 @@ void Test3DVDBKernels() {
     VDBAccessor readAccessor = v.readAccessor();
 
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
-      allocateWriteAccessor.value(ToVec(coord)) = layout(coord);
+      allocateWriteAccessor.value(coord) = layout(coord);
     }).Launch();
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
-      ARIA_ASSERT(allocateWriteAccessor.value(ToVec(coord)) == layout(coord));
+      ARIA_ASSERT(allocateWriteAccessor.value(coord) == layout(coord));
     }).Launch();
 
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
-      writeAccessor.value(ToVec(coord)) *= -1;
+      writeAccessor.value(coord) *= -1;
     }).Launch();
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
-      ARIA_ASSERT(writeAccessor.value(ToVec(coord)) == -layout(coord));
+      ARIA_ASSERT(writeAccessor.value(coord) == -layout(coord));
     }).Launch();
 
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
-      ARIA_ASSERT(readAccessor.value(ToVec(coord)) == -layout(coord));
+      ARIA_ASSERT(readAccessor.value(coord) == -layout(coord));
     }).Launch();
 
-    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable { writeAccessor.value(coord) += 233; }).Launch();
-    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable {
-      ARIA_ASSERT(readAccessor.value(coord) == -layout(ToCoord(coord)) + 233);
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
+      writeAccessor.value(coord) += 233;
+    }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == -layout(coord) + 233);
     }).Launch();
   }
 
@@ -547,30 +551,32 @@ void Test3DVDBKernels() {
 
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
       if ((get<0>(coord) + get<1>(coord) + get<2>(coord)) % 2 == 0)
-        allocateWriteAccessor.value(ToVec(coord)) = layout(coord);
+        allocateWriteAccessor.value(coord) = layout(coord);
     }).Launch();
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
       if ((get<0>(coord) + get<1>(coord) + get<2>(coord)) % 2 == 0)
-        ARIA_ASSERT(allocateWriteAccessor.value(ToVec(coord)) == layout(coord));
+        ARIA_ASSERT(allocateWriteAccessor.value(coord) == layout(coord));
     }).Launch();
 
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
       if ((get<0>(coord) + get<1>(coord) + get<2>(coord)) % 2 == 0)
-        writeAccessor.value(ToVec(coord)) *= -1;
+        writeAccessor.value(coord) *= -1;
     }).Launch();
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
       if ((get<0>(coord) + get<1>(coord) + get<2>(coord)) % 2 == 0)
-        ARIA_ASSERT(writeAccessor.value(ToVec(coord)) == -layout(coord));
+        ARIA_ASSERT(writeAccessor.value(coord) == -layout(coord));
     }).Launch();
 
     Launcher(layout, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
       if ((get<0>(coord) + get<1>(coord) + get<2>(coord)) % 2 == 0)
-        ARIA_ASSERT(readAccessor.value(ToVec(coord)) == -layout(coord));
+        ARIA_ASSERT(readAccessor.value(coord) == -layout(coord));
     }).Launch();
 
-    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable { writeAccessor.value(coord) += 233; }).Launch();
-    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable {
-      ARIA_ASSERT(readAccessor.value(coord) == -layout(ToCoord(coord)) + 233);
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
+      writeAccessor.value(coord) += 233;
+    }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == -layout(coord) + 233);
     }).Launch();
   }
 
@@ -597,9 +603,11 @@ void Test3DVDBKernels() {
       ARIA_ASSERT(readAccessor.value({i - nHalf, 0, 0}) == (i - nHalf) * (-2));
     }).Launch();
 
-    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable { writeAccessor.value(coord) *= (-3); }).Launch();
-    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable {
-      ARIA_ASSERT(readAccessor.value(coord) == coord.x() * 6);
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
+      writeAccessor.value(coord) *= (-3);
+    }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == get<0>(coord) * 6);
     }).Launch();
   }
   { // y.
@@ -624,9 +632,11 @@ void Test3DVDBKernels() {
       ARIA_ASSERT(readAccessor.value({0, i - nHalf, 0}) == (nHalf - i) * (-2));
     }).Launch();
 
-    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable { writeAccessor.value(coord) *= (-3); }).Launch();
-    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable {
-      ARIA_ASSERT(readAccessor.value(coord) == coord.y() * (-6));
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
+      writeAccessor.value(coord) *= (-3);
+    }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == get<1>(coord) * (-6));
     }).Launch();
   }
   { // z.
@@ -651,9 +661,11 @@ void Test3DVDBKernels() {
       ARIA_ASSERT(readAccessor.value({0, 0, i - nHalf}) == (nHalf - i) * (-2));
     }).Launch();
 
-    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable { writeAccessor.value(coord) *= (-3); }).Launch();
-    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable {
-      ARIA_ASSERT(readAccessor.value(coord) == coord.z() * (-6));
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
+      writeAccessor.value(coord) *= (-3);
+    }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
+      ARIA_ASSERT(readAccessor.value(coord) == get<2>(coord) * (-6));
     }).Launch();
   }
 
@@ -744,7 +756,9 @@ void Test3DVDBKernels() {
         ARIA_ASSERT(writeAccessor.value({0, i - nHalf, nHalf - i}) == (i - nHalf) * (-3));
     }).Launch();
 
-    Launcher(v, [=] ARIA_DEVICE(const Vec3i &coord) mutable { writeAccessor.value(coord) *= (-2); }).Launch();
+    Launcher(v, [=] ARIA_DEVICE(const Coord<int, int, int> &coord) mutable {
+      writeAccessor.value(coord) *= (-2);
+    }).Launch();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
       ARIA_ASSERT(writeAccessor.value({i - nHalf, i - nHalf, 0}) == (i - nHalf) * 6);
       if (i - nHalf != nHalf - i)
