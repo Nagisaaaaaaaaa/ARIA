@@ -315,6 +315,23 @@ TEST(Layout, Operators) {
   }
 
   {
+    Coord2 a{2, 7};
+    int b = 5;
+    Coord2 c0 = a + b;
+    Coord2 c1 = a - b;
+    Coord2 c2 = a * b;
+    Coord2 c3 = b + a;
+    Coord2 c4 = b - a;
+    Coord2 c5 = b * a;
+    expectCoord2(c0, 7, 12);
+    expectCoord2(c1, -3, 2);
+    expectCoord2(c2, 10, 35);
+    expectCoord2(c3, 7, 12);
+    expectCoord2(c4, 3, -2);
+    expectCoord2(c5, 10, 35);
+  }
+
+  {
     Coord3 a{2, 7, -5};
     Coord3 b{5, 11, -4};
     Coord3 c = a + b;
@@ -323,6 +340,23 @@ TEST(Layout, Operators) {
     expectCoord3(c, 7, 18, -9);
     expectCoord3(d, -3, -4, -1);
     expectCoord3(e, 10, 77, 20);
+  }
+
+  {
+    Coord3 a{2, 7, -5};
+    int b = 5;
+    Coord3 c0 = a + b;
+    Coord3 c1 = a - b;
+    Coord3 c2 = a * b;
+    Coord3 c3 = b + a;
+    Coord3 c4 = b - a;
+    Coord3 c5 = b * a;
+    expectCoord3(c0, 7, 12, 0);
+    expectCoord3(c1, -3, 2, -10);
+    expectCoord3(c2, 10, 35, -25);
+    expectCoord3(c3, 7, 12, 0);
+    expectCoord3(c4, 3, -2, 10);
+    expectCoord3(c5, 10, 35, -25);
   }
 }
 
