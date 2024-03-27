@@ -56,6 +56,23 @@ namespace ARIA {
 ///   // A `ReadAccessor` can only get and cannot set the values.
 ///   ARIA_ASSERT(readAccessor.value(coord) == layout(coord) * 2);
 /// }).Launch();
+///
+/// // Set some values to "off".
+/// Launcher(volume, [=] ARIA_DEVICE(const VCoord &coord) mutable {
+///   if (get<0>(coord) % 2 == 0)
+///     writeAccessor.value(coord) = Off{}; // This will set the value at `coord` to "off".
+/// }).Launch();
+///
+/// // Check whether the values are "on" or "off".
+/// Launcher(volume, [=] ARIA_DEVICE(const VCoord &coord) {
+///   if (get<0>(coord) % 2 == 0)
+///     ARIA_ASSERT(!readAccessor.IsValueOn(coord)); // Value at this `coord` should be "off".
+///   else
+///     ARIA_ASSERT(readAccessor.IsValueOn(coord)); // Value at this `coord` should be "on".
+/// }).Launch();
+///
+/// // After setting some values to "off", you can shrink to fit the `VDB` to save memory.
+/// volume.ShrinkToFit();
 /// ```
 ///
 /// \todo `HostVDB`s have not been implemented yet.
