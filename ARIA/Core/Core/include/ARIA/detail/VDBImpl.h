@@ -645,6 +645,8 @@ public:
   ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AssumeExist, TVec, TCache);
 
   //
+  //
+  //
 private:
   //! It is considered undefined behavior to get the value which has not been set yet.
   //! So, the getter of `value_AllocateIfNotExist` can be implemented the same as `value_AssumeExist`'s.
@@ -712,8 +714,11 @@ private:
 #endif
   }
 
-  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord,
-                                                                            const TCache &cache) const {
+  //
+  //
+  //
+  // The following methods are similar to the above ones, but will update the cache.
+  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord, const TCache &cache) const {
 #if ARIA_IS_DEVICE_CODE
     // If the given `cellCoord` is located in the cached block.
     if (CellCoord2BlockIdx(cellCoord) == cache.blockIdx) [[likely]] {
@@ -722,14 +727,13 @@ private:
                   "It is considered undefined behavior to get the value which has not been set yet");
       return cache.blockStorage->data[cellIdxInBlock];
     } else
-      return ARIA_PROP_IMPL(value_AllocateIfNotExist)(cellCoord);
+      return ARIA_PROP_IMPL(value_AssumeExist)(cellCoord);
 #else
     ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
 #endif
   }
 
-  ARIA_HOST_DEVICE void
-  ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord, const TCache &cache, const T &value) {
+  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord, const TCache &cache, const T &value) {
 #if ARIA_IS_DEVICE_CODE
     // If the given `cellCoord` is located in the cached block.
     if (CellCoord2BlockIdx(cellCoord) == cache.blockIdx) [[likely]] {
@@ -742,14 +746,13 @@ private:
 
       cache.blockStorage->data[cellIdxInBlock] = value;
     } else
-      ARIA_PROP_IMPL(value_AllocateIfNotExist)(cellCoord, value);
+      ARIA_PROP_IMPL(value_AssumeExist)(cellCoord, value);
 #else
     ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
 #endif
   }
 
-  ARIA_HOST_DEVICE void
-  ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord, const TCache &cache, const Off &off) {
+  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord, const TCache &cache, const Off &off) {
 #if ARIA_IS_DEVICE_CODE
     // If the given `cellCoord` is located in the cached block.
     if (CellCoord2BlockIdx(cellCoord) == cache.blockIdx) [[likely]] {
@@ -764,7 +767,7 @@ private:
       cache.blockStorage->onOff.Clear(cellIdxInBlock);
       cache.blockStorage->data[cellIdxInBlock] = T{};
     } else
-      ARIA_PROP_IMPL(value_AllocateIfNotExist)(cellCoord, off);
+      ARIA_PROP_IMPL(value_AssumeExist)(cellCoord, off);
 #else
     ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
 #endif
