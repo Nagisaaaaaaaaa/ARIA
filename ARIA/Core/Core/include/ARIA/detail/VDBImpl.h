@@ -847,6 +847,9 @@ private:
 #endif
   }
 
+  //
+  //
+  //
 public:
   // Whether the value at `cellCoord` is "on" or "off".
   [[nodiscard]] ARIA_HOST_DEVICE bool IsValueOn(const TVec &cellCoord) const {
@@ -861,6 +864,42 @@ public:
     // If the block exists, get and return the bit from `onOff`.
     auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
     return b->storage()->onOff[cellIdxInBlock];
+#else
+    ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
+#endif
+  }
+
+  [[nodiscard]] ARIA_HOST_DEVICE bool IsValueOn(const TVec &cellCoord, const TCache &cache) const {
+#if ARIA_IS_DEVICE_CODE
+    auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
+    const TBlockStorage *storage = nullptr;
+
+    // If the given `cellCoord` is located in the cached block.
+    if (CellCoord2BlockIdx(cellCoord) == cache.blockIdx) [[likely]] {
+      // If the given `cellCoord` is exactly the cached `cellCoord`.
+      if (cache.cellIdxInBlock == cellIdxInBlock) [[likely]]
+        return cache.isValueOn; // For this case, do not need to update cache cell information.
+
+      storage = cache.blockStorage;
+    } else {
+      // Try and get the block.
+      const TBlock *b = block_GetIfExist(cellCoord, cache);
+
+      // If the block does not exist, it is already "off", return false.
+      if (!b)
+        return false; // For this case, do not need to update cache cell information.
+
+      // If the block exists.
+      storage = b->storage();
+    }
+
+    bool isValueOn = storage->onOff[cellIdxInBlock];
+
+    // Cache cell information.
+    cache.cellIdxInBlock = cellIdxInBlock;
+    cache.isValueOn = isValueOn;
+
+    return isValueOn;
 #else
     ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
 #endif
