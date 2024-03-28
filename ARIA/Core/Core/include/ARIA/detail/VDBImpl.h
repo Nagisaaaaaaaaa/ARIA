@@ -2,6 +2,7 @@
 
 #include "ARIA/BitArray.h"
 #include "ARIA/Launcher.h"
+#include "ARIA/Math.h"
 #include "ARIA/MortonCode.h"
 #include "ARIA/Vec.h"
 
@@ -35,6 +36,45 @@ template <typename T, auto dim, typename TSpace>
 class VDB;
 
 //
+template <typename T>
+struct is_vdb : std::false_type {};
+
+template <typename T, auto dim, typename TSpace>
+struct is_vdb<VDB<T, dim, TSpace>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_vdb_v = is_vdb<T>::value;
+
+template <typename T>
+concept VDBType = is_vdb_v<T>;
+
+//
+template <typename T>
+struct is_host_vdb : std::false_type {};
+
+template <typename T, auto dim>
+struct is_host_vdb<VDB<T, dim, SpaceHost>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_host_vdb_v = is_host_vdb<T>::value;
+
+template <typename T>
+concept HostVDBType = is_host_vdb_v<T>;
+
+//
+template <typename T>
+struct is_device_vdb : std::false_type {};
+
+template <typename T, auto dim>
+struct is_device_vdb<VDB<T, dim, SpaceDevice>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_device_vdb_v = is_device_vdb<T>::value;
+
+template <typename T>
+concept DeviceVDBType = is_device_vdb_v<T>;
+
+//
 //
 //
 // A VDB handle is a lowest-level C-like VDB resource manager, which
@@ -51,50 +91,65 @@ class VDB;
 template <typename T, auto dim, typename TSpace>
 class VDBHandle;
 
-// Device VDB handle.
+//
+template <typename T>
+struct is_vdb_handle : std::false_type {};
+
+template <typename T, auto dim, typename TSpace>
+struct is_vdb_handle<VDBHandle<T, dim, TSpace>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_vdb_handle_v = is_vdb_handle<T>::value;
+
+template <typename T>
+concept VDBHandleType = is_vdb_handle_v<T>;
+
+//
+template <typename T>
+struct is_host_vdb_handle : std::false_type {};
+
+template <typename T, auto dim>
+struct is_host_vdb_handle<VDBHandle<T, dim, SpaceHost>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_host_vdb_handle_v = is_host_vdb_handle<T>::value;
+
+template <typename T>
+concept HostVDBHandleType = is_host_vdb_handle_v<T>;
+
+//
+template <typename T>
+struct is_device_vdb_handle : std::false_type {};
+
+template <typename T, auto dim>
+struct is_device_vdb_handle<VDBHandle<T, dim, SpaceDevice>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_device_vdb_handle_v = is_device_vdb_handle<T>::value;
+
+template <typename T>
+concept DeviceVDBHandleType = is_device_vdb_handle_v<T>;
+
+//
+//
+//
+// `VDB` related type and constant definitions.
+// These definitions are not included in `VDBHandle` because
+// we want to use them in other classes, such as `VDBCache`.
+template <typename T, auto dim, typename TSpace>
+class VDBDefinitions;
+
 template <typename T, auto dim_>
-class VDBHandle<T, dim_, SpaceDevice> {
+class VDBDefinitions<T, dim_, SpaceDevice> {
 public:
   using value_type = T;
   static constexpr auto dim = dim_;
   using TSpace = SpaceDevice;
 
-public:
-  // `VDBHandle` is something like (actually not) a pointer.
-  // It is constructed to something like `nullptr` by default.
-  VDBHandle() = default;
-
-  // Like pointers, copy and move are trivial.
-  ARIA_COPY_MOVE_ABILITY(VDBHandle, default, default);
-
-  // Create a `VDBHandle` which points to some resource.
-  [[nodiscard]] static VDBHandle Create() {
-    VDBHandle handle;
-    handle.blocks_ = TBlocks::createDeviceObject(nBlocksMax);
-    return handle;
-  }
-
-  // Destroy the resource which the `VDBHandle` points to.
-  void Destroy() noexcept /*! Actually, exceptions may be thrown here. */ {
-    Launcher(1, [range = blocks_.device_range()] ARIA_DEVICE(size_t i) {
-      // `block.first`  : Code of the block coord, defined by `TCode`.
-      // `block.second` : The block, whose type is `TBlock`.
-      for (auto &block : range) {
-        //! Device memory is dynamically allocated with `new`, so,
-        //! `delete` should be called to free the memory.
-        delete block.second.storage();
-      }
-    }).Launch();
-
-    cuda::device::current::get().synchronize();
-
-    TBlocks::destroyDeviceObject(blocks_);
-  }
-
   //
   //
   //
-private:
+protected:
   // Maximum number of blocks.
   static constexpr size_t nBlocksMax = 512; // TODO: Maybe still too small, who knows.
 
@@ -211,6 +266,104 @@ public:
   //   Key  : Code of the block coord, defined by `TCode`.
   //   Value: The block.
   using TBlocks = stdgpu::unordered_map<uint64, TBlock>;
+};
+
+//
+//
+//
+// Cache for `VDBAccessor`s for faster value accesses.
+template <typename T, auto dim, typename TSpace>
+class VDBCache : public VDBDefinitions<T, dim, TSpace> {
+private:
+  using Base = VDBDefinitions<T, dim, SpaceDevice>;
+
+public:
+  using typename Base::TBlockStorage;
+
+public:
+  // `mutable`s are added here because, just like cache in computers,
+  // this one should also be mutable even when `const` is specified.
+
+  // Block information.
+  mutable uint64 blockIdx = maximum<uint64>;
+  mutable TBlockStorage *blockStorage = nullptr;
+
+  // Cell information.
+  mutable int cellIdxInBlock = 0;
+  mutable bool isValueOn = false;
+};
+
+//
+//
+//
+// Device VDB handle.
+template <typename T, auto dim_>
+class VDBHandle<T, dim_, SpaceDevice> : public VDBDefinitions<T, dim_, SpaceDevice> {
+private:
+  using Base = VDBDefinitions<T, dim_, SpaceDevice>;
+
+public:
+  // clang-format off
+  using typename Base::value_type;
+  using Base::dim;
+  using typename Base::TSpace;
+  // clang-format on
+
+public:
+  // `VDBHandle` is something like (actually not) a pointer.
+  // It is constructed to something like `nullptr` by default.
+  VDBHandle() = default;
+
+  // Like pointers, copy and move are trivial.
+  ARIA_COPY_MOVE_ABILITY(VDBHandle, default, default);
+
+  // Create a `VDBHandle` which points to some resource.
+  [[nodiscard]] static VDBHandle Create() {
+    VDBHandle handle;
+    handle.blocks_ = TBlocks::createDeviceObject(nBlocksMax);
+    return handle;
+  }
+
+  // Destroy the resource which the `VDBHandle` points to.
+  void Destroy() noexcept /*! Actually, exceptions may be thrown here. */ {
+    Launcher(1, [range = blocks_.device_range()] ARIA_DEVICE(size_t i) {
+      // `block.first`  : Code of the block coord, defined by `TCode`.
+      // `block.second` : The block, whose type is `TBlock`.
+      for (auto &block : range) {
+        //! Device memory is dynamically allocated with `new`, so,
+        //! `delete` should be called to free the memory.
+        delete block.second.storage();
+      }
+    }).Launch();
+
+    cuda::device::current::get().synchronize();
+
+    TBlocks::destroyDeviceObject(blocks_);
+  }
+
+  //
+  //
+  //
+private:
+  // clang-format off
+  using Base::nBlocksMax;
+  using Base::nCellsPerBlockDim;
+  using Base::nCellsPerBlock;
+  // clang-format on
+
+public:
+  // clang-format off
+  using typename Base::TVec;
+  using typename Base::TCoord;
+  using typename Base::TCode;
+  using typename Base::TBlockLayout;
+  using typename Base::TBlockStorageOnOff;
+  using typename Base::TBlockStorageData;
+  using typename Base::TBlockStorage;
+  using typename Base::TBlock;
+  using typename Base::TBlocks;
+  using TCache = VDBCache<T, dim, TSpace>;
+  // clang-format on
 
 private:
   // Something like a pointer.
@@ -291,8 +444,8 @@ private:
     return BlockCoord2BlockIdx(CellCoord2BlockCoord(cellCoord));
   }
 
-  [[nodiscard]] ARIA_HOST_DEVICE static uint64 CellCoord2CellIdxInBlock(const TVec &cellCoord) {
-    return TBlockLayout{}(ToCoord(CellCoord2CellCoordInBlock(cellCoord)));
+  [[nodiscard]] ARIA_HOST_DEVICE static auto CellCoord2CellIdxInBlock(const TVec &cellCoord) {
+    return Auto(TBlockLayout{}(ToCoord(CellCoord2CellCoordInBlock(cellCoord))));
   }
 
   //
@@ -374,6 +527,11 @@ public:
 
   ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AssumeExist, TVec);
 
+  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AllocateIfNotExist, TVec, TCache);
+
+  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AssumeExist, TVec, TCache);
+
+  //
 private:
   //! It is considered undefined behavior to get the value which has not been set yet.
   //! So, the getter of `value_AllocateIfNotExist` can be implemented the same as `value_AssumeExist`'s.
@@ -436,6 +594,64 @@ private:
     auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
     b->storage()->onOff.Clear(cellIdxInBlock);
     b->storage()->data[cellIdxInBlock] = T{};
+#else
+    ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
+#endif
+  }
+
+  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord,
+                                                                            const TCache &cache) const {
+#if ARIA_IS_DEVICE_CODE
+    // If the given `cellCoord` is located in the cached block.
+    if (CellCoord2BlockIdx(cellCoord) == cache.blockIdx) [[likely]] {
+      auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
+      ARIA_ASSERT(cache.blockStorage->onOff[cellIdxInBlock],
+                  "It is considered undefined behavior to get the value which has not been set yet");
+      return cache.blockStorage->data[cellIdxInBlock];
+    } else
+      return ARIA_PROP_IMPL(value_AllocateIfNotExist)(cellCoord);
+#else
+    ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
+#endif
+  }
+
+  ARIA_HOST_DEVICE void
+  ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord, const TCache &cache, const T &value) {
+#if ARIA_IS_DEVICE_CODE
+    // If the given `cellCoord` is located in the cached block.
+    if (CellCoord2BlockIdx(cellCoord) == cache.blockIdx) [[likely]] {
+      auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
+
+      // If the given `cellCoord` is not exactly the cached `cellCoord`, or
+      // it's value is not "on".
+      if (cache.cellIdxInBlock != cellIdxInBlock || !cache.isValueOn) [[unlikely]]
+        cache.blockStorage->onOff.Fill(cellIdxInBlock);
+
+      cache.blockStorage->data[cellIdxInBlock] = value;
+    } else
+      ARIA_PROP_IMPL(value_AllocateIfNotExist)(cellCoord, value);
+#else
+    ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
+#endif
+  }
+
+  ARIA_HOST_DEVICE void
+  ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord, const TCache &cache, const Off &off) {
+#if ARIA_IS_DEVICE_CODE
+    // If the given `cellCoord` is located in the cached block.
+    if (CellCoord2BlockIdx(cellCoord) == cache.blockIdx) [[likely]] {
+      auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
+
+      // If the given `cellCoord` is exactly the cached `cellCoord`, and
+      // it's value is not "on".
+      if (cache.cellIdxInBlock == cellIdxInBlock && !cache.isValueOn) [[unlikely]]
+        return;
+
+      // Else, clear the storage.
+      cache.blockStorage->onOff.Clear(cellIdxInBlock);
+      cache.blockStorage->data[cellIdxInBlock] = T{};
+    } else
+      ARIA_PROP_IMPL(value_AllocateIfNotExist)(cellCoord, off);
 #else
     ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
 #endif
@@ -509,47 +725,6 @@ private:
 //
 //
 //
-template <typename T>
-struct is_vdb_handle : std::false_type {};
-
-template <typename T, auto dim, typename TSpace>
-struct is_vdb_handle<VDBHandle<T, dim, TSpace>> : std::true_type {};
-
-template <typename T>
-static constexpr bool is_vdb_handle_v = is_vdb_handle<T>::value;
-
-template <typename T>
-concept VDBHandleType = is_vdb_handle_v<T>;
-
-//
-template <typename T>
-struct is_host_vdb_handle : std::false_type {};
-
-template <typename T, auto dim>
-struct is_host_vdb_handle<VDBHandle<T, dim, SpaceHost>> : std::true_type {};
-
-template <typename T>
-static constexpr bool is_host_vdb_handle_v = is_host_vdb_handle<T>::value;
-
-template <typename T>
-concept HostVDBHandleType = is_host_vdb_handle_v<T>;
-
-//
-template <typename T>
-struct is_device_vdb_handle : std::false_type {};
-
-template <typename T, auto dim>
-struct is_device_vdb_handle<VDBHandle<T, dim, SpaceDevice>> : std::true_type {};
-
-template <typename T>
-static constexpr bool is_device_vdb_handle_v = is_device_vdb_handle<T>::value;
-
-template <typename T>
-concept DeviceVDBHandleType = is_device_vdb_handle_v<T>;
-
-//
-//
-//
 //
 //
 // Accessor policies.
@@ -573,6 +748,7 @@ class VDBAccessor<T, dim, TSpace, TAccessor> {
 private:
   using THandle = VDBHandle<T, dim, TSpace>;
   using TCoord = THandle::TCoord;
+  using TCache = THandle::TCache;
 
 public:
   VDBAccessor() = default;
@@ -589,26 +765,27 @@ public:
   /// \brief Get or set the value at `cellCoord`.
   [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCoord &cellCoord) {
     if constexpr (allocateIfNotExist)
-      return handle_.value_AllocateIfNotExist(ToVec(cellCoord));
+      return handle_.value_AllocateIfNotExist(ToVec(cellCoord), cache_);
     else
-      return handle_.value_AssumeExist(ToVec(cellCoord));
+      return handle_.value_AssumeExist(ToVec(cellCoord), cache_);
   }
 
   /// \brief Get or set the value at `cellCoord`.
   [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCoord &cellCoord) const {
     if constexpr (allocateIfNotExist)
-      return handle_.value_AllocateIfNotExist(ToVec(cellCoord));
+      return handle_.value_AllocateIfNotExist(ToVec(cellCoord), cache_);
     else
-      return handle_.value_AssumeExist(ToVec(cellCoord));
+      return handle_.value_AssumeExist(ToVec(cellCoord), cache_);
   }
 
   /// \brief Whether the value at `cellCoord` is "on" or "off".
   [[nodiscard]] ARIA_HOST_DEVICE bool IsValueOn(const TCoord &cellCoord) const {
-    return handle_.IsValueOn(ToVec(cellCoord));
+    return handle_.IsValueOn(ToVec(cellCoord), cache_);
   }
 
 private:
   THandle handle_;
+  TCache cache_;
 
   static constexpr bool allocateIfNotExist = std::is_same_v<TAccessor, AllocateWrite>;
 };
@@ -620,6 +797,7 @@ class VDBAccessor<T, dim, TSpace, TAccessor> {
 private:
   using THandle = VDBHandle<T, dim, TSpace>;
   using TCoord = THandle::TCoord;
+  using TCache = THandle::TCache;
 
 public:
   VDBAccessor() = default;
@@ -634,16 +812,17 @@ private:
 public:
   /// \brief Get or set the value at `cellCoord`.
   [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCoord &cellCoord) const {
-    return handle_.value_AssumeExist(ToVec(cellCoord));
+    return handle_.value_AssumeExist(ToVec(cellCoord), cache_);
   }
 
   /// \brief Whether the value at `cellCoord` is "on" or "off".
   [[nodiscard]] ARIA_HOST_DEVICE bool IsValueOn(const TCoord &cellCoord) const {
-    return handle_.IsValueOn(ToVec(cellCoord));
+    return handle_.IsValueOn(ToVec(cellCoord), cache_);
   }
 
 private:
   THandle handle_;
+  TCache cache_;
 };
 
 //
@@ -698,53 +877,14 @@ private:
 //
 //
 //
-template <typename T>
-struct is_vdb : std::false_type {};
-
-template <typename T, auto dim, typename TSpace>
-struct is_vdb<VDB<T, dim, TSpace>> : std::true_type {};
-
-template <typename T>
-static constexpr bool is_vdb_v = is_vdb<T>::value;
-
-template <typename T>
-concept VDBType = is_vdb_v<T>;
-
-//
-template <typename T>
-struct is_host_vdb : std::false_type {};
-
-template <typename T, auto dim>
-struct is_host_vdb<VDB<T, dim, SpaceHost>> : std::true_type {};
-
-template <typename T>
-static constexpr bool is_host_vdb_v = is_host_vdb<T>::value;
-
-template <typename T>
-concept HostVDBType = is_host_vdb_v<T>;
-
-//
-template <typename T>
-struct is_device_vdb : std::false_type {};
-
-template <typename T, auto dim>
-struct is_device_vdb<VDB<T, dim, SpaceDevice>> : std::true_type {};
-
-template <typename T>
-static constexpr bool is_device_vdb_v = is_device_vdb<T>::value;
-
-template <typename T>
-concept DeviceVDBType = is_device_vdb_v<T>;
-
-//
-//
-//
 //
 //
 // Launch kernel for each cell coord with value on.
 template <vdb::detail::DeviceVDBHandleType THandle, typename F>
-ARIA_KERNEL static void
-KernelLaunchVDBBlock(typename THandle::TBlock block, typename THandle::TCoord cellCoordOffset, F f) {
+ARIA_KERNEL static void KernelLaunchVDBBlock(uint64 blkIdx,
+                                             typename THandle::TBlockStorage *blockStorage,
+                                             typename THandle::TCoord cellCoordOffset,
+                                             F f) {
   using TCoord = typename THandle::TCoord;
   using TBlockLayout = typename THandle::TBlockLayout;
 
@@ -756,7 +896,7 @@ KernelLaunchVDBBlock(typename THandle::TBlock block, typename THandle::TCoord ce
   TCoord cellCoord = cellCoordOffset + cellCoordInBlock;
 
   if (block.storage()->onOff[cellIdxInBlock])
-    f(cellCoord);
+    f(cellCoord, createACachedAccessorHere);
 }
 
 } // namespace vdb::detail
@@ -792,7 +932,8 @@ public:
       TVec cellCoordOffset = handle_.BlockCoord2CellCoordOffset(blockCoord);
 
       // Launch.
-      Base::Launch(vdb::detail::KernelLaunchVDBBlock<THandle, F>, block.second, ToCoord(cellCoordOffset), f_);
+      Base::Launch(vdb::detail::KernelLaunchVDBBlock<THandle, F>, block.first, block.second.storage(),
+                   ToCoord(cellCoordOffset), f_);
     }
   }
 
