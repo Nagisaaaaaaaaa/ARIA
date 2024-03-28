@@ -281,16 +281,33 @@ public:
   using typename Base::TBlockStorage;
 
 public:
+  ARIA_HOST_DEVICE VDBCache() {
+    ClearBlockInfo();
+    ClearCellInfo();
+  }
+
+public:
   // `mutable`s are added here because, just like cache in computers,
   // this one should also be mutable even when `const` is specified.
 
   // Block information.
-  mutable uint64 blockIdx = maximum<uint64>;
-  mutable TBlockStorage *blockStorage = nullptr;
+  mutable uint64 blockIdx;
+  mutable TBlockStorage *blockStorage;
 
   // Cell information.
-  mutable int cellIdxInBlock = 0;
-  mutable bool isValueOn = false;
+  mutable int cellIdxInBlock;
+  mutable bool isValueOn;
+
+public:
+  void ClearBlockInfo() const {
+    blockIdx = maximum<uint64>;
+    blockStorage = nullptr;
+  }
+
+  void ClearCellInfo() const {
+    cellIdxInBlock = maximum<int>;
+    isValueOn = false;
+  }
 };
 
 //
@@ -511,6 +528,102 @@ private:
     auto it = Auto(blocks_.find(CellCoord2BlockIdx(cellCoord)));
     if (it == blocks_.end())
       return nullptr;
+
+    return &it->second;
+#else
+    ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
+#endif
+  }
+
+  // The following methods are similar to the above ones, but will update the cache.
+  ARIA_HOST_DEVICE TBlock &block_AllocateIfNotExist(const TVec &cellCoord, const TCache &cache) {
+#if ARIA_IS_DEVICE_CODE
+    // Each thread is trying to insert a block with zero storage into the unordered map,
+    // but only one unique thread will succeed.
+    auto res = Auto(blocks_.emplace(CellCoord2BlockIdx(cellCoord), TBlock{}));
+    auto blockIdx = res.first->first;
+    TBlock *block = &res.first->second;
+
+    if (res.second) { // For the unique thread which succeeded in emplacing the block, `block` points to that block.
+      // Allocate the block storage.
+      block->storage() = new TBlockStorage();
+
+      // Mark the storage as ready.
+      block->arrive();
+    } else { // For other threads which failed to emplace the block, `block` points to an undefined memory.
+      // Get reference to the emplaced block.
+      auto it = Auto(blocks_.find(CellCoord2BlockIdx(cellCoord)));
+      blockIdx = it->first;
+      block = &it->second;
+
+      // Wait for the storage being ready.
+      block->wait();
+    }
+
+    // For now, all threads have access to the emplaced block.
+
+    // Cache block information.
+    cache.blockIdx = blockIdx;
+    cache.blockStorage = block->storage();
+
+    // Clear cell information.
+    cache.ClearCellInfo();
+
+    return *block;
+#else
+    ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
+#endif
+  }
+
+  ARIA_HOST_DEVICE const TBlock &block_AssumeExist(const TVec &cellCoord, const TCache &cache) const {
+#if ARIA_IS_DEVICE_CODE
+    // Get reference to the already emplaced block.
+    auto it = Auto(blocks_.find(CellCoord2BlockIdx(cellCoord)));
+
+    // Cache block information.
+    cache.blockIdx = it->first;
+    cache.blockStorage = it->second.storage();
+
+    // Clear cell information.
+    cache.ClearCellInfo();
+
+    return it->second;
+#else
+    ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
+#endif
+  }
+
+  ARIA_HOST_DEVICE const TBlock *block_GetIfExist(const TVec &cellCoord, const TCache &cache) const {
+#if ARIA_IS_DEVICE_CODE
+    auto it = Auto(blocks_.find(CellCoord2BlockIdx(cellCoord)));
+    if (it == blocks_.end())
+      return nullptr;
+
+    // Cache block information.
+    cache.blockIdx = it->first;
+    cache.blockStorage = it->second.storage();
+
+    // Clear cell information.
+    cache.ClearCellInfo();
+
+    return &it->second;
+#else
+    ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
+#endif
+  }
+
+  ARIA_HOST_DEVICE TBlock *block_GetIfExist(const TVec &cellCoord, const TCache &cache) {
+#if ARIA_IS_DEVICE_CODE
+    auto it = Auto(blocks_.find(CellCoord2BlockIdx(cellCoord)));
+    if (it == blocks_.end())
+      return nullptr;
+
+    // Cache block information.
+    cache.blockIdx = it->first;
+    cache.blockStorage = it->second.storage();
+
+    // Clear cell information.
+    cache.ClearCellInfo();
 
     return &it->second;
 #else
