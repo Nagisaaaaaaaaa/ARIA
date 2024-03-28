@@ -720,14 +720,22 @@ private:
   // The following methods are similar to the above ones, but will update the cache.
   [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord, const TCache &cache) const {
 #if ARIA_IS_DEVICE_CODE
+    auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
+    const TBlockStorage *storage = nullptr;
+
     // If the given `cellCoord` is located in the cached block.
-    if (CellCoord2BlockIdx(cellCoord) == cache.blockIdx) [[likely]] {
-      auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
-      ARIA_ASSERT(cache.blockStorage->onOff[cellIdxInBlock],
-                  "It is considered undefined behavior to get the value which has not been set yet");
-      return cache.blockStorage->data[cellIdxInBlock];
-    } else
-      return ARIA_PROP_IMPL(value_AssumeExist)(cellCoord);
+    if (CellCoord2BlockIdx(cellCoord) == cache.blockIdx) [[likely]]
+      storage = cache.blockStorage;
+    else
+      storage = block_AssumeExist(cellCoord, cache).storage();
+
+    // Cache cell information.
+    cache.cellIdxInBlock = cellIdxInBlock;
+    cache.isValueOn = true;
+
+    ARIA_ASSERT(storage->onOff[cellIdxInBlock],
+                "It is considered undefined behavior to get the value which has not been set yet");
+    return storage->data[cellIdxInBlock];
 #else
     ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
 #endif
@@ -735,18 +743,28 @@ private:
 
   ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord, const TCache &cache, const T &value) {
 #if ARIA_IS_DEVICE_CODE
+    auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
+    TBlockStorage *storage = nullptr;
+
     // If the given `cellCoord` is located in the cached block.
     if (CellCoord2BlockIdx(cellCoord) == cache.blockIdx) [[likely]] {
-      auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
+      storage = cache.blockStorage;
 
       // If the given `cellCoord` is not exactly the cached `cellCoord`, or
       // it's value is not "on".
       if (cache.cellIdxInBlock != cellIdxInBlock || !cache.isValueOn) [[unlikely]]
-        cache.blockStorage->onOff.Fill(cellIdxInBlock);
+        storage->onOff.Fill(cellIdxInBlock);
+    } else {
+      storage = block_AssumeExist(cellCoord, cache).storage();
 
-      cache.blockStorage->data[cellIdxInBlock] = value;
-    } else
-      ARIA_PROP_IMPL(value_AssumeExist)(cellCoord, value);
+      storage->onOff.Fill(cellIdxInBlock);
+    }
+
+    // Cache cell information.
+    cache.cellIdxInBlock = cellIdxInBlock;
+    cache.isValueOn = true;
+
+    storage->data[cellIdxInBlock] = value;
 #else
     ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
 #endif
@@ -754,20 +772,36 @@ private:
 
   ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord, const TCache &cache, const Off &off) {
 #if ARIA_IS_DEVICE_CODE
+    auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
+    TBlockStorage *storage = nullptr;
+
     // If the given `cellCoord` is located in the cached block.
     if (CellCoord2BlockIdx(cellCoord) == cache.blockIdx) [[likely]] {
-      auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
-
       // If the given `cellCoord` is exactly the cached `cellCoord`, and
       // it's value is not "on".
       if (cache.cellIdxInBlock == cellIdxInBlock && !cache.isValueOn) [[unlikely]]
-        return;
+        return; // For this case, do not need to update cache cell information.
 
-      // Else, clear the storage.
-      cache.blockStorage->onOff.Clear(cellIdxInBlock);
-      cache.blockStorage->data[cellIdxInBlock] = T{};
-    } else
-      ARIA_PROP_IMPL(value_AssumeExist)(cellCoord, off);
+      storage = cache.blockStorage;
+    } else {
+      // Try and get the block.
+      TBlock *b = block_GetIfExist(cellCoord, cache);
+
+      // If the block does not exist, it is already "off", do nothing and return.
+      if (!b)
+        return; // For this case, do not need to update cache cell information.
+
+      // If the block exists.
+      storage = b->storage();
+    }
+
+    // Cache cell information.
+    cache.cellIdxInBlock = cellIdxInBlock;
+    cache.isValueOn = false;
+
+    // Clear the storage.
+    storage->onOff.Clear(cellIdxInBlock);
+    storage->data[cellIdxInBlock] = T{};
 #else
     ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
 #endif
