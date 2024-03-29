@@ -987,7 +987,14 @@ public:
 private:
   friend class VDB<T, dim, TSpace>;
 
-  // This constructor should only be called by `VDB`.
+  template <vdb::detail::DeviceVDBHandleType UHandle, typename F>
+  friend ARIA_KERNEL void KernelLaunchVDBBlock(UHandle handle,
+                                               uint64 blkIdx,
+                                               typename UHandle::TBlockStorage *blockStorage,
+                                               typename UHandle::TCoord cellCoordOffset,
+                                               F f);
+
+  // This constructor should only be called by the above friends.
   ARIA_HOST_DEVICE explicit VDBAccessor(THandle handle) : handle_(std::move(handle)) {}
 
 public:
@@ -1035,6 +1042,13 @@ public:
 
 private:
   friend class VDB<T, dim, TSpace>;
+
+  template <vdb::detail::DeviceVDBHandleType UHandle, typename F>
+  friend ARIA_KERNEL void KernelLaunchVDBBlock(UHandle handle,
+                                               uint64 blkIdx,
+                                               typename UHandle::TBlockStorage *blockStorage,
+                                               typename UHandle::TCoord cellCoordOffset,
+                                               F f);
 
   ARIA_HOST_DEVICE explicit VDBAccessor(THandle handle) : handle_(std::move(handle)) {}
 
@@ -1110,12 +1124,28 @@ private:
 //
 // Launch kernel for each cell coord with value on.
 template <vdb::detail::DeviceVDBHandleType THandle, typename F>
-ARIA_KERNEL static void KernelLaunchVDBBlock(uint64 blkIdx,
+ARIA_KERNEL static void KernelLaunchVDBBlock(THandle handle,
+                                             uint64 blkIdx,
                                              typename THandle::TBlockStorage *blockStorage,
                                              typename THandle::TCoord cellCoordOffset,
                                              F f) {
+  using T = typename THandle::value_type;
+  static constexpr auto dim = THandle::dim;
+  using TSpace = typename THandle::TSpace;
+
   using TCoord = typename THandle::TCoord;
   using TBlockLayout = typename THandle::TBlockLayout;
+
+  using TAllocateWriteAccessor = VDBAccessor<T, dim, TSpace, AllocateWrite>;
+  using TWriteAccessor = VDBAccessor<T, dim, TSpace, Write>;
+  using TReadAccessor = VDBAccessor<T, dim, TSpace, Read>;
+
+  using TAccessor = std::conditional_t<
+      std::is_invocable_v<F, TCoord>, void,
+      std::conditional_t<
+          std::is_invocable_v<F, TCoord, TAllocateWriteAccessor>, TAllocateWriteAccessor,
+          std::conditional_t<std::is_invocable_v<F, TCoord, TWriteAccessor>, TWriteAccessor,
+                             std::conditional_t<std::is_invocable_v<F, TCoord, TReadAccessor>, TReadAccessor, void>>>>;
 
   int cellIdxInBlock = static_cast<int>(threadIdx.x) + static_cast<int>(blockIdx.x) * static_cast<int>(blockDim.x);
   if (cellIdxInBlock >= cosize_safe_v<TBlockLayout>)
@@ -1124,8 +1154,12 @@ ARIA_KERNEL static void KernelLaunchVDBBlock(uint64 blkIdx,
   TCoord cellCoordInBlock = TBlockLayout{}.get_hier_coord(cellIdxInBlock);
   TCoord cellCoord = cellCoordOffset + cellCoordInBlock;
 
-  if (block.storage()->onOff[cellIdxInBlock])
-    f(cellCoord, createACachedAccessorHere);
+  if constexpr (std::is_void_v<TAccessor>)
+    f(cellCoord);
+  else {
+    TAccessor accessor{handle};
+    f(cellCoord, accessor);
+  }
 }
 
 } // namespace vdb::detail
@@ -1161,7 +1195,7 @@ public:
       TVec cellCoordOffset = handle_.BlockCoord2CellCoordOffset(blockCoord);
 
       // Launch.
-      Base::Launch(vdb::detail::KernelLaunchVDBBlock<THandle, F>, block.first, block.second.storage(),
+      Base::Launch(vdb::detail::KernelLaunchVDBBlock<THandle, F>, handle_, block.first, block.second.storage(),
                    ToCoord(cellCoordOffset), f_);
     }
   }
