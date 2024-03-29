@@ -1158,6 +1158,16 @@ ARIA_KERNEL static void KernelLaunchVDBBlock(THandle handle,
     f(cellCoord);
   else {
     TAccessor accessor{handle};
+    auto &cache = accessor.cache_;
+
+    // Cache block information.
+    cache.blockIdx = blkIdx;
+    cache.blockStorage = blockStorage;
+
+    // Cache cell information.
+    cache.cellIdxInBlock = cellIdxInBlock;
+    cache.isValueOn = true;
+
     f(cellCoord, accessor);
   }
 }
