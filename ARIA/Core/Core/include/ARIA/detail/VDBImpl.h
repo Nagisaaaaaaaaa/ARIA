@@ -541,8 +541,8 @@ private:
     // Each thread is trying to insert a block with zero storage into the unordered map,
     // but only one unique thread will succeed.
     auto res = Auto(blocks_.emplace(CellCoord2BlockIdx(cellCoord), TBlock{}));
-    auto blockIdx = res.first->first;
     TBlock *block = &res.first->second;
+    auto blockIdx = block == nullptr ? 0 : res.first->first;
 
     if (res.second) { // For the unique thread which succeeded in emplacing the block, `block` points to that block.
       // Allocate the block storage.
