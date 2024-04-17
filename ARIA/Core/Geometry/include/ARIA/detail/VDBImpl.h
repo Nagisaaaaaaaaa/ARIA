@@ -1142,12 +1142,18 @@ ARIA_KERNEL static void KernelLaunchVDBBlock(THandle handle,
   using TWriteAccessor = VDBAccessor<T, dim, TSpace, Write>;
   using TReadAccessor = VDBAccessor<T, dim, TSpace, Read>;
 
+  constexpr bool isInvocableWithAllocateWriteAccessor = std::is_invocable_v<F, TCoord, TAllocateWriteAccessor> ||
+                                                        std::is_invocable_v<F, TCoord, TAllocateWriteAccessor &>;
+  constexpr bool isInvocableWithWriteAccessor =
+      std::is_invocable_v<F, TCoord, TWriteAccessor> || std::is_invocable_v<F, TCoord, TWriteAccessor &>;
+  constexpr bool isInvocableWithReadAccessor =
+      std::is_invocable_v<F, TCoord, TReadAccessor> || std::is_invocable_v<F, TCoord, TReadAccessor &>;
+
   using TAccessor = std::conditional_t<
       std::is_invocable_v<F, TCoord>, void,
-      std::conditional_t<
-          std::is_invocable_v<F, TCoord, TAllocateWriteAccessor>, TAllocateWriteAccessor,
-          std::conditional_t<std::is_invocable_v<F, TCoord, TWriteAccessor>, TWriteAccessor,
-                             std::conditional_t<std::is_invocable_v<F, TCoord, TReadAccessor>, TReadAccessor, void>>>>;
+      std::conditional_t<isInvocableWithAllocateWriteAccessor, TAllocateWriteAccessor,
+                         std::conditional_t<isInvocableWithWriteAccessor, TWriteAccessor,
+                                            std::conditional_t<isInvocableWithReadAccessor, TReadAccessor, void>>>>;
 
   int cellIdxInBlock = static_cast<int>(threadIdx.x) + static_cast<int>(blockIdx.x) * static_cast<int>(blockDim.x);
   if (cellIdxInBlock >= cosize_safe_v<TBlockLayout>)
