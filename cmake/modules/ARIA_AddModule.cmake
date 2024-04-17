@@ -133,5 +133,14 @@ function(aria_add_module project_name module_name)
   # For Windows.
   if (WIN32)
     set_target_properties(ARIA-${project_name}-${module_name} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
+
+    # Export all tests to a single test directory so that we can access the test conveniently.
+    # TODO: Ugly implementation is used here because this is the only way to
+    #       make sure that DLLs will always be correctly updated.
+    if (ARIA_BUILD_TESTS)
+      add_custom_command(TARGET ARIA-${project_name}-${module_name} POST_BUILD
+          COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:ARIA-${project_name}-${module_name}> ${CMAKE_BINARY_DIR}/tests
+          COMMAND_EXPAND_LISTS)
+    endif ()
   endif ()
 endfunction()
