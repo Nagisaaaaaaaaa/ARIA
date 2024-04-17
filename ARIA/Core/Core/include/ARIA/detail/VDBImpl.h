@@ -299,12 +299,12 @@ public:
   mutable bool isValueOn;
 
 public:
-  void ClearBlockInfo() const {
+  ARIA_HOST_DEVICE void ClearBlockInfo() const {
     blockIdx = maximum<uint64>;
     blockStorage = nullptr;
   }
 
-  void ClearCellInfo() const {
+  ARIA_HOST_DEVICE void ClearCellInfo() const {
     cellIdxInBlock = maximum<int>;
     isValueOn = false;
   }
@@ -1149,6 +1149,9 @@ ARIA_KERNEL static void KernelLaunchVDBBlock(THandle handle,
 
   int cellIdxInBlock = static_cast<int>(threadIdx.x) + static_cast<int>(blockIdx.x) * static_cast<int>(blockDim.x);
   if (cellIdxInBlock >= cosize_safe_v<TBlockLayout>)
+    return;
+
+  if (!blockStorage->onOff[cellIdxInBlock])
     return;
 
   TCoord cellCoordInBlock = TBlockLayout{}.get_hier_coord(cellIdxInBlock);
