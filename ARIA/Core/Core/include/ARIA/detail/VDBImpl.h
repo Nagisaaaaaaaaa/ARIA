@@ -476,7 +476,8 @@ private:
 #if ARIA_IS_DEVICE_CODE
     // Each thread is trying to insert a block with zero storage into the unordered map,
     // but only one unique thread will succeed.
-    auto res = Auto(blocks_.emplace(CellCoord2BlockIdx(cellCoord), TBlock{}));
+    auto blockIdx = Auto(CellCoord2BlockIdx(cellCoord));
+    auto res = Auto(blocks_.emplace(blockIdx, TBlock{}));
     TBlock *block = &res.first->second;
 
     if (res.second) { // For the unique thread which succeeded in emplacing the block, `block` points to that block.
@@ -487,7 +488,7 @@ private:
       block->arrive();
     } else { // For other threads which failed to emplace the block, `block` points to an undefined memory.
       // Get reference to the emplaced block.
-      block = &blocks_.find(CellCoord2BlockIdx(cellCoord))->second;
+      block = &blocks_.find(blockIdx)->second;
 
       // Wait for the storage being ready.
       block->wait();
@@ -540,9 +541,9 @@ private:
 #if ARIA_IS_DEVICE_CODE
     // Each thread is trying to insert a block with zero storage into the unordered map,
     // but only one unique thread will succeed.
-    auto res = Auto(blocks_.emplace(CellCoord2BlockIdx(cellCoord), TBlock{}));
+    auto blockIdx = Auto(CellCoord2BlockIdx(cellCoord));
+    auto res = Auto(blocks_.emplace(blockIdx, TBlock{}));
     TBlock *block = &res.first->second;
-    auto blockIdx = block == nullptr ? 0 : res.first->first;
 
     if (res.second) { // For the unique thread which succeeded in emplacing the block, `block` points to that block.
       // Allocate the block storage.
@@ -552,9 +553,7 @@ private:
       block->arrive();
     } else { // For other threads which failed to emplace the block, `block` points to an undefined memory.
       // Get reference to the emplaced block.
-      auto it = Auto(blocks_.find(CellCoord2BlockIdx(cellCoord)));
-      blockIdx = it->first;
-      block = &it->second;
+      block = &blocks_.find(blockIdx)->second;
 
       // Wait for the storage being ready.
       block->wait();
@@ -578,10 +577,11 @@ private:
   ARIA_HOST_DEVICE const TBlock &block_AssumeExist(const TVec &cellCoord, const TCache &cache) const {
 #if ARIA_IS_DEVICE_CODE
     // Get reference to the already emplaced block.
-    auto it = Auto(blocks_.find(CellCoord2BlockIdx(cellCoord)));
+    auto blockIdx = Auto(CellCoord2BlockIdx(cellCoord));
+    auto it = Auto(blocks_.find(blockIdx));
 
     // Cache block information.
-    cache.blockIdx = it->first;
+    cache.blockIdx = blockIdx;
     cache.blockStorage = it->second.storage();
 
     // Clear cell information.
@@ -595,12 +595,13 @@ private:
 
   ARIA_HOST_DEVICE const TBlock *block_GetIfExist(const TVec &cellCoord, const TCache &cache) const {
 #if ARIA_IS_DEVICE_CODE
-    auto it = Auto(blocks_.find(CellCoord2BlockIdx(cellCoord)));
+    auto blockIdx = Auto(CellCoord2BlockIdx(cellCoord));
+    auto it = Auto(blocks_.find(blockIdx));
     if (it == blocks_.end())
       return nullptr;
 
     // Cache block information.
-    cache.blockIdx = it->first;
+    cache.blockIdx = blockIdx;
     cache.blockStorage = it->second.storage();
 
     // Clear cell information.
@@ -614,12 +615,13 @@ private:
 
   ARIA_HOST_DEVICE TBlock *block_GetIfExist(const TVec &cellCoord, const TCache &cache) {
 #if ARIA_IS_DEVICE_CODE
-    auto it = Auto(blocks_.find(CellCoord2BlockIdx(cellCoord)));
+    auto blockIdx = Auto(CellCoord2BlockIdx(cellCoord));
+    auto it = Auto(blocks_.find(blockIdx));
     if (it == blocks_.end())
       return nullptr;
 
     // Cache block information.
-    cache.blockIdx = it->first;
+    cache.blockIdx = blockIdx;
     cache.blockStorage = it->second.storage();
 
     // Clear cell information.
