@@ -73,6 +73,13 @@ namespace ARIA {
 ///
 /// // After setting some values to "off", you can shrink to fit the `VDB` to save memory.
 /// volume.ShrinkToFit();
+///
+/// // The `Launcher` can also automatically create accessors for each thread.
+/// // These `Launcher`-generated accessors are initialized with caches (like openvdb and nanovdb), which
+/// // contain information about the per-thread `coord`.
+/// Launcher(volume, [=] ARIA_DEVICE(const VCoord &coord, AllocateWriteAccessor& accessor) { ... }).Launch();
+/// Launcher(volume, [=] ARIA_DEVICE(const VCoord &coord, WriteAccessor& accessor) { ... }).Launch();
+/// Launcher(volume, [=] ARIA_DEVICE(const VCoord &coord, const ReadAccessor& accessor) { ... }).Launch();
 /// ```
 ///
 /// \todo `HostVDB`s have not been implemented yet.
