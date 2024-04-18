@@ -414,12 +414,113 @@ private:
 //
 //
 //
-// Define a method with the given specifiers, name, and arguments types.
-// Eg: ARIA_PYTHON_TYPE_METHOD(const, value); // `T::value() const`.
-//     ARIA_PYTHON_TYPE_METHOD(, value, int); // `T::value(int)`.
+// Define a constructor with the given arguments types.
+// Eg: ARIA_PYTHON_TYPE_CONSTRUCTOR(int);                     // `T::T(int)`.
+//     ARIA_PYTHON_TYPE_CONSTRUCTOR(int, const std::string&); // `T::T(int, const std::string&)`.
 //
 // In order to support dynamic number of arguments types, "macro magics" are used,
 // see the implementation of `ARIA_ASSERT` as a simple example.
+//
+// For 1 parameter.
+#define __ARIA_PYTHON_TYPE_CONSTRUCTOR_PARAMS1(T0)                                                                     \
+  /* Define a constructor will define all its arguments types. */                                                      \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T0>>>>()(module);    \
+  cls.def(py::init<T0>())
+
+// For 2 parameters.
+#define __ARIA_PYTHON_TYPE_CONSTRUCTOR_PARAMS2(T0, T1)                                                                 \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T0>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T1>>>>()(module);    \
+  cls.def(py::init<T0, T1>())
+
+// For 3 parameters...
+#define __ARIA_PYTHON_TYPE_CONSTRUCTOR_PARAMS3(T0, T1, T2)                                                             \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T0>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T1>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T2>>>>()(module);    \
+  cls.def(py::init<T0, T1, T2>())
+
+#define __ARIA_PYTHON_TYPE_CONSTRUCTOR_PARAMS4(T0, T1, T2, T3)                                                         \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T0>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T1>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T2>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T3>>>>()(module);    \
+  cls.def(py::init<T0, T1, T2, T3>())
+
+#define __ARIA_PYTHON_TYPE_CONSTRUCTOR_PARAMS5(T0, T1, T2, T3, T4)                                                     \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T0>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T1>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T2>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T3>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T4>>>>()(module);    \
+  cls.def(py::init<T0, T1, T2, T3, T4>())
+
+#define __ARIA_PYTHON_TYPE_CONSTRUCTOR_PARAMS6(T0, T1, T2, T3, T4, T5)                                                 \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T0>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T1>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T2>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T3>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T4>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T5>>>>()(module);    \
+  cls.def(py::init<T0, T1, T2, T3, T4, T5>())
+
+#define __ARIA_PYTHON_TYPE_CONSTRUCTOR_PARAMS7(T0, T1, T2, T3, T4, T5, T6)                                             \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T0>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T1>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T2>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T3>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T4>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T5>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T6>>>>()(module);    \
+  cls.def(py::init<T0, T1, T2, T3, T4, T5, T6>())
+
+#define __ARIA_PYTHON_TYPE_CONSTRUCTOR_PARAMS8(T0, T1, T2, T3, T4, T5, T6, T7)                                         \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T0>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T1>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T2>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T3>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T4>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T5>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T6>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T7>>>>()(module);    \
+  cls.def(py::init<T0, T1, T2, T3, T4, T5, T6, T7>())
+
+#define __ARIA_PYTHON_TYPE_CONSTRUCTOR_PARAMS9(T0, T1, T2, T3, T4, T5, T6, T7, T8)                                     \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T0>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T1>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T2>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T3>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T4>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T5>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T6>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T7>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T8>>>>()(module);    \
+  cls.def(py::init<T0, T1, T2, T3, T4, T5, T6, T7, T8>())
+
+// For 10 parameters.
+#define __ARIA_PYTHON_TYPE_CONSTRUCTOR_PARAMS10(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9)                                \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T0>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T1>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T2>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T3>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T4>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T5>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T6>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T7>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T8>>>>()(module);    \
+  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T9>>>>()(module);    \
+  cls.def(py::init<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>())
+
+#define __ARIA_PYTHON_TYPE_CONSTRUCTOR(...)                                                                            \
+  __ARIA_EXPAND(                                                                                                       \
+      __ARIA_EXPAND(ARIA_CONCAT(__ARIA_PYTHON_TYPE_CONSTRUCTOR_PARAMS, ARIA_NUM_OF(__VA_ARGS__)))(__VA_ARGS__))
+
+//
+//
+//
+// Define a method with the given specifiers, name, and arguments types.
+// Eg: ARIA_PYTHON_TYPE_METHOD(const, value); // `T::value() const`.
+//     ARIA_PYTHON_TYPE_METHOD(, value, int); // `T::value(int)`.
 //
 // clang-format off
 // For 2 parameters.
