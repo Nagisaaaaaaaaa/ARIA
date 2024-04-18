@@ -6,6 +6,32 @@ namespace ARIA {
 
 namespace {
 
+int add(int x, int y) {
+  return x + y;
+}
+
+float add(float x, float y) {
+  return x + y;
+}
+
+std::vector<int> add(const std::vector<int> &a, const std::vector<int> &b) {
+  size_t size = a.size();
+  ARIA_ASSERT(size == b.size());
+
+  std::vector<int> c(size);
+  for (size_t i = 0; i < size; ++i)
+    c[i] = a[i] + b[i];
+
+  return c;
+}
+
+std::vector<int> add0(const std::vector<int> &a, const std::vector<int> &b) {
+  return add(a, b);
+}
+
+//
+//
+//
 struct ARIATestPython_GrandParent {
   virtual ~ARIATestPython_GrandParent() = default;
 
@@ -44,11 +70,33 @@ struct ARIATestPython_OverloadWithParameters {
 struct ARIATestPython_ManyOverloads {
   using str = std::string;
 
+  ARIATestPython_ManyOverloads() {}
+
+  ARIATestPython_ManyOverloads(const int &v0) {}
+
+  ARIATestPython_ManyOverloads(const int &v0, const str &v1) {}
+
+  ARIATestPython_ManyOverloads(int v0, str v1, int v2) {}
+
+  ARIATestPython_ManyOverloads(int v0, str v1, int v2, str v3) {}
+
+  ARIATestPython_ManyOverloads(int v0, str v1, int v2, str v3, int v4) {}
+
+  ARIATestPython_ManyOverloads(int v0, str v1, int v2, str v3, int v4, str v5) {}
+
+  ARIATestPython_ManyOverloads(int v0, str v1, int v2, str v3, int v4, str v5, int v6) {}
+
+  ARIATestPython_ManyOverloads(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7) {}
+
+  ARIATestPython_ManyOverloads(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8) {}
+
+  ARIATestPython_ManyOverloads(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8, str v9) {}
+
   std::vector<bool> F() const { return {}; }
 
-  std::vector<bool> F(int v0) const { return {}; }
+  std::vector<bool> F(const int &v0) const { return {}; }
 
-  std::vector<bool> F(int v0, str v1) const { return {}; }
+  std::vector<bool> F(const int &v0, const str &v1) const { return {}; }
 
   std::vector<bool> F(int v0, str v1, int v2) const { return {}; }
 
@@ -67,7 +115,85 @@ struct ARIATestPython_ManyOverloads {
   std::vector<bool> F(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8, str v9) const {
     return {};
   }
+
+  static std::vector<bool> G() { return {}; }
+
+  static std::vector<bool> G(const int &v0) { return {}; }
+
+  static std::vector<bool> G(const int &v0, const str &v1) { return {}; }
+
+  static std::vector<bool> G(int v0, str v1, int v2) { return {}; }
+
+  static std::vector<bool> G(int v0, str v1, int v2, str v3) { return {}; }
+
+  static std::vector<bool> G(int v0, str v1, int v2, str v3, int v4) { return {}; }
+
+  static std::vector<bool> G(int v0, str v1, int v2, str v3, int v4, str v5) { return {}; }
+
+  static std::vector<bool> G(int v0, str v1, int v2, str v3, int v4, str v5, int v6) { return {}; }
+
+  static std::vector<bool> G(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7) { return {}; }
+
+  static std::vector<bool> G(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8) { return {}; }
+
+  static std::vector<bool> G(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8, str v9) {
+    return {};
+  }
 };
+
+std::vector<bool> F() {
+  return {};
+}
+
+std::vector<bool> F(const int &v0) {
+  return {};
+}
+
+std::vector<bool> F(const int &v0, const std::string &v1) {
+  return {};
+}
+
+std::vector<bool> F(int v0, std::string v1, int v2) {
+  return {};
+}
+
+std::vector<bool> F(int v0, std::string v1, int v2, std::string v3) {
+  return {};
+}
+
+std::vector<bool> F(int v0, std::string v1, int v2, std::string v3, int v4) {
+  return {};
+}
+
+std::vector<bool> F(int v0, std::string v1, int v2, std::string v3, int v4, std::string v5) {
+  return {};
+}
+
+std::vector<bool> F(int v0, std::string v1, int v2, std::string v3, int v4, std::string v5, int v6) {
+  return {};
+}
+
+std::vector<bool> F(int v0, std::string v1, int v2, std::string v3, int v4, std::string v5, int v6, std::string v7) {
+  return {};
+}
+
+std::vector<bool>
+F(int v0, std::string v1, int v2, std::string v3, int v4, std::string v5, int v6, std::string v7, int v8) {
+  return {};
+}
+
+std::vector<bool> F(int v0,
+                    std::string v1,
+                    int v2,
+                    std::string v3,
+                    int v4,
+                    std::string v5,
+                    int v6,
+                    std::string v7,
+                    int v8,
+                    std::string v9) {
+  return {};
+}
 
 //
 //
@@ -145,9 +271,22 @@ ARIA_PYTHON_TYPE_METHOD(, value, int, double);
 ARIA_PYTHON_TYPE_END;
 
 ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_ManyOverloads);
+//
+ARIA_PYTHON_TYPE_CONSTRUCTOR();
+ARIA_PYTHON_TYPE_CONSTRUCTOR(const int &);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(const int &, const std::string &);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
+//
 ARIA_PYTHON_TYPE_METHOD(const, F);
-ARIA_PYTHON_TYPE_METHOD(const, F, int);
-ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string);
+ARIA_PYTHON_TYPE_METHOD(const, F, const int &);
+ARIA_PYTHON_TYPE_METHOD(const, F, const int &, const std::string &);
 ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int);
 ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int, std::string);
 ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int, std::string, int);
@@ -157,6 +296,33 @@ ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int, std::string, int, std::
 ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int, std::string, int, std::string, int, std::string, int);
 ARIA_PYTHON_TYPE_METHOD(
     const, F, int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
+//
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, const int &);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, const int &, const std::string &);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(
+    G, int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
+//
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, const int &);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, const int &, const std::string &);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, int, std::string, int);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, int, std::string, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, int, std::string, int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(
+    F, int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
+//
 ARIA_PYTHON_TYPE_END;
 
 ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_Object);
@@ -168,12 +334,12 @@ ARIA_PYTHON_TYPE_END;
 ARIA_PYTHON_TYPE_BEGIN(decltype(std::declval<ARIATestPython_Object>().name1()));
 ARIA_PYTHON_TYPE_METHOD(, value);
 ARIA_PYTHON_TYPE_METHOD(, clear);
-ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, std::vector<std::string>);
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, const std::vector<std::string> &);
 ARIA_PYTHON_TYPE_END;
 
 ARIA_PYTHON_TYPE_BEGIN(decltype(std::declval<ARIATestPython_Object>().name2()));
 ARIA_PYTHON_TYPE_METHOD(, value);
-ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, std::vector<std::string>);
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, const std::vector<std::string> &);
 ARIA_PYTHON_TYPE_END;
 
 ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_IntProperty);
@@ -246,7 +412,22 @@ TEST(Python, Function) {
   Python::Dict local{main};
 
   // Define functions.
-  local["add"] = py::cpp_function([](const std::vector<int> &a, std::vector<int> &b) {
+  ARIA_PYTHON_ADD_FUNCTION(main, add, const std::vector<int> &, const std::vector<int> &);
+  ARIA_PYTHON_ADD_FUNCTION(main, add, int, int);
+  ARIA_PYTHON_ADD_FUNCTION(main, add, float, float);
+
+  main.Def("add0", add0).Def("add1", [](const std::vector<int> &a, std::vector<int> &b) {
+    size_t size = a.size();
+    ARIA_ASSERT(size == b.size());
+
+    std::vector<int> c(size);
+    for (size_t i = 0; i < size; ++i)
+      c[i] = a[i] + b[i];
+
+    return c;
+  });
+
+  local["add2"] = py::cpp_function([](const std::vector<int> &a, std::vector<int> &b) {
     size_t size = a.size();
     ARIA_ASSERT(size == b.size());
 
@@ -267,7 +448,9 @@ TEST(Python, Function) {
   // Execute.
   try {
     py::exec("c = add(a, b)\n"
-             "\n",
+             "c0 = add0(a, b)\n"
+             "c1 = add1(a, b)\n"
+             "c2 = add2(a, b)\n",
              py::globals(), local);
   } catch (std::exception &e) {
     fmt::print("{}\n", e.what());
@@ -278,6 +461,21 @@ TEST(Python, Function) {
   EXPECT_EQ(c[0], 5);
   EXPECT_EQ(c[1], 8);
   EXPECT_EQ(c[2], 12);
+
+  auto c0 = local["c0"].Cast<std::vector<int>>();
+  EXPECT_EQ(c[0], c0[0]);
+  EXPECT_EQ(c[1], c0[1]);
+  EXPECT_EQ(c[2], c0[2]);
+
+  auto c1 = local["c1"].Cast<std::vector<int>>();
+  EXPECT_EQ(c[0], c1[0]);
+  EXPECT_EQ(c[1], c1[1]);
+  EXPECT_EQ(c[2], c1[2]);
+
+  auto c2 = local["c2"].Cast<std::vector<int>>();
+  EXPECT_EQ(c[0], c2[0]);
+  EXPECT_EQ(c[1], c2[1]);
+  EXPECT_EQ(c[2], c2[2]);
 }
 
 TEST(Python, Inheritance) {
@@ -436,7 +634,55 @@ TEST(Python, ManyOverloads) {
              "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6) == vector\n"
              "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6, '7') == vector\n"
              "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6, '7', 8) == vector\n"
-             "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6, '7', 8, '9') == vector\n",
+             "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6, '7', 8, '9') == vector\n"
+             "\n"
+             "assert ARIATestPython_ManyOverloads.G() == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0) == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0, '1') == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0, '1', 2) == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3') == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3', 4) == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3', 4, '5') == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3', 4, '5', 6) == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3', 4, '5', 6, '7') == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3', 4, '5', 6, '7', 8) == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3', 4, '5', 6, '7', 8, '9') == vector\n"
+             "\n"
+             "assert F() == vector\n"
+             "assert F(0) == vector\n"
+             "assert F(0, '1') == vector\n"
+             "assert F(0, '1', 2) == vector\n"
+             "assert F(0, '1', 2, '3') == vector\n"
+             "assert F(0, '1', 2, '3', 4) == vector\n"
+             "assert F(0, '1', 2, '3', 4, '5') == vector\n"
+             "assert F(0, '1', 2, '3', 4, '5', 6) == vector\n"
+             "assert F(0, '1', 2, '3', 4, '5', 6, '7') == vector\n"
+             "assert F(0, '1', 2, '3', 4, '5', 6, '7', 8) == vector\n"
+             "assert F(0, '1', 2, '3', 4, '5', 6, '7', 8, '9') == vector\n"
+             "\n"
+             "a0 = ARIATestPython_ManyOverloads()\n"
+             "a1 = ARIATestPython_ManyOverloads(0)\n"
+             "a2 = ARIATestPython_ManyOverloads(0, '1')\n"
+             "a3 = ARIATestPython_ManyOverloads(0, '1', 2)\n"
+             "a4 = ARIATestPython_ManyOverloads(0, '1', 2, '3')\n"
+             "a5 = ARIATestPython_ManyOverloads(0, '1', 2, '3', 4)\n"
+             "a6 = ARIATestPython_ManyOverloads(0, '1', 2, '3', 4, '5')\n"
+             "a7 = ARIATestPython_ManyOverloads(0, '1', 2, '3', 4, '5', 6)\n"
+             "a8 = ARIATestPython_ManyOverloads(0, '1', 2, '3', 4, '5', 6, '7')\n"
+             "a9 = ARIATestPython_ManyOverloads(0, '1', 2, '3', 4, '5', 6, '7', 8)\n"
+             "a10 = ARIATestPython_ManyOverloads(0, '1', 2, '3', 4, '5', 6, '7', 8, '9')\n"
+             "\n"
+             "assert a10.F() == vector\n"
+             "assert a9.F(0) == vector\n"
+             "assert a8.F(0, '1') == vector\n"
+             "assert a7.F(0, '1', 2) == vector\n"
+             "assert a6.F(0, '1', 2, '3') == vector\n"
+             "assert a5.F(0, '1', 2, '3', 4) == vector\n"
+             "assert a4.F(0, '1', 2, '3', 4, '5') == vector\n"
+             "assert a3.F(0, '1', 2, '3', 4, '5', 6) == vector\n"
+             "assert a2.F(0, '1', 2, '3', 4, '5', 6, '7') == vector\n"
+             "assert a1.F(0, '1', 2, '3', 4, '5', 6, '7', 8) == vector\n"
+             "assert a0.F(0, '1', 2, '3', 4, '5', 6, '7', 8, '9') == vector\n",
              py::globals(), local);
   } catch (std::exception &e) {
     fmt::print("{}\n", e.what());

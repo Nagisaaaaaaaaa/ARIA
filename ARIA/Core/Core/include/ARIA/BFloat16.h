@@ -11,7 +11,7 @@
 //
 //
 //
-#include "ARIA/ARIA.h"
+#include "ARIA/Python.h"
 
 #include <cuda/std/cmath>
 #include <cuda/std/limits>

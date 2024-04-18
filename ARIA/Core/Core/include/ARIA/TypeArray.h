@@ -400,7 +400,7 @@ using MakeTypeArray = typename type_array::detail::MakeTypeArray<Types...>::type
 /// \see Loop.h
 template <type_array::detail::ArrayType TArray, typename F>
 ARIA_HOST_DEVICE constexpr void ForEach(F &&f) {
-  ForEach<TArray::size>([&]<size_t i> {
+  ForEach<TArray::size>([&]<auto i>() {
     using T = TArray::template Get<i>;
     f.template operator()<T>();
   });

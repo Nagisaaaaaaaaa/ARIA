@@ -111,4 +111,50 @@ TEST(Float16, Math) {
   TestMathCUDA();
 }
 
+TEST(Float16, Python) {
+  Python::ScopedInterpreter guard{};
+
+  Python::Module main = guard.Import("__main__");
+  Python::Dict local{main};
+
+  float16 a{0.1F};
+  float16 b{0.2F};
+  float16 a_add_b = a + b;
+  float16 a_sub_b = a - b;
+  float16 a_mul_b = a * b;
+  float16 a_div_b = a / b;
+
+  local["a_copy"] = a;
+  local["minusA_copy"] = -a;
+  local["a_add_b"] = a_add_b;
+  local["a_sub_b"] = &a_sub_b;
+  local["a_mul_b"] = a_mul_b;
+  local["a_div_b"] = &a_div_b;
+
+  try {
+    py::exec("a = float16(0.1)\n"
+             "b = float16(0.2)\n"
+             "c = float16(233)\n"
+             "\n"
+             "assert a < b\n"
+             "assert b > a\n"
+             "assert a <= b\n"
+             "assert b >= a\n"
+             "assert +a == a_copy\n"
+             "assert -a == minusA_copy\n"
+             "assert a + b == a_add_b\n"
+             "assert a - b == a_sub_b\n"
+             "assert a * b == a_mul_b\n"
+             "assert a / b == a_div_b\n"
+             "\n"
+             "assert abs(-a) == a\n"
+             "assert max(a, b) == b\n"
+             "assert min(a, b) == a\n",
+             py::globals(), local);
+  } catch (std::exception &e) {
+    fmt::print("{}\n", e.what());
+    EXPECT_FALSE(true);
+  }
+}
+
 } // namespace ARIA

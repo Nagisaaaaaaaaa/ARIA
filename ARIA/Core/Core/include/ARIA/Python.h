@@ -173,6 +173,40 @@ using python::detail::Dict;
 //
 //
 //
+/// \brief Define a constructor for the given type or template.
+///
+/// \example ```cpp
+/// class Object {
+/// public:
+///   Object() { ... }
+///   explicit Object(const std::string& name) { ... }
+/// };
+///
+/// template <typename T, auto size>
+/// class Vec {
+/// public:
+///   using value_type = T;
+///
+///   Vec() { ... }
+///   explicit Vec(const value_type& v) { ... }
+/// }
+///
+/// ARIA_PYTHON_TYPE_BEGIN(Object);
+/// ARIA_PYTHON_TYPE_CONSTRUCTOR(); // The zero-argument constructor.
+/// ARIA_PYTHON_TYPE_CONSTRUCTOR(const std::string&);
+/// ARIA_PYTHON_TYPE_END;
+///
+/// ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(Vec);
+/// ARIA_PYTHON_TYPE_CONSTRUCTOR(); // The zero-argument constructor.
+/// // Here, `T` is a place holder equals to the instantiated template type, that is, `Vec<T, size>`.
+/// ARIA_PYTHON_TYPE_CONSTRUCTOR(const T::value_type&);
+/// ARIA_PYTHON_TYPE_END;
+/// ```
+#define ARIA_PYTHON_TYPE_CONSTRUCTOR /* (parameters...) */ __ARIA_PYTHON_TYPE_CONSTRUCTOR
+
+//
+//
+//
 /// \brief Define a method for the given type or template.
 ///
 /// \example ```cpp
@@ -185,7 +219,7 @@ using python::detail::Dict;
 /// class Vec {
 /// public:
 ///   void Normalize() { ... }
-///   Vec<T, size> Dot(const Vec<T, size>& others) const { ... }
+///   T Dot(const Vec& others) const { ... }
 /// };
 ///
 /// ARIA_PYTHON_TYPE_BEGIN(Object);
@@ -195,10 +229,31 @@ using python::detail::Dict;
 /// ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(Vec);
 /// ARIA_PYTHON_TYPE_METHOD(, Normalize);
 /// // Here, `T` is a place holder equals to the instantiated template type, that is, `Vec<T, size>`.
-/// ARIA_PYTHON_TYPE_METHOD(const, Dot, T);
+/// ARIA_PYTHON_TYPE_METHOD(const, Dot, const T&);
 /// ARIA_PYTHON_TYPE_END;
 /// ```
 #define ARIA_PYTHON_TYPE_METHOD /* (specifiers, name, parameters...) */ __ARIA_PYTHON_TYPE_METHOD
+
+//
+//
+//
+/// \brief Define a static member function for the given type or template.
+///
+/// \example ```cpp
+/// template <typename T, auto size>
+/// class Vec {
+/// public:
+///   static Vec Zero() { ... }
+///   static T Dot(const Vec& x, const Vec& y) { ... }
+/// };
+///
+/// ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(Vec);
+/// ARIA_PYTHON_TYPE_STATIC_FUNCTION(Zero);
+/// // Here, `T` is a place holder equals to the instantiated template type, that is, `Vec<T, size>`.
+/// ARIA_PYTHON_TYPE_STATIC_FUNCTION(Dot, const T&, const T&);
+/// ARIA_PYTHON_TYPE_END;
+/// ```
+#define ARIA_PYTHON_TYPE_STATIC_FUNCTION /* (name, parameters...) */ __ARIA_PYTHON_TYPE_STATIC_FUNCTION
 
 //
 //
@@ -217,6 +272,7 @@ using python::detail::Dict;
 /// ARIA_PYTHON_TYPE_BEGIN(Object);
 /// ARIA_PYTHON_TYPE_PROPERTY(name);
 /// ARIA_PYTHON_TYPE_END;
+/// ```
 #define ARIA_PYTHON_TYPE_PROPERTY(name) __ARIA_PYTHON_TYPE_PROPERTY(name)
 
 //
@@ -235,6 +291,7 @@ using python::detail::Dict;
 /// ARIA_PYTHON_TYPE_BEGIN(Object);
 /// ARIA_PYTHON_TYPE_READONLY_PROPERTY(name);
 /// ARIA_PYTHON_TYPE_END;
+/// ```
 #define ARIA_PYTHON_TYPE_READONLY_PROPERTY(name) __ARIA_PYTHON_TYPE_READONLY_PROPERTY(name)
 
 //
@@ -273,6 +330,25 @@ using python::detail::Dict;
 //
 //
 //
+/// \brief Define an external function for the given type or template.
+///
+/// \example ```cpp
+/// template <typename T, auto size>
+/// class Vec { ... };
+///
+/// template <typename T, auto size>
+/// Vec abs(const Vec& x) { ... }
+///
+/// ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(Vec);
+/// // Here, `T` is a place holder equals to the instantiated template type, that is, `Vec<T, size>`.
+/// ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(abs, const T&);
+/// ARIA_PYTHON_TYPE_END;
+/// ```
+#define ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION /* (name, parameters...) */ __ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION
+
+//
+//
+//
 /// \brief Finish the definition of how a C++ class looks like in Python.
 /// This macro should be used together with `ARIA_PYTHON_TYPE_BEGIN`.
 ///
@@ -304,5 +380,22 @@ using python::detail::Dict;
 /// EXPECT_TRUE(main.HasType<std::vector<int>>());
 /// ```
 #define ARIA_PYTHON_ADD_TYPE /* (type) or (type, module) */ __ARIA_PYTHON_ADD_TYPE
+
+//
+//
+//
+/// \brief Manually define the given function in Python.
+///
+/// \example ```cpp
+/// Python::ScopedInterpreter interpreter{};
+/// Python::Module main = interpreter.Import("__main__");
+///
+/// // Define the following `abs` for module `main`.
+/// ARIA_PYTHON_ADD_FUNCTION(main, abs, int);
+/// ARIA_PYTHON_ADD_FUNCTION(main, abs, int64);
+/// ARIA_PYTHON_ADD_FUNCTION(main, abs, float);
+/// ARIA_PYTHON_ADD_FUNCTION(main, abs, double);
+/// ```
+#define ARIA_PYTHON_ADD_FUNCTION /* (module, name, parameters...) */ __ARIA_PYTHON_ADD_FUNCTION
 
 } // namespace ARIA
