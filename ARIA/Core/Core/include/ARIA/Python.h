@@ -173,6 +173,40 @@ using python::detail::Dict;
 //
 //
 //
+/// \brief Define a constructor for the given type or template.
+///
+/// \example ```cpp
+/// class Object {
+/// public:
+///   Object() { ... }
+///   explicit Object(const std::string& name) { ... }
+/// };
+///
+/// template <typename T, auto size>
+/// class Vec {
+/// public:
+///   using value_type = T;
+///
+///   Vec() { ... }
+///   explicit Vec(const value_type& v) { ... }
+/// }
+///
+/// ARIA_PYTHON_TYPE_BEGIN(Object);
+/// ARIA_PYTHON_TYPE_CONSTRUCTOR(); // The zero-argument constructor.
+/// ARIA_PYTHON_TYPE_CONSTRUCTOR(const std::string&);
+/// ARIA_PYTHON_TYPE_END;
+///
+/// ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(Vec);
+/// ARIA_PYTHON_TYPE_CONSTRUCTOR(); // The zero-argument constructor.
+/// // Here, `T` is a place holder equals to the instantiated template type, that is, `Vec<T, size>`.
+/// ARIA_PYTHON_TYPE_CONSTRUCTOR(const T::value_type&);
+/// ARIA_PYTHON_TYPE_END;
+/// ```
+#define ARIA_PYTHON_TYPE_CONSTRUCTOR /* (parameters...) */ __ARIA_PYTHON_TYPE_CONSTRUCTOR
+
+//
+//
+//
 /// \brief Define a method for the given type or template.
 ///
 /// \example ```cpp
@@ -195,7 +229,7 @@ using python::detail::Dict;
 /// ARIA_PYTHON_TEMPLATE_TYPE_BEGIN(Vec);
 /// ARIA_PYTHON_TYPE_METHOD(, Normalize);
 /// // Here, `T` is a place holder equals to the instantiated template type, that is, `Vec<T, size>`.
-/// ARIA_PYTHON_TYPE_METHOD(const, Dot, T);
+/// ARIA_PYTHON_TYPE_METHOD(const, Dot, const T&);
 /// ARIA_PYTHON_TYPE_END;
 /// ```
 #define ARIA_PYTHON_TYPE_METHOD /* (specifiers, name, parameters...) */ __ARIA_PYTHON_TYPE_METHOD
