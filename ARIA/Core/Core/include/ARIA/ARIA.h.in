@@ -17,6 +17,18 @@
 
 namespace ARIA {
 
+/// \brief Always use `int8` instead of `char`.
+using int8 = int8_t;
+
+/// \brief Always use `uint8` instead of `unsigned char`.
+using uint8 = uint8_t;
+
+/// \brief Always use `int16` instead of `short`.
+using int16 = int16_t;
+
+/// \brief Always use `uint16` instead of `unsigned short`.
+using uint16 = uint16_t;
+
 /// \brief Always use `uint` instead of `unsigned`.
 using uint = uint32_t;
 
@@ -26,6 +38,8 @@ using int64 = int64_t;
 /// \brief Always use `uint64` instead of `uint64_t`.
 using uint64 = uint64_t;
 
+static_assert(sizeof(int8) == sizeof(uint8), "Size of `int8` and `uint8` should be the same");
+static_assert(sizeof(int16) == sizeof(uint16), "Size of `int16` and `uint16` should be the same");
 static_assert(sizeof(int) == sizeof(uint), "Size of `int` and `uint` should be the same");
 static_assert(sizeof(int64) == sizeof(uint64), "Size of `int64` and `uint64` should be the same");
 
