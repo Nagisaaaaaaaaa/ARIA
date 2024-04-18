@@ -135,7 +135,7 @@ template <typename T>
 // define the C++ type `T` in the given Python module.
 template <typename T>
 struct __ARIAPython_RecursivelyDefinePythonType {
-  // void operator()(const Module &module) {}
+  // void operator()(Module &module) {}
 };
 
 //
@@ -222,7 +222,7 @@ private:
 // Specialization for function types.
 template <python::detail::function TFunction>
 struct __ARIAPython_RecursivelyDefinePythonType<TFunction> {
-  void operator()(const python::detail::Module &module) {
+  void operator()(python::detail::Module &module) {
     // Define a function will define its return type and all its arguments types.
     ForEach<typename python::detail::is_function<TFunction>::return_and_arguments_types>([&]<typename T>() {
       using TUndecorated = std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>;
@@ -235,7 +235,7 @@ struct __ARIAPython_RecursivelyDefinePythonType<TFunction> {
 // Specialization for method types.
 template <python::detail::method TMethod>
 struct __ARIAPython_RecursivelyDefinePythonType<TMethod> {
-  void operator()(const python::detail::Module &module) {
+  void operator()(python::detail::Module &module) {
     // Define a method will define its return type and all its arguments types.
     ForEach<typename python::detail::is_method<TMethod>::return_and_arguments_types>([&]<typename T>() {
       using TUndecorated = std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>;
@@ -249,7 +249,7 @@ struct __ARIAPython_RecursivelyDefinePythonType<TMethod> {
 template <typename T>
   requires(python::detail::is_python_builtin_type<T>())
 struct __ARIAPython_RecursivelyDefinePythonType<T> {
-  void operator()(const python::detail::Module &module) {
+  void operator()(python::detail::Module &module) {
     // Do nothing for Python-builtin types.
   }
 };
@@ -404,7 +404,7 @@ private:
   /* Specialization for the given type. */                                                                             \
   template <>                                                                                                          \
   struct __ARIAPython_RecursivelyDefinePythonType<TYPE> {                                                              \
-    void operator()(const python::detail::Module &module) {                                                            \
+    void operator()(python::detail::Module &module) {                                                                  \
       namespace py = python::detail::py;                                                                               \
                                                                                                                        \
       /*! Alias to `T`, in order to make it able to use `T` in other macros. */                                        \
@@ -445,7 +445,7 @@ private:
   /* Specialization for the given template. */                                                                         \
   template <typename... Args>                                                                                          \
   struct __ARIAPython_RecursivelyDefinePythonType<TEMPLATE<Args...>> {                                                 \
-    void operator()(const python::detail::Module &module) {                                                            \
+    void operator()(python::detail::Module &module) {                                                                  \
       namespace py = python::detail::py;                                                                               \
                                                                                                                        \
       using T = TEMPLATE<Args...>;                                                                                     \
