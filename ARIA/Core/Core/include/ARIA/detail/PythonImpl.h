@@ -1015,7 +1015,7 @@ using empty_va_args_wrapper_t = typename empty_va_args_wrapper<T>::type;
 
 // Manually add Python functions as dependency for a given class.
 // Eg: ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(add, int, int);
-#define __ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(...) __ARIA_PYTHON_ADD_FUNCTION(module, ...)
+#define __ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(...) __ARIA_EXPAND(__ARIA_PYTHON_ADD_FUNCTION(module, __VA_ARGS__))
 
 //
 //

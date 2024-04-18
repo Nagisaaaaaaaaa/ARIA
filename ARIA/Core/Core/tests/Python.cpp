@@ -10,6 +10,10 @@ int add(int x, int y) {
   return x + y;
 }
 
+float add(float x, float y) {
+  return x + y;
+}
+
 std::vector<int> add(const std::vector<int> &a, const std::vector<int> &b) {
   size_t size = a.size();
   ARIA_ASSERT(size == b.size());
@@ -242,6 +246,8 @@ ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int, std::string, int, std
 ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int, std::string, int, std::string, int, std::string, int);
 ARIA_PYTHON_TYPE_STATIC_FUNCTION(
     G, int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(add, int, int);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(add, float, float);
 ARIA_PYTHON_TYPE_END;
 
 ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_ManyOverloadedConstructors);
@@ -577,7 +583,10 @@ TEST(Python, ManyOverloads) {
              "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3', 4, '5', 6) == vector\n"
              "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3', 4, '5', 6, '7') == vector\n"
              "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3', 4, '5', 6, '7', 8) == vector\n"
-             "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3', 4, '5', 6, '7', 8, '9') == vector\n",
+             "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3', 4, '5', 6, '7', 8, '9') == vector\n"
+             "\n"
+             "a = add(1, 2)\n"
+             "b = add(1.0, 2.0)\n",
              py::globals(), local);
   } catch (std::exception &e) {
     fmt::print("{}\n", e.what());
