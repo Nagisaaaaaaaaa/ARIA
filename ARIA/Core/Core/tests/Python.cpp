@@ -70,6 +70,28 @@ struct ARIATestPython_OverloadWithParameters {
 struct ARIATestPython_ManyOverloads {
   using str = std::string;
 
+  ARIATestPython_ManyOverloads() {}
+
+  ARIATestPython_ManyOverloads(const int &v0) {}
+
+  ARIATestPython_ManyOverloads(const int &v0, const str &v1) {}
+
+  ARIATestPython_ManyOverloads(int v0, str v1, int v2) {}
+
+  ARIATestPython_ManyOverloads(int v0, str v1, int v2, str v3) {}
+
+  ARIATestPython_ManyOverloads(int v0, str v1, int v2, str v3, int v4) {}
+
+  ARIATestPython_ManyOverloads(int v0, str v1, int v2, str v3, int v4, str v5) {}
+
+  ARIATestPython_ManyOverloads(int v0, str v1, int v2, str v3, int v4, str v5, int v6) {}
+
+  ARIATestPython_ManyOverloads(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7) {}
+
+  ARIATestPython_ManyOverloads(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8) {}
+
+  ARIATestPython_ManyOverloads(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8, str v9) {}
+
   std::vector<bool> F() const { return {}; }
 
   std::vector<bool> F(const int &v0) const { return {}; }
@@ -173,33 +195,6 @@ std::vector<bool> F(int v0,
   return {};
 }
 
-struct ARIATestPython_ManyOverloadedConstructors {
-  using str = std::string;
-
-  ARIATestPython_ManyOverloadedConstructors() {}
-
-  ARIATestPython_ManyOverloadedConstructors(const int &v0) {}
-
-  ARIATestPython_ManyOverloadedConstructors(const int &v0, const str &v1) {}
-
-  ARIATestPython_ManyOverloadedConstructors(int v0, str v1, int v2) {}
-
-  ARIATestPython_ManyOverloadedConstructors(int v0, str v1, int v2, str v3) {}
-
-  ARIATestPython_ManyOverloadedConstructors(int v0, str v1, int v2, str v3, int v4) {}
-
-  ARIATestPython_ManyOverloadedConstructors(int v0, str v1, int v2, str v3, int v4, str v5) {}
-
-  ARIATestPython_ManyOverloadedConstructors(int v0, str v1, int v2, str v3, int v4, str v5, int v6) {}
-
-  ARIATestPython_ManyOverloadedConstructors(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7) {}
-
-  ARIATestPython_ManyOverloadedConstructors(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8) {}
-
-  ARIATestPython_ManyOverloadedConstructors(
-      int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8, str v9) {}
-};
-
 //
 //
 //
@@ -276,6 +271,19 @@ ARIA_PYTHON_TYPE_METHOD(, value, int, double);
 ARIA_PYTHON_TYPE_END;
 
 ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_ManyOverloads);
+//
+ARIA_PYTHON_TYPE_CONSTRUCTOR();
+ARIA_PYTHON_TYPE_CONSTRUCTOR(const int &);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(const int &, const std::string &);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
+//
 ARIA_PYTHON_TYPE_METHOD(const, F);
 ARIA_PYTHON_TYPE_METHOD(const, F, const int &);
 ARIA_PYTHON_TYPE_METHOD(const, F, const int &, const std::string &);
@@ -288,6 +296,7 @@ ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int, std::string, int, std::
 ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int, std::string, int, std::string, int, std::string, int);
 ARIA_PYTHON_TYPE_METHOD(
     const, F, int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
+//
 ARIA_PYTHON_TYPE_STATIC_FUNCTION(G);
 ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, const int &);
 ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, const int &, const std::string &);
@@ -300,6 +309,7 @@ ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int, std::string, int, std
 ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int, std::string, int, std::string, int, std::string, int);
 ARIA_PYTHON_TYPE_STATIC_FUNCTION(
     G, int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
+//
 ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F);
 ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, const int &);
 ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, const int &, const std::string &);
@@ -312,20 +322,7 @@ ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, int, std::string, int, std::string, int, s
 ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, int, std::string, int, std::string, int, std::string, int, std::string, int);
 ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(
     F, int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
-ARIA_PYTHON_TYPE_END;
-
-ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_ManyOverloadedConstructors);
-ARIA_PYTHON_TYPE_CONSTRUCTOR();
-ARIA_PYTHON_TYPE_CONSTRUCTOR(const int &);
-ARIA_PYTHON_TYPE_CONSTRUCTOR(const int &, const std::string &);
-ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int);
-ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string);
-ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string, int);
-ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string, int, std::string);
-ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string, int, std::string, int);
-ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string, int, std::string, int, std::string);
-ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string, int, std::string, int, std::string, int);
-ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
+//
 ARIA_PYTHON_TYPE_END;
 
 ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_Object);
@@ -661,36 +658,31 @@ TEST(Python, ManyOverloads) {
              "assert F(0, '1', 2, '3', 4, '5', 6) == vector\n"
              "assert F(0, '1', 2, '3', 4, '5', 6, '7') == vector\n"
              "assert F(0, '1', 2, '3', 4, '5', 6, '7', 8) == vector\n"
-             "assert F(0, '1', 2, '3', 4, '5', 6, '7', 8, '9') == vector\n",
-             py::globals(), local);
-  } catch (std::exception &e) {
-    fmt::print("{}\n", e.what());
-    EXPECT_FALSE(true);
-  }
-}
-
-TEST(Python, ManyOverloadedConstructors) {
-  Python::ScopedInterpreter guard{};
-
-  // Get scope.
-  Python::Module main = guard.Import("__main__");
-  Python::Dict local{main};
-
-  ARIA_PYTHON_ADD_TYPE(ARIATestPython_ManyOverloadedConstructors, main);
-
-  // Execute.
-  try {
-    py::exec("a0 = ARIATestPython_ManyOverloadedConstructors()\n"
-             "a1 = ARIATestPython_ManyOverloadedConstructors(0)\n"
-             "a2 = ARIATestPython_ManyOverloadedConstructors(0, '1')\n"
-             "a3 = ARIATestPython_ManyOverloadedConstructors(0, '1', 2)\n"
-             "a4 = ARIATestPython_ManyOverloadedConstructors(0, '1', 2, '3')\n"
-             "a5 = ARIATestPython_ManyOverloadedConstructors(0, '1', 2, '3', 4)\n"
-             "a6 = ARIATestPython_ManyOverloadedConstructors(0, '1', 2, '3', 4, '5')\n"
-             "a7 = ARIATestPython_ManyOverloadedConstructors(0, '1', 2, '3', 4, '5', 6)\n"
-             "a8 = ARIATestPython_ManyOverloadedConstructors(0, '1', 2, '3', 4, '5', 6, '7')\n"
-             "a9 = ARIATestPython_ManyOverloadedConstructors(0, '1', 2, '3', 4, '5', 6, '7', 8)\n"
-             "a10 = ARIATestPython_ManyOverloadedConstructors(0, '1', 2, '3', 4, '5', 6, '7', 8, '9')\n",
+             "assert F(0, '1', 2, '3', 4, '5', 6, '7', 8, '9') == vector\n"
+             "\n"
+             "a0 = ARIATestPython_ManyOverloads()\n"
+             "a1 = ARIATestPython_ManyOverloads(0)\n"
+             "a2 = ARIATestPython_ManyOverloads(0, '1')\n"
+             "a3 = ARIATestPython_ManyOverloads(0, '1', 2)\n"
+             "a4 = ARIATestPython_ManyOverloads(0, '1', 2, '3')\n"
+             "a5 = ARIATestPython_ManyOverloads(0, '1', 2, '3', 4)\n"
+             "a6 = ARIATestPython_ManyOverloads(0, '1', 2, '3', 4, '5')\n"
+             "a7 = ARIATestPython_ManyOverloads(0, '1', 2, '3', 4, '5', 6)\n"
+             "a8 = ARIATestPython_ManyOverloads(0, '1', 2, '3', 4, '5', 6, '7')\n"
+             "a9 = ARIATestPython_ManyOverloads(0, '1', 2, '3', 4, '5', 6, '7', 8)\n"
+             "a10 = ARIATestPython_ManyOverloads(0, '1', 2, '3', 4, '5', 6, '7', 8, '9')\n"
+             "\n"
+             "assert a10.F() == vector\n"
+             "assert a9.F(0) == vector\n"
+             "assert a8.F(0, '1') == vector\n"
+             "assert a7.F(0, '1', 2) == vector\n"
+             "assert a6.F(0, '1', 2, '3') == vector\n"
+             "assert a5.F(0, '1', 2, '3', 4) == vector\n"
+             "assert a4.F(0, '1', 2, '3', 4, '5') == vector\n"
+             "assert a3.F(0, '1', 2, '3', 4, '5', 6) == vector\n"
+             "assert a2.F(0, '1', 2, '3', 4, '5', 6, '7') == vector\n"
+             "assert a1.F(0, '1', 2, '3', 4, '5', 6, '7', 8) == vector\n"
+             "assert a0.F(0, '1', 2, '3', 4, '5', 6, '7', 8, '9') == vector\n",
              py::globals(), local);
   } catch (std::exception &e) {
     fmt::print("{}\n", e.what());
