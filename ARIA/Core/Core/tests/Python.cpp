@@ -209,12 +209,12 @@ ARIA_PYTHON_TYPE_END;
 ARIA_PYTHON_TYPE_BEGIN(decltype(std::declval<ARIATestPython_Object>().name1()));
 ARIA_PYTHON_TYPE_METHOD(, value);
 ARIA_PYTHON_TYPE_METHOD(, clear);
-ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, std::vector<std::string>);
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, const std::vector<std::string> &);
 ARIA_PYTHON_TYPE_END;
 
 ARIA_PYTHON_TYPE_BEGIN(decltype(std::declval<ARIATestPython_Object>().name2()));
 ARIA_PYTHON_TYPE_METHOD(, value);
-ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, std::vector<std::string>);
+ARIA_PYTHON_TYPE_BINARY_OPERATOR(==, const std::vector<std::string> &);
 ARIA_PYTHON_TYPE_END;
 
 ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_IntProperty);
