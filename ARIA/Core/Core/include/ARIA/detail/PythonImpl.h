@@ -422,9 +422,27 @@ private:
 // see the implementation of `ARIA_ASSERT` as a simple example.
 //
 // For 1 parameter.
+//! It is actually impossible for C/C++ macros to accept "zero argument", that is,
+//! an empty `__VA_ARGS__` does not mean "zero argument",
+//! it actually contains "one argument" (so weird...).
+//!
+//! In order to support default constructors with "zero argument",
+//! this wrapper class is introduced.
+//! Eg: `empty_va_args_wrapper_t<>`  is equals to `int`.
+//!     `empty_va_args_wrapper_t<T>` is equals to `T`.
+template <typename T = int>
+struct empty_va_args_wrapper {
+  using type = T;
+};
+
+template <typename T = int>
+using empty_va_args_wrapper_t = typename empty_va_args_wrapper<T>::type;
+
 #define __ARIA_PYTHON_TYPE_CONSTRUCTOR_PARAMS1(T0)                                                                     \
   /* Define a constructor will define all its arguments types. */                                                      \
-  __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T0>>>>()(module);    \
+  /*! The "zero argument" case is handled here. */                                                                     \
+  __ARIAPython_RecursivelyDefinePythonType<                                                                            \
+      std::remove_const_t<std::remove_pointer_t<std::decay_t<empty_va_args_wrapper_t<T0>>>>>()(module);                \
   cls.def(py::init<T0>())
 
 // For 2 parameters.
@@ -497,7 +515,6 @@ private:
   __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T8>>>>()(module);    \
   cls.def(py::init<T0, T1, T2, T3, T4, T5, T6, T7, T8>())
 
-// For 10 parameters.
 #define __ARIA_PYTHON_TYPE_CONSTRUCTOR_PARAMS10(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9)                                \
   __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T0>>>>()(module);    \
   __ARIAPython_RecursivelyDefinePythonType<std::remove_const_t<std::remove_pointer_t<std::decay_t<T1>>>>()(module);    \
