@@ -33,6 +33,24 @@ inline constexpr bool is_std_pair_or_std_tuple_v = is_std_pair_or_std_tuple<T>::
 //
 //
 //
+// Whether the given type is a function (global function or static member function) type.
+template <typename T>
+struct is_function {
+  static constexpr bool value = false;
+};
+
+template <type_array::detail::NonArrayType Ret, type_array::detail::NonArrayType... Args>
+struct is_function<Ret (*)(Args...)> {
+  static constexpr bool value = true;
+
+  using return_type = Ret;
+  using arguments_types = MakeTypeArray<Args...>;
+  using return_and_arguments_types = MakeTypeArray<return_type, arguments_types>;
+};
+
+//
+//
+//
 // Whether the given type is a method (non-static member function) type.
 template <typename T>
 struct is_method {
