@@ -46,9 +46,9 @@ struct ARIATestPython_ManyOverloads {
 
   std::vector<bool> F() const { return {}; }
 
-  std::vector<bool> F(int v0) const { return {}; }
+  std::vector<bool> F(const int &v0) const { return {}; }
 
-  std::vector<bool> F(int v0, str v1) const { return {}; }
+  std::vector<bool> F(const int &v0, const str &v1) const { return {}; }
 
   std::vector<bool> F(int v0, str v1, int v2) const { return {}; }
 
@@ -74,9 +74,9 @@ struct ARIATestPython_ManyOverloadedConstructors {
 
   ARIATestPython_ManyOverloadedConstructors() {}
 
-  ARIATestPython_ManyOverloadedConstructors(int v0) {}
+  ARIATestPython_ManyOverloadedConstructors(const int &v0) {}
 
-  ARIATestPython_ManyOverloadedConstructors(int v0, str v1) {}
+  ARIATestPython_ManyOverloadedConstructors(const int &v0, const str &v1) {}
 
   ARIATestPython_ManyOverloadedConstructors(int v0, str v1, int v2) {}
 
@@ -173,8 +173,8 @@ ARIA_PYTHON_TYPE_END;
 
 ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_ManyOverloads);
 ARIA_PYTHON_TYPE_METHOD(const, F);
-ARIA_PYTHON_TYPE_METHOD(const, F, int);
-ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string);
+ARIA_PYTHON_TYPE_METHOD(const, F, const int &);
+ARIA_PYTHON_TYPE_METHOD(const, F, const int &, const std::string &);
 ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int);
 ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int, std::string);
 ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int, std::string, int);
@@ -188,8 +188,8 @@ ARIA_PYTHON_TYPE_END;
 
 ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_ManyOverloadedConstructors);
 ARIA_PYTHON_TYPE_CONSTRUCTOR();
-ARIA_PYTHON_TYPE_CONSTRUCTOR(int);
-ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(const int &);
+ARIA_PYTHON_TYPE_CONSTRUCTOR(const int &, const std::string &);
 ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int);
 ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string);
 ARIA_PYTHON_TYPE_CONSTRUCTOR(int, std::string, int, std::string, int);
