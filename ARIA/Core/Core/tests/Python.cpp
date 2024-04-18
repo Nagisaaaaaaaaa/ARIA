@@ -6,7 +6,11 @@ namespace ARIA {
 
 namespace {
 
-std::vector<int> add(const std::vector<int> &a, std::vector<int> &b) {
+int add(int x, int y) {
+  return x + y;
+}
+
+std::vector<int> add(const std::vector<int> &a, const std::vector<int> &b) {
   size_t size = a.size();
   ARIA_ASSERT(size == b.size());
 
@@ -15,6 +19,10 @@ std::vector<int> add(const std::vector<int> &a, std::vector<int> &b) {
     c[i] = a[i] + b[i];
 
   return c;
+}
+
+std::vector<int> add0(const std::vector<int> &a, const std::vector<int> &b) {
+  return add(a, b);
 }
 
 //
@@ -337,7 +345,9 @@ TEST(Python, Function) {
   Python::Dict local{main};
 
   // Define functions.
-  main.Def("add0", add).Def("add1", [](const std::vector<int> &a, std::vector<int> &b) {
+  ARIA_PYTHON_ADD_FUNCTION(main, add, const std::vector<int> &, const std::vector<int> &);
+
+  main.Def("add0", add0).Def("add1", [](const std::vector<int> &a, std::vector<int> &b) {
     size_t size = a.size();
     ARIA_ASSERT(size == b.size());
 
@@ -368,7 +378,8 @@ TEST(Python, Function) {
 
   // Execute.
   try {
-    py::exec("c0 = add0(a, b)\n"
+    py::exec("c = add(a, b)\n"
+             "c0 = add0(a, b)\n"
              "c1 = add1(a, b)\n"
              "c2 = add2(a, b)\n",
              py::globals(), local);
@@ -377,20 +388,25 @@ TEST(Python, Function) {
     EXPECT_FALSE(true);
   }
 
+  auto c = local["c"].Cast<std::vector<int>>();
+  EXPECT_EQ(c[0], 5);
+  EXPECT_EQ(c[1], 8);
+  EXPECT_EQ(c[2], 12);
+
   auto c0 = local["c0"].Cast<std::vector<int>>();
-  EXPECT_EQ(c0[0], 5);
-  EXPECT_EQ(c0[1], 8);
-  EXPECT_EQ(c0[2], 12);
+  EXPECT_EQ(c[0], c0[0]);
+  EXPECT_EQ(c[1], c0[1]);
+  EXPECT_EQ(c[2], c0[2]);
 
   auto c1 = local["c1"].Cast<std::vector<int>>();
-  EXPECT_EQ(c0[0], c1[0]);
-  EXPECT_EQ(c0[1], c1[1]);
-  EXPECT_EQ(c0[2], c1[2]);
+  EXPECT_EQ(c[0], c1[0]);
+  EXPECT_EQ(c[1], c1[1]);
+  EXPECT_EQ(c[2], c1[2]);
 
   auto c2 = local["c2"].Cast<std::vector<int>>();
-  EXPECT_EQ(c0[0], c2[0]);
-  EXPECT_EQ(c0[1], c2[1]);
-  EXPECT_EQ(c0[2], c2[2]);
+  EXPECT_EQ(c[0], c2[0]);
+  EXPECT_EQ(c[1], c2[1]);
+  EXPECT_EQ(c[2], c2[2]);
 }
 
 TEST(Python, Inheritance) {
