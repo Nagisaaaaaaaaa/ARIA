@@ -6,6 +6,20 @@ namespace ARIA {
 
 namespace {
 
+std::vector<int> add(const std::vector<int> &a, std::vector<int> &b) {
+  size_t size = a.size();
+  ARIA_ASSERT(size == b.size());
+
+  std::vector<int> c(size);
+  for (size_t i = 0; i < size; ++i)
+    c[i] = a[i] + b[i];
+
+  return c;
+}
+
+//
+//
+//
 struct ARIATestPython_GrandParent {
   virtual ~ARIATestPython_GrandParent() = default;
 
@@ -287,7 +301,7 @@ TEST(Python, Function) {
   Python::Dict local{main};
 
   // Define functions.
-  main.Def("add0", [](const std::vector<int> &a, std::vector<int> &b) {
+  main.Def("add0", add).Def("add1", [](const std::vector<int> &a, std::vector<int> &b) {
     size_t size = a.size();
     ARIA_ASSERT(size == b.size());
 
@@ -298,7 +312,7 @@ TEST(Python, Function) {
     return c;
   });
 
-  local["add1"] = py::cpp_function([](const std::vector<int> &a, std::vector<int> &b) {
+  local["add2"] = py::cpp_function([](const std::vector<int> &a, std::vector<int> &b) {
     size_t size = a.size();
     ARIA_ASSERT(size == b.size());
 
@@ -319,7 +333,8 @@ TEST(Python, Function) {
   // Execute.
   try {
     py::exec("c0 = add0(a, b)\n"
-             "c1 = add1(a, b)\n",
+             "c1 = add1(a, b)\n"
+             "c2 = add2(a, b)\n",
              py::globals(), local);
   } catch (std::exception &e) {
     fmt::print("{}\n", e.what());
@@ -335,6 +350,11 @@ TEST(Python, Function) {
   EXPECT_EQ(c0[0], c1[0]);
   EXPECT_EQ(c0[1], c1[1]);
   EXPECT_EQ(c0[2], c1[2]);
+
+  auto c2 = local["c2"].Cast<std::vector<int>>();
+  EXPECT_EQ(c0[0], c2[0]);
+  EXPECT_EQ(c0[1], c2[1]);
+  EXPECT_EQ(c0[2], c2[2]);
 }
 
 TEST(Python, Inheritance) {

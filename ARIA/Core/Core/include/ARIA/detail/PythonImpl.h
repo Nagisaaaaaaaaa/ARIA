@@ -146,6 +146,29 @@ public:
     return types_->contains(typeid(TUndecorated).hash_code());
   }
 
+  /// \brief Define a function for this module.
+  ///
+  /// \example ```cpp
+  /// std::vector<int> add(const std::vector<int> &a, std::vector<int> &b) {
+  ///   size_t size = a.size();
+  ///   ARIA_ASSERT(size == b.size());
+  ///
+  ///   std::vector<int> c(size);
+  ///   for (size_t i = 0; i < size; ++i)
+  ///     c[i] = a[i] + b[i];
+  ///
+  ///   return c;
+  /// }
+  ///
+  /// module.Def("add0", add)
+  ///       .Def("add1", [](const std::vector<int> &a, std::vector<int> &b) { ... });
+  /// ```
+  template <typename... Ts>
+  Module &Def(Ts &&...ts) {
+    module_.def(std::forward<Ts>(ts)...);
+    return *this;
+  }
+
 private:
   // The constructor is only allowed to be called by `ScopedInterpreter::Import()`.
   friend class ScopedInterpreter;
