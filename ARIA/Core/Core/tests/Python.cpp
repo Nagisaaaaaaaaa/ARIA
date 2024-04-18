@@ -287,7 +287,18 @@ TEST(Python, Function) {
   Python::Dict local{main};
 
   // Define functions.
-  local["add"] = py::cpp_function([](const std::vector<int> &a, std::vector<int> &b) {
+  main.Def("add0", [](const std::vector<int> &a, std::vector<int> &b) {
+    size_t size = a.size();
+    ARIA_ASSERT(size == b.size());
+
+    std::vector<int> c(size);
+    for (size_t i = 0; i < size; ++i)
+      c[i] = a[i] + b[i];
+
+    return c;
+  });
+
+  local["add1"] = py::cpp_function([](const std::vector<int> &a, std::vector<int> &b) {
     size_t size = a.size();
     ARIA_ASSERT(size == b.size());
 
@@ -307,18 +318,23 @@ TEST(Python, Function) {
 
   // Execute.
   try {
-    py::exec("c = add(a, b)\n"
-             "\n",
+    py::exec("c0 = add0(a, b)\n"
+             "c1 = add1(a, b)\n",
              py::globals(), local);
   } catch (std::exception &e) {
     fmt::print("{}\n", e.what());
     EXPECT_FALSE(true);
   }
 
-  auto c = local["c"].Cast<std::vector<int>>();
-  EXPECT_EQ(c[0], 5);
-  EXPECT_EQ(c[1], 8);
-  EXPECT_EQ(c[2], 12);
+  auto c0 = local["c0"].Cast<std::vector<int>>();
+  EXPECT_EQ(c0[0], 5);
+  EXPECT_EQ(c0[1], 8);
+  EXPECT_EQ(c0[2], 12);
+
+  auto c1 = local["c1"].Cast<std::vector<int>>();
+  EXPECT_EQ(c0[0], c1[0]);
+  EXPECT_EQ(c0[1], c1[1]);
+  EXPECT_EQ(c0[2], c1[2]);
 }
 
 TEST(Python, Inheritance) {
