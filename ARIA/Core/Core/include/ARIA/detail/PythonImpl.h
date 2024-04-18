@@ -722,7 +722,7 @@ using empty_va_args_wrapper_t = typename empty_va_args_wrapper<T>::type;
   (*)()>()(module);                                                                                                    \
                                                                                                                        \
   /* Calls `module.Def` to actually define the function in Python. */                                                  \
-  module.Def(#NAME, static_cast<decltype(T::NAME(                                                                      \
+  cls.def_static(#NAME, static_cast<decltype(T::NAME(                                                                  \
   ))                                                                                                                   \
   (*)()>(&T::NAME))
 
@@ -731,7 +731,7 @@ using empty_va_args_wrapper_t = typename empty_va_args_wrapper<T>::type;
   __ARIAPython_RecursivelyDefinePythonType<decltype(T::NAME(                                                           \
   std::declval<T0>()))                                                                                                 \
   (*)(T0)>()(module);                                                                                                  \
-  module.Def(#NAME, static_cast<decltype(T::NAME(                                                                      \
+  cls.def_static(#NAME, static_cast<decltype(T::NAME(                                                                  \
   std::declval<T0>()))                                                                                                 \
   (*)(T0)>(&T::NAME))
 
@@ -740,7 +740,7 @@ using empty_va_args_wrapper_t = typename empty_va_args_wrapper<T>::type;
   __ARIAPython_RecursivelyDefinePythonType<decltype(T::NAME(                                                           \
   std::declval<T0>(), std::declval<T1>()))                                                                             \
   (*)(T0, T1)>()(module);                                                                                              \
-  module.Def(#NAME, static_cast<decltype(T::NAME(                                                                      \
+  cls.def_static(#NAME, static_cast<decltype(T::NAME(                                                                  \
   std::declval<T0>(), std::declval<T1>()))                                                                             \
   (*)(T0, T1)>(&T::NAME))
 
@@ -748,7 +748,7 @@ using empty_va_args_wrapper_t = typename empty_va_args_wrapper<T>::type;
   __ARIAPython_RecursivelyDefinePythonType<decltype(T::NAME(                                                           \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>()))                                                         \
   (*)(T0, T1, T2)>()(module);                                                                                          \
-  module.Def(#NAME, static_cast<decltype(T::NAME(                                                                      \
+  cls.def_static(#NAME, static_cast<decltype(T::NAME(                                                                  \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>()))                                                         \
   (*)(T0, T1, T2)>(&T::NAME))
 
@@ -756,7 +756,7 @@ using empty_va_args_wrapper_t = typename empty_va_args_wrapper<T>::type;
   __ARIAPython_RecursivelyDefinePythonType<decltype(T::NAME(                                                           \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>()))                                     \
   (*)(T0, T1, T2, T3)>()(module);                                                                                      \
-  module.Def(#NAME, static_cast<decltype(T::NAME(                                                                      \
+  cls.def_static(#NAME, static_cast<decltype(T::NAME(                                                                  \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>()))                                     \
   (*)(T0, T1, T2, T3)>(&T::NAME))
 
@@ -764,7 +764,7 @@ using empty_va_args_wrapper_t = typename empty_va_args_wrapper<T>::type;
   __ARIAPython_RecursivelyDefinePythonType<decltype(T::NAME(                                                           \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>()))                 \
   (*)(T0, T1, T2, T3, T4)>()(module);                                                                                  \
-  module.Def(#NAME, static_cast<decltype(T::NAME(                                                                      \
+  cls.def_static(#NAME, static_cast<decltype(T::NAME(                                                                  \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>()))                 \
   (*)(T0, T1, T2, T3, T4)>(&T::NAME))
 
@@ -773,7 +773,7 @@ using empty_va_args_wrapper_t = typename empty_va_args_wrapper<T>::type;
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>()))                                                                                                 \
   (*)(T0, T1, T2, T3, T4, T5)>()(module);                                                                              \
-  module.Def(#NAME, static_cast<decltype(T::NAME(                                                                      \
+  cls.def_static(#NAME, static_cast<decltype(T::NAME(                                                                  \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>()))                                                                                                 \
   (*)(T0, T1, T2, T3, T4, T5)>(&T::NAME))
@@ -783,7 +783,7 @@ using empty_va_args_wrapper_t = typename empty_va_args_wrapper<T>::type;
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>()))                                                                             \
   (*)(T0, T1, T2, T3, T4, T5, T6)>()(module);                                                                          \
-  module.Def(#NAME, static_cast<decltype(T::NAME(                                                                      \
+  cls.def_static(#NAME, static_cast<decltype(T::NAME(                                                                  \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>()))                                                                             \
   (*)(T0, T1, T2, T3, T4, T5, T6)>(&T::NAME))
@@ -793,7 +793,7 @@ using empty_va_args_wrapper_t = typename empty_va_args_wrapper<T>::type;
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>()))                                                         \
   (*)(T0, T1, T2, T3, T4, T5, T6, T7)>()(module);                                                                      \
-  module.Def(#NAME, static_cast<decltype(T::NAME(                                                                      \
+  cls.def_static(#NAME, static_cast<decltype(T::NAME(                                                                  \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>()))                                                         \
   (*)(T0, T1, T2, T3, T4, T5, T6, T7)>(&T::NAME))
@@ -803,7 +803,7 @@ using empty_va_args_wrapper_t = typename empty_va_args_wrapper<T>::type;
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>()))                                     \
   (*)(T0, T1, T2, T3, T4, T5, T6, T7, T8)>()(module);                                                                  \
-  module.Def(#NAME, static_cast<decltype(T::NAME(                                                                      \
+  cls.def_static(#NAME, static_cast<decltype(T::NAME(                                                                  \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>()))                                     \
   (*)(T0, T1, T2, T3, T4, T5, T6, T7, T8)>(&T::NAME))
@@ -813,7 +813,7 @@ using empty_va_args_wrapper_t = typename empty_va_args_wrapper<T>::type;
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>(), std::declval<T9>()))                 \
   (*)(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9)>()(module);                                                              \
-  module.Def(#NAME, static_cast<decltype(T::NAME(                                                                      \
+  cls.def_static(#NAME, static_cast<decltype(T::NAME(                                                                  \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>(), std::declval<T9>()))                 \
   (*)(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9)>(&T::NAME))
