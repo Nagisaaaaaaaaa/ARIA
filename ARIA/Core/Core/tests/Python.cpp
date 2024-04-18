@@ -81,6 +81,30 @@ struct ARIATestPython_ManyOverloads {
   std::vector<bool> F(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8, str v9) const {
     return {};
   }
+
+  static std::vector<bool> G() { return {}; }
+
+  static std::vector<bool> G(const int &v0) { return {}; }
+
+  static std::vector<bool> G(const int &v0, const str &v1) { return {}; }
+
+  static std::vector<bool> G(int v0, str v1, int v2) { return {}; }
+
+  static std::vector<bool> G(int v0, str v1, int v2, str v3) { return {}; }
+
+  static std::vector<bool> G(int v0, str v1, int v2, str v3, int v4) { return {}; }
+
+  static std::vector<bool> G(int v0, str v1, int v2, str v3, int v4, str v5) { return {}; }
+
+  static std::vector<bool> G(int v0, str v1, int v2, str v3, int v4, str v5, int v6) { return {}; }
+
+  static std::vector<bool> G(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7) { return {}; }
+
+  static std::vector<bool> G(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8) { return {}; }
+
+  static std::vector<bool> G(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8, str v9) {
+    return {};
+  }
 };
 
 struct ARIATestPython_ManyOverloadedConstructors {
@@ -198,6 +222,18 @@ ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int, std::string, int, std::
 ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int, std::string, int, std::string, int, std::string, int);
 ARIA_PYTHON_TYPE_METHOD(
     const, F, int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, const int &);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, const int &, const std::string &);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_STATIC_FUNCTION(
+    G, int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
 ARIA_PYTHON_TYPE_END;
 
 ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_ManyOverloadedConstructors);
@@ -513,7 +549,19 @@ TEST(Python, ManyOverloads) {
              "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6) == vector\n"
              "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6, '7') == vector\n"
              "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6, '7', 8) == vector\n"
-             "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6, '7', 8, '9') == vector\n",
+             "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6, '7', 8, '9') == vector\n"
+             "\n"
+             "assert ARIATestPython_ManyOverloads.G() == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0) == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0, '1') == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0, '1', 2) == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3') == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3', 4) == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3', 4, '5') == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3', 4, '5', 6) == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3', 4, '5', 6, '7') == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3', 4, '5', 6, '7', 8) == vector\n"
+             "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3', 4, '5', 6, '7', 8, '9') == vector\n",
              py::globals(), local);
   } catch (std::exception &e) {
     fmt::print("{}\n", e.what());
