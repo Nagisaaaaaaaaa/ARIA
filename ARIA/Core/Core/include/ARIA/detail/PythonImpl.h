@@ -48,6 +48,12 @@ struct is_function<Ret (*)(Args...)> {
   using return_and_arguments_types = MakeTypeArray<return_type, arguments_types>;
 };
 
+template <typename T>
+static constexpr bool is_function_v = is_function<T>::value;
+
+template <typename T>
+concept function = is_function_v<T>;
+
 //
 //
 //
@@ -213,6 +219,19 @@ private:
 //
 //
 //
+// Specialization for function types.
+template <python::detail::function TFunction>
+struct __ARIAPython_RecursivelyDefinePythonType<TFunction> {
+  void operator()(const python::detail::Module &module) {
+    // Define a function will define its return type and all its arguments types.
+    ForEach<typename python::detail::is_function<TFunction>::return_and_arguments_types>([&]<typename T>() {
+      using TUndecorated = std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>;
+
+      __ARIAPython_RecursivelyDefinePythonType<TUndecorated>()(module);
+    });
+  }
+};
+
 // Specialization for method types.
 template <python::detail::method TMethod>
 struct __ARIAPython_RecursivelyDefinePythonType<TMethod> {
