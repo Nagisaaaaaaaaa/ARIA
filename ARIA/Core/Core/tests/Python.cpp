@@ -119,6 +119,60 @@ struct ARIATestPython_ManyOverloads {
   }
 };
 
+std::vector<bool> F() {
+  return {};
+}
+
+std::vector<bool> F(const int &v0) {
+  return {};
+}
+
+std::vector<bool> F(const int &v0, const std::string &v1) {
+  return {};
+}
+
+std::vector<bool> F(int v0, std::string v1, int v2) {
+  return {};
+}
+
+std::vector<bool> F(int v0, std::string v1, int v2, std::string v3) {
+  return {};
+}
+
+std::vector<bool> F(int v0, std::string v1, int v2, std::string v3, int v4) {
+  return {};
+}
+
+std::vector<bool> F(int v0, std::string v1, int v2, std::string v3, int v4, std::string v5) {
+  return {};
+}
+
+std::vector<bool> F(int v0, std::string v1, int v2, std::string v3, int v4, std::string v5, int v6) {
+  return {};
+}
+
+std::vector<bool> F(int v0, std::string v1, int v2, std::string v3, int v4, std::string v5, int v6, std::string v7) {
+  return {};
+}
+
+std::vector<bool>
+F(int v0, std::string v1, int v2, std::string v3, int v4, std::string v5, int v6, std::string v7, int v8) {
+  return {};
+}
+
+std::vector<bool> F(int v0,
+                    std::string v1,
+                    int v2,
+                    std::string v3,
+                    int v4,
+                    std::string v5,
+                    int v6,
+                    std::string v7,
+                    int v8,
+                    std::string v9) {
+  return {};
+}
+
 struct ARIATestPython_ManyOverloadedConstructors {
   using str = std::string;
 
@@ -246,8 +300,18 @@ ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int, std::string, int, std
 ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, int, std::string, int, std::string, int, std::string, int, std::string, int);
 ARIA_PYTHON_TYPE_STATIC_FUNCTION(
     G, int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
-ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(add, int, int);
-ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(add, float, float);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, const int &);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, const int &, const std::string &);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, int, std::string, int);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, int, std::string, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(F, int, std::string, int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(
+    F, int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
 ARIA_PYTHON_TYPE_END;
 
 ARIA_PYTHON_TYPE_BEGIN(ARIATestPython_ManyOverloadedConstructors);
@@ -352,6 +416,8 @@ TEST(Python, Function) {
 
   // Define functions.
   ARIA_PYTHON_ADD_FUNCTION(main, add, const std::vector<int> &, const std::vector<int> &);
+  ARIA_PYTHON_ADD_FUNCTION(main, add, int, int);
+  ARIA_PYTHON_ADD_FUNCTION(main, add, float, float);
 
   main.Def("add0", add0).Def("add1", [](const std::vector<int> &a, std::vector<int> &b) {
     size_t size = a.size();
@@ -585,8 +651,17 @@ TEST(Python, ManyOverloads) {
              "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3', 4, '5', 6, '7', 8) == vector\n"
              "assert ARIATestPython_ManyOverloads.G(0, '1', 2, '3', 4, '5', 6, '7', 8, '9') == vector\n"
              "\n"
-             "a = add(1, 2)\n"
-             "b = add(1.0, 2.0)\n",
+             "assert F() == vector\n"
+             "assert F(0) == vector\n"
+             "assert F(0, '1') == vector\n"
+             "assert F(0, '1', 2) == vector\n"
+             "assert F(0, '1', 2, '3') == vector\n"
+             "assert F(0, '1', 2, '3', 4) == vector\n"
+             "assert F(0, '1', 2, '3', 4, '5') == vector\n"
+             "assert F(0, '1', 2, '3', 4, '5', 6) == vector\n"
+             "assert F(0, '1', 2, '3', 4, '5', 6, '7') == vector\n"
+             "assert F(0, '1', 2, '3', 4, '5', 6, '7', 8) == vector\n"
+             "assert F(0, '1', 2, '3', 4, '5', 6, '7', 8, '9') == vector\n",
              py::globals(), local);
   } catch (std::exception &e) {
     fmt::print("{}\n", e.what());
