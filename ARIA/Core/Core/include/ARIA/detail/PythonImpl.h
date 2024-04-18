@@ -901,110 +901,110 @@ using empty_va_args_wrapper_t = typename empty_va_args_wrapper<T>::type;
 //
 //
 //
-// Manually add Python functions for `module`.
-// Eg: ARIA_PYTHON_ADD_FUNCTION(add, int, int);
+// Manually add Python functions for a given module.
+// Eg: ARIA_PYTHON_ADD_FUNCTION(module, add, int, int);
 //
 // clang-format off
-// For 1 parameter.
-#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS1(NAME)                                                                       \
+// For 2 parameter.
+#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS2(MODULE, NAME)                                                               \
   /* Define a function will define its return type and all its arguments types. */                                     \
   __ARIAPython_RecursivelyDefinePythonType<decltype(NAME(                                                              \
   ))                                                                                                                   \
-  (*)()>()(module);                                                                                                    \
+  (*)()>()(MODULE);                                                                                                    \
                                                                                                                        \
   /* Calls `module.Def` to actually define the function in Python. */                                                  \
-  module.Def(#NAME, static_cast<decltype(NAME(                                                                         \
+  MODULE.Def(#NAME, static_cast<decltype(NAME(                                                                         \
   ))                                                                                                                   \
   (*)()>(&NAME))
 
-// For 2 parameters.
-#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS2(NAME, T0)                                                                   \
+// For 3 parameters.
+#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS3(MODULE, NAME, T0)                                                           \
   __ARIAPython_RecursivelyDefinePythonType<decltype(NAME(                                                              \
   std::declval<T0>()))                                                                                                 \
-  (*)(T0)>()(module);                                                                                                  \
-  module.Def(#NAME, static_cast<decltype(NAME(                                                                         \
+  (*)(T0)>()(MODULE);                                                                                                  \
+  MODULE.Def(#NAME, static_cast<decltype(NAME(                                                                         \
   std::declval<T0>()))                                                                                                 \
   (*)(T0)>(&NAME))
 
-// For 3 parameters...
-#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS3(NAME, T0, T1)                                                               \
+// For 4 parameters...
+#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS4(MODULE, NAME, T0, T1)                                                       \
   __ARIAPython_RecursivelyDefinePythonType<decltype(NAME(                                                              \
   std::declval<T0>(), std::declval<T1>()))                                                                             \
-  (*)(T0, T1)>()(module);                                                                                              \
-  module.Def(#NAME, static_cast<decltype(NAME(                                                                         \
+  (*)(T0, T1)>()(MODULE);                                                                                              \
+  MODULE.Def(#NAME, static_cast<decltype(NAME(                                                                         \
   std::declval<T0>(), std::declval<T1>()))                                                                             \
   (*)(T0, T1)>(&NAME))
 
-#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS4(NAME, T0, T1, T2)                                                           \
+#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS5(MODULE, NAME, T0, T1, T2)                                                   \
   __ARIAPython_RecursivelyDefinePythonType<decltype(NAME(                                                              \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>()))                                                         \
-  (*)(T0, T1, T2)>()(module);                                                                                          \
-  module.Def(#NAME, static_cast<decltype(NAME(                                                                         \
+  (*)(T0, T1, T2)>()(MODULE);                                                                                          \
+  MODULE.Def(#NAME, static_cast<decltype(NAME(                                                                         \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>()))                                                         \
   (*)(T0, T1, T2)>(&NAME))
 
-#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS5(NAME, T0, T1, T2, T3)                                                       \
+#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS6(MODULE, NAME, T0, T1, T2, T3)                                               \
   __ARIAPython_RecursivelyDefinePythonType<decltype(NAME(                                                              \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>()))                                     \
-  (*)(T0, T1, T2, T3)>()(module);                                                                                      \
-  module.Def(#NAME, static_cast<decltype(NAME(                                                                         \
+  (*)(T0, T1, T2, T3)>()(MODULE);                                                                                      \
+  MODULE.Def(#NAME, static_cast<decltype(NAME(                                                                         \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>()))                                     \
   (*)(T0, T1, T2, T3)>(&NAME))
 
-#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS6(NAME, T0, T1, T2, T3, T4)                                                   \
+#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS7(MODULE, NAME, T0, T1, T2, T3, T4)                                           \
   __ARIAPython_RecursivelyDefinePythonType<decltype(NAME(                                                              \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>()))                 \
-  (*)(T0, T1, T2, T3, T4)>()(module);                                                                                  \
-  module.Def(#NAME, static_cast<decltype(NAME(                                                                         \
+  (*)(T0, T1, T2, T3, T4)>()(MODULE);                                                                                  \
+  MODULE.Def(#NAME, static_cast<decltype(NAME(                                                                         \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>()))                 \
   (*)(T0, T1, T2, T3, T4)>(&NAME))
 
-#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS7(NAME, T0, T1, T2, T3, T4, T5)                                               \
+#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS8(MODULE, NAME, T0, T1, T2, T3, T4, T5)                                       \
   __ARIAPython_RecursivelyDefinePythonType<decltype(NAME(                                                              \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>()))                                                                                                 \
-  (*)(T0, T1, T2, T3, T4, T5)>()(module);                                                                              \
-  module.Def(#NAME, static_cast<decltype(NAME(                                                                         \
+  (*)(T0, T1, T2, T3, T4, T5)>()(MODULE);                                                                              \
+  MODULE.Def(#NAME, static_cast<decltype(NAME(                                                                         \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>()))                                                                                                 \
   (*)(T0, T1, T2, T3, T4, T5)>(&NAME))
 
-#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS8(NAME, T0, T1, T2, T3, T4, T5, T6)                                           \
+#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS9(MODULE, NAME, T0, T1, T2, T3, T4, T5, T6)                                   \
   __ARIAPython_RecursivelyDefinePythonType<decltype(NAME(                                                              \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>()))                                                                             \
-  (*)(T0, T1, T2, T3, T4, T5, T6)>()(module);                                                                          \
-  module.Def(#NAME, static_cast<decltype(NAME(                                                                         \
+  (*)(T0, T1, T2, T3, T4, T5, T6)>()(MODULE);                                                                          \
+  MODULE.Def(#NAME, static_cast<decltype(NAME(                                                                         \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>()))                                                                             \
   (*)(T0, T1, T2, T3, T4, T5, T6)>(&NAME))
 
-#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS9(NAME, T0, T1, T2, T3, T4, T5, T6, T7)                                       \
+#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS10(MODULE, NAME, T0, T1, T2, T3, T4, T5, T6, T7)                              \
   __ARIAPython_RecursivelyDefinePythonType<decltype(NAME(                                                              \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>()))                                                         \
-  (*)(T0, T1, T2, T3, T4, T5, T6, T7)>()(module);                                                                      \
-  module.Def(#NAME, static_cast<decltype(NAME(                                                                         \
+  (*)(T0, T1, T2, T3, T4, T5, T6, T7)>()(MODULE);                                                                      \
+  MODULE.Def(#NAME, static_cast<decltype(NAME(                                                                         \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>()))                                                         \
   (*)(T0, T1, T2, T3, T4, T5, T6, T7)>(&NAME))
 
-#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS10(NAME, T0, T1, T2, T3, T4, T5, T6, T7, T8)                                  \
+#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS11(MODULE, NAME, T0, T1, T2, T3, T4, T5, T6, T7, T8)                          \
   __ARIAPython_RecursivelyDefinePythonType<decltype(NAME(                                                              \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>()))                                     \
-  (*)(T0, T1, T2, T3, T4, T5, T6, T7, T8)>()(module);                                                                  \
-  module.Def(#NAME, static_cast<decltype(NAME(                                                                         \
+  (*)(T0, T1, T2, T3, T4, T5, T6, T7, T8)>()(MODULE);                                                                  \
+  MODULE.Def(#NAME, static_cast<decltype(NAME(                                                                         \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>()))                                     \
   (*)(T0, T1, T2, T3, T4, T5, T6, T7, T8)>(&NAME))
 
-#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS11(NAME, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9)                              \
+#define __ARIA_PYTHON_ADD_FUNCTION_PARAMS12(MODULE, NAME, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9)                      \
   __ARIAPython_RecursivelyDefinePythonType<decltype(NAME(                                                              \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>(), std::declval<T9>()))                 \
-  (*)(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9)>()(module);                                                              \
-  module.Def(#NAME, static_cast<decltype(NAME(                                                                         \
+  (*)(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9)>()(MODULE);                                                              \
+  MODULE.Def(#NAME, static_cast<decltype(NAME(                                                                         \
   std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
   std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>(), std::declval<T9>()))                 \
   (*)(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9)>(&NAME))
@@ -1012,6 +1012,10 @@ using empty_va_args_wrapper_t = typename empty_va_args_wrapper<T>::type;
 
 #define __ARIA_PYTHON_ADD_FUNCTION(...)                                                                                \
   __ARIA_EXPAND(__ARIA_EXPAND(ARIA_CONCAT(__ARIA_PYTHON_ADD_FUNCTION_PARAMS, ARIA_NUM_OF(__VA_ARGS__)))(__VA_ARGS__))
+
+// Manually add Python functions as dependency for a given class.
+// Eg: ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(add, int, int);
+#define __ARIA_PYTHON_TYPE_EXTERNAL_FUNCTION(...) __ARIA_PYTHON_ADD_FUNCTION(module, ...)
 
 //
 //
