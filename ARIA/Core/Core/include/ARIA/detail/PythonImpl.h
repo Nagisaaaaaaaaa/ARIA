@@ -468,8 +468,7 @@ private:
                                                                                                                        \
       module.types_->insert(typeid(T).hash_code());                                                                    \
                                                                                                                        \
-      /* TODO: Give unique name for each instantiated type. */                                                         \
-      py::class_<T> cls(module, #TEMPLATE)
+      py::class_<T> cls(module, typeid(T).name())
 
 //
 //
