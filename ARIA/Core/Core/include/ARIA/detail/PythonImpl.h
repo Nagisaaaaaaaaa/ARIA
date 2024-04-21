@@ -4,6 +4,7 @@
 #include "ARIA/TypeArray.h"
 
 #include <pybind11/embed.h>
+#include <pybind11/numpy.h>
 #include <pybind11/operators.h>
 
 #include <list>
@@ -29,6 +30,19 @@ struct is_std_pair_or_std_tuple<std::tuple<Args...>> : std::true_type {};
 
 template <typename T>
 inline constexpr bool is_std_pair_or_std_tuple_v = is_std_pair_or_std_tuple<T>::value;
+
+//
+//
+//
+// Whether the given type is `py::array_t`.
+template <typename T>
+struct is_py_array : std::false_type {};
+
+template <typename T, int extraFlags>
+struct is_py_array<py::array_t<T, extraFlags>> : std::true_type {};
+
+template <typename T>
+inline constexpr bool is_py_array_v = is_py_array<T>::value;
 
 //
 //
@@ -105,14 +119,15 @@ template <typename T>
   using TUndecorated = std::remove_const_t<std::remove_pointer_t<std::decay_t<T>>>;
 
   // Return true if `TUndecorated` is a Python-builtin type, which is
-  // fundamental, `std::string`, `std::pair`, or `std::tuple`,
+  // fundamental, `std::string`, `std::pair`, `std::tuple`, or `py::array_t`,
   // because these types have been automatically handled.
   //! Note that it is possible for `std::pair` and `std::tuple` to
   //! contain unhandled types, for example, `std::pair<int, std::vector<int>>`, where
   //! `std::vector<int>` is unhandled.
   //! There's no way to perfectly address this problem.
   if constexpr (std::is_fundamental_v<TUndecorated> || std::is_same_v<TUndecorated, std::string> ||
-                python::detail::is_std_pair_or_std_tuple_v<TUndecorated>) {
+                python::detail::is_std_pair_or_std_tuple_v<TUndecorated> ||
+                python::detail::is_py_array_v<TUndecorated>) {
     //! `T` is not allowed to be a non-const reference type, as explained below.
     static_assert(!(!std::is_const_v<std::remove_reference_t<T>> && std::is_reference_v<std::remove_const_t<T>>),
                   "It is dangerous to take non-const references for Python-builtin types because"
@@ -468,8 +483,7 @@ private:
                                                                                                                        \
       module.types_->insert(typeid(T).hash_code());                                                                    \
                                                                                                                        \
-      /* TODO: Give unique name for each instantiated type. */                                                         \
-      py::class_<T> cls(module, #TEMPLATE)
+      py::class_<T> cls(module, typeid(T).name())
 
 //
 //
