@@ -10,6 +10,11 @@ namespace layout::detail {
 
 // Fetch implementations from CuTe.
 
+using cute::get;
+
+//
+//
+//
 using cute::Coord;
 
 using cute::make_coord;
