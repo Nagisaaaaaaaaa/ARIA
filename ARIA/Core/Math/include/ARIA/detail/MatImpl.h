@@ -214,19 +214,19 @@ static constexpr bool is_mat_rc_v = is_mat_rc<T, row, col>::value;
   /* Z. */                                                                                                             \
   ARIA_SUB_PROP(specifiers, std::decay_t<type>::Scalar, z);
 
-#define __ARIA_PROP_PREFAB_MAT(accessGet, accessSet, specifiers, type, propName)                                       \
+#define __ARIA_PROP_PREFAB_MAT(accessGet, accessSet, specifiers, type, /*propName,*/...)                               \
   static_assert(ARIA::mat::detail::is_mat_v<std::decay_t<type>>,                                                       \
                 "Type of the property should be `class Mat` in order to use this prefab");                             \
                                                                                                                        \
-  ARIA_PROP_BEGIN(accessGet, accessSet, specifiers, type, propName);                                                   \
+  ARIA_PROP_BEGIN(accessGet, accessSet, specifiers, type, /*propName,*/ __VA_ARGS__);                                  \
   __ARIA_PROP_AND_SUB_PROP_PREFAB_MEMBERS_MAT(specifiers, type);                                                       \
   ARIA_PROP_END
 
-#define __ARIA_SUB_PROP_PREFAB_MAT(specifiers, type, propName)                                                         \
+#define __ARIA_SUB_PROP_PREFAB_MAT(specifiers, type, /*propName,*/...)                                                 \
   static_assert(ARIA::mat::detail::is_mat_v<std::decay_t<type>>,                                                       \
                 "Type of the property should be `class Mat` in order to use this prefab");                             \
                                                                                                                        \
-  ARIA_SUB_PROP_BEGIN(specifiers, type, propName);                                                                     \
+  ARIA_SUB_PROP_BEGIN(specifiers, type, /*propName,*/ __VA_ARGS__);                                                    \
   __ARIA_PROP_AND_SUB_PROP_PREFAB_MEMBERS_MAT(specifiers, type);                                                       \
   ARIA_PROP_END
 

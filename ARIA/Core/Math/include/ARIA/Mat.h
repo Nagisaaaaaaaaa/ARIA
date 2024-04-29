@@ -67,8 +67,8 @@ using Mat4r = Mat4<Real>;
 /// \example ```cpp
 /// ARIA_PROP_PREFAB_MAT(public, public, __host__, Mat3r, rotationMat)
 /// ```
-#define ARIA_PROP_PREFAB_MAT(accessGet, accessSet, specifiers, type, propName)                                         \
-  __ARIA_PROP_PREFAB_MAT(accessGet, accessSet, specifiers, type, propName)
+#define ARIA_PROP_PREFAB_MAT /*(accessGet, accessSet, specifiers, type, propName, (optional) args...)*/                \
+  __ARIA_PROP_PREFAB_MAT
 
 /// \brief A sub-property prefab for `class Mat`.
 /// All possible sub-sub-properties and functions have been defined here.

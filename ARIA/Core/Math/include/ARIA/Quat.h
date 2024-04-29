@@ -64,8 +64,8 @@ template <typename TInput>
 /// \example ```cpp
 /// ARIA_PROP_PREFAB_QUAT(public, public, __host__, Quatr, rotation)
 /// ```
-#define ARIA_PROP_PREFAB_QUAT(accessGet, accessSet, specifiers, type, propName)                                        \
-  __ARIA_PROP_PREFAB_QUAT(accessGet, accessSet, specifiers, type, propName)
+#define ARIA_PROP_PREFAB_QUAT /*(accessGet, accessSet, specifiers, type, propName, (optional) args...)*/               \
+  __ARIA_PROP_PREFAB_QUAT
 
 /// \brief A sub-property prefab for type `class Quat`.
 /// All possible sub-sub-properties and functions have been defined here.
