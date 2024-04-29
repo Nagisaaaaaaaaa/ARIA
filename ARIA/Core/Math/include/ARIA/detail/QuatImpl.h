@@ -81,19 +81,19 @@ static constexpr bool is_quat_v = is_quat<T>::value;
   /* Z. */                                                                                                             \
   ARIA_SUB_PROP(specifiers, std::decay_t<type>::Scalar, z);
 
-#define __ARIA_PROP_PREFAB_QUAT(accessGet, accessSet, specifiers, type, propName)                                      \
+#define __ARIA_PROP_PREFAB_QUAT(accessGet, accessSet, specifiers, type, /*propName,*/...)                              \
   static_assert(ARIA::quat::detail::is_quat_v<std::decay_t<type>>,                                                     \
                 "Type of the property should be `class Quat` in order to use this prefab");                            \
                                                                                                                        \
-  ARIA_PROP_BEGIN(accessGet, accessSet, specifiers, type, propName);                                                   \
+  ARIA_PROP_BEGIN(accessGet, accessSet, specifiers, type, /*propName,*/ __VA_ARGS__);                                  \
   __ARIA_PROP_AND_SUB_PROP_PREFAB_MEMBERS_QUAT(specifiers, type);                                                      \
   ARIA_PROP_END
 
-#define __ARIA_SUB_PROP_PREFAB_QUAT(specifiers, type, propName)                                                        \
+#define __ARIA_SUB_PROP_PREFAB_QUAT(specifiers, type, /*propName,*/...)                                                \
   static_assert(ARIA::quat::detail::is_quat_v<std::decay_t<type>>,                                                     \
                 "Type of the property should be `class Quat` in order to use this prefab");                            \
                                                                                                                        \
-  ARIA_SUB_PROP_BEGIN(specifiers, type, propName);                                                                     \
+  ARIA_SUB_PROP_BEGIN(specifiers, type, /*propName,*/ __VA_ARGS__);                                                    \
   __ARIA_PROP_AND_SUB_PROP_PREFAB_MEMBERS_QUAT(specifiers, type);                                                      \
   ARIA_PROP_END
 

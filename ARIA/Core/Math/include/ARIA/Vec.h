@@ -67,8 +67,8 @@ using Vec4r = Vec4<Real>;
 /// \example ```cpp
 /// ARIA_PROP_PREFAB_VEC(public, public, __host__, Vec3r, position)
 /// ```
-#define ARIA_PROP_PREFAB_VEC(accessGet, accessSet, specifiers, type, propName)                                         \
-  __ARIA_PROP_PREFAB_VEC(accessGet, accessSet, specifiers, type, propName)
+#define ARIA_PROP_PREFAB_VEC /*(accessGet, accessSet, specifiers, type, propName, (optional) args...)*/                \
+  __ARIA_PROP_PREFAB_VEC
 
 /// \brief A sub-property prefab for `class Vec`.
 /// All possible sub-sub-properties and functions have been defined here.
