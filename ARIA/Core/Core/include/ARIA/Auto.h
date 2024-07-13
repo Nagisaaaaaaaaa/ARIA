@@ -88,8 +88,11 @@ namespace ARIA {
 /// \see PropertyImpl.h
 template <typename T>
 ARIA_HOST_DEVICE auto Auto(const T &v) {
-  if constexpr (std::is_same_v<std::decay_t<T>,
-                               std::decay_t<decltype(std::vector<bool>()[0])>>) //! For `std::vector<bool>`.
+  if constexpr //! For ARIA property, note that this should be checked before any other proxy systems.
+      (property::detail::PropertyType<std::decay_t<T>>)
+    return v.value();
+  else if constexpr (std::is_same_v<std::decay_t<T>,
+                                    std::decay_t<decltype(std::vector<bool>()[0])>>) //! For `std::vector<bool>`.
     return static_cast<bool>(v);
   else if constexpr (!std::is_same_v<std::decay_t<T>, std::decay_t<decltype(thrust::raw_reference_cast(v))>>)
     return thrust::raw_reference_cast(v);
@@ -98,9 +101,6 @@ ARIA_HOST_DEVICE auto Auto(const T &v) {
          { v.eval() };
        })
     return v.eval();
-  else if constexpr //! For ARIA property.
-      (property::detail::PropertyType<std::decay_t<T>>)
-    return v.value();
   else //! By default.
     return v;
 }
