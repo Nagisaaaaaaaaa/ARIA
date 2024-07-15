@@ -15,12 +15,12 @@ namespace property::detail {
 /// or it will be dangerous when multiple proxy systems are used together.
 template <typename T>
 static constexpr bool isProxyType =
-    (std::is_same_v<std::decay_t<T>, std::decay_t<decltype(std::vector<bool>()[0])>>)                           ? true
+    PropertyType<std::decay_t<T>>                                                                               ? true
+    : (std::is_same_v<std::decay_t<T>, std::decay_t<decltype(std::vector<bool>()[0])>>)                         ? true
     : (!std::is_same_v<std::decay_t<T>, std::decay_t<decltype(thrust::raw_reference_cast(std::declval<T>()))>>) ? true
     : (requires(T &&v) {
         { v.eval() };
       })                                                                                                        ? true
-    : PropertyType<std::decay_t<T>>                                                                             ? true
                                                                                                                 : false;
 
 /// \brief Whether the decayed given type `T` is a settable proxy type of any proxy system.
@@ -37,12 +37,12 @@ static constexpr bool isProxyType =
 /// or it will be dangerous when multiple proxy systems are used together.
 template <typename T>
 static constexpr bool isSettableProxyType =
-    (std::is_same_v<std::decay_t<T>, std::decay_t<decltype(std::vector<bool>()[0])>>)                           ? true
+    PropertyType<std::decay_t<T>>                                                                               ? true
+    : (std::is_same_v<std::decay_t<T>, std::decay_t<decltype(std::vector<bool>()[0])>>)                         ? true
     : (!std::is_same_v<std::decay_t<T>, std::decay_t<decltype(thrust::raw_reference_cast(std::declval<T>()))>>) ? true
     : (requires(T &&v) {
         { v.eval() };
       })                                                                                                        ? false
-    : PropertyType<std::decay_t<T>>                                                                             ? true
                                                                                                                 : false;
 
 //
