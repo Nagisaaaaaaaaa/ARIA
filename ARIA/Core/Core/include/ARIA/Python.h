@@ -237,6 +237,25 @@ using python::detail::Dict;
 //
 //
 //
+/// \brief Define an `operator()` for the given type or template.
+///
+/// \example ```cpp
+/// class Operator {
+/// public:
+///   const bool operator()() const { ... }
+///   const bool operator()(int v) const { ... }
+/// };
+///
+/// ARIA_PYTHON_TYPE_BEGIN(Operator);
+/// ARIA_PYTHON_TYPE_OPERATOR_CALL(const);
+/// ARIA_PYTHON_TYPE_OPERATOR_CALL(const, int);
+/// ARIA_PYTHON_TYPE_END;
+/// ```
+#define ARIA_PYTHON_TYPE_OPERATOR_CALL /* (specifiers, parameters...) */ __ARIA_PYTHON_TYPE_OPERATOR_CALL
+
+//
+//
+//
 /// \brief Define a static member function for the given type or template.
 ///
 /// \example ```cpp
