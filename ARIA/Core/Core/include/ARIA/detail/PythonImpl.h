@@ -866,7 +866,18 @@ using empty_va_args_wrapper_t = typename empty_va_args_wrapper<T>::type;
   (T::*)(T0) SPECIFIERS>()(module);                                                                                    \
   cls.def("__getitem__", static_cast<decltype(std::declval<SPECIFIERS T>().operator[](                                 \
   std::declval<T0>()))                                                                                                 \
-  (T::*)(T0) SPECIFIERS>(&T::operator[]))
+  (T::*)(T0) SPECIFIERS>(&T::operator[]));                                                                             \
+                                                                                                                       \
+  /* TODO: Support other numbers of parameters. */                                                                     \
+  do {                                                                                                                 \
+    if constexpr (std::string(#SPECIFIERS).find("const") == std::string::npos) {                                       \
+      using TRetUndecorated = decltype(Auto(std::declval<SPECIFIERS T>().operator[](                                   \
+                                            std::declval<T0>())));                                                     \
+      cls.def("__setitem__", [](T& t, T0 t0, TRetUndecorated value) {                                                  \
+        t[t0] = value;                                                                                                 \
+      });                                                                                                              \
+    }                                                                                                                  \
+  } while (0)
 
 // For 3 parameters...
 #define __ARIA_PYTHON_TYPE_OPERATOR_ITEM_PARAMS3(SPECIFIERS, T0, T1)                                                   \
