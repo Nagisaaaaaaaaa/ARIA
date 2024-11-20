@@ -29,13 +29,72 @@ namespace ARIA {
 /// template <int v>
 /// using Int = C<v>;
 /// using _0 = C<0>;
-/// using _1 = Int<0>;
+/// using _1 = Int<1>;
+///
+/// C<0> i0 = 0_I;
+/// C<1U> u1 = 1_U;
 ///
 /// C<1> a{};
 /// C<3> b = a + C<2>{};
+/// C<2> c = b - 1_I;
 /// ```
 template <auto T>
 using C = cute::C<T>;
+
+//
+//
+//
+//
+//
+namespace constant::detail {
+
+template <int v>
+using CInt = C<v>;
+
+template <uint v>
+using CUInt = C<v>;
+
+template <typename T, char... cs>
+consteval auto make_integral_udl() {
+  T result = 0;
+  ((result = result * 10 + (cs - '0')), ...);
+  return result;
+}
+
+} // namespace constant::detail
+
+//
+//
+//
+//
+//
+/// \brief UDL for constant signed integers.
+///
+/// \example ```cpp
+/// auto one = 1_I;
+/// static_assert(std::is_same_v<decltype(one), C<1>>);
+/// static_assert(one == 1_I);
+/// static_assert(one == 1_U);
+/// ```
+template <char... cs>
+consteval auto operator""_I() {
+  constexpr auto value = constant::detail::make_integral_udl<int, cs...>();
+  return constant::detail::CInt<value>{};
+}
+
+/// \brief UDL for constant unsigned integers.
+///
+/// \example ```cpp
+/// auto one = 1_U;
+/// static_assert(std::is_same_v<decltype(one), C<1U>>);
+/// static_assert(one == 1_I);
+/// static_assert(one == 1_U);
+/// ```
+template <char... cs>
+consteval auto operator""_U() {
+  constexpr auto value = constant::detail::make_integral_udl<uint, cs...>();
+  return constant::detail::CUInt<value>{};
+}
 
 //
 //
