@@ -70,6 +70,8 @@ struct ARIATestPython_OverloadWithParameters {
 struct ARIATestPython_ManyOverloads {
   using str = std::string;
 
+  std::vector<bool> member;
+
   ARIATestPython_ManyOverloads() {}
 
   ARIATestPython_ManyOverloads(const int &v0) {}
@@ -115,6 +117,64 @@ struct ARIATestPython_ManyOverloads {
   std::vector<bool> F(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8, str v9) const {
     return {};
   }
+
+  std::vector<bool> operator()() const { return {}; }
+
+  std::vector<bool> operator()(const int &v0) const { return {}; }
+
+  std::vector<bool> operator()(const int &v0, const str &v1) const { return {}; }
+
+  std::vector<bool> operator()(int v0, str v1, int v2) const { return {}; }
+
+  std::vector<bool> operator()(int v0, str v1, int v2, str v3) const { return {}; }
+
+  std::vector<bool> operator()(int v0, str v1, int v2, str v3, int v4) const { return {}; }
+
+  std::vector<bool> operator()(int v0, str v1, int v2, str v3, int v4, str v5) const { return {}; }
+
+  std::vector<bool> operator()(int v0, str v1, int v2, str v3, int v4, str v5, int v6) const { return {}; }
+
+  std::vector<bool> operator()(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7) const { return {}; }
+
+  std::vector<bool> operator()(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8) const {
+    return {};
+  }
+
+  std::vector<bool> operator()(int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8, str v9) const {
+    return {};
+  }
+
+#if 0
+  std::vector<bool> &operator[]() { return member; }
+
+  std::vector<bool> &operator[](const int &v0) { return member; }
+
+  std::vector<bool> &operator[](const int &v0, const str &v1) { return member; }
+
+  std::vector<bool> &operator[](int v0, str v1, int v2) { return member; }
+
+  std::vector<bool> &operator[](int v0, str v1, int v2, str v3) { return member; }
+
+  std::vector<bool> &operator[](int v0, str v1, int v2, str v3, int v4) { return member; }
+
+  std::vector<bool> &operator[](int v0, str v1, int v2, str v3, int v4, str v5) { return member; }
+
+  std::vector<bool> &operator[](int v0, str v1, int v2, str v3, int v4, str v5, int v6) { return member; }
+
+  std::vector<bool> &operator[](int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7) { return member; }
+
+  std::vector<bool> &operator[](int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8) {
+    return member;
+  }
+
+  std::vector<bool> &operator[](int v0, str v1, int v2, str v3, int v4, str v5, int v6, str v7, int v8, str v9) {
+    return member;
+  }
+#else
+  const std::vector<bool> &operator[](const int &v0) const { return member; }
+
+  std::vector<bool> &operator[](const int &v0) { return member; }
+#endif
 
   static std::vector<bool> G() { return {}; }
 
@@ -296,6 +356,37 @@ ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int, std::string, int, std::
 ARIA_PYTHON_TYPE_METHOD(const, F, int, std::string, int, std::string, int, std::string, int, std::string, int);
 ARIA_PYTHON_TYPE_METHOD(
     const, F, int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
+//
+ARIA_PYTHON_TYPE_OPERATOR_CALL(const);
+ARIA_PYTHON_TYPE_OPERATOR_CALL(const, const int &);
+ARIA_PYTHON_TYPE_OPERATOR_CALL(const, const int &, const std::string &);
+ARIA_PYTHON_TYPE_OPERATOR_CALL(const, int, std::string, int);
+ARIA_PYTHON_TYPE_OPERATOR_CALL(const, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_OPERATOR_CALL(const, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_OPERATOR_CALL(const, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_OPERATOR_CALL(const, int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_OPERATOR_CALL(const, int, std::string, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_OPERATOR_CALL(const, int, std::string, int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_OPERATOR_CALL(
+    const, int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
+//
+#if 0
+ARIA_PYTHON_TYPE_OPERATOR_ITEM(const);
+ARIA_PYTHON_TYPE_OPERATOR_ITEM(const, const int &);
+ARIA_PYTHON_TYPE_OPERATOR_ITEM(const, const int &, const std::string &);
+ARIA_PYTHON_TYPE_OPERATOR_ITEM(const, int, std::string, int);
+ARIA_PYTHON_TYPE_OPERATOR_ITEM(const, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_OPERATOR_ITEM(const, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_OPERATOR_ITEM(const, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_OPERATOR_ITEM(const, int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_OPERATOR_ITEM(const, int, std::string, int, std::string, int, std::string, int, std::string);
+ARIA_PYTHON_TYPE_OPERATOR_ITEM(const, int, std::string, int, std::string, int, std::string, int, std::string, int);
+ARIA_PYTHON_TYPE_OPERATOR_ITEM(
+    const, int, std::string, int, std::string, int, std::string, int, std::string, int, std::string);
+#else
+ARIA_PYTHON_TYPE_OPERATOR_ITEM(const, const int &);
+ARIA_PYTHON_TYPE_OPERATOR_ITEM(, const int &);
+#endif
 //
 ARIA_PYTHON_TYPE_STATIC_FUNCTION(G);
 ARIA_PYTHON_TYPE_STATIC_FUNCTION(G, const int &);
@@ -621,6 +712,7 @@ TEST(Python, ManyOverloads) {
 
   local["manyOverloads"] = manyOverloads;
   local["vector"] = std::vector<bool>{};
+  local["vectorFilled"] = std::vector<bool>{true, false, true};
 
   // Execute.
   try {
@@ -635,6 +727,24 @@ TEST(Python, ManyOverloads) {
              "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6, '7') == vector\n"
              "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6, '7', 8) == vector\n"
              "assert manyOverloads.F(0, '1', 2, '3', 4, '5', 6, '7', 8, '9') == vector\n"
+             "\n"
+             "assert manyOverloads() == vector\n"
+             "assert manyOverloads(0) == vector\n"
+             "assert manyOverloads(0, '1') == vector\n"
+             "assert manyOverloads(0, '1', 2) == vector\n"
+             "assert manyOverloads(0, '1', 2, '3') == vector\n"
+             "assert manyOverloads(0, '1', 2, '3', 4) == vector\n"
+             "assert manyOverloads(0, '1', 2, '3', 4, '5') == vector\n"
+             "assert manyOverloads(0, '1', 2, '3', 4, '5', 6) == vector\n"
+             "assert manyOverloads(0, '1', 2, '3', 4, '5', 6, '7') == vector\n"
+             "assert manyOverloads(0, '1', 2, '3', 4, '5', 6, '7', 8) == vector\n"
+             "assert manyOverloads(0, '1', 2, '3', 4, '5', 6, '7', 8, '9') == vector\n"
+             "\n"
+             "assert manyOverloads[0] == vector\n"
+             "manyOverloads[0] = vectorFilled\n"
+             "assert manyOverloads[0] == vectorFilled\n"
+             "manyOverloads[0] = vector\n"
+             "assert manyOverloads[0] == vector\n"
              "\n"
              "assert ARIATestPython_ManyOverloads.G() == vector\n"
              "assert ARIATestPython_ManyOverloads.G(0) == vector\n"

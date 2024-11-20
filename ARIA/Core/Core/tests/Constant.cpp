@@ -35,6 +35,43 @@ struct MyFakeFloatingPointConstant {
 } // namespace
 
 TEST(Constant, Base) {
+  // UDL.
+  static_assert(std::is_same_v<decltype(99999_I), C<99999>>);
+  static_assert(std::is_same_v<decltype(1_I), C<1>>);
+  static_assert(std::is_same_v<decltype(0_I), C<0>>);
+  static_assert(std::is_same_v<decltype(-1_I), C<-1>>);
+  static_assert(std::is_same_v<decltype(-99999_I), C<-99999>>);
+
+  static_assert(std::is_same_v<decltype(99999_U), C<99999U>>);
+  static_assert(std::is_same_v<decltype(1_U), C<1U>>);
+  static_assert(std::is_same_v<decltype(0_U), C<0U>>);
+  static_assert(std::is_same_v<decltype(-1_U), C<-1U>>);
+  static_assert(std::is_same_v<decltype(-99999_U), C<-99999U>>);
+
+  static_assert(99999_I == C<99999>{});
+  static_assert(1_I == C<1>{});
+  static_assert(0_I == C<0>{});
+  static_assert(-1_I == C<-1>{});
+  static_assert(-99999_I == C<-99999>{});
+
+  static_assert(99999_I == C<99999U>{});
+  static_assert(1_I == C<1U>{});
+  static_assert(0_I == C<0U>{});
+  static_assert(-1_I == C<-1U>{});
+  static_assert(-99999_I == C<-99999U>{});
+
+  static_assert(99999_U == C<99999>{});
+  static_assert(1_U == C<1>{});
+  static_assert(0_U == C<0>{});
+  static_assert(-1_U == C<-1>{});
+  static_assert(-99999_U == C<-99999>{});
+
+  static_assert(99999_U == C<99999U>{});
+  static_assert(1_U == C<1U>{});
+  static_assert(0_U == C<0U>{});
+  static_assert(-1_U == C<-1U>{});
+  static_assert(-99999_U == C<-99999U>{});
+
   // Constant Arithmetic.
   static_assert(!ConstantArithmetic<int>);
   static_assert(!ConstantArithmetic<float>);

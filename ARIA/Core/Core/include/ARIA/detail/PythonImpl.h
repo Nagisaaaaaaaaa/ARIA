@@ -725,6 +725,251 @@ using empty_va_args_wrapper_t = typename empty_va_args_wrapper<T>::type;
 //
 //
 //
+// Define an `operator()` with the given specifiers and arguments types.
+// Eg: ARIA_PYTHON_TYPE_OPERATOR_CALL(const); // `T::operator()() const`.
+//     ARIA_PYTHON_TYPE_OPERATOR_CALL(, int); // `T::operator()(int)`.
+//
+// clang-format off
+// For 1 parameter.
+#define __ARIA_PYTHON_TYPE_OPERATOR_CALL_PARAMS1(SPECIFIERS)                                                           \
+  /* Define a method will define its return type and all its arguments types. */                                       \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator()(                           \
+  ))                                                                                                                   \
+  (T::*)() SPECIFIERS>()(module);                                                                                      \
+                                                                                                                       \
+  /* Calls `py::class_::def` to actually define the method in Python. */                                               \
+  cls.def("__call__", static_cast<decltype(std::declval<SPECIFIERS T>().operator()(                                    \
+  ))                                                                                                                   \
+  (T::*)() SPECIFIERS>(&T::operator()))
+
+// For 2 parameters.
+#define __ARIA_PYTHON_TYPE_OPERATOR_CALL_PARAMS2(SPECIFIERS, T0)                                                       \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator()(                           \
+  std::declval<T0>()))                                                                                                 \
+  (T::*)(T0) SPECIFIERS>()(module);                                                                                    \
+  cls.def("__call__", static_cast<decltype(std::declval<SPECIFIERS T>().operator()(                                    \
+  std::declval<T0>()))                                                                                                 \
+  (T::*)(T0) SPECIFIERS>(&T::operator()))
+
+// For 3 parameters...
+#define __ARIA_PYTHON_TYPE_OPERATOR_CALL_PARAMS3(SPECIFIERS, T0, T1)                                                   \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator()(                           \
+  std::declval<T0>(), std::declval<T1>()))                                                                             \
+  (T::*)(T0, T1) SPECIFIERS>()(module);                                                                                \
+  cls.def("__call__", static_cast<decltype(std::declval<SPECIFIERS T>().operator()(                                    \
+  std::declval<T0>(), std::declval<T1>()))                                                                             \
+  (T::*)(T0, T1) SPECIFIERS>(&T::operator()))
+
+#define __ARIA_PYTHON_TYPE_OPERATOR_CALL_PARAMS4(SPECIFIERS, T0, T1, T2)                                               \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator()(                           \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>()))                                                         \
+  (T::*)(T0, T1, T2) SPECIFIERS>()(module);                                                                            \
+  cls.def("__call__", static_cast<decltype(std::declval<SPECIFIERS T>().operator()(                                    \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>()))                                                         \
+  (T::*)(T0, T1, T2) SPECIFIERS>(&T::operator()))
+
+#define __ARIA_PYTHON_TYPE_OPERATOR_CALL_PARAMS5(SPECIFIERS, T0, T1, T2, T3)                                           \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator()(                           \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>()))                                     \
+  (T::*)(T0, T1, T2, T3) SPECIFIERS>()(module);                                                                        \
+  cls.def("__call__", static_cast<decltype(std::declval<SPECIFIERS T>().operator()(                                    \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>()))                                     \
+  (T::*)(T0, T1, T2, T3) SPECIFIERS>(&T::operator()))
+
+#define __ARIA_PYTHON_TYPE_OPERATOR_CALL_PARAMS6(SPECIFIERS, T0, T1, T2, T3, T4)                                       \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator()(                           \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>()))                 \
+  (T::*)(T0, T1, T2, T3, T4) SPECIFIERS>()(module);                                                                    \
+  cls.def("__call__", static_cast<decltype(std::declval<SPECIFIERS T>().operator()(                                    \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>()))                 \
+  (T::*)(T0, T1, T2, T3, T4) SPECIFIERS>(&T::operator()))
+
+#define __ARIA_PYTHON_TYPE_OPERATOR_CALL_PARAMS7(SPECIFIERS, T0, T1, T2, T3, T4, T5)                                   \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator()(                           \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>()))                                                                                                 \
+  (T::*)(T0, T1, T2, T3, T4, T5) SPECIFIERS>()(module);                                                                \
+  cls.def("__call__", static_cast<decltype(std::declval<SPECIFIERS T>().operator()(                                    \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>()))                                                                                                 \
+  (T::*)(T0, T1, T2, T3, T4, T5) SPECIFIERS>(&T::operator()))
+
+#define __ARIA_PYTHON_TYPE_OPERATOR_CALL_PARAMS8(SPECIFIERS, T0, T1, T2, T3, T4, T5, T6)                               \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator()(                           \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>()))                                                                             \
+  (T::*)(T0, T1, T2, T3, T4, T5, T6) SPECIFIERS>()(module);                                                            \
+  cls.def("__call__", static_cast<decltype(std::declval<SPECIFIERS T>().operator()(                                    \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>()))                                                                             \
+  (T::*)(T0, T1, T2, T3, T4, T5, T6) SPECIFIERS>(&T::operator()))
+
+#define __ARIA_PYTHON_TYPE_OPERATOR_CALL_PARAMS9(SPECIFIERS, T0, T1, T2, T3, T4, T5, T6, T7)                           \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator()(                           \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>(), std::declval<T7>()))                                                         \
+  (T::*)(T0, T1, T2, T3, T4, T5, T6, T7) SPECIFIERS>()(module);                                                        \
+  cls.def("__call__", static_cast<decltype(std::declval<SPECIFIERS T>().operator()(                                    \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>(), std::declval<T7>()))                                                         \
+  (T::*)(T0, T1, T2, T3, T4, T5, T6, T7) SPECIFIERS>(&T::operator()))
+
+#define __ARIA_PYTHON_TYPE_OPERATOR_CALL_PARAMS10(SPECIFIERS, T0, T1, T2, T3, T4, T5, T6, T7, T8)                      \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator()(                           \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>()))                                     \
+  (T::*)(T0, T1, T2, T3, T4, T5, T6, T7, T8) SPECIFIERS>()(module);                                                    \
+  cls.def("__call__", static_cast<decltype(std::declval<SPECIFIERS T>().operator()(                                    \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>()))                                     \
+  (T::*)(T0, T1, T2, T3, T4, T5, T6, T7, T8) SPECIFIERS>(&T::operator()))
+
+#define __ARIA_PYTHON_TYPE_OPERATOR_CALL_PARAMS11(SPECIFIERS, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9)                  \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator()(                           \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>(), std::declval<T9>()))                 \
+  (T::*)(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9) SPECIFIERS>()(module);                                                \
+  cls.def("__call__", static_cast<decltype(std::declval<SPECIFIERS T>().operator()(                                    \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>(), std::declval<T9>()))                 \
+  (T::*)(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9) SPECIFIERS>(&T::operator()))
+// clang-format on
+
+#define __ARIA_PYTHON_TYPE_OPERATOR_CALL(...)                                                                          \
+  __ARIA_EXPAND(                                                                                                       \
+      __ARIA_EXPAND(ARIA_CONCAT(__ARIA_PYTHON_TYPE_OPERATOR_CALL_PARAMS, ARIA_NUM_OF(__VA_ARGS__)))(__VA_ARGS__))
+
+//
+//
+//
+// Define an `operator[]` with the given specifiers and arguments types.
+// Eg: ARIA_PYTHON_TYPE_OPERATOR_ITEM(const); // `T::operator[]() const`.
+//     ARIA_PYTHON_TYPE_OPERATOR_ITEM(, int); // `T::operator[](int)`.
+//
+// clang-format off
+// For 1 parameter.
+#define __ARIA_PYTHON_TYPE_OPERATOR_ITEM_PARAMS1(SPECIFIERS)                                                           \
+  /* Define a method will define its return type and all its arguments types. */                                       \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator[](                           \
+  ))                                                                                                                   \
+  (T::*)() SPECIFIERS>()(module);                                                                                      \
+                                                                                                                       \
+  /* Calls `py::class_::def` to actually define the method in Python. */                                               \
+  cls.def("__getitem__", static_cast<decltype(std::declval<SPECIFIERS T>().operator[](                                 \
+  ))                                                                                                                   \
+  (T::*)() SPECIFIERS>(&T::operator[]))
+
+// For 2 parameters.
+#define __ARIA_PYTHON_TYPE_OPERATOR_ITEM_PARAMS2(SPECIFIERS, T0)                                                       \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator[](                           \
+  std::declval<T0>()))                                                                                                 \
+  (T::*)(T0) SPECIFIERS>()(module);                                                                                    \
+  cls.def("__getitem__", static_cast<decltype(std::declval<SPECIFIERS T>().operator[](                                 \
+  std::declval<T0>()))                                                                                                 \
+  (T::*)(T0) SPECIFIERS>(&T::operator[]));                                                                             \
+                                                                                                                       \
+  /* TODO: Support other numbers of parameters. */                                                                     \
+  do {                                                                                                                 \
+    if constexpr (std::string(#SPECIFIERS).find("const") == std::string::npos) {                                       \
+      using TRetUndecorated = decltype(Auto(std::declval<SPECIFIERS T>().operator[](                                   \
+                                            std::declval<T0>())));                                                     \
+      cls.def("__setitem__", [](T& t, T0 t0, TRetUndecorated value) {                                                  \
+        t[t0] = value;                                                                                                 \
+      });                                                                                                              \
+    }                                                                                                                  \
+  } while (0)
+
+// For 3 parameters...
+#define __ARIA_PYTHON_TYPE_OPERATOR_ITEM_PARAMS3(SPECIFIERS, T0, T1)                                                   \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator[](                           \
+  std::declval<T0>(), std::declval<T1>()))                                                                             \
+  (T::*)(T0, T1) SPECIFIERS>()(module);                                                                                \
+  cls.def("__getitem__", static_cast<decltype(std::declval<SPECIFIERS T>().operator[](                                 \
+  std::declval<T0>(), std::declval<T1>()))                                                                             \
+  (T::*)(T0, T1) SPECIFIERS>(&T::operator[]))
+
+#define __ARIA_PYTHON_TYPE_OPERATOR_ITEM_PARAMS4(SPECIFIERS, T0, T1, T2)                                               \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator[](                           \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>()))                                                         \
+  (T::*)(T0, T1, T2) SPECIFIERS>()(module);                                                                            \
+  cls.def("__getitem__", static_cast<decltype(std::declval<SPECIFIERS T>().operator[](                                 \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>()))                                                         \
+  (T::*)(T0, T1, T2) SPECIFIERS>(&T::operator[]))
+
+#define __ARIA_PYTHON_TYPE_OPERATOR_ITEM_PARAMS5(SPECIFIERS, T0, T1, T2, T3)                                           \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator[](                           \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>()))                                     \
+  (T::*)(T0, T1, T2, T3) SPECIFIERS>()(module);                                                                        \
+  cls.def("__getitem__", static_cast<decltype(std::declval<SPECIFIERS T>().operator[](                                 \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>()))                                     \
+  (T::*)(T0, T1, T2, T3) SPECIFIERS>(&T::operator[]))
+
+#define __ARIA_PYTHON_TYPE_OPERATOR_ITEM_PARAMS6(SPECIFIERS, T0, T1, T2, T3, T4)                                       \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator[](                           \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>()))                 \
+  (T::*)(T0, T1, T2, T3, T4) SPECIFIERS>()(module);                                                                    \
+  cls.def("__getitem__", static_cast<decltype(std::declval<SPECIFIERS T>().operator[](                                 \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>()))                 \
+  (T::*)(T0, T1, T2, T3, T4) SPECIFIERS>(&T::operator[]))
+
+#define __ARIA_PYTHON_TYPE_OPERATOR_ITEM_PARAMS7(SPECIFIERS, T0, T1, T2, T3, T4, T5)                                   \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator[](                           \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>()))                                                                                                 \
+  (T::*)(T0, T1, T2, T3, T4, T5) SPECIFIERS>()(module);                                                                \
+  cls.def("__getitem__", static_cast<decltype(std::declval<SPECIFIERS T>().operator[](                                 \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>()))                                                                                                 \
+  (T::*)(T0, T1, T2, T3, T4, T5) SPECIFIERS>(&T::operator[]))
+
+#define __ARIA_PYTHON_TYPE_OPERATOR_ITEM_PARAMS8(SPECIFIERS, T0, T1, T2, T3, T4, T5, T6)                               \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator[](                           \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>()))                                                                             \
+  (T::*)(T0, T1, T2, T3, T4, T5, T6) SPECIFIERS>()(module);                                                            \
+  cls.def("__getitem__", static_cast<decltype(std::declval<SPECIFIERS T>().operator[](                                 \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>()))                                                                             \
+  (T::*)(T0, T1, T2, T3, T4, T5, T6) SPECIFIERS>(&T::operator[]))
+
+#define __ARIA_PYTHON_TYPE_OPERATOR_ITEM_PARAMS9(SPECIFIERS, T0, T1, T2, T3, T4, T5, T6, T7)                           \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator[](                           \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>(), std::declval<T7>()))                                                         \
+  (T::*)(T0, T1, T2, T3, T4, T5, T6, T7) SPECIFIERS>()(module);                                                        \
+  cls.def("__getitem__", static_cast<decltype(std::declval<SPECIFIERS T>().operator[](                                 \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>(), std::declval<T7>()))                                                         \
+  (T::*)(T0, T1, T2, T3, T4, T5, T6, T7) SPECIFIERS>(&T::operator[]))
+
+#define __ARIA_PYTHON_TYPE_OPERATOR_ITEM_PARAMS10(SPECIFIERS, T0, T1, T2, T3, T4, T5, T6, T7, T8)                      \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator[](                           \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>()))                                     \
+  (T::*)(T0, T1, T2, T3, T4, T5, T6, T7, T8) SPECIFIERS>()(module);                                                    \
+  cls.def("__getitem__", static_cast<decltype(std::declval<SPECIFIERS T>().operator[](                                 \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>()))                                     \
+  (T::*)(T0, T1, T2, T3, T4, T5, T6, T7, T8) SPECIFIERS>(&T::operator[]))
+
+#define __ARIA_PYTHON_TYPE_OPERATOR_ITEM_PARAMS11(SPECIFIERS, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9)                  \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(std::declval<SPECIFIERS T>().operator[](                           \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>(), std::declval<T9>()))                 \
+  (T::*)(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9) SPECIFIERS>()(module);                                                \
+  cls.def("__getitem__", static_cast<decltype(std::declval<SPECIFIERS T>().operator[](                                 \
+  std::declval<T0>(), std::declval<T1>(), std::declval<T2>(), std::declval<T3>(), std::declval<T4>(),                  \
+  std::declval<T5>(), std::declval<T6>(), std::declval<T7>(), std::declval<T8>(), std::declval<T9>()))                 \
+  (T::*)(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9) SPECIFIERS>(&T::operator[]))
+// clang-format on
+
+#define __ARIA_PYTHON_TYPE_OPERATOR_ITEM(...)                                                                          \
+  __ARIA_EXPAND(                                                                                                       \
+      __ARIA_EXPAND(ARIA_CONCAT(__ARIA_PYTHON_TYPE_OPERATOR_ITEM_PARAMS, ARIA_NUM_OF(__VA_ARGS__)))(__VA_ARGS__))
+
+//
+//
+//
 // Define a static member function with the given name and arguments types.
 //
 // clang-format off
