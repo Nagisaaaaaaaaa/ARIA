@@ -23,10 +23,6 @@
 //
 #include "ARIA/detail/PropertyType.h"
 
-#include <thrust/detail/raw_reference_cast.h>
-
-#include <vector>
-
 namespace ARIA {
 
 /// \brief A function return type wrapper to help `auto` better deduce return types from proxy systems.
