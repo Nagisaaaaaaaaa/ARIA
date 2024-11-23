@@ -879,7 +879,7 @@ public:                                                                         
       if constexpr (std::is_pointer_v<decltype(tmp)>) {                                                                \
         using TGet = decltype(tmp->PROP_NAME());                                                                       \
                                                                                                                        \
-        constexpr bool isGetProxy = property::detail::isProxyType<TGet>;                                               \
+        constexpr bool isGetProxy = property::detail::ProxyType<TGet>;                                                 \
         constexpr bool isGetReferenceOrPointer = property::detail::isReferenceOrPointer<TGet>;                         \
         constexpr bool isGetValue = !isGetReferenceOrPointer && !isGetProxy;                                           \
                                                                                                                        \
@@ -891,7 +891,7 @@ public:                                                                         
       } else {                                                                                                         \
         using TGet = decltype(tmp.PROP_NAME());                                                                        \
                                                                                                                        \
-        constexpr bool isGetProxy = property::detail::isProxyType<TGet>;                                               \
+        constexpr bool isGetProxy = property::detail::ProxyType<TGet>;                                                 \
         constexpr bool isGetReferenceOrPointer = property::detail::isReferenceOrPointer<TGet>;                         \
         constexpr bool isGetValue = !isGetReferenceOrPointer && !isGetProxy;                                           \
                                                                                                                        \
@@ -1288,7 +1288,7 @@ private:                                                                        
                                                                                                                        \
     using TRes = decltype(v DOT_OR_ARROW FUNC_NAME(std::forward<Ts>(ts)...));                                          \
                                                                                                                        \
-    if constexpr (property::detail::isSettableProxyType<TRes>) {                                                       \
+    if constexpr (property::detail::SettableProxyType<TRes>) {                                                         \
       /* This requirement is necessary to avoid settable proxies pointing to temporary variables. */                   \
       ARIA_STATIC_ASSERT_FALSE("Return type of the property function should not be a settable proxy type");            \
     } else {                                                                                                           \
@@ -1325,7 +1325,7 @@ private:                                                                        
                                                                                                                        \
     using TRes = decltype(v DOT_OR_ARROW FUNC_NAME(std::forward<Ts>(ts)...));                                          \
                                                                                                                        \
-    if constexpr (property::detail::isSettableProxyType<TRes>) {                                                       \
+    if constexpr (property::detail::SettableProxyType<TRes>) {                                                         \
       /* This requirement is necessary to avoid settable proxies pointing to temporary variables. */                   \
       ARIA_STATIC_ASSERT_FALSE("Return type of the property function should not be a settable proxy type");            \
     } else {                                                                                                           \

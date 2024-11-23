@@ -35,7 +35,7 @@ concept NonPropertyType = !PropertyType<T>;
 /// \warning EVERY settable proxy type of EVERY proxy system should be taken into account,
 /// or it will be dangerous when multiple proxy systems are used together.
 template <typename T>
-static constexpr bool isProxyType =
+static constexpr bool is_proxy_type_v =
     PropertyType<std::decay_t<T>>                                                                               ? true
     : (std::is_same_v<std::decay_t<T>, std::decay_t<decltype(std::vector<bool>()[0])>>)                         ? true
     : (!std::is_same_v<std::decay_t<T>, std::decay_t<decltype(thrust::raw_reference_cast(std::declval<T>()))>>) ? true
@@ -43,6 +43,9 @@ static constexpr bool isProxyType =
         { v.eval() };
       })                                                                                                        ? true
                                                                                                                 : false;
+
+template <typename T>
+concept ProxyType = is_proxy_type_v<T>;
 
 /// \brief Whether the decayed given type `T` is a settable proxy type of any proxy system.
 /// For example, return type of `std::vector<bool>()[i]` is a settable proxy,
@@ -57,7 +60,7 @@ static constexpr bool isProxyType =
 /// \warning EVERY settable proxy type of EVERY proxy system should be taken into account,
 /// or it will be dangerous when multiple proxy systems are used together.
 template <typename T>
-static constexpr bool isSettableProxyType =
+static constexpr bool is_settable_proxy_type_v =
     PropertyType<std::decay_t<T>>                                                                               ? true
     : (std::is_same_v<std::decay_t<T>, std::decay_t<decltype(std::vector<bool>()[0])>>)                         ? true
     : (!std::is_same_v<std::decay_t<T>, std::decay_t<decltype(thrust::raw_reference_cast(std::declval<T>()))>>) ? true
@@ -65,6 +68,9 @@ static constexpr bool isSettableProxyType =
         { v.eval() };
       })                                                                                                        ? false
                                                                                                                 : false;
+
+template <typename T>
+concept SettableProxyType = is_settable_proxy_type_v<T>;
 
 } // namespace property::detail
 
