@@ -47,6 +47,9 @@ static constexpr bool is_proxy_type_v =
 template <typename T>
 concept ProxyType = is_proxy_type_v<T>;
 
+template <typename T>
+concept NonProxyType = !ProxyType<T>;
+
 /// \brief Whether the decayed given type `T` is a settable proxy type of any proxy system.
 /// For example, return type of `std::vector<bool>()[i]` is a settable proxy,
 /// return type of `thrust::device_vector<...>()[i]` is a settable proxy,
@@ -71,6 +74,9 @@ static constexpr bool is_settable_proxy_type_v =
 
 template <typename T>
 concept SettableProxyType = is_settable_proxy_type_v<T>;
+
+template <typename T>
+concept NonSettableProxyType = !SettableProxyType<T>;
 
 } // namespace property::detail
 

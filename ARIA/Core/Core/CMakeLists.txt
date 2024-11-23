@@ -78,6 +78,7 @@ set(core_core_headers
     ARIA/Invocations.h
     ARIA/Launcher.h
     ARIA/Layout.h
+    ARIA/Let.h
     ARIA/Property.h
     ARIA/PropertySTL.h
     ARIA/Python.h
