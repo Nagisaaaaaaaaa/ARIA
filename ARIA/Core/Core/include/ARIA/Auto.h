@@ -1,6 +1,7 @@
 #pragma once
 
-/// \file You may have known that `std::vector<bool>` is a special case in C++ STL.
+/// \file
+/// \brief You may have known that `std::vector<bool>` is a special case in C++ STL.
 /// See https://en.cppreference.com/w/cpp/container/vector_bool.
 /// This special cases make code based on `std::vector` much more error prone,
 /// one of the most tricky bugs is about `auto`, see the following examples.

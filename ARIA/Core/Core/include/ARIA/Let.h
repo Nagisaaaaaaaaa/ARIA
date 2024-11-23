@@ -1,8 +1,9 @@
 #pragma once
 
-/// \file Make sure you are familiar with `Auto.h` before continue.
+/// \file
+/// \warning Make sure you are familiar with `Auto.h` before continue.
 ///
-/// Suppose you are writing a very small project based on ARIA,
+/// \brief Suppose you are writing a very small project based on ARIA,
 /// it is very annoying to use `auto + Auto` type deduction everywhere.
 /// Instead, we want to use `Auto` only when we have to, which
 /// means that the compiler should be able to tell us:
