@@ -163,7 +163,26 @@ This tutorial shows how to integrate ARIA into a simple project with cmake and C
    
    `Auto()` helps better deduce the types from all proxy systems used in ARIA, which makes our codes safe. Read the comments in `Auto.h` and `Property.h` to see how to use them.
 
-5. **Coding standards.**
+5. **Make life easier for small projects.**
+
+   Suppose you are writing a very small project based on ARIA, it is very annoying to use `auto + Auto` type deduction everywhere. Instead, we want to use `Auto` only when we have to, which means that the compiler should be able to tell us:
+   1. Which `auto` is unsafe and refuse to compile them,
+   2. Which `Auto` is unnecessary and refuse to compile them.
+
+   So, `let + Let` type deduction is introduced to make life easier for small projects:
+
+   ```c++
+   let x = 10;
+   let x = Let(10); // Compile error.
+   
+   std::vector<bool> v(1);
+   let y = v[0]; // Compile error.
+   let y = Let(v[0]);
+   ```
+
+   Read the comments in `Let.h` to see how to use them, and feel free to use `let + Let` instead of `auto + Auto`.
+
+6. **Coding standards.**
 
    ARIA uses the coding standards similar to https://llvm.org/docs/CodingStandards.html but very different in naming. Please exactly follow the style of `ARIA::Core`. Read the codes and you will understand.
 
