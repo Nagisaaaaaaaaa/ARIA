@@ -26,6 +26,18 @@
 
 namespace ARIA {
 
+/// \brief A wrapped `auto`, refuse to compile when deducted to proxy types.
+///
+/// \example ```cpp
+/// let x = 10;
+/// let x = Let(10); // Compile error.
+///
+/// std::vector<bool> v(1);
+/// let x = v[0]; // Compile error.
+/// let x = Let(v[0]);
+/// ```
+///
+/// \see Auto.h
 #define let ::ARIA::property::detail::NonProxyType auto
 
 template <ARIA::property::detail::ProxyType T>
