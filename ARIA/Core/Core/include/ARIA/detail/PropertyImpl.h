@@ -449,12 +449,13 @@ private:
   template <typename TObjectMaybeConst>                                                                                \
   class ARIA_ANON(PROP_NAME);                                                                                          \
                                                                                                                        \
-  [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() {                                                                \
-    return ARIA_ANON(ARIA_ANON(PROP_NAME))<decltype(*this)>{this};                                                     \
-  }                                                                                                                    \
-  [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() const {                                                          \
-    return ARIA_ANON(ARIA_ANON(PROP_NAME))<decltype(*this)>{this};                                                     \
-  }                                                                                                                    \
+  /* TODO: Accessors are good, but will make it unable to overload properties. */                                      \
+  /* [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() {            */                                               \
+  /*   return ARIA_ANON(ARIA_ANON(PROP_NAME))<decltype(*this)>{this}; */                                               \
+  /* }                                                                */                                               \
+  /* [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() const {      */                                               \
+  /*   return ARIA_ANON(ARIA_ANON(PROP_NAME))<decltype(*this)>{this}; */                                               \
+  /* }                                                                */                                               \
                                                                                                                        \
   [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME(const T0 &t0) {                                                    \
     return ARIA_ANON(PROP_NAME)<decltype(*this)>{*this, t0};                                                           \
@@ -601,12 +602,12 @@ private:
   template <typename TObjectMaybeConst>                                                                                \
   class ARIA_ANON(PROP_NAME);                                                                                          \
                                                                                                                        \
-  [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() {                                                                \
-    return ARIA_ANON(ARIA_ANON(PROP_NAME))<decltype(*this)>{this};                                                     \
-  }                                                                                                                    \
-  [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() const {                                                          \
-    return ARIA_ANON(ARIA_ANON(PROP_NAME))<decltype(*this)>{this};                                                     \
-  }                                                                                                                    \
+  /* [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() {            */                                               \
+  /*   return ARIA_ANON(ARIA_ANON(PROP_NAME))<decltype(*this)>{this}; */                                               \
+  /* }                                                                */                                               \
+  /* [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() const {      */                                               \
+  /*   return ARIA_ANON(ARIA_ANON(PROP_NAME))<decltype(*this)>{this}; */                                               \
+  /* }                                                                */                                               \
                                                                                                                        \
   [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME(const T0 &t0, const T1 &t1) {                                      \
     return ARIA_ANON(PROP_NAME)<decltype(*this)>{*this, t0, t1};                                                       \

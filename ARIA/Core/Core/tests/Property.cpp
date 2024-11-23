@@ -2378,25 +2378,25 @@ TEST(Property, PropertyArguments) {
   {
     Test1Arg t0;
     const Test1Arg t1;
-    auto a0 = Auto(t0.test());
-    auto a1 = Auto(t1.test());
+    // auto a0 = Auto(t0.test());
+    // auto a1 = Auto(t1.test());
 
     EXPECT_EQ(t0.test(9), 19);
-    EXPECT_EQ(a0(9), 19);
+    // EXPECT_EQ(a0(9), 19);
     EXPECT_EQ(t1.test(9), 19);
-    EXPECT_EQ(a1(9), 19);
+    // EXPECT_EQ(a1(9), 19);
   }
 
   {
     Test2Args t0;
     const Test2Args t1;
-    auto a0 = Auto(t0.test());
-    auto a1 = Auto(t1.test());
+    // auto a0 = Auto(t0.test());
+    // auto a1 = Auto(t1.test());
 
     EXPECT_EQ(t0.test(9, 1.999F), 20);
-    EXPECT_EQ(a0(9, 1.999F), 20);
+    // EXPECT_EQ(a0(9, 1.999F), 20);
     EXPECT_EQ(t1.test(9, 1.999F), 20);
-    EXPECT_EQ(a1(9, 1.999F), 20);
+    // EXPECT_EQ(a1(9, 1.999F), 20);
   }
 }
 
