@@ -83,7 +83,7 @@ namespace ARIA {
 /// \see Property.h
 /// \see PropertyImpl.h
 template <typename T>
-ARIA_HOST_DEVICE auto Auto(const T &v) {
+ARIA_HOST_DEVICE auto Auto(T &&v) {
   if constexpr //! For ARIA property, note that this should be checked before any other proxy systems.
       (property::detail::PropertyType<std::decay_t<T>>)
     return v.value();
@@ -99,7 +99,7 @@ ARIA_HOST_DEVICE auto Auto(const T &v) {
        })
     return v.eval();
   else //! By default.
-    return v;
+    return std::forward<T>(v);
 }
 
 } // namespace ARIA
