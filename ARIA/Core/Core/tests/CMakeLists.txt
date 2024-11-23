@@ -14,6 +14,7 @@ if (ARIA_BUILD_TESTS)
       Invocations.cpp
       Launcher.cu
       Layout.cu
+      Let.cpp
       Property.cpp
       PropertySTL.cpp
       Python.cpp

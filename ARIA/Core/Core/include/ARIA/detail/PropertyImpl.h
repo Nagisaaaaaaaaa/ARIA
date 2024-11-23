@@ -9,45 +9,6 @@ namespace ARIA {
 
 namespace property::detail {
 
-/// \brief Whether the decayed given type `T` is a proxy type of any proxy system.
-///
-/// \warning EVERY settable proxy type of EVERY proxy system should be taken into account,
-/// or it will be dangerous when multiple proxy systems are used together.
-template <typename T>
-static constexpr bool isProxyType =
-    PropertyType<std::decay_t<T>>                                                                               ? true
-    : (std::is_same_v<std::decay_t<T>, std::decay_t<decltype(std::vector<bool>()[0])>>)                         ? true
-    : (!std::is_same_v<std::decay_t<T>, std::decay_t<decltype(thrust::raw_reference_cast(std::declval<T>()))>>) ? true
-    : (requires(T &&v) {
-        { v.eval() };
-      })                                                                                                        ? true
-                                                                                                                : false;
-
-/// \brief Whether the decayed given type `T` is a settable proxy type of any proxy system.
-/// For example, return type of `std::vector<bool>()[i]` is a settable proxy,
-/// return type of `thrust::device_vector<...>()[i]` is a settable proxy,
-/// all ARIA properties are settable proxies, but
-/// all `Eigen` proxies are non-settable proxies.
-///
-/// We have to define this concept to classify settable proxies from others,
-/// in order to forbid non-settable proxies in `ARIA_PROP_FUNC`.
-/// For example, `Eigen` function return types.
-///
-/// \warning EVERY settable proxy type of EVERY proxy system should be taken into account,
-/// or it will be dangerous when multiple proxy systems are used together.
-template <typename T>
-static constexpr bool isSettableProxyType =
-    PropertyType<std::decay_t<T>>                                                                               ? true
-    : (std::is_same_v<std::decay_t<T>, std::decay_t<decltype(std::vector<bool>()[0])>>)                         ? true
-    : (!std::is_same_v<std::decay_t<T>, std::decay_t<decltype(thrust::raw_reference_cast(std::declval<T>()))>>) ? true
-    : (requires(T &&v) {
-        { v.eval() };
-      })                                                                                                        ? false
-                                                                                                                : false;
-
-//
-//
-//
 /// \brief The opposite of `std::same_as`.
 template <typename T, typename U>
 concept DiffFrom = !std::same_as<T, U>;
@@ -482,8 +443,19 @@ private:
                 "The given property argument type should not be a property type");                                     \
                                                                                                                        \
   ACCESS_GET:                                                                                                          \
+  /*! Accessor type is generated for each property with arguments. */                                                  \
+  template <typename TObjectMaybeConst>                                                                                \
+  class ARIA_ANON(ARIA_ANON(PROP_NAME));                                                                               \
   template <typename TObjectMaybeConst>                                                                                \
   class ARIA_ANON(PROP_NAME);                                                                                          \
+                                                                                                                       \
+  /* TODO: Accessors are good, but will make it unable to overload properties. */                                      \
+  /* [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() {            */                                               \
+  /*   return ARIA_ANON(ARIA_ANON(PROP_NAME))<decltype(*this)>{this}; */                                               \
+  /* }                                                                */                                               \
+  /* [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() const {      */                                               \
+  /*   return ARIA_ANON(ARIA_ANON(PROP_NAME))<decltype(*this)>{this}; */                                               \
+  /* }                                                                */                                               \
                                                                                                                        \
   [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME(const T0 &t0) {                                                    \
     return ARIA_ANON(PROP_NAME)<decltype(*this)>{*this, t0};                                                           \
@@ -491,6 +463,28 @@ private:
   [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME(const T0 &t0) const {                                              \
     return ARIA_ANON(PROP_NAME)<decltype(*this)>{*this, t0};                                                           \
   }                                                                                                                    \
+                                                                                                                       \
+  template <typename TObjectMaybeConst>                                                                                \
+  class ARIA_ANON(ARIA_ANON(PROP_NAME)) final {                                                                        \
+  private:                                                                                                             \
+    using TObject = std::remove_const_t<TObjectMaybeConst>;                                                            \
+    friend std::decay_t<TObject>;                                                                                      \
+                                                                                                                       \
+    using TObjectMaybeConstNonRef = std::remove_reference_t<TObjectMaybeConst>;                                        \
+    TObjectMaybeConstNonRef *object;                                                                                   \
+                                                                                                                       \
+    SPECIFIERS explicit ARIA_ANON(ARIA_ANON(PROP_NAME))(TObjectMaybeConstNonRef * object) : object(object) {}          \
+                                                                                                                       \
+  public:                                                                                                              \
+    ARIA_COPY_MOVE_ABILITY(ARIA_ANON(ARIA_ANON(PROP_NAME)), default, default);                                         \
+                                                                                                                       \
+    ARIA_HOST_DEVICE decltype(auto) operator()(const T0 &t0) {                                                         \
+      return ARIA_ANON(PROP_NAME)<TObjectMaybeConst>{*object, t0};                                                     \
+    }                                                                                                                  \
+    ARIA_HOST_DEVICE decltype(auto) operator()(const T0 &t0) const {                                                   \
+      return ARIA_ANON(PROP_NAME)<TObjectMaybeConst>{*object, t0};                                                     \
+    }                                                                                                                  \
+  };                                                                                                                   \
                                                                                                                        \
   template <typename TObjectMaybeConst>                                                                                \
       class ARIA_ANON(PROP_NAME) final : public property::detail::PropertyBase < ARIA_ANON(PROP_NAME) <                \
@@ -604,7 +598,16 @@ private:
                                                                                                                        \
   ACCESS_GET:                                                                                                          \
   template <typename TObjectMaybeConst>                                                                                \
+  class ARIA_ANON(ARIA_ANON(PROP_NAME));                                                                               \
+  template <typename TObjectMaybeConst>                                                                                \
   class ARIA_ANON(PROP_NAME);                                                                                          \
+                                                                                                                       \
+  /* [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() {            */                                               \
+  /*   return ARIA_ANON(ARIA_ANON(PROP_NAME))<decltype(*this)>{this}; */                                               \
+  /* }                                                                */                                               \
+  /* [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() const {      */                                               \
+  /*   return ARIA_ANON(ARIA_ANON(PROP_NAME))<decltype(*this)>{this}; */                                               \
+  /* }                                                                */                                               \
                                                                                                                        \
   [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME(const T0 &t0, const T1 &t1) {                                      \
     return ARIA_ANON(PROP_NAME)<decltype(*this)>{*this, t0, t1};                                                       \
@@ -612,6 +615,28 @@ private:
   [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME(const T0 &t0, const T1 &t1) const {                                \
     return ARIA_ANON(PROP_NAME)<decltype(*this)>{*this, t0, t1};                                                       \
   }                                                                                                                    \
+                                                                                                                       \
+  template <typename TObjectMaybeConst>                                                                                \
+  class ARIA_ANON(ARIA_ANON(PROP_NAME)) final {                                                                        \
+  private:                                                                                                             \
+    using TObject = std::remove_const_t<TObjectMaybeConst>;                                                            \
+    friend std::decay_t<TObject>;                                                                                      \
+                                                                                                                       \
+    using TObjectMaybeConstNonRef = std::remove_reference_t<TObjectMaybeConst>;                                        \
+    TObjectMaybeConstNonRef *object;                                                                                   \
+                                                                                                                       \
+    SPECIFIERS explicit ARIA_ANON(ARIA_ANON(PROP_NAME))(TObjectMaybeConstNonRef * object) : object(object) {}          \
+                                                                                                                       \
+  public:                                                                                                              \
+    ARIA_COPY_MOVE_ABILITY(ARIA_ANON(ARIA_ANON(PROP_NAME)), default, default);                                         \
+                                                                                                                       \
+    ARIA_HOST_DEVICE decltype(auto) operator()(const T0 &t0, const T1 &t1) {                                           \
+      return ARIA_ANON(PROP_NAME)<TObjectMaybeConst>{*object, t0, t1};                                                 \
+    }                                                                                                                  \
+    ARIA_HOST_DEVICE decltype(auto) operator()(const T0 &t0, const T1 &t1) const {                                     \
+      return ARIA_ANON(PROP_NAME)<TObjectMaybeConst>{*object, t0, t1};                                                 \
+    }                                                                                                                  \
+  };                                                                                                                   \
                                                                                                                        \
   template <typename TObjectMaybeConst>                                                                                \
       class ARIA_ANON(PROP_NAME) final : public property::detail::PropertyBase < ARIA_ANON(PROP_NAME) <                \
@@ -855,7 +880,7 @@ public:                                                                         
       if constexpr (std::is_pointer_v<decltype(tmp)>) {                                                                \
         using TGet = decltype(tmp->PROP_NAME());                                                                       \
                                                                                                                        \
-        constexpr bool isGetProxy = property::detail::isProxyType<TGet>;                                               \
+        constexpr bool isGetProxy = property::detail::ProxyType<TGet>;                                                 \
         constexpr bool isGetReferenceOrPointer = property::detail::isReferenceOrPointer<TGet>;                         \
         constexpr bool isGetValue = !isGetReferenceOrPointer && !isGetProxy;                                           \
                                                                                                                        \
@@ -867,7 +892,7 @@ public:                                                                         
       } else {                                                                                                         \
         using TGet = decltype(tmp.PROP_NAME());                                                                        \
                                                                                                                        \
-        constexpr bool isGetProxy = property::detail::isProxyType<TGet>;                                               \
+        constexpr bool isGetProxy = property::detail::ProxyType<TGet>;                                                 \
         constexpr bool isGetReferenceOrPointer = property::detail::isReferenceOrPointer<TGet>;                         \
         constexpr bool isGetValue = !isGetReferenceOrPointer && !isGetProxy;                                           \
                                                                                                                        \
@@ -1264,7 +1289,7 @@ private:                                                                        
                                                                                                                        \
     using TRes = decltype(v DOT_OR_ARROW FUNC_NAME(std::forward<Ts>(ts)...));                                          \
                                                                                                                        \
-    if constexpr (property::detail::isSettableProxyType<TRes>) {                                                       \
+    if constexpr (property::detail::SettableProxyType<TRes>) {                                                         \
       /* This requirement is necessary to avoid settable proxies pointing to temporary variables. */                   \
       ARIA_STATIC_ASSERT_FALSE("Return type of the property function should not be a settable proxy type");            \
     } else {                                                                                                           \
@@ -1301,7 +1326,7 @@ private:                                                                        
                                                                                                                        \
     using TRes = decltype(v DOT_OR_ARROW FUNC_NAME(std::forward<Ts>(ts)...));                                          \
                                                                                                                        \
-    if constexpr (property::detail::isSettableProxyType<TRes>) {                                                       \
+    if constexpr (property::detail::SettableProxyType<TRes>) {                                                         \
       /* This requirement is necessary to avoid settable proxies pointing to temporary variables. */                   \
       ARIA_STATIC_ASSERT_FALSE("Return type of the property function should not be a settable proxy type");            \
     } else {                                                                                                           \

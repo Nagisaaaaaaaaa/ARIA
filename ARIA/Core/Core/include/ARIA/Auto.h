@@ -1,6 +1,7 @@
 #pragma once
 
-/// \file You may have known that `std::vector<bool>` is a special case in C++ STL.
+/// \file
+/// \brief You may have known that `std::vector<bool>` is a special case in C++ STL.
 /// See https://en.cppreference.com/w/cpp/container/vector_bool.
 /// This special cases make code based on `std::vector` much more error prone,
 /// one of the most tricky bugs is about `auto`, see the following examples.
@@ -22,10 +23,6 @@
 //
 //
 #include "ARIA/detail/PropertyType.h"
-
-#include <thrust/detail/raw_reference_cast.h>
-
-#include <vector>
 
 namespace ARIA {
 
@@ -87,14 +84,15 @@ namespace ARIA {
 /// \see Property.h
 /// \see PropertyImpl.h
 template <typename T>
-ARIA_HOST_DEVICE auto Auto(const T &v) {
+ARIA_HOST_DEVICE auto Auto(T &&v) {
   if constexpr //! For ARIA property, note that this should be checked before any other proxy systems.
       (property::detail::PropertyType<std::decay_t<T>>)
     return v.value();
   else if constexpr (std::is_same_v<std::decay_t<T>,
                                     std::decay_t<decltype(std::vector<bool>()[0])>>) //! For `std::vector<bool>`.
     return static_cast<bool>(v);
-  else if constexpr (!std::is_same_v<std::decay_t<T>, std::decay_t<decltype(thrust::raw_reference_cast(v))>>)
+  else if constexpr (!std::is_same_v<std::decay_t<T>,
+                                     std::decay_t<decltype(thrust::raw_reference_cast(v))>>) //! For `thrust`.
     return thrust::raw_reference_cast(v);
   else if constexpr //! For `Eigen`.
       (requires {
@@ -102,7 +100,7 @@ ARIA_HOST_DEVICE auto Auto(const T &v) {
        })
     return v.eval();
   else //! By default.
-    return v;
+    return std::forward<T>(v);
 }
 
 } // namespace ARIA

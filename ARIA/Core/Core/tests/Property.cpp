@@ -625,6 +625,36 @@ private:
   }
 };
 
+class Test1Arg {
+public:
+  ARIA_PROP(public, public, , int, test, int);
+
+private:
+  int base = 10;
+
+  [[nodiscard]] int ARIA_PROP_IMPL(test)(int v) const {
+    return base + v;
+  }
+  [[nodiscard]] int ARIA_PROP_IMPL(test)(int v) {
+    return base + v;
+  }
+};
+
+class Test2Args {
+public:
+  ARIA_PROP(public, public, , int, test, int, float);
+
+private:
+  int base = 10;
+
+  [[nodiscard]] int ARIA_PROP_IMPL(test)(int v0, float v1) const {
+    return base + v0 + static_cast<int>(std::floor(v1));
+  }
+  [[nodiscard]] int ARIA_PROP_IMPL(test)(int v0, float v1) {
+    return base + v0 + static_cast<int>(std::floor(v1));
+  }
+};
+
 } // namespace
 
 
@@ -2341,6 +2371,32 @@ TEST(Property, ReferenceProperties) {
     f0.z() = 1.1f;
     EXPECT_FLOAT_EQ(t0.forward().z(), 1.1f);
     EXPECT_FLOAT_EQ(f0.z(), 1.1f);
+  }
+}
+
+TEST(Property, PropertyArguments) {
+  {
+    Test1Arg t0;
+    const Test1Arg t1;
+    // auto a0 = Auto(t0.test());
+    // auto a1 = Auto(t1.test());
+
+    EXPECT_EQ(t0.test(9), 19);
+    // EXPECT_EQ(a0(9), 19);
+    EXPECT_EQ(t1.test(9), 19);
+    // EXPECT_EQ(a1(9), 19);
+  }
+
+  {
+    Test2Args t0;
+    const Test2Args t1;
+    // auto a0 = Auto(t0.test());
+    // auto a1 = Auto(t1.test());
+
+    EXPECT_EQ(t0.test(9, 1.999F), 20);
+    // EXPECT_EQ(a0(9, 1.999F), 20);
+    EXPECT_EQ(t1.test(9, 1.999F), 20);
+    // EXPECT_EQ(a1(9, 1.999F), 20);
   }
 }
 
