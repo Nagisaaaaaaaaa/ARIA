@@ -40,6 +40,21 @@ namespace ARIA {
 /// \see Auto.h
 #define let ::ARIA::property::detail::NonProxyType auto
 
+//
+//
+//
+/// \brief A wrapped `Auto`, refuse to compile when given non-proxy types.
+///
+/// \example ```cpp
+/// let x = 10;
+/// let x = Let(10); // Compile error.
+///
+/// std::vector<bool> v(1);
+/// let x = v[0]; // Compile error.
+/// let x = Let(v[0]);
+/// ```
+///
+/// \see Auto.h
 template <ARIA::property::detail::ProxyType T>
 ARIA_HOST_DEVICE auto Let(T &&v) {
   return Auto(std::forward<T>(v));
