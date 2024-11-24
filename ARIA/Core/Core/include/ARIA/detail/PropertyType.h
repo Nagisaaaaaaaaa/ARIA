@@ -41,6 +41,7 @@ static constexpr bool is_proxy_type_v =
     : (!std::is_same_v<std::decay_t<T>, std::decay_t<decltype(thrust::raw_reference_cast(std::declval<T>()))>>) ? true
     : (requires(T &&v) {
         { v.eval() };
+        requires !std::is_same_v<std::decay_t<T>, std::decay_t<decltype(v.eval())>>;
       })                                                                                                        ? true
                                                                                                                 : false;
 
@@ -69,6 +70,7 @@ static constexpr bool is_settable_proxy_type_v =
     : (!std::is_same_v<std::decay_t<T>, std::decay_t<decltype(thrust::raw_reference_cast(std::declval<T>()))>>) ? true
     : (requires(T &&v) {
         { v.eval() };
+        requires !std::is_same_v<std::decay_t<T>, std::decay_t<decltype(v.eval())>>;
       })                                                                                                        ? false
                                                                                                                 : false;
 
