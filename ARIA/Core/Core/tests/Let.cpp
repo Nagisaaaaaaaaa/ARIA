@@ -72,20 +72,32 @@ TEST(Let, Base) {
   {
     // let v0 = t.forward();
     let v1 = Let(t.forward());
+    let &v2 = v1;
+    let &&v3 = std::move(v1);
     static_assert(std::is_same_v<decltype(v1), Vec3<float>>);
+    static_assert(std::is_same_v<decltype(v2), Vec3<float> &>);
+    static_assert(std::is_same_v<decltype(v3), Vec3<float> &&>);
   }
 
   {
     // let v0 = t.forward().x();
     let v1 = Let(t.forward().x());
+    let &v2 = v1;
+    let &&v3 = std::move(v1);
     static_assert(std::is_same_v<decltype(v1), float>);
+    static_assert(std::is_same_v<decltype(v2), float &>);
+    static_assert(std::is_same_v<decltype(v3), float &&>);
   }
 
   {
     std::vector<bool> vec(10);
     // let v0 = vec[0];
     let v1 = Let(vec[0]);
+    let &v2 = v1;
+    let &&v3 = std::move(v1);
     static_assert(std::is_same_v<decltype(v1), bool>);
+    static_assert(std::is_same_v<decltype(v2), bool &>);
+    static_assert(std::is_same_v<decltype(v3), bool &&>);
   }
 }
 
