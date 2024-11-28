@@ -92,7 +92,7 @@ public:
   //! While methods `Fill`, `Clear`, and `Flip` can be easily implemented as atomic,
   //! `at(i)` and `operator[]` cannot be trivially implemented as atomic, because
   //! setting a bit requires twice the efforts than filling, clearing, or flipping a bit.
-  ARIA_PROP(public, public, ARIA_HOST_DEVICE, bool, at, size_t);
+  ARIA_PROP(public, public, ARIA_HOST_DEVICE, bool, at);
 
 public:
   /// \brief Access the i^th bit.
