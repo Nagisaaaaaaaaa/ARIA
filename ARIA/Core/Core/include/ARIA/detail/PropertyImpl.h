@@ -442,8 +442,8 @@ private:
 private:                                                                                                               \
   class ARIA_ANON(DummyClassForPropEnd) {}
 
-#define __ARIA_PROP(...);                                                                                              \
-  __ARIA_PROP_BEGIN(__VA_ARGS__);                                                                                      \
+#define __ARIA_PROP(ACCESS_GET, ACCESS_SET, SPECIFIERS, TYPE, PROP_NAME)                                               \
+  __ARIA_PROP_BEGIN(ACCESS_GET, ACCESS_SET, SPECIFIERS, TYPE, PROP_NAME);                                              \
   __ARIA_PROP_END
 // clang-format on
 
@@ -660,7 +660,7 @@ public:                                                                         
 private:                                                                                                               \
   class ARIA_CONCAT(DummyClassForSubPropEnd, __COUNTER__) {}
 
-#define __ARIA_SUB_PROP(SPECIFIERS, TYPE, PROP_NAME);                                                                  \
+#define __ARIA_SUB_PROP(SPECIFIERS, TYPE, PROP_NAME)                                                                   \
   __ARIA_SUB_PROP_BEGIN(SPECIFIERS, TYPE, PROP_NAME);                                                                  \
   __ARIA_SUB_PROP_END
 // clang-format on
