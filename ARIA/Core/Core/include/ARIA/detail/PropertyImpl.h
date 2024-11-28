@@ -418,15 +418,15 @@ private:
     template <typename TUVW>                                                                                           \
      SPECIFIERS ARIA_ANON(PROP_NAME) &operator=(TUVW &&value) {                                                        \
       cuda::std::apply(                                                                                                \
-          [&](const auto &...propArgsTuple) { Set(object, propArgsTuple..., std::forward<TUVW>(value)); }, propArgs);  \
+          [&](const auto &...propArgsTuple) { Set(object, std::forward<TUVW>(value), propArgsTuple...); }, propArgs);  \
       return *this;                                                                                                    \
     }                                                                                                                  \
     /* Calls the user-defined setter with an array. */                                                                 \
     template <typename TUVW, size_t n>                                                                                 \
      SPECIFIERS ARIA_ANON(PROP_NAME) &operator=(const TUVW (&args)[n]) {                                               \
       cuda::std::apply([&](const auto &...propArgsTuple) {                                                             \
-        Set(object, propArgsTuple...,                                                                                  \
-            property::detail::ConstructWithArray<std::decay_t<Type>>(args, std::make_index_sequence<n>{}));            \
+        Set(object, property::detail::ConstructWithArray<std::decay_t<Type>>(args, std::make_index_sequence<n>{}),     \
+            propArgsTuple...);                                                                                         \
       }, propArgs);                                                                                                    \
       return *this;                                                                                                    \
     }                                                                                                                  \
@@ -638,14 +638,14 @@ public:                                                                         
     template <typename TUVW>                                                                                           \
     SPECIFIERS ARIA_ANON(PROP_NAME) &operator=(TUVW &&value) {                                                         \
       cuda::std::apply(                                                                                                \
-          [&](const auto &...propArgsTuple) { Set(object, propArgsTuple..., std::forward<TUVW>(value)); }, propArgs);  \
+          [&](const auto &...propArgsTuple) { Set(object, std::forward<TUVW>(value), propArgsTuple...); }, propArgs);  \
       return *this;                                                                                                    \
     }                                                                                                                  \
     template <typename TUVW, size_t n>                                                                                 \
     SPECIFIERS ARIA_ANON(PROP_NAME) &operator=(const TUVW (&args)[n]) {                                                \
       cuda::std::apply([&](const auto &...propArgsTuple) {                                                             \
-        Set(object, propArgsTuple...,                                                                                  \
-            property::detail::ConstructWithArray<std::decay_t<Type>>(args, std::make_index_sequence<n>{}));            \
+        Set(object, property::detail::ConstructWithArray<std::decay_t<Type>>(args, std::make_index_sequence<n>{}),     \
+            propArgsTuple...);                                                                                         \
       }, propArgs);                                                                                                    \
       return *this;                                                                                                    \
     }                                                                                                                  \
