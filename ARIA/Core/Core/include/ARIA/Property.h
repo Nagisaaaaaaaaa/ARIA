@@ -367,8 +367,8 @@ namespace ARIA {
 /// So, `inline` has no effects here.
 /// \param type Type of the property, can be value or reference.
 /// \param propName Name of the property.
-/// \param args Optional arguments types to get or set the property.
-#define ARIA_PROP_BEGIN /*(accessGet, accessSet, specifiers, type, propName, (optional) args...)*/ __ARIA_PROP_BEGIN
+#define ARIA_PROP_BEGIN(accessGet, accessSet, specifiers, type, propName)                                              \
+  __ARIA_PROP_BEGIN(accessGet, accessSet, specifiers, type, propName)
 
 //
 //
@@ -395,8 +395,8 @@ namespace ARIA {
 /// So, `inline` has no effects here.
 /// \param type Type of the property, can be value or reference.
 /// \param propName Name of the property.
-/// \param args Optional arguments types to get or set the property.
-#define ARIA_PROP /*(accessGet, accessSet, specifiers, type, propName, (optional) args...)*/ __ARIA_PROP
+#define ARIA_PROP(accessGet, accessSet, specifiers, type, propName)                                                    \
+  __ARIA_PROP(accessGet, accessSet, specifiers, type, propName)
 
 //
 //
