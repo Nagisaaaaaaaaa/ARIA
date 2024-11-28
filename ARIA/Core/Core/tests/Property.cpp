@@ -627,7 +627,7 @@ private:
 
 class Test1Arg {
 public:
-  ARIA_PROP(public, public, , int, test, int);
+  ARIA_PROP(public, public, , int, test);
 
 private:
   int base = 10;
@@ -642,7 +642,7 @@ private:
 
 class Test2Args {
 public:
-  ARIA_PROP(public, public, , int, test, int, float);
+  ARIA_PROP(public, public, , int, test);
 
 private:
   int base = 10;
