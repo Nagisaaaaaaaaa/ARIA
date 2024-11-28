@@ -380,6 +380,11 @@ private:
                         std::is_same_v<std::decay_t<TUVW>, On> || std::is_same_v<std::decay_t<TUVW>, Off>,             \
                     "The value given to the setter should be convertible to the given property value type");           \
                                                                                                                        \
+      /* Also, return type of the setter is restricted to `void`. */                                                   \
+      static_assert(requires {                                                                                         \
+        { object.__ARIA_PROP_IMPL(PROP_NAME)(propArgs..., std::forward<TUVW>(value)) } -> std::same_as<void>;          \
+      }, "Return type of the setter should be void");                                                                  \
+                                                                                                                       \
       /* Calls the user-defined setter. */                                                                             \
       object.__ARIA_PROP_IMPL(PROP_NAME)(propArgs..., std::forward<TUVW>(value));                                      \
     }                                                                                                                  \
