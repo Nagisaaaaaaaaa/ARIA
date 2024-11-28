@@ -346,7 +346,7 @@ private:
                                                                                                                        \
     /* This function is defined `static` to handle `auto c = obj.a().b().c();`. */                                     \
     /* See comments of `ARIA_SUB_PROP_BEGIN`. */                                                                       \
-    [[nodiscard]] static SPECIFIERS decltype(auto) Get(TObjectMaybeConst &object, const TUVWArgs &...propArgs)         \
+    [[nodiscard]] static SPECIFIERS decltype(auto) Get(TObjectMaybeConst &object, const auto &...propArgs)             \
       requires property::detail::isReferenceOrPointer<Type>                                                            \
     {                                                                                                                  \
       static_assert(                                                                                                   \
@@ -358,7 +358,7 @@ private:
       /* Calls the user-defined getter. */                                                                             \
       return object.__ARIA_PROP_IMPL(PROP_NAME)(propArgs...);                                                          \
     }                                                                                                                  \
-    [[nodiscard]] static SPECIFIERS Type Get(TObjectMaybeConst &object, const TUVWArgs &...propArgs)                   \
+    [[nodiscard]] static SPECIFIERS Type Get(TObjectMaybeConst &object, const auto &...propArgs)                       \
       requires(!property::detail::isReferenceOrPointer<Type>)                                                          \
     {                                                                                                                  \
       static_assert(                                                                                                   \
@@ -371,7 +371,7 @@ private:
       return Auto(object.__ARIA_PROP_IMPL(PROP_NAME)(propArgs...));                                                    \
     }                                                                                                                  \
     template <typename TUVW>                                                                                           \
-    static SPECIFIERS void Set(TObject &object, TUVW &&value, const TUVWArgs &...propArgs) {                           \
+    static SPECIFIERS void Set(TObject &object, TUVW &&value, const auto &...propArgs) {                               \
       /* Perform type check. */                                                                                        \
       /* This check is performed to restrict behavior of the user-defined setter. */                                   \
       /* For example, users should not set a dog to a cat, */                                                          \
@@ -515,7 +515,7 @@ public:                                                                         
     SPECIFIERS explicit ARIA_ANON(PROP_NAME)(TObjectMaybeConst & object, const TUVWArgs &...propArgs)                  \
         : object(object), propArgs(propArgs...) {}                                                                     \
                                                                                                                        \
-    [[nodiscard]] static SPECIFIERS decltype(auto) Get(TObjectMaybeConst &object, const TUVWArgs &...propArgs)         \
+    [[nodiscard]] static SPECIFIERS decltype(auto) Get(TObjectMaybeConst &object, const auto &...propArgs)             \
       requires property::detail::isReferenceOrPointer<Type>                                                            \
     {                                                                                                                  \
       decltype(auto) tmp = TPropertyBase::Get(object);                                                                 \
@@ -549,7 +549,7 @@ public:                                                                         
           return tmp.PROP_NAME(propArgs...);                                                                           \
       }                                                                                                                \
     }                                                                                                                  \
-    [[nodiscard]] static SPECIFIERS Type Get(TObjectMaybeConst &object, const TUVWArgs &...propArgs)                   \
+    [[nodiscard]] static SPECIFIERS Type Get(TObjectMaybeConst &object, const auto &...propArgs)                       \
       requires(!property::detail::isReferenceOrPointer<Type>)                                                          \
     {                                                                                                                  \
       decltype(auto) tmp = TPropertyBase::Get(object);                                                                 \
@@ -577,7 +577,7 @@ public:                                                                         
       }                                                                                                                \
     }                                                                                                                  \
     template <typename TUVW>                                                                                           \
-    static SPECIFIERS void Set(TObject &object, TUVW &&value, const TUVWArgs &...propArgs) {                           \
+    static SPECIFIERS void Set(TObject &object, TUVW &&value, const auto &...propArgs) {                               \
       static_assert(std::convertible_to<decltype(value), std::decay_t<Type>> ||                                        \
                         std::is_same_v<std::decay_t<TUVW>, On> || std::is_same_v<std::decay_t<TUVW>, Off>,             \
                     "The value given to the setter should be convertible to the given property value type");           \
