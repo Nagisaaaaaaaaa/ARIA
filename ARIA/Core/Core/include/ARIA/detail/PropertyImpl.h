@@ -259,7 +259,9 @@ private:
 //
 //
 //
-#define __ARIA_PROP_IMPL(PROP_NAME) ARIA_CONCAT(PROP_NAME, ARIAPropertyImplementation)
+#define __ARIA_PROP_GETTER(PROP_NAME) ARIA_CONCAT(PROP_NAME, ARIAPropertyGetterImplementation)
+
+#define __ARIA_PROP_SETTER(PROP_NAME) ARIA_CONCAT(PROP_NAME, ARIAPropertySetterImplementation)
 
 //
 //
@@ -351,24 +353,24 @@ private:
     {                                                                                                                  \
       static_assert(                                                                                                   \
           !property::detail::isReferenceOrPointer<Type> ||                                                             \
-              property::detail::isReferenceOrPointer<decltype(object.__ARIA_PROP_IMPL(PROP_NAME)(propArgs...))>,       \
+              property::detail::isReferenceOrPointer<decltype(object.__ARIA_PROP_GETTER(PROP_NAME)(propArgs...))>,     \
           "The getter is only allowed to return reference or pointer when "                                            \
           "the specified property value type is a reference or a pointer");                                            \
                                                                                                                        \
       /* Calls the user-defined getter. */                                                                             \
-      return object.__ARIA_PROP_IMPL(PROP_NAME)(propArgs...);                                                          \
+      return object.__ARIA_PROP_GETTER(PROP_NAME)(propArgs...);                                                        \
     }                                                                                                                  \
     [[nodiscard]] static SPECIFIERS Type Get(TObjectMaybeConst &object, const auto &...propArgs)                       \
       requires(!property::detail::isReferenceOrPointer<Type>)                                                          \
     {                                                                                                                  \
       static_assert(                                                                                                   \
           !property::detail::isReferenceOrPointer<Type> ||                                                             \
-              property::detail::isReferenceOrPointer<decltype(object.__ARIA_PROP_IMPL(PROP_NAME)(propArgs...))>,       \
+              property::detail::isReferenceOrPointer<decltype(object.__ARIA_PROP_GETTER(PROP_NAME)(propArgs...))>,     \
           "The getter is only allowed to return reference or pointer when "                                            \
           "the specified property value type is a reference or a pointer");                                            \
                                                                                                                        \
       /* Calls the user-defined getter. */                                                                             \
-      return Auto(object.__ARIA_PROP_IMPL(PROP_NAME)(propArgs...));                                                    \
+      return Auto(object.__ARIA_PROP_GETTER(PROP_NAME)(propArgs...));                                                  \
     }                                                                                                                  \
     template <typename TUVW>                                                                                           \
     static SPECIFIERS void Set(TObject &object, TUVW &&value, const auto &...propArgs) {                               \
@@ -382,11 +384,11 @@ private:
                                                                                                                        \
       /* Also, return type of the setter is restricted to `void`. */                                                   \
       static_assert(requires {                                                                                         \
-        { object.__ARIA_PROP_IMPL(PROP_NAME)(propArgs..., std::forward<TUVW>(value)) } -> std::same_as<void>;          \
+        { object.__ARIA_PROP_SETTER(PROP_NAME)(propArgs..., std::forward<TUVW>(value)) } -> std::same_as<void>;        \
       }, "Return type of the setter should be void");                                                                  \
                                                                                                                        \
       /* Calls the user-defined setter. */                                                                             \
-      object.__ARIA_PROP_IMPL(PROP_NAME)(propArgs..., std::forward<TUVW>(value));                                      \
+      object.__ARIA_PROP_SETTER(PROP_NAME)(propArgs..., std::forward<TUVW>(value));                                    \
     }                                                                                                                  \
                                                                                                                        \
   public:                                                                                                              \

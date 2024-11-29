@@ -26,12 +26,12 @@
 ///   // Define a property, whose type is `size_t`, name is `size`.
 ///   // The first `public` means external codes are allowed to get the value.
 ///   // The second `public` means external codes are allowed to set the value.
-///   // The "getter" is defined below with `ARIA_PROP_IMPL(size)()`.
-///   // The "setter" is defined below with `ARIA_PROP_IMPL(size)(...)`.
+///   // The "getter" is defined below with `ARIA_PROP_GETTER(size)()`.
+///   // The "setter" is defined below with `ARIA_PROP_SETTER(size)(...)`.
 ///   // The third parameter is the function specifiers, for example,
 ///   // `__host__`, `__device__`, or nothing, etc.
-///   // Note, whether the "getter" or "setter" is inline depends on
-///   // its actual implementation, which is defined with `ARIA_PROP_IMPL`.
+///   // Note, whether the "getter" or "setter" is inline depends on its
+///   // actual implementation, which is defined with `ARIA_PROP_GETTER` or `ARIA_PROP_SETTER`.
 ///   // You are allowed to declare the "getter" and "setter" in `.h` files, and
 ///   // implement them in `.cpp` files, that's fine.
 ///   // So, `inline` has no effects here.
@@ -62,10 +62,10 @@
 ///   // even though the below two functions are declared as private.
 /// private:
 ///   // The "getter" of property `size`.
-///   [[nodiscard]] size_t ARIA_PROP_IMPL(size)() const { return v.size(); }
+///   [[nodiscard]] size_t ARIA_PROP_GETTER(size)() const { return v.size(); }
 ///
 ///   // The "setter" of property `size`.
-///   void ARIA_PROP_IMPL(size)(const size_t &value) { v.resize(value); }
+///   void ARIA_PROP_SETTER(size)(const size_t &value) { v.resize(value); }
 /// };
 ///
 /// template <typename T>
@@ -122,15 +122,15 @@
 ///   T &yImpl() { return y_; }
 ///
 ///   // The "getter" of property `lengthSqr`.
-///   [[nodiscard]] T ARIA_PROP_IMPL(lengthSqr)() const { return Dot(*this); }
+///   [[nodiscard]] T ARIA_PROP_GETTER(lengthSqr)() const { return Dot(*this); }
 ///
 ///   // Note, we don't need to implement a "setter" for `lengthSqr`.
 ///
 ///   // The "getter" of property `length`.
-///   [[nodiscard]] T ARIA_PROP_IMPL(length)() const { return std::sqrt(lengthSqr()); }
+///   [[nodiscard]] T ARIA_PROP_GETTER(length)() const { return std::sqrt(lengthSqr()); }
 ///
 ///   // The "setter" of property `length`.
-///   void ARIA_PROP_IMPL(length)(const T &value) {
+///   void ARIA_PROP_SETTER(length)(const T &value) {
 ///     auto scaling = value / length();
 ///     x() *= scaling;
 ///     y() *= scaling;
@@ -186,25 +186,25 @@
 ///   Vec3<double> forward_; // Note, double here, but type of property `forward` is declared as `Vec3<float>`.
 ///
 ///   // The "getter" of property `forward`.
-///   [[nodiscard]] Vec3<float> ARIA_PROP_IMPL(forward)() const {
+///   [[nodiscard]] Vec3<float> ARIA_PROP_GETTER(forward)() const {
 ///     return {static_cast<float>(forward_.x()), static_cast<float>(forward_.y()), static_cast<float>(forward_.z())};
 ///   }
 ///
 ///   // The "setter" of property `forward`.
-///   void ARIA_PROP_IMPL(forward)(const Vec3<float> &value) {
+///   void ARIA_PROP_SETTER(forward)(const Vec3<float> &value) {
 ///     forward_.x() = value.x();
 ///     forward_.y() = value.y();
 ///     forward_.z() = value.z();
 ///   }
 ///
 ///   // The "getter" of property `forwardByRef`, const version.
-///   [[nodiscard]] const Vec3<double> &ARIA_PROP_IMPL(forwardByRef)() const { return forward_; }
+///   [[nodiscard]] const Vec3<double> &ARIA_PROP_GETTER(forwardByRef)() const { return forward_; }
 ///
 ///   // The "getter" of property `forwardByRef`, non const version.
-///   [[nodiscard]] Vec3<double> &ARIA_PROP_IMPL(forwardByRef)() { return forward_; }
+///   [[nodiscard]] Vec3<double> &ARIA_PROP_GETTER(forwardByRef)() { return forward_; }
 ///
 ///   // The "setter" of property `forwardByRef`.
-///   void ARIA_PROP_IMPL(forwardByRef)(const Vec3<double> &value) { forward_ = value; }
+///   void ARIA_PROP_SETTER(forwardByRef)(const Vec3<double> &value) { forward_ = value; }
 /// };
 ///
 /// class Object {
@@ -341,10 +341,15 @@
 //
 namespace ARIA {
 
-/// \brief Getter and setter of a property should be defined only with the help of this macro.
+/// \brief Getters of a property should be defined only with the help of this macro.
 ///
 /// \param propName Name of the property defined by `ARIA_PROP` or `ARIA_PROP_BEGIN`.
-#define ARIA_PROP_IMPL(propName) __ARIA_PROP_IMPL(propName)
+#define ARIA_PROP_GETTER(propName) __ARIA_PROP_GETTER(propName)
+
+/// \brief Setters of a property should be defined only with the help of this macro.
+///
+/// \param propName Name of the property defined by `ARIA_PROP` or `ARIA_PROP_BEGIN`.
+#define ARIA_PROP_SETTER(propName) __ARIA_PROP_SETTER(propName)
 
 //
 //
@@ -363,7 +368,8 @@ namespace ARIA {
 /// \param accessSet The accessibility of the property setter by external codes.
 /// Should be `public`, `protected`, or `private`.
 /// \param specifiers Function specifiers such as `__host__`, `__device__`, etc.
-/// Note, whether the getter or setter is inline depends on its actual implementation, defined with `ARIA_PROP_IMPL`.
+/// Note, whether the getter or setter is inline depends on its actual implementation, which
+/// is defined with `ARIA_PROP_GETTER` or `ARIA_PROP_SETTER`.
 /// So, `inline` has no effects here.
 /// \param type Type of the property, can be value or reference.
 /// \param propName Name of the property.
@@ -391,7 +397,8 @@ namespace ARIA {
 /// \param accessSet The accessibility of the property setter by external codes.
 /// Should be `public`, `protected`, or `private`.
 /// \param specifiers Function specifiers such as `__host__`, `__device__`, etc.
-/// Note, whether the getter or setter is inline depends on its actual implementation, defined with `ARIA_PROP_IMPL`.
+/// Note, whether the getter or setter is inline depends on its actual implementation, which
+/// is defined with `ARIA_PROP_GETTER` or `ARIA_PROP_SETTER`.
 /// So, `inline` has no effects here.
 /// \param type Type of the property, can be value or reference.
 /// \param propName Name of the property.
@@ -410,7 +417,8 @@ namespace ARIA {
 /// Within the begin-end region, sub-sub-properties can be defined with `ARIA_SUB_PROP` or `ARIA_SUB_PROP_BEGIN`.
 ///
 /// \param specifiers Function specifiers such as `__host__`, `__device__`, etc.
-/// Note, whether the getter or setter is inline depends on its actual implementation, defined with `ARIA_PROP_IMPL`.
+/// Note, whether the getter or setter is inline depends on its actual implementation, which
+/// is defined with `ARIA_PROP_GETTER` or `ARIA_PROP_SETTER`.
 /// So, `inline` has no effects here.
 /// \param type Type of the sub-property.
 /// \param propName Name of the sub-property.
@@ -432,7 +440,8 @@ namespace ARIA {
 /// you want to define a complex sub-property with sub-sub-properties and functions.
 ///
 /// \param specifiers Function specifiers such as `__host__`, `__device__`, etc.
-/// Note, whether the getter or setter is inline depends on its actual implementation, defined with `ARIA_PROP_IMPL`.
+/// Note, whether the getter or setter is inline depends on its actual implementation, which
+/// is defined with `ARIA_PROP_GETTER` or `ARIA_PROP_SETTER`.
 /// So, `inline` has no effects here.
 /// \param type Type of the sub-property.
 /// \param propName Name of the sub-property.
@@ -450,7 +459,8 @@ namespace ARIA {
 /// \param access The accessibility of the property getter and setter by external codes.
 /// Should be `public`, `protected`, or `private`.
 /// \param specifiers Function specifiers such as `__host__`, `__device__`, etc.
-/// Note, whether the getter or setter is inline depends on its actual implementation, defined with `ARIA_PROP_IMPL`.
+/// Note, whether the getter or setter is inline depends on its actual implementation, which
+/// is defined with `ARIA_PROP_GETTER` or `ARIA_PROP_SETTER`.
 /// So, `inline` has no effects here.
 /// \param propName Name of the property.
 /// \param reference The reference which the property is based on.
@@ -471,7 +481,8 @@ namespace ARIA {
 /// \param access The accessibility for this function by external codes.
 /// Should be `public`, `protected`, or `private`.
 /// \param specifiers Function specifiers such as `__host__`, `__device__`, etc.
-/// Note, whether the getter or setter is inline depends on its actual implementation, defined with `ARIA_PROP_IMPL`.
+/// Note, whether the getter or setter is inline depends on its actual implementation, which
+/// is defined with `ARIA_PROP_GETTER` or `ARIA_PROP_SETTER`.
 /// So, `inline` has no effects here.
 /// \param funcName Name of the function.
 ///
