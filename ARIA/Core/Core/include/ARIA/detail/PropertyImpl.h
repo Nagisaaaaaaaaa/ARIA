@@ -383,9 +383,10 @@ private:
                     "The value given to the setter should be convertible to the given property value type");           \
                                                                                                                        \
       /* Also, return type of the setter is restricted to `void`. */                                                   \
-      static_assert(requires {                                                                                         \
-        { object.__ARIA_PROP_SETTER(PROP_NAME)(propArgs..., std::forward<TUVW>(value)) } -> std::same_as<void>;        \
-      }, "Return type of the setter should be void");                                                                  \
+      /* TODO: NVCC bug here. */                                                                                       \
+      /* static_assert(requires {                                                                                  */  \
+      /*   { object.__ARIA_PROP_SETTER(PROP_NAME)(propArgs..., std::forward<TUVW>(value)) } -> std::same_as<void>; */  \
+      /* }, "Return type of the setter should be void");                                                           */  \
                                                                                                                        \
       /* Calls the user-defined setter. */                                                                             \
       object.__ARIA_PROP_SETTER(PROP_NAME)(propArgs..., std::forward<TUVW>(value));                                    \
