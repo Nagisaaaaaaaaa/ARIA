@@ -64,9 +64,9 @@ private:
 
   //
 private:
-  [[nodiscard]] bool ARIA_PROP_IMPL(validity)() const noexcept { return validity_.load(std::memory_order_acquire); }
+  [[nodiscard]] bool ARIA_PROP_GETTER(validity)() const noexcept { return validity_.load(std::memory_order_acquire); }
 
-  void ARIA_PROP_IMPL(validity)(const bool &value) noexcept { validity_.store(value, std::memory_order_release); }
+  void ARIA_PROP_SETTER(validity)(const bool &value) noexcept { validity_.store(value, std::memory_order_release); }
 };
 
 //

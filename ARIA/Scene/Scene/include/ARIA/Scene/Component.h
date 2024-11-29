@@ -42,7 +42,7 @@ public:
   /// \example ```cpp
   /// Transform& trans = comp.transform();
   /// ```
-  ARIA_REF_PROP(public, , transform, ARIA_PROP_IMPL(transform)());
+  ARIA_REF_PROP(public, , transform, ARIA_PROP_GETTER(transform)());
 
   //
   //
@@ -71,8 +71,8 @@ public:
 private:
   Object &object_;
 
-  const Transform &ARIA_PROP_IMPL(transform)() const;
-  Transform &ARIA_PROP_IMPL(transform)();
+  const Transform &ARIA_PROP_GETTER(transform)() const;
+  Transform &ARIA_PROP_GETTER(transform)();
 };
 
 } // namespace ARIA

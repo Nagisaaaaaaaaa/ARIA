@@ -145,7 +145,28 @@ This tutorial shows how to integrate ARIA into a simple project with cmake and C
 
    We can use `position()`, `rotation`, `position().x()`, and `rotation.w()` as if these functions return references to the underlying member variables, but actually, these variables do not exist. Now, we are able to write C#-like elegant codes in C++, as if we are using Unity!
 
-4. **Make `auto` safe in ARIA.**
+4. **Even stronger than C#.**
+
+   The ARIA property system is even stronger than the C# built-in feature. You can write properties with arbitrary number and type of parameters. For example, suppose you are writing a 2D fluid simulator based on the lattice Boltzmann method (LBM), your code may look like this:
+
+   ```c++
+   using I0 = std::integral_constant<int, 0>;
+   using I1 = std::integral_constant<int, 1>;
+   using I2 = std::integral_constant<int, 2>;
+   ...
+
+   // The streaming process of the LBM.
+   grid.f(coord, I0{}) = grid.fPost(coord - Coord{0, 0}, I0{});
+   grid.f(coord, I1{}) = grid.fPost(coord - Coord{1, 0}, I1{});
+   grid.f(coord, I2{}) = grid.fPost(coord - Coord{0, 1}, I2{});
+   ...
+   ```
+
+   Here, both properties, `f` and `fPost`, have 2 parameters, where the first type is `Coord` (means coordinate), and the second type can be any `std::integral_constant` (means the LBM velocity set).
+
+   Only several lines of codes are needed to generate such complex properties.
+
+5. **Make `auto` safe in ARIA.**
 
    To make `auto` safe, ARIA uses `auto + Auto()` type deduction:
    
@@ -163,7 +184,7 @@ This tutorial shows how to integrate ARIA into a simple project with cmake and C
    
    `Auto()` helps better deduce the types from all proxy systems used in ARIA, which makes our codes safe. Read the comments in `Auto.h` and `Property.h` to see how to use them.
 
-5. **Make life easier for small projects.**
+6. **Make life easier for small projects.**
 
    Suppose you are writing a very small project based on ARIA, it is very annoying to use `auto + Auto` type deduction everywhere. Instead, we want to use `Auto` only when we have to, which means that the compiler should be able to tell us:
    1. Which `auto` is unsafe and refuse to compile them,
@@ -182,7 +203,7 @@ This tutorial shows how to integrate ARIA into a simple project with cmake and C
 
    Read the comments in `Let.h` to see how to use them, and feel free to use `let + Let` instead of `auto + Auto`.
 
-6. **Coding standards.**
+7. **Coding standards.**
 
    ARIA uses the coding standards similar to https://llvm.org/docs/CodingStandards.html but very different in naming. Please exactly follow the style of `ARIA::Core`. Read the codes and you will understand.
 

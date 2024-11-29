@@ -88,12 +88,12 @@ private:
   //
   //
   //
-  [[nodiscard]] bool ARIA_PROP_IMPL(perspective)() const;
-  void ARIA_PROP_IMPL(perspective)(const bool &value);
+  [[nodiscard]] bool ARIA_PROP_GETTER(perspective)() const;
+  void ARIA_PROP_SETTER(perspective)(const bool &value);
 
   //
-  [[nodiscard]] Mat4r ARIA_PROP_IMPL(worldToCameraMat)() const;
-  [[nodiscard]] Mat4r ARIA_PROP_IMPL(projectionMat)() const;
+  [[nodiscard]] Mat4r ARIA_PROP_GETTER(worldToCameraMat)() const;
+  [[nodiscard]] Mat4r ARIA_PROP_GETTER(projectionMat)() const;
 };
 
 } // namespace ARIA

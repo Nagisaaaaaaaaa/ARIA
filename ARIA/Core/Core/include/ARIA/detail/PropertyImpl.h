@@ -3,6 +3,8 @@
 #include "ARIA/Auto.h"
 #include "ARIA/TypeArray.h"
 
+#include <cuda/std/tuple>
+
 #include <ostream>
 
 namespace ARIA {
@@ -257,15 +259,16 @@ private:
 //
 //
 //
-#define __ARIA_PROP_IMPL(PROP_NAME) ARIA_CONCAT(PROP_NAME, ARIAPropertyImplementation)
+#define __ARIA_PROP_GETTER(PROP_NAME) ARIA_CONCAT(PROP_NAME, ARIAPropertyGetterImplementation)
+
+#define __ARIA_PROP_SETTER(PROP_NAME) ARIA_CONCAT(PROP_NAME, ARIAPropertySetterImplementation)
 
 //
 //
 //
 //
 //
-// For properties with 0 argument.
-#define __ARIA_PROP_BEGIN_PARAMS5(ACCESS_GET, ACCESS_SET, SPECIFIERS, TYPE, PROP_NAME)                                 \
+#define __ARIA_PROP_BEGIN(ACCESS_GET, ACCESS_SET, SPECIFIERS, TYPE, PROP_NAME)                                         \
                                                                                                                        \
   /* Users should not directly access the underlying property types. */                                                \
   static_assert(!property::detail::PropertyType<std::decay_t<TYPE>>,                                                   \
@@ -288,24 +291,27 @@ private:
   /*! For example, the `<<` operator is defined for properties with `TYPE` equals to `Vec3`, */                        \
   /*! but we don't get any compiler error until `operator<<()` is actually called. */                                  \
   /*! So we can pre-define everything for all properties, even though many will not work. */                           \
-  template <typename TObjectMaybeConst>                                                                                \
+  template <typename TObjectMaybeConst, typename... TUVWArgs>                                                          \
   class ARIA_ANON(PROP_NAME);                                                                                          \
                                                                                                                        \
   /* The actual non-const property method. */                                                                          \
-  [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() {                                                                \
+  template <typename... TUVWArgs>                                                                                      \
+  [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME(TUVWArgs &&...propArgs) {                                          \
     /* Generate an instance of the property, that is why `auto` is dangerous. */                                       \
-    return ARIA_ANON(PROP_NAME)<decltype(*this)>{*this};                                                               \
+    return ARIA_ANON(PROP_NAME)<decltype(*this), TUVWArgs...>{*this, std::forward<TUVWArgs>(propArgs)...};             \
   }                                                                                                                    \
   /* The actual const property method. */                                                                              \
-  [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() const {                                                          \
-    return ARIA_ANON(PROP_NAME)<decltype(*this)>{*this};                                                               \
+  template <typename... TUVWArgs>                                                                                      \
+  [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME(TUVWArgs &&...propArgs) const {                                    \
+    return ARIA_ANON(PROP_NAME)<decltype(*this), TUVWArgs...>{*this, std::forward<TUVWArgs>(propArgs)...};             \
   }                                                                                                                    \
                                                                                                                        \
   /* Implementation of the actual property class. */                                                                   \
   /* Use CRTP to automatically generate operators, and also, satisfies the `PropertyType` concept. */                  \
-  template <typename TObjectMaybeConst>                                                                                \
-      class ARIA_ANON(PROP_NAME) final : public property::detail::PropertyBase < ARIA_ANON(PROP_NAME) <                \
-                                         TObjectMaybeConst >> {                                                        \
+  template <typename TObjectMaybeConst, typename... TUVWArgs>                                                          \
+      class ARIA_ANON(PROP_NAME) final                                                                                 \
+      : public property::detail::PropertyBase < ARIA_ANON(PROP_NAME) < TObjectMaybeConst,                              \
+      TUVWArgs... >> {                                                                                                 \
     /* Using the `Type` to support `ARIA_PROP_FUNC` */                                                                 \
   private:                                                                                                             \
     using Type = TYPE;                                                                                                 \
@@ -323,8 +329,11 @@ private:
     /* That is why `auto` is dangerous. */                                                                             \
     TObjectMaybeConst &object;                                                                                         \
                                                                                                                        \
+    cuda::std::tuple<std::decay_t<TUVWArgs>...> propArgs;                                                              \
+                                                                                                                       \
     /* Constructor of the property, called by the property methods. */                                                 \
-    SPECIFIERS explicit ARIA_ANON(PROP_NAME)(TObjectMaybeConst & object) : object(object) {}                           \
+    SPECIFIERS explicit ARIA_ANON(PROP_NAME)(TObjectMaybeConst & object, const TUVWArgs &...propArgs)                  \
+        : object(object), propArgs(propArgs...) {}                                                                     \
                                                                                                                        \
     /* Properties use lazy evaluation in order to support operations and getters. */                                   \
     /* For example, `transform.forward().length()` is not immediately evaluated to a float, */                         \
@@ -339,30 +348,32 @@ private:
                                                                                                                        \
     /* This function is defined `static` to handle `auto c = obj.a().b().c();`. */                                     \
     /* See comments of `ARIA_SUB_PROP_BEGIN`. */                                                                       \
-    [[nodiscard]] static SPECIFIERS decltype(auto) Get(TObjectMaybeConst &object)                                      \
+    [[nodiscard]] static SPECIFIERS decltype(auto) Get(TObjectMaybeConst &object, const auto &...propArgs)             \
       requires property::detail::isReferenceOrPointer<Type>                                                            \
     {                                                                                                                  \
-      static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                   \
-                        property::detail::isReferenceOrPointer<decltype(object.__ARIA_PROP_IMPL(PROP_NAME)())>,        \
-                    "The getter is only allowed to return reference or pointer when "                                  \
-                    "the specified property value type is a reference or a pointer");                                  \
+      static_assert(                                                                                                   \
+          !property::detail::isReferenceOrPointer<Type> ||                                                             \
+              property::detail::isReferenceOrPointer<decltype(object.__ARIA_PROP_GETTER(PROP_NAME)(propArgs...))>,     \
+          "The getter is only allowed to return reference or pointer when "                                            \
+          "the specified property value type is a reference or a pointer");                                            \
                                                                                                                        \
       /* Calls the user-defined getter. */                                                                             \
-      return object.__ARIA_PROP_IMPL(PROP_NAME)();                                                                     \
+      return object.__ARIA_PROP_GETTER(PROP_NAME)(propArgs...);                                                        \
     }                                                                                                                  \
-    [[nodiscard]] static SPECIFIERS Type Get(TObjectMaybeConst &object)                                                \
+    [[nodiscard]] static SPECIFIERS Type Get(TObjectMaybeConst &object, const auto &...propArgs)                       \
       requires(!property::detail::isReferenceOrPointer<Type>)                                                          \
     {                                                                                                                  \
-      static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                   \
-                        property::detail::isReferenceOrPointer<decltype(object.__ARIA_PROP_IMPL(PROP_NAME)())>,        \
-                    "The getter is only allowed to return reference or pointer when "                                  \
-                    "the specified property value type is a reference or a pointer");                                  \
+      static_assert(                                                                                                   \
+          !property::detail::isReferenceOrPointer<Type> ||                                                             \
+              property::detail::isReferenceOrPointer<decltype(object.__ARIA_PROP_GETTER(PROP_NAME)(propArgs...))>,     \
+          "The getter is only allowed to return reference or pointer when "                                            \
+          "the specified property value type is a reference or a pointer");                                            \
                                                                                                                        \
       /* Calls the user-defined getter. */                                                                             \
-      return Auto(object.__ARIA_PROP_IMPL(PROP_NAME)());                                                               \
+      return Auto(object.__ARIA_PROP_GETTER(PROP_NAME)(propArgs...));                                                  \
     }                                                                                                                  \
     template <typename TUVW>                                                                                           \
-    static SPECIFIERS void Set(TObject &object, TUVW &&value) {                                                        \
+    static SPECIFIERS void Set(TObject &object, TUVW &&value, const auto &...propArgs) {                               \
       /* Perform type check. */                                                                                        \
       /* This check is performed to restrict behavior of the user-defined setter. */                                   \
       /* For example, users should not set a dog to a cat, */                                                          \
@@ -371,8 +382,14 @@ private:
                         std::is_same_v<std::decay_t<TUVW>, On> || std::is_same_v<std::decay_t<TUVW>, Off>,             \
                     "The value given to the setter should be convertible to the given property value type");           \
                                                                                                                        \
+      /* Also, return type of the setter is restricted to `void`. */                                                   \
+      /* TODO: NVCC bug here. */                                                                                       \
+      /* static_assert(requires {                                                                                  */  \
+      /*   { object.__ARIA_PROP_SETTER(PROP_NAME)(propArgs..., std::forward<TUVW>(value)) } -> std::same_as<void>; */  \
+      /* }, "Return type of the setter should be void");                                                           */  \
+                                                                                                                       \
       /* Calls the user-defined setter. */                                                                             \
-      object.__ARIA_PROP_IMPL(PROP_NAME)(std::forward<TUVW>(value));                                                   \
+      object.__ARIA_PROP_SETTER(PROP_NAME)(propArgs..., std::forward<TUVW>(value));                                    \
     }                                                                                                                  \
                                                                                                                        \
   public:                                                                                                              \
@@ -380,10 +397,10 @@ private:
                                                                                                                        \
     /* Calls the user-defined getter. */                                                                               \
     [[nodiscard]] SPECIFIERS decltype(auto) value() {                                                                  \
-      return Get(object);                                                                                              \
+      return cuda::std::apply([&](const auto &...propArgsTuple) { return Get(object, propArgsTuple...); }, propArgs);  \
     }                                                                                                                  \
     [[nodiscard]] SPECIFIERS decltype(auto) value() const {                                                            \
-      return Get(object);                                                                                              \
+      return cuda::std::apply([&](const auto &...propArgsTuple) { return Get(object, propArgsTuple...); }, propArgs);  \
     }                                                                                                                  \
                                                                                                                        \
     /* Calls the user-defined getter. */                                                                               \
@@ -408,331 +425,23 @@ private:
     /* Calls the user-defined setter. */                                                                               \
     template <typename TUVW>                                                                                           \
      SPECIFIERS ARIA_ANON(PROP_NAME) &operator=(TUVW &&value) {                                                        \
-      Set(object, std::forward<TUVW>(value));                                                                          \
+      cuda::std::apply(                                                                                                \
+          [&](const auto &...propArgsTuple) { Set(object, std::forward<TUVW>(value), propArgsTuple...); }, propArgs);  \
       return *this;                                                                                                    \
     }                                                                                                                  \
     /* Calls the user-defined setter with an array. */                                                                 \
     template <typename TUVW, size_t n>                                                                                 \
      SPECIFIERS ARIA_ANON(PROP_NAME) &operator=(const TUVW (&args)[n]) {                                               \
-      Set(object, property::detail::ConstructWithArray<std::decay_t<Type>>(args, std::make_index_sequence<n>{}));      \
+      cuda::std::apply([&](const auto &...propArgsTuple) {                                                             \
+        Set(object, property::detail::ConstructWithArray<std::decay_t<Type>>(args, std::make_index_sequence<n>{}),     \
+            propArgsTuple...);                                                                                         \
+      }, propArgs);                                                                                                    \
       return *this;                                                                                                    \
     }                                                                                                                  \
                                                                                                                        \
   private:                                                                                                             \
     class ARIA_CONCAT(DummyClassForPropBegin, PROP_NAME) {}
 // clang-format on
-
-//
-//
-//
-// For properties with 1 argument.
-#define __ARIA_PROP_BEGIN_PARAMS6(ACCESS_GET, ACCESS_SET, SPECIFIERS, TYPE, PROP_NAME, T0)                             \
-                                                                                                                       \
-  static_assert(!property::detail::PropertyType<std::decay_t<TYPE>>,                                                   \
-                "The given property value type should not be a property type");                                        \
-                                                                                                                       \
-  static_assert(!std::is_const_v<std::remove_reference_t<TYPE>>,                                                       \
-                "The given property value type should not be const because "                                           \
-                "const-ness should be properly handled by setters and getters");                                       \
-                                                                                                                       \
-  static_assert(!std::is_rvalue_reference_v<TYPE>, "The given property value type should not be a r-value reference"); \
-                                                                                                                       \
-  static_assert(std::is_same_v<T0, std::decay_t<T0>>, "The given property argument type should be a decayed type");    \
-                                                                                                                       \
-  static_assert(!property::detail::PropertyType<std::decay_t<T0>>,                                                     \
-                "The given property argument type should not be a property type");                                     \
-                                                                                                                       \
-  ACCESS_GET:                                                                                                          \
-  /*! Accessor type is generated for each property with arguments. */                                                  \
-  template <typename TObjectMaybeConst>                                                                                \
-  class ARIA_ANON(ARIA_ANON(PROP_NAME));                                                                               \
-  template <typename TObjectMaybeConst>                                                                                \
-  class ARIA_ANON(PROP_NAME);                                                                                          \
-                                                                                                                       \
-  /* TODO: Accessors are good, but will make it unable to overload properties. */                                      \
-  /* [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() {            */                                               \
-  /*   return ARIA_ANON(ARIA_ANON(PROP_NAME))<decltype(*this)>{this}; */                                               \
-  /* }                                                                */                                               \
-  /* [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() const {      */                                               \
-  /*   return ARIA_ANON(ARIA_ANON(PROP_NAME))<decltype(*this)>{this}; */                                               \
-  /* }                                                                */                                               \
-                                                                                                                       \
-  [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME(const T0 &t0) {                                                    \
-    return ARIA_ANON(PROP_NAME)<decltype(*this)>{*this, t0};                                                           \
-  }                                                                                                                    \
-  [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME(const T0 &t0) const {                                              \
-    return ARIA_ANON(PROP_NAME)<decltype(*this)>{*this, t0};                                                           \
-  }                                                                                                                    \
-                                                                                                                       \
-  template <typename TObjectMaybeConst>                                                                                \
-  class ARIA_ANON(ARIA_ANON(PROP_NAME)) final {                                                                        \
-  private:                                                                                                             \
-    using TObject = std::remove_const_t<TObjectMaybeConst>;                                                            \
-    friend std::decay_t<TObject>;                                                                                      \
-                                                                                                                       \
-    using TObjectMaybeConstNonRef = std::remove_reference_t<TObjectMaybeConst>;                                        \
-    TObjectMaybeConstNonRef *object;                                                                                   \
-                                                                                                                       \
-    SPECIFIERS explicit ARIA_ANON(ARIA_ANON(PROP_NAME))(TObjectMaybeConstNonRef * object) : object(object) {}          \
-                                                                                                                       \
-  public:                                                                                                              \
-    ARIA_COPY_MOVE_ABILITY(ARIA_ANON(ARIA_ANON(PROP_NAME)), default, default);                                         \
-                                                                                                                       \
-    ARIA_HOST_DEVICE decltype(auto) operator()(const T0 &t0) {                                                         \
-      return ARIA_ANON(PROP_NAME)<TObjectMaybeConst>{*object, t0};                                                     \
-    }                                                                                                                  \
-    ARIA_HOST_DEVICE decltype(auto) operator()(const T0 &t0) const {                                                   \
-      return ARIA_ANON(PROP_NAME)<TObjectMaybeConst>{*object, t0};                                                     \
-    }                                                                                                                  \
-  };                                                                                                                   \
-                                                                                                                       \
-  template <typename TObjectMaybeConst>                                                                                \
-      class ARIA_ANON(PROP_NAME) final : public property::detail::PropertyBase < ARIA_ANON(PROP_NAME) <                \
-                                         TObjectMaybeConst >> {                                                        \
-  private:                                                                                                             \
-    using Type = TYPE;                                                                                                 \
-                                                                                                                       \
-  private:                                                                                                             \
-    using TProperty = ARIA_ANON(PROP_NAME);                                                                            \
-                                                                                                                       \
-    using TObject = std::remove_const_t<TObjectMaybeConst>;                                                            \
-    friend std::decay_t<TObject>;                                                                                      \
-                                                                                                                       \
-    TObjectMaybeConst &object;                                                                                         \
-    T0 t0;                                                                                                             \
-                                                                                                                       \
-    SPECIFIERS explicit ARIA_ANON(PROP_NAME)(TObjectMaybeConst & object, const T0 &t0) : object(object), t0(t0) {}     \
-                                                                                                                       \
-    [[nodiscard]] static SPECIFIERS decltype(auto) Get(TObjectMaybeConst &object, const T0 &t0)                        \
-      requires property::detail::isReferenceOrPointer<Type>                                                            \
-    {                                                                                                                  \
-      static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                   \
-                        property::detail::isReferenceOrPointer<decltype(object.__ARIA_PROP_IMPL(PROP_NAME)(t0))>,      \
-                    "The getter is only allowed to return reference or pointer when "                                  \
-                    "the specified property value type is a reference or a pointer");                                  \
-                                                                                                                       \
-      return object.__ARIA_PROP_IMPL(PROP_NAME)(t0);                                                                   \
-    }                                                                                                                  \
-    [[nodiscard]] static SPECIFIERS Type Get(TObjectMaybeConst &object, const T0 &t0)                                  \
-      requires(!property::detail::isReferenceOrPointer<Type>)                                                          \
-    {                                                                                                                  \
-      static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                   \
-                        property::detail::isReferenceOrPointer<decltype(object.__ARIA_PROP_IMPL(PROP_NAME)(t0))>,      \
-                    "The getter is only allowed to return reference or pointer when "                                  \
-                    "the specified property value type is a reference or a pointer");                                  \
-                                                                                                                       \
-      return Auto(object.__ARIA_PROP_IMPL(PROP_NAME)(t0));                                                             \
-    }                                                                                                                  \
-    template <typename TUVW>                                                                                           \
-    static SPECIFIERS void Set(TObject &object, const T0 &t0, TUVW &&value) {                                          \
-      static_assert(std::convertible_to<decltype(value), std::decay_t<Type>> ||                                        \
-                        std::is_same_v<std::decay_t<TUVW>, On> || std::is_same_v<std::decay_t<TUVW>, Off>,             \
-                    "The value given to the setter should be convertible to the given property value type");           \
-                                                                                                                       \
-      object.__ARIA_PROP_IMPL(PROP_NAME)(t0, std::forward<TUVW>(value));                                               \
-    }                                                                                                                  \
-                                                                                                                       \
-  public:                                                                                                              \
-    ARIA_COPY_MOVE_ABILITY(ARIA_ANON(PROP_NAME), delete, default);                                                     \
-                                                                                                                       \
-    [[nodiscard]] SPECIFIERS decltype(auto) value() {                                                                  \
-      return Get(object, t0);                                                                                          \
-    }                                                                                                                  \
-    [[nodiscard]] SPECIFIERS decltype(auto) value() const {                                                            \
-      return Get(object, t0);                                                                                          \
-    }                                                                                                                  \
-                                                                                                                       \
-    [[nodiscard]] SPECIFIERS operator decltype(auto)() {                                                               \
-      return value();                                                                                                  \
-    }                                                                                                                  \
-    [[nodiscard]] SPECIFIERS operator decltype(auto)() const {                                                         \
-      return value();                                                                                                  \
-    }                                                                                                                  \
-                                                                                                                       \
-    [[nodiscard]] SPECIFIERS ARIA_ANON(PROP_NAME) *operator-> () {                                                     \
-      return this;                                                                                                     \
-    }                                                                                                                  \
-    [[nodiscard]] SPECIFIERS const ARIA_ANON(PROP_NAME) *operator-> () const {                                         \
-      return this;                                                                                                     \
-    }                                                                                                                  \
-                                                                                                                       \
-    /* clang-format off */                                                                                             \
-  ACCESS_SET:                                                                                                          \
-    template <typename TUVW>                                                                                           \
-     SPECIFIERS ARIA_ANON(PROP_NAME) &operator=(TUVW &&value) {                                                        \
-      Set(object, t0, std::forward<TUVW>(value));                                                                      \
-      return *this;                                                                                                    \
-    }                                                                                                                  \
-    template <typename TUVW, size_t n>                                                                                 \
-     SPECIFIERS ARIA_ANON(PROP_NAME) &operator=(const TUVW (&args)[n]) {                                               \
-      Set(object, t0, property::detail::ConstructWithArray<std::decay_t<Type>>(args, std::make_index_sequence<n>{}));  \
-      return *this;                                                                                                    \
-    }                                                                                                                  \
-                                                                                                                       \
-  private:                                                                                                             \
-    class ARIA_CONCAT(DummyClassForPropBegin, PROP_NAME) {}
-// clang-format on
-
-//
-//
-//
-// For properties with 2 argument.
-#define __ARIA_PROP_BEGIN_PARAMS7(ACCESS_GET, ACCESS_SET, SPECIFIERS, TYPE, PROP_NAME, T0, T1)                         \
-                                                                                                                       \
-  static_assert(!property::detail::PropertyType<std::decay_t<TYPE>>,                                                   \
-                "The given property value type should not be a property type");                                        \
-                                                                                                                       \
-  static_assert(!std::is_const_v<std::remove_reference_t<TYPE>>,                                                       \
-                "The given property value type should not be const because "                                           \
-                "const-ness should be properly handled by setters and getters");                                       \
-                                                                                                                       \
-  static_assert(!std::is_rvalue_reference_v<TYPE>, "The given property value type should not be a r-value reference"); \
-                                                                                                                       \
-  static_assert(std::is_same_v<T0, std::decay_t<T0>>, "The given property argument type should be a decayed type");    \
-  static_assert(std::is_same_v<T1, std::decay_t<T1>>, "The given property argument type should be a decayed type");    \
-                                                                                                                       \
-  static_assert(!property::detail::PropertyType<std::decay_t<T0>>,                                                     \
-                "The given property argument type should not be a property type");                                     \
-  static_assert(!property::detail::PropertyType<std::decay_t<T1>>,                                                     \
-                "The given property argument type should not be a property type");                                     \
-                                                                                                                       \
-  ACCESS_GET:                                                                                                          \
-  template <typename TObjectMaybeConst>                                                                                \
-  class ARIA_ANON(ARIA_ANON(PROP_NAME));                                                                               \
-  template <typename TObjectMaybeConst>                                                                                \
-  class ARIA_ANON(PROP_NAME);                                                                                          \
-                                                                                                                       \
-  /* [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() {            */                                               \
-  /*   return ARIA_ANON(ARIA_ANON(PROP_NAME))<decltype(*this)>{this}; */                                               \
-  /* }                                                                */                                               \
-  /* [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() const {      */                                               \
-  /*   return ARIA_ANON(ARIA_ANON(PROP_NAME))<decltype(*this)>{this}; */                                               \
-  /* }                                                                */                                               \
-                                                                                                                       \
-  [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME(const T0 &t0, const T1 &t1) {                                      \
-    return ARIA_ANON(PROP_NAME)<decltype(*this)>{*this, t0, t1};                                                       \
-  }                                                                                                                    \
-  [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME(const T0 &t0, const T1 &t1) const {                                \
-    return ARIA_ANON(PROP_NAME)<decltype(*this)>{*this, t0, t1};                                                       \
-  }                                                                                                                    \
-                                                                                                                       \
-  template <typename TObjectMaybeConst>                                                                                \
-  class ARIA_ANON(ARIA_ANON(PROP_NAME)) final {                                                                        \
-  private:                                                                                                             \
-    using TObject = std::remove_const_t<TObjectMaybeConst>;                                                            \
-    friend std::decay_t<TObject>;                                                                                      \
-                                                                                                                       \
-    using TObjectMaybeConstNonRef = std::remove_reference_t<TObjectMaybeConst>;                                        \
-    TObjectMaybeConstNonRef *object;                                                                                   \
-                                                                                                                       \
-    SPECIFIERS explicit ARIA_ANON(ARIA_ANON(PROP_NAME))(TObjectMaybeConstNonRef * object) : object(object) {}          \
-                                                                                                                       \
-  public:                                                                                                              \
-    ARIA_COPY_MOVE_ABILITY(ARIA_ANON(ARIA_ANON(PROP_NAME)), default, default);                                         \
-                                                                                                                       \
-    ARIA_HOST_DEVICE decltype(auto) operator()(const T0 &t0, const T1 &t1) {                                           \
-      return ARIA_ANON(PROP_NAME)<TObjectMaybeConst>{*object, t0, t1};                                                 \
-    }                                                                                                                  \
-    ARIA_HOST_DEVICE decltype(auto) operator()(const T0 &t0, const T1 &t1) const {                                     \
-      return ARIA_ANON(PROP_NAME)<TObjectMaybeConst>{*object, t0, t1};                                                 \
-    }                                                                                                                  \
-  };                                                                                                                   \
-                                                                                                                       \
-  template <typename TObjectMaybeConst>                                                                                \
-      class ARIA_ANON(PROP_NAME) final : public property::detail::PropertyBase < ARIA_ANON(PROP_NAME) <                \
-                                         TObjectMaybeConst >> {                                                        \
-  private:                                                                                                             \
-    using Type = TYPE;                                                                                                 \
-                                                                                                                       \
-  private:                                                                                                             \
-    using TProperty = ARIA_ANON(PROP_NAME);                                                                            \
-                                                                                                                       \
-    using TObject = std::remove_const_t<TObjectMaybeConst>;                                                            \
-    friend std::decay_t<TObject>;                                                                                      \
-                                                                                                                       \
-    TObjectMaybeConst &object;                                                                                         \
-    T0 t0;                                                                                                             \
-    T1 t1;                                                                                                             \
-                                                                                                                       \
-    SPECIFIERS explicit ARIA_ANON(PROP_NAME)(TObjectMaybeConst & object, const T0 &t0, const T1 &t1)                   \
-        : object(object), t0(t0), t1(t1) {}                                                                            \
-                                                                                                                       \
-    [[nodiscard]] static SPECIFIERS decltype(auto) Get(TObjectMaybeConst &object, const T0 &t0, const T1 &t1)          \
-      requires property::detail::isReferenceOrPointer<Type>                                                            \
-    {                                                                                                                  \
-      static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                   \
-                        property::detail::isReferenceOrPointer<decltype(object.__ARIA_PROP_IMPL(PROP_NAME)(t0, t1))>,  \
-                    "The getter is only allowed to return reference or pointer when "                                  \
-                    "the specified property value type is a reference or a pointer");                                  \
-                                                                                                                       \
-      return object.__ARIA_PROP_IMPL(PROP_NAME)(t0, t1);                                                               \
-    }                                                                                                                  \
-    [[nodiscard]] static SPECIFIERS Type Get(TObjectMaybeConst &object, const T0 &t0, const T1 &t1)                    \
-      requires(!property::detail::isReferenceOrPointer<Type>)                                                          \
-    {                                                                                                                  \
-      static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                   \
-                        property::detail::isReferenceOrPointer<decltype(object.__ARIA_PROP_IMPL(PROP_NAME)(t0, t1))>,  \
-                    "The getter is only allowed to return reference or pointer when "                                  \
-                    "the specified property value type is a reference or a pointer");                                  \
-                                                                                                                       \
-      return Auto(object.__ARIA_PROP_IMPL(PROP_NAME)(t0, t1));                                                         \
-    }                                                                                                                  \
-    template <typename TUVW>                                                                                           \
-    static SPECIFIERS void Set(TObject &object, const T0 &t0, const T1 &t1, TUVW &&value) {                            \
-      static_assert(std::convertible_to<decltype(value), std::decay_t<Type>> ||                                        \
-                        std::is_same_v<std::decay_t<TUVW>, On> || std::is_same_v<std::decay_t<TUVW>, Off>,             \
-                    "The value given to the setter should be convertible to the given property value type");           \
-                                                                                                                       \
-      object.__ARIA_PROP_IMPL(PROP_NAME)(t0, t1, std::forward<TUVW>(value));                                           \
-    }                                                                                                                  \
-                                                                                                                       \
-  public:                                                                                                              \
-    ARIA_COPY_MOVE_ABILITY(ARIA_ANON(PROP_NAME), delete, default);                                                     \
-                                                                                                                       \
-    [[nodiscard]] SPECIFIERS decltype(auto) value() {                                                                  \
-      return Get(object, t0, t1);                                                                                      \
-    }                                                                                                                  \
-    [[nodiscard]] SPECIFIERS decltype(auto) value() const {                                                            \
-      return Get(object, t0, t1);                                                                                      \
-    }                                                                                                                  \
-                                                                                                                       \
-    [[nodiscard]] SPECIFIERS operator decltype(auto)() {                                                               \
-      return value();                                                                                                  \
-    }                                                                                                                  \
-    [[nodiscard]] SPECIFIERS operator decltype(auto)() const {                                                         \
-      return value();                                                                                                  \
-    }                                                                                                                  \
-                                                                                                                       \
-    [[nodiscard]] SPECIFIERS ARIA_ANON(PROP_NAME) *operator-> () {                                                     \
-      return this;                                                                                                     \
-    }                                                                                                                  \
-    [[nodiscard]] SPECIFIERS const ARIA_ANON(PROP_NAME) *operator-> () const {                                         \
-      return this;                                                                                                     \
-    }                                                                                                                  \
-                                                                                                                       \
-    /* clang-format off */                                                                                             \
-  ACCESS_SET:                                                                                                          \
-    template <typename TUVW>                                                                                           \
-     SPECIFIERS ARIA_ANON(PROP_NAME) &operator=(TUVW &&value) {                                                        \
-      Set(object, t0, t1, std::forward<TUVW>(value));                                                                  \
-      return *this;                                                                                                    \
-    }                                                                                                                  \
-    template <typename TUVW, size_t n>                                                                                 \
-     SPECIFIERS ARIA_ANON(PROP_NAME) &operator=(const TUVW (&args)[n]) {                                               \
-      Set(object, t0, t1,                                                                                              \
-          property::detail::ConstructWithArray<std::decay_t<Type>>(args, std::make_index_sequence<n>{}));              \
-      return *this;                                                                                                    \
-    }                                                                                                                  \
-                                                                                                                       \
-  private:                                                                                                             \
-    class ARIA_CONCAT(DummyClassForPropBegin, PROP_NAME) {}
-// clang-format on
-
-//
-//
-//
-#define __ARIA_PROP_BEGIN(...)                                                                                         \
-  __ARIA_EXPAND(__ARIA_EXPAND(ARIA_CONCAT(__ARIA_PROP_BEGIN_PARAMS, ARIA_NUM_OF(__VA_ARGS__)))(__VA_ARGS__))
 
 // clang-format off
 #define __ARIA_PROP_END                                                                                                \
@@ -741,8 +450,8 @@ private:
 private:                                                                                                               \
   class ARIA_ANON(DummyClassForPropEnd) {}
 
-#define __ARIA_PROP(...);                                                                                              \
-  __ARIA_PROP_BEGIN(__VA_ARGS__);                                                                                      \
+#define __ARIA_PROP(ACCESS_GET, ACCESS_SET, SPECIFIERS, TYPE, PROP_NAME)                                               \
+  __ARIA_PROP_BEGIN(ACCESS_GET, ACCESS_SET, SPECIFIERS, TYPE, PROP_NAME);                                              \
   __ARIA_PROP_END
 // clang-format on
 
@@ -766,10 +475,11 @@ private:                                                                        
                                                                                                                        \
   /* Sub-properties are always public, let property accessibility dominates. */                                        \
 public:                                                                                                                \
-  template <typename ARIA_ANON(ARIA_CONCAT(TPropertyBaseMaybeConst, PROP_NAME))>                                       \
+  template <typename ARIA_ANON(ARIA_CONCAT(TPropertyBaseMaybeConst, PROP_NAME)), typename... TUVWArgs>                 \
   class ARIA_ANON(PROP_NAME);                                                                                          \
                                                                                                                        \
-  [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() {                                                                \
+  template <typename... TUVWArgs>                                                                                      \
+  [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME(TUVWArgs &&...propArgs) {                                          \
     /* All sub-properties also owns the actual object. */                                                              \
     /* For example, `obj.a().b().c()`, then `a` owns `obj`, `b` owns `obj`, and `c` also owns `obj`. */                \
     /* There exist another design, let `b` owns `a` and `c` owns `b`. */                                               \
@@ -780,16 +490,18 @@ public:                                                                         
                                                                                                                        \
     /* This `TProperty` here is the one defined by the base property, */                                               \
     /* to help the template type deduction. */                                                                         \
-    return ARIA_ANON(PROP_NAME)<TProperty>{this->object};                                                              \
+    return ARIA_ANON(PROP_NAME)<TProperty, TUVWArgs...>{this->object, std::forward<TUVWArgs>(propArgs)...};            \
   }                                                                                                                    \
-  [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME() const {                                                          \
-    return ARIA_ANON(PROP_NAME)<const TProperty>{this->object};                                                        \
+  template <typename... TUVWArgs>                                                                                      \
+  [[nodiscard]] SPECIFIERS decltype(auto) PROP_NAME(TUVWArgs &&...propArgs) const {                                    \
+    return ARIA_ANON(PROP_NAME)<const TProperty, TUVWArgs...>{this->object, std::forward<TUVWArgs>(propArgs)...};      \
   }                                                                                                                    \
                                                                                                                        \
   /* Sub-properties are also property types. */                                                                        \
-  template <typename ARIA_ANON(ARIA_CONCAT(TPropertyBaseMaybeConst, PROP_NAME))>                                       \
+  template <typename ARIA_ANON(ARIA_CONCAT(TPropertyBaseMaybeConst, PROP_NAME)), typename... TUVWArgs>                 \
       class ARIA_ANON(PROP_NAME) final : public property::detail::PropertyBase < ARIA_ANON(PROP_NAME) <                \
-                                         ARIA_ANON(ARIA_CONCAT(TPropertyBaseMaybeConst, PROP_NAME)) >> {               \
+                                         ARIA_ANON(ARIA_CONCAT(TPropertyBaseMaybeConst, PROP_NAME)),                   \
+      TUVWArgs... >> {                                                                                                 \
   private:                                                                                                             \
     using Type = TYPE;                                                                                                 \
                                                                                                                        \
@@ -806,9 +518,12 @@ public:                                                                         
     /* As explained above, all sub-properties also owns the actual object. */                                          \
     TObjectMaybeConst &object;                                                                                         \
                                                                                                                        \
-    SPECIFIERS explicit ARIA_ANON(PROP_NAME)(TObjectMaybeConst & object) : object(object) {}                           \
+    cuda::std::tuple<std::decay_t<TUVWArgs>...> propArgs;                                                              \
                                                                                                                        \
-    [[nodiscard]] static SPECIFIERS decltype(auto) Get(TObjectMaybeConst &object)                                      \
+    SPECIFIERS explicit ARIA_ANON(PROP_NAME)(TObjectMaybeConst & object, const TUVWArgs &...propArgs)                  \
+        : object(object), propArgs(propArgs...) {}                                                                     \
+                                                                                                                       \
+    [[nodiscard]] static SPECIFIERS decltype(auto) Get(TObjectMaybeConst &object, const auto &...propArgs)             \
       requires property::detail::isReferenceOrPointer<Type>                                                            \
     {                                                                                                                  \
       decltype(auto) tmp = TPropertyBase::Get(object);                                                                 \
@@ -820,29 +535,29 @@ public:                                                                         
                                                                                                                        \
       if constexpr (std::is_pointer_v<decltype(tmp)>) {                                                                \
         static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                 \
-                          (property::detail::PropertyType<std::decay_t<decltype(tmp->PROP_NAME())>> ||                 \
-                           property::detail::isReferenceOrPointer<decltype(tmp->PROP_NAME())>),                        \
+                          (property::detail::PropertyType<std::decay_t<decltype(tmp->PROP_NAME(propArgs...))>> ||      \
+                           property::detail::isReferenceOrPointer<decltype(tmp->PROP_NAME(propArgs...))>),             \
                       "The getter is only allowed to return reference or pointer when "                                \
                       "the specified sub-property value type is a reference or a pointer");                            \
                                                                                                                        \
-        if constexpr (property::detail::PropertyType<std::decay_t<decltype(tmp->PROP_NAME())>>)                        \
-          return tmp->PROP_NAME().value();                                                                             \
+        if constexpr (property::detail::PropertyType<std::decay_t<decltype(tmp->PROP_NAME(propArgs...))>>)             \
+          return tmp->PROP_NAME(propArgs...).value();                                                                  \
         else                                                                                                           \
-          return tmp->PROP_NAME();                                                                                     \
+          return tmp->PROP_NAME(propArgs...);                                                                          \
       } else {                                                                                                         \
         static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                 \
-                          (property::detail::PropertyType<std::decay_t<decltype(tmp.PROP_NAME())>> ||                  \
-                           property::detail::isReferenceOrPointer<decltype(tmp.PROP_NAME())>),                         \
+                          (property::detail::PropertyType<std::decay_t<decltype(tmp.PROP_NAME(propArgs...))>> ||       \
+                           property::detail::isReferenceOrPointer<decltype(tmp.PROP_NAME(propArgs...))>),              \
                       "The getter is only allowed to return reference or pointer when "                                \
                       "the specified sub-property value type is a reference or a pointer");                            \
                                                                                                                        \
-        if constexpr (property::detail::PropertyType<std::decay_t<decltype(tmp.PROP_NAME())>>)                         \
-          return tmp.PROP_NAME().value();                                                                              \
+        if constexpr (property::detail::PropertyType<std::decay_t<decltype(tmp.PROP_NAME(propArgs...))>>)              \
+          return tmp.PROP_NAME(propArgs...).value();                                                                   \
         else                                                                                                           \
-          return tmp.PROP_NAME();                                                                                      \
+          return tmp.PROP_NAME(propArgs...);                                                                           \
       }                                                                                                                \
     }                                                                                                                  \
-    [[nodiscard]] static SPECIFIERS Type Get(TObjectMaybeConst &object)                                                \
+    [[nodiscard]] static SPECIFIERS Type Get(TObjectMaybeConst &object, const auto &...propArgs)                       \
       requires(!property::detail::isReferenceOrPointer<Type>)                                                          \
     {                                                                                                                  \
       decltype(auto) tmp = TPropertyBase::Get(object);                                                                 \
@@ -853,24 +568,24 @@ public:                                                                         
                                                                                                                        \
       if constexpr (std::is_pointer_v<decltype(tmp)>) {                                                                \
         static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                 \
-                          (property::detail::PropertyType<std::decay_t<decltype(tmp->PROP_NAME())>> ||                 \
-                           property::detail::isReferenceOrPointer<decltype(tmp->PROP_NAME())>),                        \
+                          (property::detail::PropertyType<std::decay_t<decltype(tmp->PROP_NAME(propArgs...))>> ||      \
+                           property::detail::isReferenceOrPointer<decltype(tmp->PROP_NAME(propArgs...))>),             \
                       "The getter is only allowed to return reference or pointer when "                                \
                       "the specified sub-property value type is a reference");                                         \
                                                                                                                        \
-        return Auto(tmp->PROP_NAME());                                                                                 \
+        return Auto(tmp->PROP_NAME(propArgs...));                                                                      \
       } else {                                                                                                         \
         static_assert(!property::detail::isReferenceOrPointer<Type> ||                                                 \
-                          (property::detail::PropertyType<std::decay_t<decltype(tmp.PROP_NAME())>> ||                  \
-                           property::detail::isReferenceOrPointer<decltype(tmp.PROP_NAME())>),                         \
+                          (property::detail::PropertyType<std::decay_t<decltype(tmp.PROP_NAME(propArgs...))>> ||       \
+                           property::detail::isReferenceOrPointer<decltype(tmp.PROP_NAME(propArgs...))>),              \
                       "The getter is only allowed to return reference or pointer when "                                \
                       "the specified sub-property value type is a reference");                                         \
                                                                                                                        \
-        return Auto(tmp.PROP_NAME());                                                                                  \
+        return Auto(tmp.PROP_NAME(propArgs...));                                                                       \
       }                                                                                                                \
     }                                                                                                                  \
     template <typename TUVW>                                                                                           \
-    static SPECIFIERS void Set(TObject &object, TUVW &&value) {                                                        \
+    static SPECIFIERS void Set(TObject &object, TUVW &&value, const auto &...propArgs) {                               \
       static_assert(std::convertible_to<decltype(value), std::decay_t<Type>> ||                                        \
                         std::is_same_v<std::decay_t<TUVW>, On> || std::is_same_v<std::decay_t<TUVW>, Off>,             \
                     "The value given to the setter should be convertible to the given property value type");           \
@@ -878,7 +593,7 @@ public:                                                                         
       decltype(auto) tmp = TPropertyBase::Get(object);                                                                 \
                                                                                                                        \
       if constexpr (std::is_pointer_v<decltype(tmp)>) {                                                                \
-        using TGet = decltype(tmp->PROP_NAME());                                                                       \
+        using TGet = decltype(tmp->PROP_NAME(propArgs...));                                                            \
                                                                                                                        \
         constexpr bool isGetProxy = property::detail::ProxyType<TGet>;                                                 \
         constexpr bool isGetReferenceOrPointer = property::detail::isReferenceOrPointer<TGet>;                         \
@@ -886,11 +601,11 @@ public:                                                                         
                                                                                                                        \
         static_assert(!isGetValue, "Return type of this member should not be a non-proxy value type");                 \
                                                                                                                        \
-        tmp->PROP_NAME() = std::forward<TUVW>(value);                                                                  \
+        tmp->PROP_NAME(propArgs...) = std::forward<TUVW>(value);                                                       \
                                                                                                                        \
         TPropertyBase::Set(object, std::move(tmp));                                                                    \
       } else {                                                                                                         \
-        using TGet = decltype(tmp.PROP_NAME());                                                                        \
+        using TGet = decltype(tmp.PROP_NAME(propArgs...));                                                             \
                                                                                                                        \
         constexpr bool isGetProxy = property::detail::ProxyType<TGet>;                                                 \
         constexpr bool isGetReferenceOrPointer = property::detail::isReferenceOrPointer<TGet>;                         \
@@ -898,7 +613,7 @@ public:                                                                         
                                                                                                                        \
         static_assert(!isGetValue, "Return type of this member should not be a non-proxy value type");                 \
                                                                                                                        \
-        tmp.PROP_NAME() = std::forward<TUVW>(value);                                                                   \
+        tmp.PROP_NAME(propArgs...) = std::forward<TUVW>(value);                                                        \
                                                                                                                        \
         TPropertyBase::Set(object, std::move(tmp));                                                                    \
       }                                                                                                                \
@@ -908,10 +623,10 @@ public:                                                                         
     ARIA_COPY_MOVE_ABILITY(ARIA_ANON(PROP_NAME), delete, default);                                                     \
                                                                                                                        \
     [[nodiscard]] SPECIFIERS decltype(auto) value() {                                                                  \
-      return Get(object);                                                                                              \
+      return cuda::std::apply([&](const auto &...propArgsTuple) { return Get(object, propArgsTuple...); }, propArgs);  \
     }                                                                                                                  \
     [[nodiscard]] SPECIFIERS decltype(auto) value() const {                                                            \
-      return Get(object);                                                                                              \
+      return cuda::std::apply([&](const auto &...propArgsTuple) { return Get(object, propArgsTuple...); }, propArgs);  \
     }                                                                                                                  \
                                                                                                                        \
     [[nodiscard]] SPECIFIERS operator decltype(auto)() {                                                               \
@@ -930,12 +645,16 @@ public:                                                                         
                                                                                                                        \
     template <typename TUVW>                                                                                           \
     SPECIFIERS ARIA_ANON(PROP_NAME) &operator=(TUVW &&value) {                                                         \
-      Set(object, std::forward<TUVW>(value));                                                                          \
+      cuda::std::apply(                                                                                                \
+          [&](const auto &...propArgsTuple) { Set(object, std::forward<TUVW>(value), propArgsTuple...); }, propArgs);  \
       return *this;                                                                                                    \
     }                                                                                                                  \
     template <typename TUVW, size_t n>                                                                                 \
     SPECIFIERS ARIA_ANON(PROP_NAME) &operator=(const TUVW (&args)[n]) {                                                \
-      Set(object, property::detail::ConstructWithArray<std::decay_t<Type>>(args, std::make_index_sequence<n>{}));      \
+      cuda::std::apply([&](const auto &...propArgsTuple) {                                                             \
+        Set(object, property::detail::ConstructWithArray<std::decay_t<Type>>(args, std::make_index_sequence<n>{}),     \
+            propArgsTuple...);                                                                                         \
+      }, propArgs);                                                                                                    \
       return *this;                                                                                                    \
     }                                                                                                                  \
                                                                                                                        \
@@ -949,7 +668,7 @@ public:                                                                         
 private:                                                                                                               \
   class ARIA_CONCAT(DummyClassForSubPropEnd, __COUNTER__) {}
 
-#define __ARIA_SUB_PROP(SPECIFIERS, TYPE, PROP_NAME);                                                                  \
+#define __ARIA_SUB_PROP(SPECIFIERS, TYPE, PROP_NAME)                                                                   \
   __ARIA_SUB_PROP_BEGIN(SPECIFIERS, TYPE, PROP_NAME);                                                                  \
   __ARIA_SUB_PROP_END
 // clang-format on

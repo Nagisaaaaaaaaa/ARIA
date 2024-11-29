@@ -119,9 +119,9 @@ public:
 private:
   std::string name_ = "Lua です喵"; // Test UTF-8.
 
-  std::string ARIA_PROP_IMPL(name1)() const { return name_; }
+  std::string ARIA_PROP_GETTER(name1)() const { return name_; }
 
-  std::string ARIA_PROP_IMPL(name1)(const std::string &name) { name_ = name; }
+  std::string ARIA_PROP_GETTER(name1)(const std::string &name) { name_ = name; }
 };
 
 //

@@ -308,63 +308,63 @@ private:
   //
   //
   //
-  [[nodiscard]] const Transform *ARIA_PROP_IMPL(parent)() const;
-  [[nodiscard]] Transform *ARIA_PROP_IMPL(parent)();
-  void ARIA_PROP_IMPL(parent)(Transform *value);
-  [[nodiscard]] const Transform *ARIA_PROP_IMPL(root)() const;
-  [[nodiscard]] Transform *ARIA_PROP_IMPL(root)();
-  void ARIA_PROP_IMPL(root)(Transform *value);
+  [[nodiscard]] const Transform *ARIA_PROP_GETTER(parent)() const;
+  [[nodiscard]] Transform *ARIA_PROP_GETTER(parent)();
+  void ARIA_PROP_SETTER(parent)(Transform *value);
+  [[nodiscard]] const Transform *ARIA_PROP_GETTER(root)() const;
+  [[nodiscard]] Transform *ARIA_PROP_GETTER(root)();
+  void ARIA_PROP_SETTER(root)(Transform *value);
 
   //
-  [[nodiscard]] Vec3r ARIA_PROP_IMPL(localPosition)() const;
-  void ARIA_PROP_IMPL(localPosition)(const Vec3r &value);
-  [[nodiscard]] Quatr ARIA_PROP_IMPL(localRotation)() const;
-  void ARIA_PROP_IMPL(localRotation)(const Quatr &value);
-  [[nodiscard]] Vec3r ARIA_PROP_IMPL(localScale)() const;
-  void ARIA_PROP_IMPL(localScale)(const Vec3r &value);
+  [[nodiscard]] Vec3r ARIA_PROP_GETTER(localPosition)() const;
+  void ARIA_PROP_SETTER(localPosition)(const Vec3r &value);
+  [[nodiscard]] Quatr ARIA_PROP_GETTER(localRotation)() const;
+  void ARIA_PROP_SETTER(localRotation)(const Quatr &value);
+  [[nodiscard]] Vec3r ARIA_PROP_GETTER(localScale)() const;
+  void ARIA_PROP_SETTER(localScale)(const Vec3r &value);
 
   //
-  [[nodiscard]] Vec3r ARIA_PROP_IMPL(localEulerAngles)() const;
-  void ARIA_PROP_IMPL(localEulerAngles)(const Vec3r &value);
+  [[nodiscard]] Vec3r ARIA_PROP_GETTER(localEulerAngles)() const;
+  void ARIA_PROP_SETTER(localEulerAngles)(const Vec3r &value);
 
   //
-  [[nodiscard]] Vec3r ARIA_PROP_IMPL(localUp)() const;
-  void ARIA_PROP_IMPL(localUp)(const Vec3r &value);
-  [[nodiscard]] Vec3r ARIA_PROP_IMPL(localDown)() const;
-  void ARIA_PROP_IMPL(localDown)(const Vec3r &value);
-  [[nodiscard]] Vec3r ARIA_PROP_IMPL(localForward)() const;
-  void ARIA_PROP_IMPL(localForward)(const Vec3r &value);
-  [[nodiscard]] Vec3r ARIA_PROP_IMPL(localBack)() const;
-  void ARIA_PROP_IMPL(localBack)(const Vec3r &value);
-  [[nodiscard]] Vec3r ARIA_PROP_IMPL(localLeft)() const;
-  void ARIA_PROP_IMPL(localLeft)(const Vec3r &value);
-  [[nodiscard]] Vec3r ARIA_PROP_IMPL(localRight)() const;
-  void ARIA_PROP_IMPL(localRight)(const Vec3r &value);
+  [[nodiscard]] Vec3r ARIA_PROP_GETTER(localUp)() const;
+  void ARIA_PROP_SETTER(localUp)(const Vec3r &value);
+  [[nodiscard]] Vec3r ARIA_PROP_GETTER(localDown)() const;
+  void ARIA_PROP_SETTER(localDown)(const Vec3r &value);
+  [[nodiscard]] Vec3r ARIA_PROP_GETTER(localForward)() const;
+  void ARIA_PROP_SETTER(localForward)(const Vec3r &value);
+  [[nodiscard]] Vec3r ARIA_PROP_GETTER(localBack)() const;
+  void ARIA_PROP_SETTER(localBack)(const Vec3r &value);
+  [[nodiscard]] Vec3r ARIA_PROP_GETTER(localLeft)() const;
+  void ARIA_PROP_SETTER(localLeft)(const Vec3r &value);
+  [[nodiscard]] Vec3r ARIA_PROP_GETTER(localRight)() const;
+  void ARIA_PROP_SETTER(localRight)(const Vec3r &value);
 
   //
-  [[nodiscard]] Mat4r ARIA_PROP_IMPL(localToParentMat)() const;
-  [[nodiscard]] Mat4r ARIA_PROP_IMPL(localToWorldMat)() const;
+  [[nodiscard]] Mat4r ARIA_PROP_GETTER(localToParentMat)() const;
+  [[nodiscard]] Mat4r ARIA_PROP_GETTER(localToWorldMat)() const;
 
   //
-  [[nodiscard]] Vec3r ARIA_PROP_IMPL(position)() const;
-  void ARIA_PROP_IMPL(position)(const Vec3r &value);
-  [[nodiscard]] Quatr ARIA_PROP_IMPL(rotation)() const;
-  void ARIA_PROP_IMPL(rotation)(const Quatr &value);
-  [[nodiscard]] Vec3r ARIA_PROP_IMPL(lossyScale)() const;
+  [[nodiscard]] Vec3r ARIA_PROP_GETTER(position)() const;
+  void ARIA_PROP_SETTER(position)(const Vec3r &value);
+  [[nodiscard]] Quatr ARIA_PROP_GETTER(rotation)() const;
+  void ARIA_PROP_SETTER(rotation)(const Quatr &value);
+  [[nodiscard]] Vec3r ARIA_PROP_GETTER(lossyScale)() const;
 
   //
-  [[nodiscard]] Vec3r ARIA_PROP_IMPL(up)() const;
-  void ARIA_PROP_IMPL(up)(const Vec3r &value);
-  [[nodiscard]] Vec3r ARIA_PROP_IMPL(down)() const;
-  void ARIA_PROP_IMPL(down)(const Vec3r &value);
-  [[nodiscard]] Vec3r ARIA_PROP_IMPL(forward)() const;
-  void ARIA_PROP_IMPL(forward)(const Vec3r &value);
-  [[nodiscard]] Vec3r ARIA_PROP_IMPL(back)() const;
-  void ARIA_PROP_IMPL(back)(const Vec3r &value);
-  [[nodiscard]] Vec3r ARIA_PROP_IMPL(left)() const;
-  void ARIA_PROP_IMPL(left)(const Vec3r &value);
-  [[nodiscard]] Vec3r ARIA_PROP_IMPL(right)() const;
-  void ARIA_PROP_IMPL(right)(const Vec3r &value);
+  [[nodiscard]] Vec3r ARIA_PROP_GETTER(up)() const;
+  void ARIA_PROP_SETTER(up)(const Vec3r &value);
+  [[nodiscard]] Vec3r ARIA_PROP_GETTER(down)() const;
+  void ARIA_PROP_SETTER(down)(const Vec3r &value);
+  [[nodiscard]] Vec3r ARIA_PROP_GETTER(forward)() const;
+  void ARIA_PROP_SETTER(forward)(const Vec3r &value);
+  [[nodiscard]] Vec3r ARIA_PROP_GETTER(back)() const;
+  void ARIA_PROP_SETTER(back)(const Vec3r &value);
+  [[nodiscard]] Vec3r ARIA_PROP_GETTER(left)() const;
+  void ARIA_PROP_SETTER(left)(const Vec3r &value);
+  [[nodiscard]] Vec3r ARIA_PROP_GETTER(right)() const;
+  void ARIA_PROP_SETTER(right)(const Vec3r &value);
 
   // Supporting methods.
   using Affine3r = Eigen::Transform<Real, 3, Eigen::Affine>;

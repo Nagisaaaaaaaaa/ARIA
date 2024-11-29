@@ -42,15 +42,15 @@ void DestroyImmediate(Component &component) {
 //
 //
 //
-const Object *Object::ARIA_PROP_IMPL(parent)() const {
+const Object *Object::ARIA_PROP_GETTER(parent)() const {
   return parent_;
 }
 
-Object *Object::ARIA_PROP_IMPL(parent)() {
+Object *Object::ARIA_PROP_GETTER(parent)() {
   return parent_;
 }
 
-void Object::ARIA_PROP_IMPL(parent)(Object *value) {
+void Object::ARIA_PROP_SETTER(parent)(Object *value) {
   if (value->IsChildOf(*this)) {
     ARIA_THROW(std::runtime_error, "The given parent should not be a child of the current `Object`");
   }
@@ -73,7 +73,7 @@ void Object::ARIA_PROP_IMPL(parent)(Object *value) {
   value->children_.emplace_back(std::move(self));
 }
 
-const Object *Object::ARIA_PROP_IMPL(root)() const {
+const Object *Object::ARIA_PROP_GETTER(root)() const {
   const Object *p = this;
 
   while (!p->IsRoot())
@@ -82,7 +82,7 @@ const Object *Object::ARIA_PROP_IMPL(root)() const {
   return p;
 }
 
-Object *Object::ARIA_PROP_IMPL(root)() {
+Object *Object::ARIA_PROP_GETTER(root)() {
   Object *p = this;
 
   while (!p->IsRoot())
@@ -91,7 +91,7 @@ Object *Object::ARIA_PROP_IMPL(root)() {
   return p;
 }
 
-void Object::ARIA_PROP_IMPL(root)(Object *value) {
+void Object::ARIA_PROP_SETTER(root)(Object *value) {
   if (value->IsChildOf(*this)) {
     ARIA_THROW(std::runtime_error, "The given parent should not be a child of the current `Object`");
   }
@@ -106,11 +106,11 @@ void Object::ARIA_PROP_IMPL(root)(Object *value) {
 //
 //
 //
-const Transform &Object::ARIA_PROP_IMPL(transform)() const {
+const Transform &Object::ARIA_PROP_GETTER(transform)() const {
   return *static_cast<Transform *>(components_[0].get());
 }
 
-Transform &Object::ARIA_PROP_IMPL(transform)() {
+Transform &Object::ARIA_PROP_GETTER(transform)() {
   return *static_cast<Transform *>(components_[0].get());
 }
 

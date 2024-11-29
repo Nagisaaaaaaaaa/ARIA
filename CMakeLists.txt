@@ -20,7 +20,7 @@ list(APPEND CMAKE_MODULE_PATH "${ARIA_SOURCE_DIR}/cmake/modules" "${CMAKE_BINARY
 
 # Setup flags for Windows.
 if ((WIN32) AND (MSVC) AND (MSVC_VERSION GREATER_EQUAL 1914))
-  string(APPEND CMAKE_CXX_FLAGS " /Zc:__cplusplus /MP /utf-8")
+  string(APPEND CMAKE_CXX_FLAGS " /Zc:__cplusplus /MP /utf-8 /bigobj")
 endif ()
 
 # In-tree builds are not permitted.

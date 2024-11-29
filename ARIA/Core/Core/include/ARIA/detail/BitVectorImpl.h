@@ -92,7 +92,7 @@ public:
   //! While methods `Fill`, `Clear`, and `Flip` can be easily implemented as atomic,
   //! `at(i)` and `operator[]` cannot be trivially implemented as atomic, because
   //! setting a bit requires twice the efforts than filling, clearing, or flipping a bit.
-  ARIA_PROP(public, public, ARIA_HOST_DEVICE, bool, at, size_t);
+  ARIA_PROP(public, public, ARIA_HOST_DEVICE, bool, at);
 
 public:
   /// \brief Access the i^th bit.
@@ -234,12 +234,12 @@ protected:
     block = (block & ~mask) | (TBlock{bit} << iBits);
   }
 
-  [[nodiscard]] ARIA_HOST_DEVICE bool ARIA_PROP_IMPL(at)(size_t i) const {
+  [[nodiscard]] ARIA_HOST_DEVICE bool ARIA_PROP_GETTER(at)(size_t i) const {
     auto [iBlocks, iBits] = i2iBlocksAndiBits(i);
     return GetBit(derived().data()[iBlocks], iBits);
   }
 
-  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(at)(size_t i, bool value) {
+  ARIA_HOST_DEVICE void ARIA_PROP_SETTER(at)(size_t i, bool value) {
     auto [iBlocks, iBits] = i2iBlocksAndiBits(i);
     SetBit(derived().data()[iBlocks], iBits, value);
   }

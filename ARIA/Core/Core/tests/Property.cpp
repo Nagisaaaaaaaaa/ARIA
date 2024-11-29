@@ -1,7 +1,9 @@
 #include "ARIA/Property.h"
+#include "ARIA/Constant.h"
 
 #include <gtest/gtest.h>
 
+#include <array>
 #include <vector>
 
 namespace ARIA {
@@ -32,11 +34,11 @@ class A {
  private:
   int x_{};
 
-  [[nodiscard]] int ARIA_PROP_IMPL(x)() const {
+  [[nodiscard]] int ARIA_PROP_GETTER(x)() const {
     return x_;
   }
 
-  void ARIA_PROP_IMPL(x)(const int& value) {
+  void ARIA_PROP_SETTER(x)(const int& value) {
     x_ = value;
   }
 
@@ -56,11 +58,11 @@ class B {
  private:
   int x_{};
 
-  [[nodiscard]] int ARIA_PROP_IMPL(x)() const {
+  [[nodiscard]] int ARIA_PROP_GETTER(x)() const {
     return x_;
   }
 
-  void ARIA_PROP_IMPL(x)(const int& value) {
+  void ARIA_PROP_SETTER(x)(const int& value) {
     x_ = value;
   }
 };
@@ -230,11 +232,11 @@ class ChaosA {
  public:
   HierarchyA h_{};
 
-  [[nodiscard]] auto ARIA_PROP_IMPL(h)() const {
+  [[nodiscard]] auto ARIA_PROP_GETTER(h)() const {
     return h_;
   }
 
-  void ARIA_PROP_IMPL(h)(const auto& value) {
+  void ARIA_PROP_SETTER(h)(const auto& value) {
     h_ = value;
   }
 };
@@ -263,11 +265,11 @@ class ChaosB {
  public:
   HierarchyB h_{};
 
-  [[nodiscard]] auto ARIA_PROP_IMPL(h)() const {
+  [[nodiscard]] auto ARIA_PROP_GETTER(h)() const {
     return h_;
   }
 
-  void ARIA_PROP_IMPL(h)(const auto& value) {
+  void ARIA_PROP_SETTER(h)(const auto& value) {
     h_ = value;
   }
 };
@@ -296,11 +298,11 @@ class ChaosC {
  public:
   HierarchyC h_{};
 
-  [[nodiscard]] auto ARIA_PROP_IMPL(h)() const {
+  [[nodiscard]] auto ARIA_PROP_GETTER(h)() const {
     return h_;
   }
 
-  void ARIA_PROP_IMPL(h)(const auto& value) {
+  void ARIA_PROP_SETTER(h)(const auto& value) {
     h_ = value;
   }
 };
@@ -321,10 +323,10 @@ class ChaosListA {
 
              public:
               int g_ = 5;
-              [[nodiscard]] auto ARIA_PROP_IMPL(g)() const {
+              [[nodiscard]] auto ARIA_PROP_GETTER(g)() const {
                 return g_;
               }
-              void ARIA_PROP_IMPL(g)(const auto& value) {
+              void ARIA_PROP_SETTER(g)(const auto& value) {
                 g_ = value;
               }
             } f_;
@@ -354,10 +356,10 @@ class ChaosListA {
           ARIA_SUB_PROP_END;
         ARIA_PROP_END;
 
-        [[nodiscard]] auto ARIA_PROP_IMPL(d)() const {
+        [[nodiscard]] auto ARIA_PROP_GETTER(d)() const {
           return d_;
         }
-        void ARIA_PROP_IMPL(d)(const auto& value) {
+        void ARIA_PROP_SETTER(d)(const auto& value) {
           d_ = value;
         }
       } c_;
@@ -393,10 +395,10 @@ class ChaosListA {
     ARIA_SUB_PROP_END;
   ARIA_PROP_END;
 
-  [[nodiscard]] auto ARIA_PROP_IMPL(a)() const {
+  [[nodiscard]] auto ARIA_PROP_GETTER(a)() const {
     return a_;
   }
-  void ARIA_PROP_IMPL(a)(const auto& value) {
+  void ARIA_PROP_SETTER(a)(const auto& value) {
     a_ = value;
   }
 };
@@ -426,11 +428,11 @@ class ChaosListB {
  public:
   ChaosListA a_{};
 
-  [[nodiscard]] auto ARIA_PROP_IMPL(a)() const {
+  [[nodiscard]] auto ARIA_PROP_GETTER(a)() const {
     return a_;
   }
 
-  void ARIA_PROP_IMPL(a)(const auto& value) {
+  void ARIA_PROP_SETTER(a)(const auto& value) {
     a_ = value;
   }
 };
@@ -462,11 +464,11 @@ class ChaosListC {
  public:
   ChaosListB b_{};
 
-  [[nodiscard]] auto ARIA_PROP_IMPL(b)() const {
+  [[nodiscard]] auto ARIA_PROP_GETTER(b)() const {
     return b_;
   }
 
-  void ARIA_PROP_IMPL(b)(const auto& value) {
+  void ARIA_PROP_SETTER(b)(const auto& value) {
     b_ = value;
   }
 };
@@ -483,14 +485,14 @@ class VectorBool {
  private:
   std::vector<bool> vs_{false};
 
-  [[nodiscard]] auto ARIA_PROP_IMPL(vs)() const {
+  [[nodiscard]] auto ARIA_PROP_GETTER(vs)() const {
     return vs_;
   }
 
-  [[nodiscard]] auto ARIA_PROP_IMPL(v)() const {
+  [[nodiscard]] auto ARIA_PROP_GETTER(v)() const {
     return vs_[0];
   }
-  void ARIA_PROP_IMPL(v)(const auto& value) {
+  void ARIA_PROP_SETTER(v)(const auto& value) {
     vs_[0] = value;
   }
 };
@@ -518,11 +520,11 @@ class Func {
     ss << "Testing callable: " << offset + v << std::endl;
   };
 
-  [[nodiscard]] auto ARIA_PROP_IMPL(f0)() const {
+  [[nodiscard]] auto ARIA_PROP_GETTER(f0)() const {
     return f0_;
   }
 
-  [[nodiscard]] auto ARIA_PROP_IMPL(f1)() const {
+  [[nodiscard]] auto ARIA_PROP_GETTER(f1)() const {
     return f1_;
   }
 };
@@ -585,12 +587,12 @@ class Transform {
  private:
   Vec3<double> forward_;
 
-  [[nodiscard]] auto ARIA_PROP_IMPL(forward)() const {
+  [[nodiscard]] auto ARIA_PROP_GETTER(forward)() const {
     return Vec3<float>{float(forward_.x()),
                        float(forward_.y()),
                        float(forward_.z())};
   }
-  void ARIA_PROP_IMPL(forward)(const auto& value) {
+  void ARIA_PROP_SETTER(forward)(const auto& value) {
     forward_.x() = value.x();
     forward_.y() = value.y();
     forward_.z() = value.z();
@@ -612,13 +614,13 @@ public:
 private:
   Vec3<float> forward_;
 
-  [[nodiscard]] const Vec3<float>& ARIA_PROP_IMPL(forward)() const {
+  [[nodiscard]] const Vec3<float>& ARIA_PROP_GETTER(forward)() const {
     return forward_;
   }
-  [[nodiscard]] Vec3<float>& ARIA_PROP_IMPL(forward)() {
+  [[nodiscard]] Vec3<float>& ARIA_PROP_GETTER(forward)() {
     return forward_;
   }
-  void ARIA_PROP_IMPL(forward)(const auto& value) {
+  void ARIA_PROP_SETTER(forward)(const auto& value) {
     forward_.x() = value.x();
     forward_.y() = value.y();
     forward_.z() = value.z();
@@ -627,31 +629,48 @@ private:
 
 class Test1Arg {
 public:
-  ARIA_PROP(public, public, , int, test, int);
+  ARIA_PROP(public, public, , int, test);
 
 private:
-  int base = 10;
+  int base_ = 10;
 
-  [[nodiscard]] int ARIA_PROP_IMPL(test)(int v) const {
-    return base + v;
+  [[nodiscard]] int ARIA_PROP_GETTER(test)(int v) const {
+    return base_ + v;
   }
-  [[nodiscard]] int ARIA_PROP_IMPL(test)(int v) {
-    return base + v;
+  [[nodiscard]] int ARIA_PROP_GETTER(test)(int v) {
+    return base_ + v;
   }
 };
 
 class Test2Args {
 public:
-  ARIA_PROP(public, public, , int, test, int, float);
+  ARIA_PROP(public, public, , int, test);
 
 private:
-  int base = 10;
+  int base_ = 10;
 
-  [[nodiscard]] int ARIA_PROP_IMPL(test)(int v0, float v1) const {
-    return base + v0 + static_cast<int>(std::floor(v1));
+  [[nodiscard]] int ARIA_PROP_GETTER(test)(int v0, float v1) const {
+    return base_ + v0 + static_cast<int>(std::floor(v1));
   }
-  [[nodiscard]] int ARIA_PROP_IMPL(test)(int v0, float v1) {
-    return base + v0 + static_cast<int>(std::floor(v1));
+  [[nodiscard]] int ARIA_PROP_GETTER(test)(int v0, float v1) {
+    return base_ + v0 + static_cast<int>(std::floor(v1));
+  }
+};
+
+class LBMD2Q9 {
+public:
+  ARIA_PROP(public, public, , int, f);
+
+private:
+  std::array<int, 9> f_;
+
+  [[nodiscard]] int ARIA_PROP_GETTER(f)(const std::pair<int, int>& coord, auto q) {
+    constexpr int testConstexpr = q;
+    return f_[q];
+  }
+  void ARIA_PROP_SETTER(f)(const std::pair<int, int>& coord, auto q, int value) {
+    constexpr int testConstexpr = q;
+    f_[q] = value;
   }
 };
 
@@ -2397,6 +2416,30 @@ TEST(Property, PropertyArguments) {
     // EXPECT_EQ(a0(9, 1.999F), 20);
     EXPECT_EQ(t1.test(9, 1.999F), 20);
     // EXPECT_EQ(a1(9, 1.999F), 20);
+  }
+
+  {
+    LBMD2Q9 lbm;
+
+    lbm.f(std::make_pair(0, 0), 0_I) = 9;
+    lbm.f(std::make_pair(0, 0), 1_I) = 8;
+    lbm.f(std::make_pair(0, 0), 2_I) = 7;
+    lbm.f(std::make_pair(0, 0), 3_I) = 6;
+    lbm.f(std::make_pair(0, 0), 4_I) = 5;
+    lbm.f(std::make_pair(0, 0), 5_I) = 4;
+    lbm.f(std::make_pair(0, 0), 6_I) = 3;
+    lbm.f(std::make_pair(0, 0), 7_I) = 2;
+    lbm.f(std::make_pair(0, 0), 8_I) = 1;
+
+    EXPECT_EQ(lbm.f(std::make_pair(0, 0), 0_I), 9);
+    EXPECT_EQ(lbm.f(std::make_pair(0, 0), 1_I), 8);
+    EXPECT_EQ(lbm.f(std::make_pair(0, 0), 2_I), 7);
+    EXPECT_EQ(lbm.f(std::make_pair(0, 0), 3_I), 6);
+    EXPECT_EQ(lbm.f(std::make_pair(0, 0), 4_I), 5);
+    EXPECT_EQ(lbm.f(std::make_pair(0, 0), 5_I), 4);
+    EXPECT_EQ(lbm.f(std::make_pair(0, 0), 6_I), 3);
+    EXPECT_EQ(lbm.f(std::make_pair(0, 0), 7_I), 2);
+    EXPECT_EQ(lbm.f(std::make_pair(0, 0), 8_I), 1);
   }
 }
 

@@ -2,11 +2,11 @@
 
 namespace ARIA {
 
-std::string Window::ARIA_PROP_IMPL(title)() const {
+std::string Window::ARIA_PROP_GETTER(title)() const {
   return title_;
 }
 
-void Window::ARIA_PROP_IMPL(title)(const std::string &value) {
+void Window::ARIA_PROP_SETTER(title)(const std::string &value) {
   title_ = value;
 
   //! Should not be `title().c_str()` here because `title()` will make a copy, and
@@ -14,13 +14,13 @@ void Window::ARIA_PROP_IMPL(title)(const std::string &value) {
   glfwSetWindowTitle(window_, title_.c_str());
 }
 
-Vec2u Window::ARIA_PROP_IMPL(size)() const {
+Vec2u Window::ARIA_PROP_GETTER(size)() const {
   int x, y;
   glfwGetWindowSize(window_, &x, &y);
   return {x, y};
 }
 
-void Window::ARIA_PROP_IMPL(size)(const Vec2u &value) {
+void Window::ARIA_PROP_SETTER(size)(const Vec2u &value) {
   glfwSetWindowSize(window_, value.x(), value.y());
   context_->Viewport(0, 0, value.x(), value.y());
 }
@@ -28,24 +28,24 @@ void Window::ARIA_PROP_IMPL(size)(const Vec2u &value) {
 //
 //
 //
-bool Window::ARIA_PROP_IMPL(shouldClose)() const {
+bool Window::ARIA_PROP_GETTER(shouldClose)() const {
   return static_cast<bool>(glfwWindowShouldClose(window_));
 }
 
-void Window::ARIA_PROP_IMPL(shouldClose)(const bool &value) {
+void Window::ARIA_PROP_SETTER(shouldClose)(const bool &value) {
   glfwSetWindowShouldClose(window_, static_cast<int>(value));
 }
 
 //
 //
 //
-Vec4r Window::ARIA_PROP_IMPL(clearColor)() const {
+Vec4r Window::ARIA_PROP_GETTER(clearColor)() const {
   Vec4f color;
   context_->GetFloatv(GL_COLOR_CLEAR_VALUE, color.data());
   return color;
 }
 
-void Window::ARIA_PROP_IMPL(clearColor)(const Vec4r &value) {
+void Window::ARIA_PROP_SETTER(clearColor)(const Vec4r &value) {
   context_->ClearColor(value.x(), value.y(), value.z(), value.w());
 }
 

@@ -3,11 +3,11 @@
 
 namespace ARIA {
 
-const Transform &Component::ARIA_PROP_IMPL(transform)() const {
+const Transform &Component::ARIA_PROP_GETTER(transform)() const {
   return object().transform();
 }
 
-Transform &Component::ARIA_PROP_IMPL(transform)() {
+Transform &Component::ARIA_PROP_GETTER(transform)() {
   return object().transform();
 }
 

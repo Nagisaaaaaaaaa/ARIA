@@ -273,11 +273,11 @@ public:
 private:
   std::vector<std::string> name_ = {"Python です喵"}; // Test UTF-8.
 
-  std::vector<std::string> ARIA_PROP_IMPL(name1)() const { return name_; }
+  std::vector<std::string> ARIA_PROP_GETTER(name1)() const { return name_; }
 
-  void ARIA_PROP_IMPL(name1)(const std::vector<std::string> &name) { name_ = name; }
+  void ARIA_PROP_SETTER(name1)(const std::vector<std::string> &name) { name_ = name; }
 
-  std::vector<std::string> ARIA_PROP_IMPL(name2)() const { return name_; }
+  std::vector<std::string> ARIA_PROP_GETTER(name2)() const { return name_; }
 
   ARIA_PYTHON_TYPE_FRIEND;
 };
@@ -292,9 +292,9 @@ public:
 private:
   int value_ = 233;
 
-  int ARIA_PROP_IMPL(value)() const { return value_; }
+  int ARIA_PROP_GETTER(value)() const { return value_; }
 
-  void ARIA_PROP_IMPL(value)(const int &value) { value_ = value; }
+  void ARIA_PROP_SETTER(value)(const int &value) { value_ = value; }
 
   ARIA_PYTHON_TYPE_FRIEND;
 };

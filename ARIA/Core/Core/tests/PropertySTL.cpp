@@ -11,7 +11,7 @@ public:
   ARIA_PROP_PREFAB_STD_STRING(public, private, , std::string, str);
 
 private:
-  [[nodiscard]] std::string ARIA_PROP_IMPL(str)() const { return "Hello"; }
+  [[nodiscard]] std::string ARIA_PROP_GETTER(str)() const { return "Hello"; }
 };
 
 } // namespace
