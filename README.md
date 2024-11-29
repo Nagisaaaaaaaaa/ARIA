@@ -150,13 +150,19 @@ This tutorial shows how to integrate ARIA into a simple project with cmake and C
    The ARIA property system is even stronger than the C# built-in feature. You can write properties with arbitrary number and type of parameters. For example, suppose you are writing a 2D fluid simulator based on the lattice Boltzmann method (LBM), your code may look like this:
 
    ```c++
+   using I0 = std::integral_constant<int, 0>;
+   using I1 = std::integral_constant<int, 1>;
+   using I2 = std::integral_constant<int, 2>;
+   ...
+
    // The streaming process of the LBM.
-   grid.f(coord, 1_I) = grid.fPost(coord - Coord{1, 0}, 1_I);
-   grid.f(coord, 2_I) = grid.fPost(coord - Coord{0, 1}, 2_I);
+   grid.f(coord, I0{}) = grid.fPost(coord - Coord{0, 0}, I0{});
+   grid.f(coord, I1{}) = grid.fPost(coord - Coord{1, 0}, I1{});
+   grid.f(coord, I2{}) = grid.fPost(coord - Coord{0, 1}, I2{});
    ...
    ```
 
-   Here, both properties, `f` and `fPost`, have 2 parameters, where the first type is `Coord` (means coordinate), and the second type can be any constant integral types (means the LBM velocity set) such as `std::integral_constant`.
+   Here, both properties, `f` and `fPost`, have 2 parameters, where the first type is `Coord` (means coordinate), and the second type can be any `std::integral_constant` (means the LBM velocity set).
 
    Only several lines of codes are needed to generate such complex properties.
 
