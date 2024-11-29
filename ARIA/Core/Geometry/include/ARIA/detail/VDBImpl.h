@@ -652,11 +652,11 @@ public:
 private:
   //! It is considered undefined behavior to get the value which has not been set yet.
   //! So, the getter of `value_AllocateIfNotExist` can be implemented the same as `value_AssumeExist`'s.
-  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord) const {
-    return ARIA_PROP_IMPL(value_AssumeExist)(cellCoord);
+  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_GETTER(value_AllocateIfNotExist)(const TVec &cellCoord) const {
+    return ARIA_PROP_GETTER(value_AssumeExist)(cellCoord);
   }
 
-  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord, const T &value) {
+  ARIA_HOST_DEVICE void ARIA_PROP_SETTER(value_AllocateIfNotExist)(const TVec &cellCoord, const T &value) {
 #if ARIA_IS_DEVICE_CODE
     TBlock &b = block_AllocateIfNotExist(cellCoord);
 
@@ -669,11 +669,11 @@ private:
   }
 
   // Set the value at `cellCoord` to off.
-  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord, const Off &off) {
-    ARIA_PROP_IMPL(value_AssumeExist)(cellCoord, off);
+  ARIA_HOST_DEVICE void ARIA_PROP_SETTER(value_AllocateIfNotExist)(const TVec &cellCoord, const Off &off) {
+    ARIA_PROP_SETTER(value_AssumeExist)(cellCoord, off);
   }
 
-  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord) const {
+  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_GETTER(value_AssumeExist)(const TVec &cellCoord) const {
 #if ARIA_IS_DEVICE_CODE
     const TBlock &b = block_AssumeExist(cellCoord);
 
@@ -686,7 +686,7 @@ private:
 #endif
   }
 
-  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord, const T &value) {
+  ARIA_HOST_DEVICE void ARIA_PROP_SETTER(value_AssumeExist)(const TVec &cellCoord, const T &value) {
 #if ARIA_IS_DEVICE_CODE
     const TBlock &b = block_AssumeExist(cellCoord);
 
@@ -698,7 +698,7 @@ private:
 #endif
   }
 
-  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord, const Off &off) {
+  ARIA_HOST_DEVICE void ARIA_PROP_SETTER(value_AssumeExist)(const TVec &cellCoord, const Off &off) {
 #if ARIA_IS_DEVICE_CODE
     // Try and get the block.
     TBlock *b = block_GetIfExist(cellCoord);
@@ -720,13 +720,13 @@ private:
   //
   //
   // The following methods are similar to the above ones, but will update the cache.
-  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord,
-                                                                            const TCache &cache) const {
-    return ARIA_PROP_IMPL(value_AssumeExist)(cellCoord, cache);
+  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_GETTER(value_AllocateIfNotExist)(const TVec &cellCoord,
+                                                                              const TCache &cache) const {
+    return ARIA_PROP_GETTER(value_AssumeExist)(cellCoord, cache);
   }
 
   ARIA_HOST_DEVICE void
-  ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord, const TCache &cache, const T &value) {
+  ARIA_PROP_SETTER(value_AllocateIfNotExist)(const TVec &cellCoord, const TCache &cache, const T &value) {
 #if ARIA_IS_DEVICE_CODE
     auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
     TBlockStorage *storage = nullptr;
@@ -756,11 +756,12 @@ private:
   }
 
   ARIA_HOST_DEVICE void
-  ARIA_PROP_IMPL(value_AllocateIfNotExist)(const TVec &cellCoord, const TCache &cache, const Off &off) {
-    ARIA_PROP_IMPL(value_AssumeExist)(cellCoord, cache, off);
+  ARIA_PROP_SETTER(value_AllocateIfNotExist)(const TVec &cellCoord, const TCache &cache, const Off &off) {
+    ARIA_PROP_SETTER(value_AssumeExist)(cellCoord, cache, off);
   }
 
-  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord, const TCache &cache) const {
+  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_GETTER(value_AssumeExist)(const TVec &cellCoord,
+                                                                       const TCache &cache) const {
 #if ARIA_IS_DEVICE_CODE
     auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
     const TBlockStorage *storage = nullptr;
@@ -783,7 +784,8 @@ private:
 #endif
   }
 
-  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord, const TCache &cache, const T &value) {
+  ARIA_HOST_DEVICE void
+  ARIA_PROP_SETTER(value_AssumeExist)(const TVec &cellCoord, const TCache &cache, const T &value) {
 #if ARIA_IS_DEVICE_CODE
     auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
     TBlockStorage *storage = nullptr;
@@ -812,7 +814,8 @@ private:
 #endif
   }
 
-  ARIA_HOST_DEVICE void ARIA_PROP_IMPL(value_AssumeExist)(const TVec &cellCoord, const TCache &cache, const Off &off) {
+  ARIA_HOST_DEVICE void
+  ARIA_PROP_SETTER(value_AssumeExist)(const TVec &cellCoord, const TCache &cache, const Off &off) {
 #if ARIA_IS_DEVICE_CODE
     auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
     TBlockStorage *storage = nullptr;
