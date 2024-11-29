@@ -53,14 +53,14 @@ private:
   //
   //
   //
-  const Material *ARIA_PROP_IMPL(material)() const {
+  const Material *ARIA_PROP_GETTER(material)() const {
     if (materials().empty())
       return nullptr;
 
     return materials().data();
   }
 
-  Material *ARIA_PROP_IMPL(material)() {
+  Material *ARIA_PROP_GETTER(material)() {
     if (materials().empty())
       return nullptr;
 
