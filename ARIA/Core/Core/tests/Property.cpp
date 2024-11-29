@@ -1,7 +1,9 @@
 #include "ARIA/Property.h"
+#include "ARIA/Constant.h"
 
 #include <gtest/gtest.h>
 
+#include <array>
 #include <vector>
 
 namespace ARIA {
@@ -630,13 +632,13 @@ public:
   ARIA_PROP(public, public, , int, test);
 
 private:
-  int base = 10;
+  int base_ = 10;
 
   [[nodiscard]] int ARIA_PROP_GETTER(test)(int v) const {
-    return base + v;
+    return base_ + v;
   }
   [[nodiscard]] int ARIA_PROP_GETTER(test)(int v) {
-    return base + v;
+    return base_ + v;
   }
 };
 
@@ -645,13 +647,30 @@ public:
   ARIA_PROP(public, public, , int, test);
 
 private:
-  int base = 10;
+  int base_ = 10;
 
   [[nodiscard]] int ARIA_PROP_GETTER(test)(int v0, float v1) const {
-    return base + v0 + static_cast<int>(std::floor(v1));
+    return base_ + v0 + static_cast<int>(std::floor(v1));
   }
   [[nodiscard]] int ARIA_PROP_GETTER(test)(int v0, float v1) {
-    return base + v0 + static_cast<int>(std::floor(v1));
+    return base_ + v0 + static_cast<int>(std::floor(v1));
+  }
+};
+
+class LBMD2Q9 {
+public:
+  ARIA_PROP(public, public, , int, f);
+
+private:
+  std::array<int, 9> f_;
+
+  [[nodiscard]] int ARIA_PROP_GETTER(f)(const std::pair<int, int>& coord, auto q) {
+    constexpr int testConstexpr = q;
+    return f_[q];
+  }
+  void ARIA_PROP_SETTER(f)(const std::pair<int, int>& coord, auto q, int value) {
+    constexpr int testConstexpr = q;
+    f_[q] = value;
   }
 };
 
@@ -2397,6 +2416,30 @@ TEST(Property, PropertyArguments) {
     // EXPECT_EQ(a0(9, 1.999F), 20);
     EXPECT_EQ(t1.test(9, 1.999F), 20);
     // EXPECT_EQ(a1(9, 1.999F), 20);
+  }
+
+  {
+    LBMD2Q9 lbm;
+
+    lbm.f(std::make_pair(0, 0), 0_I) = 9;
+    lbm.f(std::make_pair(0, 0), 1_I) = 8;
+    lbm.f(std::make_pair(0, 0), 2_I) = 7;
+    lbm.f(std::make_pair(0, 0), 3_I) = 6;
+    lbm.f(std::make_pair(0, 0), 4_I) = 5;
+    lbm.f(std::make_pair(0, 0), 5_I) = 4;
+    lbm.f(std::make_pair(0, 0), 6_I) = 3;
+    lbm.f(std::make_pair(0, 0), 7_I) = 2;
+    lbm.f(std::make_pair(0, 0), 8_I) = 1;
+
+    EXPECT_EQ(lbm.f(std::make_pair(0, 0), 0_I), 9);
+    EXPECT_EQ(lbm.f(std::make_pair(0, 0), 1_I), 8);
+    EXPECT_EQ(lbm.f(std::make_pair(0, 0), 2_I), 7);
+    EXPECT_EQ(lbm.f(std::make_pair(0, 0), 3_I), 6);
+    EXPECT_EQ(lbm.f(std::make_pair(0, 0), 4_I), 5);
+    EXPECT_EQ(lbm.f(std::make_pair(0, 0), 5_I), 4);
+    EXPECT_EQ(lbm.f(std::make_pair(0, 0), 6_I), 3);
+    EXPECT_EQ(lbm.f(std::make_pair(0, 0), 7_I), 2);
+    EXPECT_EQ(lbm.f(std::make_pair(0, 0), 8_I), 1);
   }
 }
 
