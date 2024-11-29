@@ -151,7 +151,9 @@ This tutorial shows how to integrate ARIA into a simple project with cmake and C
 
    ```c++
    // The streaming process of the LBM.
-   grid.f(coord + Coord{1, 0}, 1_I) = grid.fPost(coord, 1_I);
+   grid.f(coord, 1_I) = grid.fPost(coord - Coord{1, 0}, 1_I);
+   grid.f(coord, 2_I) = grid.fPost(coord - Coord{0, 1}, 2_I);
+   ...
    ```
 
    Here, both properties, `f` and `fPost`, have 2 parameters, where the first type is `Coord` (means coordinate), and the second type can be any constant integral types (means the LBM velocity set) such as `std::integral_constant`.
