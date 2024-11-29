@@ -78,10 +78,10 @@ void Test2DVDBHandleKernels() {
   { // x.
     Handle handle = Handle::Create();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      handle.value_AllocateIfNotExist({i - nHalf, 0}) = i - nHalf;
+      handle.value_AllocateIfNotExist(Vec2i{i - nHalf, 0}) = i - nHalf;
     }).Launch();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      ARIA_ASSERT(handle.value_AllocateIfNotExist({i - nHalf, 0}) == i - nHalf);
+      ARIA_ASSERT(handle.value_AllocateIfNotExist(Vec2i{i - nHalf, 0}) == i - nHalf);
     }).Launch();
     cuda::device::current::get().synchronize();
     handle.Destroy();
@@ -89,10 +89,10 @@ void Test2DVDBHandleKernels() {
   { // y.
     Handle handle = Handle::Create();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      handle.value_AllocateIfNotExist({0, nHalf - i}) = i - nHalf;
+      handle.value_AllocateIfNotExist(Vec2i{0, nHalf - i}) = i - nHalf;
     }).Launch();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      ARIA_ASSERT(handle.value_AssumeExist({0, nHalf - i}) == i - nHalf);
+      ARIA_ASSERT(handle.value_AssumeExist(Vec2i{0, nHalf - i}) == i - nHalf);
     }).Launch();
     cuda::device::current::get().synchronize();
     handle.Destroy();
@@ -102,12 +102,12 @@ void Test2DVDBHandleKernels() {
   {
     Handle handle = Handle::Create();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      handle.value_AllocateIfNotExist({i - nHalf, i - nHalf}) = i - nHalf;
-      handle.value_AllocateIfNotExist({i - nHalf, nHalf - i}) = i - nHalf;
+      handle.value_AllocateIfNotExist(Vec2i{i - nHalf, i - nHalf}) = i - nHalf;
+      handle.value_AllocateIfNotExist(Vec2i{i - nHalf, nHalf - i}) = i - nHalf;
     }).Launch();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      ARIA_ASSERT(handle.value_AllocateIfNotExist({i - nHalf, i - nHalf}) == i - nHalf);
-      ARIA_ASSERT(handle.value_AssumeExist({i - nHalf, nHalf - i}) == i - nHalf);
+      ARIA_ASSERT(handle.value_AllocateIfNotExist(Vec2i{i - nHalf, i - nHalf}) == i - nHalf);
+      ARIA_ASSERT(handle.value_AssumeExist(Vec2i{i - nHalf, nHalf - i}) == i - nHalf);
     }).Launch();
     cuda::device::current::get().synchronize();
     handle.Destroy();
@@ -153,10 +153,10 @@ void Test3DVDBHandleKernels() {
   { // x.
     Handle handle = Handle::Create();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      handle.value_AllocateIfNotExist({i - nHalf, 0, 0}) = i - nHalf;
+      handle.value_AllocateIfNotExist(Vec3i{i - nHalf, 0, 0}) = i - nHalf;
     }).Launch();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      ARIA_ASSERT(handle.value_AllocateIfNotExist({i - nHalf, 0, 0}) == i - nHalf);
+      ARIA_ASSERT(handle.value_AllocateIfNotExist(Vec3i{i - nHalf, 0, 0}) == i - nHalf);
     }).Launch();
     cuda::device::current::get().synchronize();
     handle.Destroy();
@@ -164,10 +164,10 @@ void Test3DVDBHandleKernels() {
   { // y.
     Handle handle = Handle::Create();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      handle.value_AllocateIfNotExist({0, nHalf - i, 0}) = i - nHalf;
+      handle.value_AllocateIfNotExist(Vec3i{0, nHalf - i, 0}) = i - nHalf;
     }).Launch();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      ARIA_ASSERT(handle.value_AssumeExist({0, nHalf - i, 0}) == i - nHalf);
+      ARIA_ASSERT(handle.value_AssumeExist(Vec3i{0, nHalf - i, 0}) == i - nHalf);
     }).Launch();
     cuda::device::current::get().synchronize();
     handle.Destroy();
@@ -175,10 +175,10 @@ void Test3DVDBHandleKernels() {
   { // z.
     Handle handle = Handle::Create();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      handle.value_AllocateIfNotExist({0, 0, nHalf - i}) = i - nHalf;
+      handle.value_AllocateIfNotExist(Vec3i{0, 0, nHalf - i}) = i - nHalf;
     }).Launch();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      ARIA_ASSERT(handle.value_AssumeExist({0, 0, nHalf - i}) == i - nHalf);
+      ARIA_ASSERT(handle.value_AssumeExist(Vec3i{0, 0, nHalf - i}) == i - nHalf);
     }).Launch();
     cuda::device::current::get().synchronize();
     handle.Destroy();
@@ -188,31 +188,31 @@ void Test3DVDBHandleKernels() {
   {
     Handle handle = Handle::Create();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      handle.value_AllocateIfNotExist({i - nHalf, i - nHalf, 0}) = i - nHalf;
-      handle.value_AllocateIfNotExist({i - nHalf, nHalf - i, 0}) = i - nHalf;
+      handle.value_AllocateIfNotExist(Vec3i{i - nHalf, i - nHalf, 0}) = i - nHalf;
+      handle.value_AllocateIfNotExist(Vec3i{i - nHalf, nHalf - i, 0}) = i - nHalf;
 
       if (i - nHalf != nHalf - i) {
-        handle.value_AllocateIfNotExist({i - nHalf, 0, i - nHalf}) = (i - nHalf) * 2;
-        handle.value_AllocateIfNotExist({i - nHalf, 0, nHalf - i}) = (i - nHalf) * 2;
+        handle.value_AllocateIfNotExist(Vec3i{i - nHalf, 0, i - nHalf}) = (i - nHalf) * 2;
+        handle.value_AllocateIfNotExist(Vec3i{i - nHalf, 0, nHalf - i}) = (i - nHalf) * 2;
       }
 
       if (i - nHalf != nHalf - i) {
-        handle.value_AllocateIfNotExist({0, i - nHalf, i - nHalf}) = (i - nHalf) * (-3);
-        handle.value_AllocateIfNotExist({0, i - nHalf, nHalf - i}) = (i - nHalf) * (-3);
+        handle.value_AllocateIfNotExist(Vec3i{0, i - nHalf, i - nHalf}) = (i - nHalf) * (-3);
+        handle.value_AllocateIfNotExist(Vec3i{0, i - nHalf, nHalf - i}) = (i - nHalf) * (-3);
       }
     }).Launch();
     Launcher(n, [=] ARIA_DEVICE(int i) mutable {
-      ARIA_ASSERT(handle.value_AllocateIfNotExist({i - nHalf, i - nHalf, 0}) == i - nHalf);
-      ARIA_ASSERT(handle.value_AssumeExist({i - nHalf, nHalf - i, 0}) == i - nHalf);
+      ARIA_ASSERT(handle.value_AllocateIfNotExist(Vec3i{i - nHalf, i - nHalf, 0}) == i - nHalf);
+      ARIA_ASSERT(handle.value_AssumeExist(Vec3i{i - nHalf, nHalf - i, 0}) == i - nHalf);
 
       if (i - nHalf != nHalf - i) {
-        ARIA_ASSERT(handle.value_AllocateIfNotExist({i - nHalf, 0, i - nHalf}) == (i - nHalf) * 2);
-        ARIA_ASSERT(handle.value_AssumeExist({i - nHalf, 0, nHalf - i}) == (i - nHalf) * 2);
+        ARIA_ASSERT(handle.value_AllocateIfNotExist(Vec3i{i - nHalf, 0, i - nHalf}) == (i - nHalf) * 2);
+        ARIA_ASSERT(handle.value_AssumeExist(Vec3i{i - nHalf, 0, nHalf - i}) == (i - nHalf) * 2);
       }
 
       if (i - nHalf != nHalf - i) {
-        ARIA_ASSERT(handle.value_AllocateIfNotExist({0, i - nHalf, i - nHalf}) == (i - nHalf) * (-3));
-        ARIA_ASSERT(handle.value_AssumeExist({0, i - nHalf, nHalf - i}) == (i - nHalf) * (-3));
+        ARIA_ASSERT(handle.value_AllocateIfNotExist(Vec3i{0, i - nHalf, i - nHalf}) == (i - nHalf) * (-3));
+        ARIA_ASSERT(handle.value_AssumeExist(Vec3i{0, i - nHalf, nHalf - i}) == (i - nHalf) * (-3));
       }
     }).Launch();
     cuda::device::current::get().synchronize();

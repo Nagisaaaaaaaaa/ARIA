@@ -638,13 +638,9 @@ private:
   //
 public:
   // Get or set the value at `cellCoord`.
-  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AllocateIfNotExist, TVec);
+  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AllocateIfNotExist);
 
-  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AssumeExist, TVec);
-
-  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AllocateIfNotExist, TVec, TCache);
-
-  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AssumeExist, TVec, TCache);
+  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AssumeExist);
 
   //
   //
