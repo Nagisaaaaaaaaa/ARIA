@@ -28,11 +28,11 @@ public:
 private:
   T x_{}, y_{}, z_{};
 
-  [[nodiscard]] auto ARIA_PROP_IMPL(lengthSqr)() const { return x() * x() + y() * y() + z() * z(); }
+  [[nodiscard]] auto ARIA_PROP_GETTER(lengthSqr)() const { return x() * x() + y() * y() + z() * z(); }
 
-  [[nodiscard]] auto ARIA_PROP_IMPL(length)() const { return std::sqrt(lengthSqr()); }
+  [[nodiscard]] auto ARIA_PROP_GETTER(length)() const { return std::sqrt(lengthSqr()); }
 
-  void ARIA_PROP_IMPL(length)(const auto &value) {
+  void ARIA_PROP_SETTER(length)(const auto &value) {
     auto scaling = value / length();
     x() *= scaling;
     y() *= scaling;
@@ -53,11 +53,11 @@ public:
 private:
   Vec3<double> forward_;
 
-  [[nodiscard]] auto ARIA_PROP_IMPL(forward)() const {
+  [[nodiscard]] auto ARIA_PROP_GETTER(forward)() const {
     return Vec3<float>{float(forward_.x()), float(forward_.y()), float(forward_.z())};
   }
 
-  void ARIA_PROP_IMPL(forward)(const auto &value) {
+  void ARIA_PROP_SETTER(forward)(const auto &value) {
     forward_.x() = value.x();
     forward_.y() = value.y();
     forward_.z() = value.z();
