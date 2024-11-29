@@ -190,7 +190,7 @@ public:
   /// \example ```cpp
   /// Transform& trans = obj.transform();
   /// ```
-  ARIA_REF_PROP(public, , transform, ARIA_PROP_IMPL(transform)());
+  ARIA_REF_PROP(public, , transform, ARIA_PROP_GETTER(transform)());
 
   //
   //
@@ -342,16 +342,16 @@ private:
   //
   //
   //
-  [[nodiscard]] const Object *ARIA_PROP_IMPL(parent)() const;
-  [[nodiscard]] Object *ARIA_PROP_IMPL(parent)();
-  void ARIA_PROP_IMPL(parent)(Object *value);
+  [[nodiscard]] const Object *ARIA_PROP_GETTER(parent)() const;
+  [[nodiscard]] Object *ARIA_PROP_GETTER(parent)();
+  void ARIA_PROP_SETTER(parent)(Object *value);
 
-  [[nodiscard]] const Object *ARIA_PROP_IMPL(root)() const;
-  [[nodiscard]] Object *ARIA_PROP_IMPL(root)();
-  void ARIA_PROP_IMPL(root)(Object *value);
+  [[nodiscard]] const Object *ARIA_PROP_GETTER(root)() const;
+  [[nodiscard]] Object *ARIA_PROP_GETTER(root)();
+  void ARIA_PROP_SETTER(root)(Object *value);
 
-  [[nodiscard]] const Transform &ARIA_PROP_IMPL(transform)() const;
-  [[nodiscard]] Transform &ARIA_PROP_IMPL(transform)();
+  [[nodiscard]] const Transform &ARIA_PROP_GETTER(transform)() const;
+  [[nodiscard]] Transform &ARIA_PROP_GETTER(transform)();
 
   //
   //
