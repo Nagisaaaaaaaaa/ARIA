@@ -1097,16 +1097,14 @@ using empty_va_args_wrapper_t = typename empty_va_args_wrapper<T>::type;
                                                                                                                        \
   /* Define the setter. */                                                                                             \
   /*! Here `ARIA_PROP_SETTER(NAME)` is used. */                                                                        \
-  __ARIAPython_RecursivelyDefinePythonType<void (T:: *)(                                                               \
-      const decltype(std::declval<T>().ARIA_PROP_SETTER(NAME)()) &)>()(module);                                        \
+  __ARIAPython_RecursivelyDefinePythonType<decltype(&T::ARIA_PROP_SETTER(NAME))>()(module);                            \
                                                                                                                        \
   static_assert(property::detail::PropertyType<decltype(std::declval<T>().NAME())>,                                    \
                 "The given type to be defined in Python should be an ARIA property type");                             \
                                                                                                                        \
   /* Calls `py::class_::def_property` to actually define the property in Python. */                                    \
   cls.def_property(#NAME, static_cast<decltype(std::declval<T>().NAME()) (T:: *)()>(&T::NAME),                         \
-                   static_cast<void (T:: *)(const decltype(std::declval<T>().ARIA_PROP_SETTER(NAME)()) &)>(            \
-                       &T::ARIA_PROP_SETTER(NAME)))
+                   &T::ARIA_PROP_SETTER(NAME))
 
 //
 //
