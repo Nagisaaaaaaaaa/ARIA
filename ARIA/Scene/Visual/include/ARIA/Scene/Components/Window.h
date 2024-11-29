@@ -272,18 +272,18 @@ private:
   //
   //
 private:
-  [[nodiscard]] std::string ARIA_PROP_IMPL(title)() const;
-  void ARIA_PROP_IMPL(title)(const std::string &value);
-  [[nodiscard]] Vec2u ARIA_PROP_IMPL(size)() const;
-  void ARIA_PROP_IMPL(size)(const Vec2u &value);
+  [[nodiscard]] std::string ARIA_PROP_GETTER(title)() const;
+  void ARIA_PROP_SETTER(title)(const std::string &value);
+  [[nodiscard]] Vec2u ARIA_PROP_GETTER(size)() const;
+  void ARIA_PROP_SETTER(size)(const Vec2u &value);
 
   //
-  [[nodiscard]] bool ARIA_PROP_IMPL(shouldClose)() const;
-  void ARIA_PROP_IMPL(shouldClose)(const bool &value);
+  [[nodiscard]] bool ARIA_PROP_GETTER(shouldClose)() const;
+  void ARIA_PROP_SETTER(shouldClose)(const bool &value);
 
   //
-  [[nodiscard]] Vec4r ARIA_PROP_IMPL(clearColor)() const;
-  void ARIA_PROP_IMPL(clearColor)(const Vec4r &value);
+  [[nodiscard]] Vec4r ARIA_PROP_GETTER(clearColor)() const;
+  void ARIA_PROP_SETTER(clearColor)(const Vec4r &value);
 };
 
 } // namespace ARIA
