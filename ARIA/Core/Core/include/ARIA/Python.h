@@ -303,8 +303,8 @@ using python::detail::Dict;
 /// public:
 ///   ARIA_PROP(public, public, , std::string, name);
 /// private:
-///   std::string ARIA_PROP_IMPL(name)() const { ... }
-///   void ARIA_PROP_IMPL(name)(const std::string &name) { ... }
+///   std::string ARIA_PROP_GETTER(name)() const { ... }
+///   void ARIA_PROP_SETTER(name)(const std::string &name) { ... }
 /// };
 ///
 /// ARIA_PYTHON_TYPE_BEGIN(Object);
@@ -323,7 +323,7 @@ using python::detail::Dict;
 /// public:
 ///   ARIA_PROP(public, private, , std::string, name);
 /// private:
-///   std::string ARIA_PROP_IMPL(name)() const { ... }
+///   std::string ARIA_PROP_GETTER(name)() const { ... }
 /// };
 ///
 /// ARIA_PYTHON_TYPE_BEGIN(Object);
