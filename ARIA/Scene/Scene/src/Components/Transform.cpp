@@ -3,35 +3,35 @@
 
 namespace ARIA {
 
-const Transform *Transform::ARIA_PROP_IMPL(parent)() const {
+const Transform *Transform::ARIA_PROP_GETTER(parent)() const {
   const Object *p = object().parent();
   const Transform &t = p->transform();
   return &t;
 }
 
-Transform *Transform::ARIA_PROP_IMPL(parent)() {
+Transform *Transform::ARIA_PROP_GETTER(parent)() {
   Object *p = object().parent();
   Transform &t = p->transform();
   return &t;
 }
 
-void Transform::ARIA_PROP_IMPL(parent)(Transform *value) {
+void Transform::ARIA_PROP_SETTER(parent)(Transform *value) {
   object().parent() = &value->object();
 }
 
-const Transform *Transform::ARIA_PROP_IMPL(root)() const {
+const Transform *Transform::ARIA_PROP_GETTER(root)() const {
   const Object *r = object().root();
   const Transform &t = r->transform();
   return &t;
 }
 
-Transform *Transform::ARIA_PROP_IMPL(root)() {
+Transform *Transform::ARIA_PROP_GETTER(root)() {
   Object *r = object().root();
   Transform &t = r->transform();
   return &t;
 }
 
-void Transform::ARIA_PROP_IMPL(root)(Transform *value) {
+void Transform::ARIA_PROP_SETTER(root)(Transform *value) {
   object().root() = &value->object();
 }
 
@@ -40,7 +40,7 @@ void Transform::ARIA_PROP_IMPL(root)(Transform *value) {
 //
 //
 //
-Vec3r Transform::ARIA_PROP_IMPL(localPosition)() const {
+Vec3r Transform::ARIA_PROP_GETTER(localPosition)() const {
   return localPosition_;
 }
 
@@ -48,26 +48,26 @@ Vec3r Transform::ARIA_PROP_IMPL(localPosition)() const {
 // TODO: It is non-trivial to implement dirty flags for `Transform`,
 //       because when the parent `Transform` is set to dirty,
 //       all its children should be recursively set to dirty.
-void Transform::ARIA_PROP_IMPL(localPosition)(const Vec3r &value) {
+void Transform::ARIA_PROP_SETTER(localPosition)(const Vec3r &value) {
   // dirty() = true;
   localPosition_ = value;
 }
 
-Quatr Transform::ARIA_PROP_IMPL(localRotation)() const {
+Quatr Transform::ARIA_PROP_GETTER(localRotation)() const {
   return localRotation_;
 }
 
-void Transform::ARIA_PROP_IMPL(localRotation)(const Quatr &value) {
+void Transform::ARIA_PROP_SETTER(localRotation)(const Quatr &value) {
   // dirty() = true;
   localRotation_ = value;
   localRotation_.normalize(); //! Local rotation is always a normalized quaternion to avoid numerical issues.
 }
 
-Vec3r Transform::ARIA_PROP_IMPL(localScale)() const {
+Vec3r Transform::ARIA_PROP_GETTER(localScale)() const {
   return localScale_;
 }
 
-void Transform::ARIA_PROP_IMPL(localScale)(const Vec3r &value) {
+void Transform::ARIA_PROP_SETTER(localScale)(const Vec3r &value) {
   // dirty() = true;
   localScale_ = value;
 }
@@ -77,11 +77,11 @@ void Transform::ARIA_PROP_IMPL(localScale)(const Vec3r &value) {
 //
 //
 //
-Vec3r Transform::ARIA_PROP_IMPL(localEulerAngles)() const {
+Vec3r Transform::ARIA_PROP_GETTER(localEulerAngles)() const {
   return ToEulerAngles(localRotation());
 }
 
-void Transform::ARIA_PROP_IMPL(localEulerAngles)(const Vec3r &value) {
+void Transform::ARIA_PROP_SETTER(localEulerAngles)(const Vec3r &value) {
   localRotation() = FromEulerAngles(value);
 }
 
@@ -90,11 +90,11 @@ void Transform::ARIA_PROP_IMPL(localEulerAngles)(const Vec3r &value) {
 //
 //
 //
-Vec3r Transform::ARIA_PROP_IMPL(localUp)() const {
+Vec3r Transform::ARIA_PROP_GETTER(localUp)() const {
   return localRotation() * Transform::Up();
 }
 
-void Transform::ARIA_PROP_IMPL(localUp)(const Vec3r &value) {
+void Transform::ARIA_PROP_SETTER(localUp)(const Vec3r &value) {
   // Compute the current up direction.
   const Vec3r curUp = localUp();
 
@@ -107,11 +107,11 @@ void Transform::ARIA_PROP_IMPL(localUp)(const Vec3r &value) {
   localRotation() = rotDelta * curRot;
 }
 
-Vec3r Transform::ARIA_PROP_IMPL(localDown)() const {
+Vec3r Transform::ARIA_PROP_GETTER(localDown)() const {
   return localRotation() * Transform::Down();
 }
 
-void Transform::ARIA_PROP_IMPL(localDown)(const Vec3r &value) {
+void Transform::ARIA_PROP_SETTER(localDown)(const Vec3r &value) {
   // Compute the current down direction.
   const Vec3r curDown = localDown();
 
@@ -124,11 +124,11 @@ void Transform::ARIA_PROP_IMPL(localDown)(const Vec3r &value) {
   localRotation() = rotDelta * curRot;
 }
 
-Vec3r Transform::ARIA_PROP_IMPL(localForward)() const {
+Vec3r Transform::ARIA_PROP_GETTER(localForward)() const {
   return localRotation() * Transform::Forward();
 }
 
-void Transform::ARIA_PROP_IMPL(localForward)(const Vec3r &value) {
+void Transform::ARIA_PROP_SETTER(localForward)(const Vec3r &value) {
   // Compute the current forward direction.
   const Vec3r curForward = localForward();
 
@@ -141,11 +141,11 @@ void Transform::ARIA_PROP_IMPL(localForward)(const Vec3r &value) {
   localRotation() = rotDelta * curRot;
 }
 
-Vec3r Transform::ARIA_PROP_IMPL(localBack)() const {
+Vec3r Transform::ARIA_PROP_GETTER(localBack)() const {
   return localRotation() * Transform::Back();
 }
 
-void Transform::ARIA_PROP_IMPL(localBack)(const Vec3r &value) {
+void Transform::ARIA_PROP_SETTER(localBack)(const Vec3r &value) {
   // Compute the current back direction.
   const Vec3r curBack = localBack();
 
@@ -158,11 +158,11 @@ void Transform::ARIA_PROP_IMPL(localBack)(const Vec3r &value) {
   localRotation() = rotDelta * curRot;
 }
 
-Vec3r Transform::ARIA_PROP_IMPL(localLeft)() const {
+Vec3r Transform::ARIA_PROP_GETTER(localLeft)() const {
   return localRotation() * Transform::Left();
 }
 
-void Transform::ARIA_PROP_IMPL(localLeft)(const Vec3r &value) {
+void Transform::ARIA_PROP_SETTER(localLeft)(const Vec3r &value) {
   // Compute the current left direction.
   const Vec3r curLeft = localLeft();
 
@@ -175,11 +175,11 @@ void Transform::ARIA_PROP_IMPL(localLeft)(const Vec3r &value) {
   localRotation() = rotDelta * curRot;
 }
 
-Vec3r Transform::ARIA_PROP_IMPL(localRight)() const {
+Vec3r Transform::ARIA_PROP_GETTER(localRight)() const {
   return localRotation() * Transform::Right();
 }
 
-void Transform::ARIA_PROP_IMPL(localRight)(const Vec3r &value) {
+void Transform::ARIA_PROP_SETTER(localRight)(const Vec3r &value) {
   // Compute the current right direction.
   const Vec3r curRight = localRight();
 
@@ -197,11 +197,11 @@ void Transform::ARIA_PROP_IMPL(localRight)(const Vec3r &value) {
 //
 //
 //
-Mat4r Transform::ARIA_PROP_IMPL(localToParentMat)() const {
+Mat4r Transform::ARIA_PROP_GETTER(localToParentMat)() const {
   return localToParentAffine().matrix();
 }
 
-Mat4r Transform::ARIA_PROP_IMPL(localToWorldMat)() const {
+Mat4r Transform::ARIA_PROP_GETTER(localToWorldMat)() const {
   return localToWorldAffine().matrix();
 }
 
@@ -210,7 +210,7 @@ Mat4r Transform::ARIA_PROP_IMPL(localToWorldMat)() const {
 //
 //
 //
-Vec3r Transform::ARIA_PROP_IMPL(position)() const {
+Vec3r Transform::ARIA_PROP_GETTER(position)() const {
   if (IsRoot())
     return localPosition();
   else {
@@ -219,7 +219,7 @@ Vec3r Transform::ARIA_PROP_IMPL(position)() const {
   }
 }
 
-void Transform::ARIA_PROP_IMPL(position)(const Vec3r &value) {
+void Transform::ARIA_PROP_SETTER(position)(const Vec3r &value) {
   if (IsRoot())
     localPosition() = value;
   else {
@@ -228,7 +228,7 @@ void Transform::ARIA_PROP_IMPL(position)(const Vec3r &value) {
   }
 }
 
-Quatr Transform::ARIA_PROP_IMPL(rotation)() const {
+Quatr Transform::ARIA_PROP_GETTER(rotation)() const {
   const Transform *p = this;
 
   Quatr res = localRotation();
@@ -241,7 +241,7 @@ Quatr Transform::ARIA_PROP_IMPL(rotation)() const {
   return res.normalized();
 }
 
-void Transform::ARIA_PROP_IMPL(rotation)(const Quatr &value) {
+void Transform::ARIA_PROP_SETTER(rotation)(const Quatr &value) {
   if (IsRoot())
     localRotation() = value;
   else {
@@ -250,7 +250,7 @@ void Transform::ARIA_PROP_IMPL(rotation)(const Quatr &value) {
   }
 }
 
-Vec3r Transform::ARIA_PROP_IMPL(lossyScale)() const {
+Vec3r Transform::ARIA_PROP_GETTER(lossyScale)() const {
   Mat3r linearPart = localToWorldAffine().linear();
 
   Vec3r scales;
@@ -266,11 +266,11 @@ Vec3r Transform::ARIA_PROP_IMPL(lossyScale)() const {
 //
 //
 //
-Vec3r Transform::ARIA_PROP_IMPL(up)() const {
+Vec3r Transform::ARIA_PROP_GETTER(up)() const {
   return rotation() * Transform::Up();
 }
 
-void Transform::ARIA_PROP_IMPL(up)(const Vec3r &value) {
+void Transform::ARIA_PROP_SETTER(up)(const Vec3r &value) {
   // Compute the current up direction.
   const Vec3r curUp = up();
 
@@ -283,11 +283,11 @@ void Transform::ARIA_PROP_IMPL(up)(const Vec3r &value) {
   rotation() = rotDelta * curRot;
 }
 
-Vec3r Transform::ARIA_PROP_IMPL(down)() const {
+Vec3r Transform::ARIA_PROP_GETTER(down)() const {
   return rotation() * Transform::Down();
 }
 
-void Transform::ARIA_PROP_IMPL(down)(const Vec3r &value) {
+void Transform::ARIA_PROP_SETTER(down)(const Vec3r &value) {
   // Compute the current down direction.
   const Vec3r curDown = down();
 
@@ -300,11 +300,11 @@ void Transform::ARIA_PROP_IMPL(down)(const Vec3r &value) {
   rotation() = rotDelta * curRot;
 }
 
-Vec3r Transform::ARIA_PROP_IMPL(forward)() const {
+Vec3r Transform::ARIA_PROP_GETTER(forward)() const {
   return rotation() * Transform::Forward();
 }
 
-void Transform::ARIA_PROP_IMPL(forward)(const Vec3r &value) {
+void Transform::ARIA_PROP_SETTER(forward)(const Vec3r &value) {
   // Compute the current forward direction.
   const Vec3r curForward = forward();
 
@@ -317,11 +317,11 @@ void Transform::ARIA_PROP_IMPL(forward)(const Vec3r &value) {
   rotation() = rotDelta * curRot;
 }
 
-Vec3r Transform::ARIA_PROP_IMPL(back)() const {
+Vec3r Transform::ARIA_PROP_GETTER(back)() const {
   return rotation() * Transform::Back();
 }
 
-void Transform::ARIA_PROP_IMPL(back)(const Vec3r &value) {
+void Transform::ARIA_PROP_SETTER(back)(const Vec3r &value) {
   // Compute the current back direction.
   const Vec3r curBack = back();
 
@@ -334,11 +334,11 @@ void Transform::ARIA_PROP_IMPL(back)(const Vec3r &value) {
   rotation() = rotDelta * curRot;
 }
 
-Vec3r Transform::ARIA_PROP_IMPL(left)() const {
+Vec3r Transform::ARIA_PROP_GETTER(left)() const {
   return rotation() * Transform::Left();
 }
 
-void Transform::ARIA_PROP_IMPL(left)(const Vec3r &value) {
+void Transform::ARIA_PROP_SETTER(left)(const Vec3r &value) {
   // Compute the current left direction.
   const Vec3r curLeft = left();
 
@@ -351,11 +351,11 @@ void Transform::ARIA_PROP_IMPL(left)(const Vec3r &value) {
   rotation() = rotDelta * curRot;
 }
 
-Vec3r Transform::ARIA_PROP_IMPL(right)() const {
+Vec3r Transform::ARIA_PROP_GETTER(right)() const {
   return rotation() * Transform::Right();
 }
 
-void Transform::ARIA_PROP_IMPL(right)(const Vec3r &value) {
+void Transform::ARIA_PROP_SETTER(right)(const Vec3r &value) {
   // Compute the current right direction.
   const Vec3r curRight = right();
 
