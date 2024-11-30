@@ -11,7 +11,9 @@ public:
 private:
   using VecDim = Vec<T, dim>;
   static_assert(
-      std::is_same_v<VecDim, decltype(Auto(invoke_with_parentheses_or_brackets(std::declval<TControlPoints>(), 0)))>,
+      std::is_same_v<
+          VecDim,
+          std::decay_t<decltype(Auto(invoke_with_parentheses_or_brackets(std::declval<TControlPoints>(), 0)))>>,
       "Type of control points does not match the dimension");
 
 public:
@@ -73,7 +75,9 @@ public:
 private:
   using VecDim = Vec<T, dim>;
   static_assert(
-      std::is_same_v<VecDim, decltype(Auto(invoke_with_parentheses_or_brackets(std::declval<TControlPoints>(), 0)))>,
+      std::is_same_v<
+          VecDim,
+          std::decay_t<decltype(Auto(invoke_with_parentheses_or_brackets(std::declval<TControlPoints>(), 0)))>>,
       "Type of control points does not match the dimension");
 
 public:
