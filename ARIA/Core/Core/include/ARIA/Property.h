@@ -325,9 +325,10 @@
 /// Actually, it's much more powerful than you imagine.
 /// Here lists the advanced features:
 /// 1. Properties can have any type or number of parameters.
-///    Simply add more parameters to the getters and setters, and
-///    call the property functions with the arguments you want.
-///    For example, `ARIA_PROP_GETTER(prop)(int arg0)` and `ARIA_PROP_SETTER(prop)(int arg0, const T &value)`.
+///    For example, you can define getters and setters with parameters, like
+///    `ARIA_PROP_GETTER(prop)(int arg0, float arg1)` and
+///    `ARIA_PROP_SETTER(prop)(int arg0, float arg1, const T &value)`.
+///    Then, call the property with arguments, like `cls.prop(arg0, arg1)`.
 /// 2. Overloading is supported.
 ///    Simply add more getters and setters with the same name.
 /// 3. Property arguments can be specified later, just like the so-called "accessors".
