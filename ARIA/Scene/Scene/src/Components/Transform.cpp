@@ -4,14 +4,12 @@
 namespace ARIA {
 
 const Transform *Transform::ARIA_PROP_GETTER(parent)() const {
-  const Object *p = object().parent();
-  const Transform &t = p->transform();
+  const Transform &t = object().parent()->transform();
   return &t;
 }
 
 Transform *Transform::ARIA_PROP_GETTER(parent)() {
-  Object *p = object().parent();
-  Transform &t = p->transform();
+  Transform &t = object().parent()->transform();
   return &t;
 }
 
@@ -20,14 +18,12 @@ void Transform::ARIA_PROP_SETTER(parent)(Transform *value) {
 }
 
 const Transform *Transform::ARIA_PROP_GETTER(root)() const {
-  const Object *r = object().root();
-  const Transform &t = r->transform();
+  const Transform &t = object().root()->transform();
   return &t;
 }
 
 Transform *Transform::ARIA_PROP_GETTER(root)() {
-  Object *r = object().root();
-  Transform &t = r->transform();
+  Transform &t = object().root()->transform();
   return &t;
 }
 
