@@ -397,10 +397,12 @@ private:
                                                                                                                        \
     /* Calls the user-defined getter. */                                                                               \
     [[nodiscard]] SPECIFIERS decltype(auto) value() {                                                                  \
-      return cuda::std::apply([&](const auto &...propArgsTuple) { return Get(object, propArgsTuple...); }, propArgs);  \
+      return cuda::std::apply(                                                                                         \
+          [&](const auto &...propArgsTuple) -> decltype(auto) { return Get(object, propArgsTuple...); }, propArgs);    \
     }                                                                                                                  \
     [[nodiscard]] SPECIFIERS decltype(auto) value() const {                                                            \
-      return cuda::std::apply([&](const auto &...propArgsTuple) { return Get(object, propArgsTuple...); }, propArgs);  \
+      return cuda::std::apply(                                                                                         \
+          [&](const auto &...propArgsTuple) -> decltype(auto) { return Get(object, propArgsTuple...); }, propArgs);    \
     }                                                                                                                  \
                                                                                                                        \
     /* Calls the user-defined getter. */                                                                               \
@@ -623,10 +625,12 @@ public:                                                                         
     ARIA_COPY_MOVE_ABILITY(ARIA_ANON(PROP_NAME), delete, default);                                                     \
                                                                                                                        \
     [[nodiscard]] SPECIFIERS decltype(auto) value() {                                                                  \
-      return cuda::std::apply([&](const auto &...propArgsTuple) { return Get(object, propArgsTuple...); }, propArgs);  \
+      return cuda::std::apply(                                                                                         \
+          [&](const auto &...propArgsTuple) -> decltype(auto) { return Get(object, propArgsTuple...); }, propArgs);    \
     }                                                                                                                  \
     [[nodiscard]] SPECIFIERS decltype(auto) value() const {                                                            \
-      return cuda::std::apply([&](const auto &...propArgsTuple) { return Get(object, propArgsTuple...); }, propArgs);  \
+      return cuda::std::apply(                                                                                         \
+          [&](const auto &...propArgsTuple) -> decltype(auto) { return Get(object, propArgsTuple...); }, propArgs);    \
     }                                                                                                                  \
                                                                                                                        \
     [[nodiscard]] SPECIFIERS operator decltype(auto)() {                                                               \

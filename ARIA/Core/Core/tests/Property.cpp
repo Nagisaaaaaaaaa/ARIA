@@ -2241,7 +2241,7 @@ TEST(Property, Auto) {
     auto x = Auto(v.x());
     decltype(auto) y = Auto(v.x());
     static_assert(std::is_same_v<decltype(x), float>);
-    static_assert(std::is_same_v<decltype(y), float>);
+    static_assert(std::is_same_v<decltype(y), float&>);
   }
 
   {
