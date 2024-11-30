@@ -395,6 +395,20 @@ private:
   public:                                                                                                              \
     ARIA_COPY_MOVE_ABILITY(ARIA_ANON(PROP_NAME), delete, default);                                                     \
                                                                                                                        \
+    /* Each property is also designed to be an accessor, which */                                                      \
+    /* means that users can set or reset arguments with `obj.a().args(...)`. */                                        \
+    /* This will generate new properties with different arguments. */                                                  \
+    template <typename... TUVWArgsNew>                                                                                 \
+    [[nodiscard]] SPECIFIERS decltype(auto) args(TUVWArgsNew &&...propArgsNew) {                                       \
+      return ARIA_ANON(PROP_NAME)<TObjectMaybeConst, TUVWArgsNew...>{this->object,                                     \
+                                                                     std::forward<TUVWArgsNew>(propArgsNew)...};       \
+    }                                                                                                                  \
+    template <typename... TUVWArgsNew>                                                                                 \
+    [[nodiscard]] SPECIFIERS decltype(auto) args(TUVWArgsNew &&...propArgsNew) const {                                 \
+      return ARIA_ANON(PROP_NAME)<TObjectMaybeConst, TUVWArgsNew...>{this->object,                                     \
+                                                                     std::forward<TUVWArgsNew>(propArgsNew)...};       \
+    }                                                                                                                  \
+                                                                                                                       \
     /* Calls the user-defined getter. */                                                                               \
     [[nodiscard]] SPECIFIERS decltype(auto) value() {                                                                  \
       return cuda::std::apply(                                                                                         \
@@ -623,6 +637,17 @@ public:                                                                         
                                                                                                                        \
   public:                                                                                                              \
     ARIA_COPY_MOVE_ABILITY(ARIA_ANON(PROP_NAME), delete, default);                                                     \
+                                                                                                                       \
+    template <typename... TUVWArgsNew>                                                                                 \
+    [[nodiscard]] SPECIFIERS decltype(auto) args(TUVWArgsNew &&...propArgsNew) {                                       \
+      return ARIA_ANON(PROP_NAME)<TObjectMaybeConst, TUVWArgsNew...>{this->object,                                     \
+                                                                     std::forward<TUVWArgsNew>(propArgsNew)...};       \
+    }                                                                                                                  \
+    template <typename... TUVWArgsNew>                                                                                 \
+    [[nodiscard]] SPECIFIERS decltype(auto) args(TUVWArgsNew &&...propArgsNew) const {                                 \
+      return ARIA_ANON(PROP_NAME)<TObjectMaybeConst, TUVWArgsNew...>{this->object,                                     \
+                                                                     std::forward<TUVWArgsNew>(propArgsNew)...};       \
+    }                                                                                                                  \
                                                                                                                        \
     [[nodiscard]] SPECIFIERS decltype(auto) value() {                                                                  \
       return cuda::std::apply(                                                                                         \
