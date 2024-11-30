@@ -321,6 +321,22 @@
 ///
 /// Now, you are all done!
 ///
+/// \note The above example only shows the most primary usages of the ARIA property system.
+/// Actually, it's much more powerful than you imagine.
+/// Here lists the advanced features:
+/// 1. Properties can have any type or number of parameters.
+///    Simply add more parameters to the getters and setters, and
+///    call the property functions with the arguments you want.
+///    For example, `ARIA_PROP_GETTER(prop)(int arg0)` and `ARIA_PROP_SETTER(prop)(int arg0, const T &value)`.
+/// 2. Overloading is supported.
+///    Simply add more getters and setters with the same name.
+/// 3. Property arguments can be specified later, just like the so-called "accessors".
+///    It's OK to specify the arguments at the first time, like `cls.prop(arg0, arg1)`.
+///    You can also type `Property auto p = cls.prop();` and
+///    specify the arguments later, like `p.args(arg0, arg1)`.
+///    The method `args` is defined for every properties, which
+///    can be used to set or reset arguments.
+///
 /// \see Auto.h
 
 //
