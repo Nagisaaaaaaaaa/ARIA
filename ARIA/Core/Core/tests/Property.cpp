@@ -2397,25 +2397,81 @@ TEST(Property, PropertyArguments) {
   {
     Test1Arg t0;
     const Test1Arg t1;
-    // auto a0 = Auto(t0.test());
-    // auto a1 = Auto(t1.test());
+
+    auto a0 = t0.test();
+    auto a1 = t1.test();
+    auto b0 = a0.args(9);
+    auto b1 = a1.args(9);
+    auto c0 = b0.args();
+    auto c1 = b1.args();
+    auto d0 = c0.args(9);
+    auto d1 = c1.args(9);
+    auto e0 = d0.args("Fake");
+    auto e1 = d1.args("Fake");
+
+    static_assert(property::detail::PropertyType<decltype(a0)>);
+    static_assert(property::detail::PropertyType<decltype(a1)>);
+    static_assert(property::detail::PropertyType<decltype(b0)>);
+    static_assert(property::detail::PropertyType<decltype(b1)>);
+    static_assert(property::detail::PropertyType<decltype(c0)>);
+    static_assert(property::detail::PropertyType<decltype(c1)>);
+    static_assert(property::detail::PropertyType<decltype(d0)>);
+    static_assert(property::detail::PropertyType<decltype(d1)>);
+    static_assert(property::detail::PropertyType<decltype(e0)>);
+    static_assert(property::detail::PropertyType<decltype(e1)>);
+    static_assert(std::is_same_v<decltype(a0), decltype(c0)>);
+    static_assert(std::is_same_v<decltype(a1), decltype(c1)>);
+    static_assert(std::is_same_v<decltype(b0), decltype(d0)>);
+    static_assert(std::is_same_v<decltype(b1), decltype(d1)>);
 
     EXPECT_EQ(t0.test(9), 19);
-    // EXPECT_EQ(a0(9), 19);
     EXPECT_EQ(t1.test(9), 19);
-    // EXPECT_EQ(a1(9), 19);
+    EXPECT_EQ(t0.test().args(9), 19);
+    EXPECT_EQ(t1.test().args(9), 19);
+    EXPECT_EQ(b0, 19);
+    EXPECT_EQ(b1, 19);
+    EXPECT_EQ(d0, 19);
+    EXPECT_EQ(d1, 19);
   }
 
   {
     Test2Args t0;
     const Test2Args t1;
-    // auto a0 = Auto(t0.test());
-    // auto a1 = Auto(t1.test());
+
+    auto a0 = t0.test();
+    auto a1 = t1.test();
+    auto b0 = a0.args(9, 1.999F);
+    auto b1 = a1.args(9, 1.999F);
+    auto c0 = b0.args();
+    auto c1 = b1.args();
+    auto d0 = c0.args(9, 1.999F);
+    auto d1 = c1.args(9, 1.999F);
+    auto e0 = d0.args("Fake");
+    auto e1 = d1.args("Fake");
+
+    static_assert(property::detail::PropertyType<decltype(a0)>);
+    static_assert(property::detail::PropertyType<decltype(a1)>);
+    static_assert(property::detail::PropertyType<decltype(b0)>);
+    static_assert(property::detail::PropertyType<decltype(b1)>);
+    static_assert(property::detail::PropertyType<decltype(c0)>);
+    static_assert(property::detail::PropertyType<decltype(c1)>);
+    static_assert(property::detail::PropertyType<decltype(d0)>);
+    static_assert(property::detail::PropertyType<decltype(d1)>);
+    static_assert(property::detail::PropertyType<decltype(e0)>);
+    static_assert(property::detail::PropertyType<decltype(e1)>);
+    static_assert(std::is_same_v<decltype(a0), decltype(c0)>);
+    static_assert(std::is_same_v<decltype(a1), decltype(c1)>);
+    static_assert(std::is_same_v<decltype(b0), decltype(d0)>);
+    static_assert(std::is_same_v<decltype(b1), decltype(d1)>);
 
     EXPECT_EQ(t0.test(9, 1.999F), 20);
-    // EXPECT_EQ(a0(9, 1.999F), 20);
     EXPECT_EQ(t1.test(9, 1.999F), 20);
-    // EXPECT_EQ(a1(9, 1.999F), 20);
+    EXPECT_EQ(t0.test().args(9, 1.999F), 20);
+    EXPECT_EQ(t1.test().args(9, 1.999F), 20);
+    EXPECT_EQ(b0, 20);
+    EXPECT_EQ(b1, 20);
+    EXPECT_EQ(d0, 20);
+    EXPECT_EQ(d1, 20);
   }
 
   {
