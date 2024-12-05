@@ -79,6 +79,7 @@ set(core_core_headers
     ARIA/Launcher.h
     ARIA/Layout.h
     ARIA/Let.h
+    ARIA/Mosaic.h
     ARIA/Property.h
     ARIA/PropertySTL.h
     ARIA/Python.h

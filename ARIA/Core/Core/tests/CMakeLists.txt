@@ -15,6 +15,7 @@ if (ARIA_BUILD_TESTS)
       Launcher.cu
       Layout.cu
       Let.cpp
+      Mosaic.cu
       Property.cpp
       PropertySTL.cpp
       Python.cpp
