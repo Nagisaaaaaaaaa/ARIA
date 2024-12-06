@@ -59,6 +59,24 @@ struct TestRecursive2Members {
   } s0;
 };
 
+struct TestRecursiveLValueMembers {
+  int v0 = 5;
+
+  struct {
+    double v1 = 6;
+    float &v2;
+  } s0;
+};
+
+struct TestRecursiveRValueMembers {
+  int v0 = 5;
+
+  struct {
+    double v1 = 6;
+    float &&v2 = 7;
+  } s0;
+};
+
 struct TestRecursiveComplex {
   int v0 = 5, v1 = 6, v2 = 7;
 
@@ -619,6 +637,16 @@ TEST(Mosaic, Base) {
     static_assert(INonRec2IRec<2, TestRecursive2Members>() == 3);
     static_assert(INonRec2IRec<99999, TestRecursive2Members>() == 3);
     static_assert(std::is_same_v<MosaicTiles<TestRecursive2Members>, TypeArray<int, double, int *>>);
+
+    static_assert(!std::is_scalar_v<TestRecursiveLValueMembers>);
+    static_assert(std::is_aggregate_v<TestRecursiveLValueMembers>);
+    static_assert(boost::pfr::tuple_size_v<TestRecursiveLValueMembers> == 2);
+    static_assert(!MosaicPattern<TestRecursiveLValueMembers>);
+
+    static_assert(!std::is_scalar_v<TestRecursiveRValueMembers>);
+    static_assert(std::is_aggregate_v<TestRecursiveRValueMembers>);
+    static_assert(boost::pfr::tuple_size_v<TestRecursiveRValueMembers> == 2);
+    static_assert(!MosaicPattern<TestRecursiveRValueMembers>);
 
     static_assert(!std::is_scalar_v<TestRecursiveComplex>);
     static_assert(std::is_aggregate_v<TestRecursiveComplex>);
