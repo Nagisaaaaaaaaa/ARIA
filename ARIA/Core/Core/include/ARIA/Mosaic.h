@@ -140,6 +140,24 @@ template <auto iNonRec, MosaicPattern T>
 //
 //
 //
+template <auto iRec, typename T>
+[[nodiscard]] static inline constexpr decltype(auto) get_recursive(T &&v) noexcept {
+  using TDecayed = std::decay_t<T>;
+  static_assert(MosaicPattern<TDecayed>, "The decayed given type should be a `MosaicPattern`");
+
+  using TInteger = std::decay_t<decltype(boost::pfr::tuple_size_v<TDecayed>)>;
+
+  if constexpr (std::is_scalar_v<TDecayed>)
+    return boost::pfr::get<iRec>(std::forward<T>(v));
+  else if constexpr (std::is_aggregate_v<TDecayed>) {
+    constexpr TInteger iNonRec = IRec2INonRec<iRec, TDecayed>();
+    return get_recursive<iRec - INonRec2IRec<iNonRec, TDecayed>()>(boost::pfr::get<iNonRec>(std::forward<T>(v)));
+  }
+}
+
+//
+//
+//
 template <typename T, MosaicPattern U>
 class Mosaic {};
 
