@@ -161,59 +161,28 @@ TEST(Mosaic, Base) {
 
   // Pointer types.
   {
-    static_assert(std::is_scalar_v<double *>);
-    static_assert(!std::is_aggregate_v<double *>);
-    static_assert(boost::pfr::tuple_size_v<double *> == 1);
-    static_assert(MosaicPattern<double *>);
-    static_assert(tuple_size_recursive_v<double *> == 1);
+    auto testPointerType = []<typename T>() {
+      static_assert(!std::is_pointer_v<T>);
 
-    static_assert(std::is_scalar_v<Test0Member *>);
-    static_assert(!std::is_aggregate_v<Test0Member *>);
-    static_assert(boost::pfr::tuple_size_v<Test0Member *> == 1);
-    static_assert(MosaicPattern<Test0Member *>);
-    static_assert(tuple_size_recursive_v<Test0Member *> == 1);
+      static_assert(std::is_scalar_v<T *>);
+      static_assert(!std::is_aggregate_v<T *>);
+      static_assert(boost::pfr::tuple_size_v<T *> == 1);
+      static_assert(MosaicPattern<T *>);
+      static_assert(tuple_size_recursive_v<T *> == 1);
+      static_assert(IRec2INonRec<0, T *>() == 0);
+      static_assert(IRec2INonRec<1, T *>() == 1);
+      static_assert(IRec2INonRec<99999, T *>() == 1);
+    };
 
-    static_assert(std::is_scalar_v<Test1Member *>);
-    static_assert(!std::is_aggregate_v<Test1Member *>);
-    static_assert(boost::pfr::tuple_size_v<Test1Member *> == 1);
-    static_assert(MosaicPattern<Test1Member *>);
-    static_assert(tuple_size_recursive_v<Test1Member *> == 1);
-
-    static_assert(std::is_scalar_v<Test2Members *>);
-    static_assert(!std::is_aggregate_v<Test2Members *>);
-    static_assert(boost::pfr::tuple_size_v<Test2Members *> == 1);
-    static_assert(MosaicPattern<Test2Members *>);
-    static_assert(tuple_size_recursive_v<Test2Members *> == 1);
-
-    static_assert(std::is_scalar_v<TestPrivateMembers *>);
-    static_assert(!std::is_aggregate_v<TestPrivateMembers *>);
-    static_assert(boost::pfr::tuple_size_v<TestPrivateMembers *> == 1);
-    static_assert(MosaicPattern<TestPrivateMembers *>);
-    static_assert(tuple_size_recursive_v<TestPrivateMembers *> == 1);
-
-    static_assert(std::is_scalar_v<TestRecursive0Member *>);
-    static_assert(!std::is_aggregate_v<TestRecursive0Member *>);
-    static_assert(boost::pfr::tuple_size_v<TestRecursive0Member *> == 1);
-    static_assert(MosaicPattern<TestRecursive0Member *>);
-    static_assert(tuple_size_recursive_v<TestRecursive0Member *> == 1);
-
-    static_assert(std::is_scalar_v<TestRecursive1Member *>);
-    static_assert(!std::is_aggregate_v<TestRecursive1Member *>);
-    static_assert(boost::pfr::tuple_size_v<TestRecursive1Member *> == 1);
-    static_assert(MosaicPattern<TestRecursive1Member *>);
-    static_assert(tuple_size_recursive_v<TestRecursive1Member *> == 1);
-
-    static_assert(std::is_scalar_v<TestRecursive2Members *>);
-    static_assert(!std::is_aggregate_v<TestRecursive2Members *>);
-    static_assert(boost::pfr::tuple_size_v<TestRecursive2Members *> == 1);
-    static_assert(MosaicPattern<TestRecursive2Members *>);
-    static_assert(tuple_size_recursive_v<TestRecursive2Members *> == 1);
-
-    static_assert(std::is_scalar_v<TestRecursiveComplex *>);
-    static_assert(!std::is_aggregate_v<TestRecursiveComplex *>);
-    static_assert(boost::pfr::tuple_size_v<TestRecursiveComplex *> == 1);
-    static_assert(MosaicPattern<TestRecursiveComplex *>);
-    static_assert(tuple_size_recursive_v<TestRecursiveComplex *> == 1);
+    testPointerType.operator()<double>();
+    testPointerType.operator()<Test0Member>();
+    testPointerType.operator()<Test1Member>();
+    testPointerType.operator()<Test2Members>();
+    testPointerType.operator()<TestPrivateMembers>();
+    testPointerType.operator()<TestRecursive0Member>();
+    testPointerType.operator()<TestRecursive1Member>();
+    testPointerType.operator()<TestRecursive2Members>();
+    testPointerType.operator()<TestRecursiveComplex>();
   }
 }
 

@@ -65,6 +65,28 @@ static constexpr auto tuple_size_recursive_v = TupleSizeRecursiveImpl<T>();
 //
 //
 //
+// Given the recursive index, compute the non-recursive index.
+template <auto iRec, MosaicPattern T>
+[[nodiscard]] static consteval auto IRec2INonRec() {
+  using TInteger = std::decay_t<decltype(boost::pfr::tuple_size_v<T>)>;
+
+  TInteger sum = 0;
+  TInteger iNonRec = 0;
+
+  ForEach<boost::pfr::tuple_size_v<T>>([&](auto i) {
+    using U = std::decay_t<decltype(boost::pfr::get<i>(std::declval<T>()))>;
+    sum += tuple_size_recursive_v<U>;
+
+    if (iRec >= sum)
+      iNonRec = i + 1;
+  });
+
+  return iNonRec;
+}
+
+//
+//
+//
 template <typename T, MosaicPattern U>
 class Mosaic {};
 
