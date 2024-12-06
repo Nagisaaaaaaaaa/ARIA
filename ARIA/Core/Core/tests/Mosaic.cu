@@ -1,3 +1,4 @@
+#include "ARIA/Launcher.h"
 #include "ARIA/Mosaic.h"
 
 #include <gtest/gtest.h>
@@ -76,6 +77,95 @@ struct TestRecursiveComplex {
   double *v6 = nullptr;
   float *v7 = nullptr;
 };
+
+void TestGetRecursive() {
+  {
+    int v = 5;
+    static_assert(std::is_same_v<decltype(get_recursive<0>(v)), int &>);
+    static_assert(std::is_same_v<decltype(get_recursive<0>(int{})), int>);
+    EXPECT_EQ(get_recursive<0>(v), 5);
+    EXPECT_EQ(get_recursive<0>(int{5}), 5);
+    static_assert(get_recursive<0>(int{5}) == 5);
+  }
+
+  Launcher(1, [] ARIA_DEVICE(int i) {
+    int v = 5;
+    static_assert(std::is_same_v<decltype(get_recursive<0>(v)), int &>);
+    static_assert(std::is_same_v<decltype(get_recursive<0>(int{})), int>);
+    ARIA_ASSERT(get_recursive<0>(v) == 5);
+    ARIA_ASSERT(get_recursive<0>(int{5}) == 5);
+    static_assert(get_recursive<0>(int{5}) == 5);
+  }).Launch();
+  cuda::device::current::get().synchronize();
+
+  {
+    Test2Members v;
+    static_assert(std::is_same_v<decltype(get_recursive<0>(v)), int &>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(v)), double &>);
+    static_assert(std::is_same_v<decltype(get_recursive<0>(Test2Members{})), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(Test2Members{})), double>);
+    EXPECT_EQ(get_recursive<0>(v), 5);
+    EXPECT_EQ(get_recursive<1>(v), 6);
+    EXPECT_EQ(get_recursive<0>(Test2Members{}), 5);
+    EXPECT_EQ(get_recursive<1>(Test2Members{}), 6);
+    static_assert(get_recursive<0>(Test2Members{}) == 5);
+    static_assert(get_recursive<1>(Test2Members{}) == 6);
+  }
+
+  Launcher(1, [] ARIA_DEVICE(int i) {
+    Test2Members v;
+    static_assert(std::is_same_v<decltype(get_recursive<0>(v)), int &>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(v)), double &>);
+    static_assert(std::is_same_v<decltype(get_recursive<0>(Test2Members{})), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(Test2Members{})), double>);
+    ARIA_ASSERT(get_recursive<0>(v) == 5);
+    ARIA_ASSERT(get_recursive<1>(v) == 6);
+    ARIA_ASSERT(get_recursive<0>(Test2Members{}) == 5);
+    ARIA_ASSERT(get_recursive<1>(Test2Members{}) == 6);
+    static_assert(get_recursive<0>(Test2Members{}) == 5);
+    static_assert(get_recursive<1>(Test2Members{}) == 6);
+  }).Launch();
+  cuda::device::current::get().synchronize();
+
+  {
+    TestRecursive2Members v;
+    static_assert(std::is_same_v<decltype(get_recursive<0>(v)), int &>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(v)), double &>);
+    static_assert(std::is_same_v<decltype(get_recursive<2>(v)), int *&>);
+    static_assert(std::is_same_v<decltype(get_recursive<0>(TestRecursive2Members{})), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(TestRecursive2Members{})), double>);
+    static_assert(std::is_same_v<decltype(get_recursive<2>(TestRecursive2Members{})), int *>);
+    EXPECT_EQ(get_recursive<0>(v), 5);
+    EXPECT_EQ(get_recursive<1>(v), 6);
+    EXPECT_EQ(get_recursive<2>(v), nullptr);
+    EXPECT_EQ(get_recursive<0>(TestRecursive2Members{}), 5);
+    EXPECT_EQ(get_recursive<1>(TestRecursive2Members{}), 6);
+    EXPECT_EQ(get_recursive<2>(TestRecursive2Members{}), nullptr);
+    static_assert(get_recursive<0>(TestRecursive2Members{}) == 5);
+    static_assert(get_recursive<1>(TestRecursive2Members{}) == 6);
+    static_assert(get_recursive<2>(TestRecursive2Members{}) == nullptr);
+  }
+
+  Launcher(1, [] ARIA_DEVICE(int i) {
+    TestRecursive2Members v;
+    static_assert(std::is_same_v<decltype(get_recursive<0>(v)), int &>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(v)), double &>);
+    static_assert(std::is_same_v<decltype(get_recursive<2>(v)), int *&>);
+    static_assert(std::is_same_v<decltype(get_recursive<0>(TestRecursive2Members{})), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(TestRecursive2Members{})), double>);
+    static_assert(std::is_same_v<decltype(get_recursive<2>(TestRecursive2Members{})), int *>);
+    ARIA_ASSERT(get_recursive<0>(v) == 5);
+    ARIA_ASSERT(get_recursive<1>(v) == 6);
+    ARIA_ASSERT(get_recursive<2>(v) == nullptr);
+    ARIA_ASSERT(get_recursive<0>(TestRecursive2Members{}) == 5);
+    ARIA_ASSERT(get_recursive<1>(TestRecursive2Members{}) == 6);
+    ARIA_ASSERT(get_recursive<2>(TestRecursive2Members{}) == nullptr);
+    static_assert(get_recursive<0>(TestRecursive2Members{}) == 5);
+    static_assert(get_recursive<1>(TestRecursive2Members{}) == 6);
+    static_assert(get_recursive<2>(TestRecursive2Members{}) == nullptr);
+  }).Launch();
+  cuda::device::current::get().synchronize();
+}
 
 } // namespace
 
@@ -210,6 +300,10 @@ TEST(Mosaic, Base) {
     testPointerType.operator()<TestRecursive2Members>();
     testPointerType.operator()<TestRecursiveComplex>();
   }
+}
+
+TEST(Mosaic, GetRecursive) {
+  TestGetRecursive();
 }
 
 } // namespace ARIA
