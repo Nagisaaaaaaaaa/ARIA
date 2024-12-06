@@ -27,7 +27,7 @@ struct TestRecursive0Member {
   int v0 = 5;
 
   struct {
-  } s1;
+  } s0;
 };
 
 //! Structures with 1 member is considered unnecessary.
@@ -36,7 +36,7 @@ struct TestRecursive1Member {
 
   struct {
     double v1 = 6;
-  } s1;
+  } s0;
 };
 
 struct TestRecursive2Members {
@@ -45,7 +45,36 @@ struct TestRecursive2Members {
   struct {
     double v1 = 6;
     int *v2 = nullptr;
-  } s1;
+  } s0;
+};
+
+struct TestRecursiveComplex {
+  int v0 = 5, v1 = 5, v2 = 5;
+
+  struct {
+    double vs0 = 6;
+    int *vs1 = nullptr;
+
+    struct {
+      int vss0 = 7;
+      double vss1 = 8;
+    } ss0, ss1;
+
+    double *vs2 = nullptr;
+  } s0, s1;
+
+  double v3 = 9, v4 = 9;
+
+  struct {
+    double vs0 = 10;
+    int *vs1 = nullptr;
+    double *vs2 = nullptr;
+    float *vs3 = nullptr;
+  } s2, s3, s4;
+
+  int *v5 = nullptr;
+  double *v6 = nullptr;
+  float *v7 = nullptr;
 };
 
 } // namespace
@@ -95,6 +124,12 @@ TEST(Mosaic, Base) {
     static_assert(boost::pfr::tuple_size_v<TestRecursive2Members> == 2);
     static_assert(MosaicPattern<TestRecursive2Members>);
     static_assert(tuple_size_recursive_v<TestRecursive2Members> == 3);
+
+    static_assert(!std::is_scalar_v<TestRecursiveComplex>);
+    static_assert(std::is_aggregate_v<TestRecursiveComplex>);
+    static_assert(boost::pfr::tuple_size_v<TestRecursiveComplex> == 13);
+    static_assert(MosaicPattern<TestRecursiveComplex>);
+    static_assert(tuple_size_recursive_v<TestRecursiveComplex> == 34);
   }
 
   // Pointer types.
@@ -146,6 +181,12 @@ TEST(Mosaic, Base) {
     static_assert(boost::pfr::tuple_size_v<TestRecursive2Members *> == 1);
     static_assert(MosaicPattern<TestRecursive2Members *>);
     static_assert(tuple_size_recursive_v<TestRecursive2Members *> == 1);
+
+    static_assert(std::is_scalar_v<TestRecursiveComplex *>);
+    static_assert(!std::is_aggregate_v<TestRecursiveComplex *>);
+    static_assert(boost::pfr::tuple_size_v<TestRecursiveComplex *> == 1);
+    static_assert(MosaicPattern<TestRecursiveComplex *>);
+    static_assert(tuple_size_recursive_v<TestRecursiveComplex *> == 1);
   }
 }
 
