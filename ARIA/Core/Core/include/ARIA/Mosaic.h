@@ -65,7 +65,24 @@ static constexpr auto tuple_size_recursive_v = TupleSizeRecursiveImpl<T>();
 //
 //
 //
-// Given the recursive index, compute the non-recursive index.
+// \brief Given the recursive index, compute the non-recursive index.
+//
+// \example ```cpp
+// struct Pattern {
+//   int v0;
+//
+//   struct {
+//     int v1;
+//     int v2;
+//   } s0;
+// };
+//
+// static_assert(IRec2INonRec<0, Pattern>() == 0);
+// static_assert(IRec2INonRec<1, Pattern>() == 1);
+// static_assert(IRec2INonRec<2, Pattern>() == 1);
+// static_assert(IRec2INonRec<3, Pattern>() == 2);
+// static_assert(IRec2INonRec<99999, Pattern>() == 2);
+// ```
 template <auto iRec, MosaicPattern T>
 [[nodiscard]] static consteval auto IRec2INonRec() {
   using TInteger = std::decay_t<decltype(boost::pfr::tuple_size_v<T>)>;
