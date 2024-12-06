@@ -144,6 +144,7 @@ template <auto iRec, typename T>
 [[nodiscard]] static inline constexpr decltype(auto) get_recursive(T &&v) noexcept {
   using TDecayed = std::decay_t<T>;
   static_assert(MosaicPattern<TDecayed>, "The decayed given type should be a `MosaicPattern`");
+  static_assert(iRec < tuple_size_recursive_v<TDecayed>, "Index out of range");
 
   using TInteger = std::decay_t<decltype(boost::pfr::tuple_size_v<TDecayed>)>;
 
