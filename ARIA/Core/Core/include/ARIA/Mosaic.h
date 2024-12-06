@@ -15,7 +15,12 @@ namespace ARIA {
 
 template <typename T>
 [[nodiscard]] static consteval bool IsMosaicPatternImpl() {
-  static_assert(std::is_same_v<T, std::decay_t<T>>, "The given type `T` should be a decayed type");
+  static_assert(std::is_same_v<T, std::decay_t<T>>, "The given type should be a decayed type");
+
+  //! The "strongest" copy ability is required to
+  //! prevent users from defining reference members.
+  if (!std::is_copy_constructible_v<T> || !std::is_copy_assignable_v<T>)
+    return false;
 
   // For scalar types.
   if constexpr (std::is_scalar_v<T>)

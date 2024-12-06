@@ -24,6 +24,16 @@ private:
   int v_ = 5;
 };
 
+struct TestLValueMembers {
+  int v0 = 5;
+  double &v1;
+};
+
+struct TestRValueMembers {
+  int v0 = 5;
+  double &&v1 = 6;
+};
+
 struct TestRecursive0Member {
   int v0 = 5;
 
@@ -574,6 +584,16 @@ TEST(Mosaic, Base) {
     // static_assert(boost::pfr::tuple_size_v<TestPrivateMembers> == 0);
     // static_assert(!MosaicPattern<TestPrivateMembers>);
 
+    static_assert(!std::is_scalar_v<TestLValueMembers>);
+    static_assert(std::is_aggregate_v<TestLValueMembers>);
+    static_assert(boost::pfr::tuple_size_v<TestLValueMembers> == 2);
+    static_assert(!MosaicPattern<TestLValueMembers>);
+
+    static_assert(!std::is_scalar_v<TestRValueMembers>);
+    static_assert(std::is_aggregate_v<TestRValueMembers>);
+    static_assert(boost::pfr::tuple_size_v<TestRValueMembers> == 2);
+    static_assert(!MosaicPattern<TestRValueMembers>);
+
     static_assert(!std::is_scalar_v<TestRecursive0Member>);
     static_assert(std::is_aggregate_v<TestRecursive0Member>);
     static_assert(boost::pfr::tuple_size_v<TestRecursive0Member> == 2);
@@ -663,6 +683,8 @@ TEST(Mosaic, Base) {
     testPointerType.operator()<Test1Member>();
     testPointerType.operator()<Test2Members>();
     testPointerType.operator()<TestPrivateMembers>();
+    testPointerType.operator()<TestLValueMembers>();
+    testPointerType.operator()<TestRValueMembers>();
     testPointerType.operator()<TestRecursive0Member>();
     testPointerType.operator()<TestRecursive1Member>();
     testPointerType.operator()<TestRecursive2Members>();
