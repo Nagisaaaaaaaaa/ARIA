@@ -104,6 +104,42 @@ template <auto iRec, MosaicPattern T>
 //
 //
 //
+// \brief Given the non-recursive index, compute the recursive index.
+//
+// \example ```cpp
+// struct Pattern {
+//   int v0;
+//
+//   struct {
+//     int v1;
+//     int v2;
+//   } s0;
+// };
+//
+// static_assert(INonRec2IRec<0, Pattern>() == 0);
+// static_assert(INonRec2IRec<1, Pattern>() == 1);
+// static_assert(INonRec2IRec<2, Pattern>() == 3);
+// static_assert(INonRec2IRec<99999, Pattern>() == 3);
+template <auto iNonRec, MosaicPattern T>
+[[nodiscard]] static consteval auto INonRec2IRec() {
+  using TInteger = std::decay_t<decltype(boost::pfr::tuple_size_v<T>)>;
+
+  TInteger sum = 0;
+
+  ForEach<boost::pfr::tuple_size_v<T>>([&](auto i) {
+    if (i >= iNonRec)
+      return;
+
+    using U = std::decay_t<decltype(boost::pfr::get<i>(std::declval<T>()))>;
+    sum += tuple_size_recursive_v<U>;
+  });
+
+  return sum;
+}
+
+//
+//
+//
 template <typename T, MosaicPattern U>
 class Mosaic {};
 
