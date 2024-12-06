@@ -87,6 +87,9 @@ TEST(Mosaic, Base) {
     static_assert(boost::pfr::tuple_size_v<int> == 1);
     static_assert(MosaicPattern<int>);
     static_assert(tuple_size_recursive_v<int> == 1);
+    static_assert(IRec2INonRec<0, int>() == 0);
+    static_assert(IRec2INonRec<1, int>() == 1);
+    static_assert(IRec2INonRec<99999, int>() == 1);
 
     static_assert(!std::is_scalar_v<Test0Member>);
     static_assert(std::is_aggregate_v<Test0Member>);
@@ -103,6 +106,10 @@ TEST(Mosaic, Base) {
     static_assert(boost::pfr::tuple_size_v<Test2Members> == 2);
     static_assert(MosaicPattern<Test2Members>);
     static_assert(tuple_size_recursive_v<Test2Members> == 2);
+    static_assert(IRec2INonRec<0, Test2Members>() == 0);
+    static_assert(IRec2INonRec<1, Test2Members>() == 1);
+    static_assert(IRec2INonRec<2, Test2Members>() == 2);
+    static_assert(IRec2INonRec<99999, Test2Members>() == 2);
 
     static_assert(!std::is_scalar_v<TestPrivateMembers>);
     static_assert(!std::is_aggregate_v<TestPrivateMembers>);
@@ -124,12 +131,32 @@ TEST(Mosaic, Base) {
     static_assert(boost::pfr::tuple_size_v<TestRecursive2Members> == 2);
     static_assert(MosaicPattern<TestRecursive2Members>);
     static_assert(tuple_size_recursive_v<TestRecursive2Members> == 3);
+    static_assert(IRec2INonRec<0, TestRecursive2Members>() == 0);
+    static_assert(IRec2INonRec<1, TestRecursive2Members>() == 1);
+    static_assert(IRec2INonRec<2, TestRecursive2Members>() == 1);
+    static_assert(IRec2INonRec<3, TestRecursive2Members>() == 2);
+    static_assert(IRec2INonRec<99999, TestRecursive2Members>() == 2);
 
     static_assert(!std::is_scalar_v<TestRecursiveComplex>);
     static_assert(std::is_aggregate_v<TestRecursiveComplex>);
     static_assert(boost::pfr::tuple_size_v<TestRecursiveComplex> == 13);
     static_assert(MosaicPattern<TestRecursiveComplex>);
     static_assert(tuple_size_recursive_v<TestRecursiveComplex> == 34);
+    static_assert(IRec2INonRec<0, TestRecursiveComplex>() == 0);
+    static_assert(IRec2INonRec<1, TestRecursiveComplex>() == 1);
+    static_assert(IRec2INonRec<2, TestRecursiveComplex>() == 2);
+    ForEach<7>([&]<auto i>() { static_assert(IRec2INonRec<3 + i, TestRecursiveComplex>() == 3); });
+    ForEach<7>([&]<auto i>() { static_assert(IRec2INonRec<10 + i, TestRecursiveComplex>() == 4); });
+    static_assert(IRec2INonRec<17, TestRecursiveComplex>() == 5);
+    static_assert(IRec2INonRec<18, TestRecursiveComplex>() == 6);
+    ForEach<4>([&]<auto i>() { static_assert(IRec2INonRec<19 + i, TestRecursiveComplex>() == 7); });
+    ForEach<4>([&]<auto i>() { static_assert(IRec2INonRec<23 + i, TestRecursiveComplex>() == 8); });
+    ForEach<4>([&]<auto i>() { static_assert(IRec2INonRec<27 + i, TestRecursiveComplex>() == 9); });
+    static_assert(IRec2INonRec<31, TestRecursiveComplex>() == 10);
+    static_assert(IRec2INonRec<32, TestRecursiveComplex>() == 11);
+    static_assert(IRec2INonRec<33, TestRecursiveComplex>() == 12);
+    static_assert(IRec2INonRec<34, TestRecursiveComplex>() == 13);
+    static_assert(IRec2INonRec<99999, TestRecursiveComplex>() == 13);
   }
 
   // Pointer types.
