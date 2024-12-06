@@ -7,6 +7,12 @@ configure_file(
 aria_setup_module(Core Core)
 
 CPMAddPackage(
+    NAME boost-pfr
+    GITHUB_REPOSITORY boostorg/pfr
+    GIT_TAG boost-1.84.0
+)
+
+CPMAddPackage(
     NAME fmt
     GITHUB_REPOSITORY fmtlib/fmt
     GIT_TAG "10.1.1"
@@ -99,6 +105,7 @@ aria_add_module(
     HEADERS ${core_core_headers}
     SOURCES ${core_core_sources}
     HARD_DEPENDENCIES
+    Boost::pfr
     CUDA::cudart
     fmt::fmt
     #libluajit
