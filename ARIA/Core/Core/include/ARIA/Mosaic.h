@@ -7,6 +7,7 @@
 //       Eg 3. `Vec3f` can be described with `struct { float, float, float }`.
 
 #include "ARIA/ForEach.h"
+#include "ARIA/TypeArray.h"
 
 #include <boost/pfr.hpp>
 
@@ -24,7 +25,7 @@ template <typename T>
   else if constexpr (std::is_aggregate_v<T> && boost::pfr::tuple_size_v<T> > 1) {
     bool res = true;
     ForEach<boost::pfr::tuple_size_v<T>>([&](auto i) {
-      using U = std::decay_t<decltype(boost::pfr::get<i>(std::declval<T>()))>;
+      using U = decltype(boost::pfr::get<i>(std::declval<T>()));
       if (!IsMosaicPatternImpl<U>())
         res = false;
     });
@@ -52,7 +53,7 @@ template <MosaicPattern T>
   else if constexpr (std::is_aggregate_v<T>) {
     TInteger sum = 0;
     ForEach<boost::pfr::tuple_size_v<T>>([&](auto i) {
-      using U = std::decay_t<decltype(boost::pfr::get<i>(std::declval<T>()))>;
+      using U = decltype(boost::pfr::get<i>(std::declval<T>()));
       sum += TupleSizeRecursiveImpl<U>();
     });
     return sum;
@@ -91,7 +92,7 @@ template <auto iRec, MosaicPattern T>
   TInteger iNonRec = 0;
 
   ForEach<boost::pfr::tuple_size_v<T>>([&](auto i) {
-    using U = std::decay_t<decltype(boost::pfr::get<i>(std::declval<T>()))>;
+    using U = decltype(boost::pfr::get<i>(std::declval<T>()));
     sum += tuple_size_recursive_v<U>;
 
     if (iRec >= sum)
@@ -130,7 +131,7 @@ template <auto iNonRec, MosaicPattern T>
     if (i >= iNonRec)
       return;
 
-    using U = std::decay_t<decltype(boost::pfr::get<i>(std::declval<T>()))>;
+    using U = decltype(boost::pfr::get<i>(std::declval<T>()));
     sum += tuple_size_recursive_v<U>;
   });
 
@@ -155,6 +156,32 @@ template <auto iRec, typename T>
     return get_recursive<iRec - INonRec2IRec<iNonRec, TDecayed>()>(boost::pfr::get<iNonRec>(std::forward<T>(v)));
   }
 }
+
+//
+//
+//
+namespace mosaic::detail {
+
+template <MosaicPattern T, auto i, typename TArray>
+struct MosaicTilesImpl;
+
+template <MosaicPattern T, auto i, typename TArray>
+  requires(i < tuple_size_recursive_v<T>)
+struct MosaicTilesImpl<T, i, TArray> {
+  using type =
+      typename MosaicTilesImpl<T, i + 1, MakeTypeArray<TArray, decltype(get_recursive<i>(std::declval<T>()))>>::type;
+};
+
+template <MosaicPattern T, auto i, typename TArray>
+  requires(i == tuple_size_recursive_v<T>)
+struct MosaicTilesImpl<T, i, TArray> {
+  using type = TArray;
+};
+
+} // namespace mosaic::detail
+
+template <MosaicPattern T>
+using MosaicTiles = typename mosaic::detail::MosaicTilesImpl<T, 0, MakeTypeArray<>>::type;
 
 //
 //
