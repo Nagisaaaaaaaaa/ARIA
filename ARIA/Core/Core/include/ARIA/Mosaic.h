@@ -6,7 +6,7 @@
 //       Eg 2. `double` can be described with `double` itself.
 //       Eg 3. `Vec3f` can be described with `struct { float, float, float }`.
 
-#include "ARIA/Property.h"
+#include "ARIA/ForEach.h"
 
 #include <boost/pfr.hpp>
 
@@ -39,6 +39,28 @@ static constexpr bool is_mosaic_pattern_v = IsMosaicPatternImpl<T>();
 
 template <typename T>
 concept MosaicPattern = is_mosaic_pattern_v<T>;
+
+//
+//
+//
+template <MosaicPattern T>
+[[nodiscard]] static consteval auto TupleSizeRecursiveImpl() {
+  using TInteger = std::decay_t<decltype(boost::pfr::tuple_size_v<T>)>;
+
+  if constexpr (std::is_scalar_v<T>)
+    return TInteger{1};
+  else if constexpr (std::is_aggregate_v<T>) {
+    TInteger sum = 0;
+    ForEach<boost::pfr::tuple_size_v<T>>([&](auto i) {
+      using U = std::decay_t<decltype(boost::pfr::get<i>(std::declval<T>()))>;
+      sum += TupleSizeRecursiveImpl<U>();
+    });
+    return sum;
+  }
+}
+
+template <MosaicPattern T>
+static constexpr auto tuple_size_recursive_v = TupleSizeRecursiveImpl<T>();
 
 //
 //
