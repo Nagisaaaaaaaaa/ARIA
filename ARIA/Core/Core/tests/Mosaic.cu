@@ -542,6 +542,7 @@ TEST(Mosaic, Base) {
     static_assert(INonRec2IRec<0, int>() == 0);
     static_assert(INonRec2IRec<1, int>() == 1);
     static_assert(INonRec2IRec<99999, int>() == 1);
+    static_assert(std::is_same_v<MosaicTiles<int>, TypeArray<int>>);
 
     static_assert(!std::is_scalar_v<Test0Member>);
     static_assert(std::is_aggregate_v<Test0Member>);
@@ -566,6 +567,7 @@ TEST(Mosaic, Base) {
     static_assert(INonRec2IRec<1, Test2Members>() == 1);
     static_assert(INonRec2IRec<2, Test2Members>() == 2);
     static_assert(INonRec2IRec<99999, Test2Members>() == 2);
+    static_assert(std::is_same_v<MosaicTiles<Test2Members>, TypeArray<int, double>>);
 
     static_assert(!std::is_scalar_v<TestPrivateMembers>);
     static_assert(!std::is_aggregate_v<TestPrivateMembers>);
@@ -596,6 +598,7 @@ TEST(Mosaic, Base) {
     static_assert(INonRec2IRec<1, TestRecursive2Members>() == 1);
     static_assert(INonRec2IRec<2, TestRecursive2Members>() == 3);
     static_assert(INonRec2IRec<99999, TestRecursive2Members>() == 3);
+    static_assert(std::is_same_v<MosaicTiles<TestRecursive2Members>, TypeArray<int, double, int *>>);
 
     static_assert(!std::is_scalar_v<TestRecursiveComplex>);
     static_assert(std::is_aggregate_v<TestRecursiveComplex>);
@@ -632,6 +635,11 @@ TEST(Mosaic, Base) {
     static_assert(INonRec2IRec<12, TestRecursiveComplex>() == 33);
     static_assert(INonRec2IRec<13, TestRecursiveComplex>() == 34);
     static_assert(INonRec2IRec<99999, TestRecursiveComplex>() == 34);
+    static_assert(std::is_same_v<
+                  MosaicTiles<TestRecursiveComplex>,
+                  TypeArray<int, int, int, double, int *, int64, float, int64, float, double *, double, int *, int64,
+                            float, int64, float, double *, double, double, float, int *, double *, float *, float,
+                            int *, double *, float *, float, int *, double *, float *, int *, double *, float *>>);
   }
 
   // Pointer types.
@@ -647,6 +655,7 @@ TEST(Mosaic, Base) {
       static_assert(IRec2INonRec<0, T *>() == 0);
       static_assert(IRec2INonRec<1, T *>() == 1);
       static_assert(IRec2INonRec<99999, T *>() == 1);
+      static_assert(std::is_same_v<MosaicTiles<T *>, TypeArray<T *>>);
     };
 
     testPointerType.operator()<double>();
