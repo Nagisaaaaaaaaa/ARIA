@@ -17,9 +17,10 @@ template <typename T>
 [[nodiscard]] static consteval bool IsMosaicPatternImpl() {
   static_assert(std::is_same_v<T, std::decay_t<T>>, "The given type should be a decayed type");
 
-  //! The "strongest" copy ability is required to
-  //! prevent users from defining reference members.
-  if (!std::is_copy_constructible_v<T> || !std::is_copy_assignable_v<T>)
+  //! The "strongest" copy and move ability is required, which means that
+  //! types such as l-value or r-value references are not allowed here.
+  if (!(std::is_copy_constructible_v<T> && std::is_copy_assignable_v<T> && std::is_move_constructible_v<T> &&
+        std::is_move_assignable_v<T>))
     return false;
 
   // For scalar types.
