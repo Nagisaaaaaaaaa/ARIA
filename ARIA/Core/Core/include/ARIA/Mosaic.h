@@ -19,6 +19,18 @@
 
 namespace ARIA {
 
+// `MosaicPattern`s are classes which can be easily serialized.
+// For example:
+// 1. `int` and `int *` are "scalar" types, which
+//    can be serialized by themselves.
+// 2. `struct { int x, y; }` and `struct { int x; struct { int y, z; } s; }` are "aggregate" types, where
+//    all members are recursively "scalar" types.
+//! 3. `std::string` and `std::vector` are "non-scalar-and-non-aggregate" types.
+//!    They are considered complex, thus cannot be easily serialized.
+//
+// It is named as "pattern" because, you can imagine that,
+// small classes can be arbitrary placed together and be merged into a large class.
+// For example, `Vec3f` = 3 `float`s = `struct { float x, y; }` + `float`.
 template <typename T>
 [[nodiscard]] static consteval bool IsMosaicPatternImpl() {
   static_assert(std::is_same_v<T, std::decay_t<T>>, "The given type should be a decayed type");
