@@ -563,9 +563,6 @@ void TestGetRecursive() {
   cuda::device::current::get().synchronize();
 }
 
-//
-//
-//
 template <typename T>
 class Vec3 {
 public:
@@ -588,23 +585,32 @@ struct TestVec3 {
 
 } // namespace
 
-template <typename T>
-struct Mosaic<Vec3<T>, TestVec3<T>> {
-  Vec3<T> operator()(const TestVec3<T> &v) const { return {v.x, v.y, v.z}; }
-
-  TestVec3<T> operator()(const Vec3<T> &v) const { return {.x = v.x, .y = v.y, .z = v.z}; }
+template <>
+struct Mosaic<float, float> {
+  float operator()(float v) const { return v; }
 };
 
-static_assert(ValidMosaic<Mosaic<Vec3<int>, TestVec3<int>>>);
-static_assert(ValidMosaic<Mosaic<Vec3<double>, TestVec3<double>>>);
-static_assert(ValidMosaic<Mosaic<Vec3<int *>, TestVec3<int *>>>);
-static_assert(ValidMosaic<Mosaic<Vec3<double *>, TestVec3<double *>>>);
+template <>
+struct Mosaic<double, float> {
+  float operator()(double v) const { return v; }
 
-// static_assert(ValidMosaic<Mosaic<Vec3<std::string>, TestVec3<std::string>>>);
+  double operator()(float v) const { return v; }
+};
 
-//
-//
-//
+template <>
+struct Mosaic<float, double> {
+  double operator()(float v) const { return v; }
+
+  float operator()(double v) const { return v; }
+};
+
+template <typename T>
+struct Mosaic<Vec3<T>, TestVec3<T>> {
+  TestVec3<T> operator()(const Vec3<T> &v) const { return {.x = v.x, .y = v.y, .z = v.z}; }
+
+  Vec3<T> operator()(const TestVec3<T> &v) const { return {v.x, v.y, v.z}; }
+};
+
 TEST(Mosaic, Base) {
   // Non-pointer types.
   {
@@ -779,6 +785,18 @@ TEST(Mosaic, Base) {
 
 TEST(Mosaic, GetRecursive) {
   TestGetRecursive();
+}
+
+TEST(Mosaic, ValidMoasic) {
+  static_assert(ValidMosaic<Mosaic<float, float>>);
+  static_assert(ValidMosaic<Mosaic<double, float>>);
+  static_assert(ValidMosaic<Mosaic<float, double>>);
+
+  static_assert(ValidMosaic<Mosaic<Vec3<int>, TestVec3<int>>>);
+  static_assert(ValidMosaic<Mosaic<Vec3<double>, TestVec3<double>>>);
+  static_assert(ValidMosaic<Mosaic<Vec3<int *>, TestVec3<int *>>>);
+  static_assert(ValidMosaic<Mosaic<Vec3<double *>, TestVec3<double *>>>);
+  // static_assert(ValidMosaic<Mosaic<Vec3<std::string>, TestVec3<std::string>>>);
 }
 
 } // namespace ARIA
