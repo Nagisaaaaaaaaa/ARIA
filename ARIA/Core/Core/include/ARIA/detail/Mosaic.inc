@@ -235,6 +235,9 @@ static constexpr bool is_mosaic_v = is_mosaic<T>::value;
 //
 //
 //
+// Whether the given type is a valid `Mosaic`, where "valid" means that:
+// 1. Types should be carefully checked.
+// 2. `operator()` should be carefully checked.
 template <typename TMosaic>
   requires(is_mosaic_v<TMosaic>)
 [[nodiscard]] static consteval bool IsValidMosaicImpl() {
