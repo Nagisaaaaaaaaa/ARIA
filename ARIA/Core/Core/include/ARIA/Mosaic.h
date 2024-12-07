@@ -112,6 +112,8 @@ static constexpr auto tuple_size_recursive_v = TupleSizeRecursiveImpl<T>();
 //
 //
 //
+// Before continue, we need to define some supporting functions.
+
 // \brief Given the recursive index, compute the non-recursive index.
 //
 // \example ```cpp
@@ -148,9 +150,6 @@ template <auto iRec, MosaicPattern T>
   return iNonRec;
 }
 
-//
-//
-//
 // \brief Given the non-recursive index, compute the recursive index.
 //
 // \example ```cpp
