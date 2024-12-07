@@ -1,17 +1,33 @@
 #pragma once
 
-// TODO: Mosaic is an abstraction about:
-//       How to describe instances of one type with instances of another type.
-//       Eg 1. `double` can be described with `float` with precision lost.
-//       Eg 2. `double` can be described with `double` itself.
-//       Eg 3. `Vec3f` can be described with `struct { float, float, float }`.
+/// \file
+/// \brief `Mosaic` is an abstraction about how to describe one type with
+/// another type, where the later type can be easily and automatically serialized.
+///
+/// For example, `Vec3f` might be extremely complex, but
+/// `struct Pattern { float x, y, z; };` is always simple.
+///
+/// Suppose ARIA knows how to convert `Vec3f` to and from `Pattern`,
+/// then, ARIA can automatically do a lot of things for us.
+/// For example, arrays and vectors of `Vec3f` can be automatically
+/// converted to structure-of-arrays (SoA) storages, etc.
+///
+/// Here lists all the ARIA built-in features which
+/// are compatible with `Mosaic`:
+/// 1. (Nothing now, we are still working on them, QAQ.)
+///
+/// Users only need to define some simple types and methods,
+/// see `class Mosaic` below, and all things will be ready.
+///
+/// \details Actually, it is better to use the name `Puzzle`, but
+/// the main developer of ARIA really likes "Kin-iro Mosaic".
+/// That's why `Mosaic` is used.
 
-// TODO: Document that `boost::pfr` fails to handle:
-//       1. Classes with only one member.
-//       2. Inheritance.
-//       3. All non-scalar and non-aggregate classes, for example,
-//          `boost::pfr::get<0>(std::string{})` will fails to compile.
-
+//
+//
+//
+//
+//
 #include "ARIA/TypeArray.h"
 
 #include <boost/pfr.hpp>
