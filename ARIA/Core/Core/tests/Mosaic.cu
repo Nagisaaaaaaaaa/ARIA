@@ -24,6 +24,14 @@ private:
   int v_ = 5;
 };
 
+struct TestInheritanceBase {
+  int v0 = 5;
+};
+
+struct TestInheritance : public TestInheritanceBase {
+  double v1 = 6;
+};
+
 struct TestLValueMembers {
   int v0 = 5;
   double &v1;
@@ -599,8 +607,13 @@ TEST(Mosaic, Base) {
 
     static_assert(!std::is_scalar_v<TestPrivateMembers>);
     static_assert(!std::is_aggregate_v<TestPrivateMembers>);
-    // static_assert(boost::pfr::tuple_size_v<TestPrivateMembers> == 0);
+    // static_assert(boost::pfr::tuple_size_v<TestPrivateMembers> == 1);
     // static_assert(!MosaicPattern<TestPrivateMembers>);
+
+    static_assert(!std::is_scalar_v<TestInheritance>);
+    static_assert(std::is_aggregate_v<TestInheritance>);
+    // static_assert(boost::pfr::tuple_size_v<TestInheritance> == 2);
+    // static_assert(!MosaicPattern<TestInheritance>);
 
     static_assert(!std::is_scalar_v<TestLValueMembers>);
     static_assert(std::is_aggregate_v<TestLValueMembers>);
