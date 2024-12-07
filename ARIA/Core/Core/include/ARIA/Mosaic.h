@@ -38,21 +38,30 @@ namespace ARIA {
 /// the later type can be easily and automatically serialized.
 ///
 /// \example ```cpp
-/// // Define the mosaic pattern for `Vec3<T>`.
+/// // Define a mosaic pattern for `Vec3<T>`.
 /// template <typename T>
 /// struct Pattern {
 ///   T x, y, z;
 /// };
 ///
-/// // Define the mosaic for `Vec3<T>`.
+/// // Define the mosaic for `Vec3<T>` and `Pattern<T>`.
 /// template <typename T>
 /// struct Mosaic<Vec3<T>, Pattern<T>> {
+///   // How to convert `Vec3<T>` to `Pattern<T>`.
+///   Pattern<T> operator()(const Vec3<T> &v) const { return {.x = v.x(), .y = v.y(), .z = v.z()}; }
 ///
-/// // How to convert `Vec3<T>` to `Pattern<T>`.
-/// Pattern<T> operator()(const Vec3<T> &v) const { return {.x = v.x(), .y = v.y(), .z = v.z()}; }
+///   // How to convert `Pattern<T>` to `Vec3<T>`.
+///   Vec3<T> operator()(const Pattern<T> &v) const { return {v.x, v.y, v.z}; }
+/// };
 ///
-/// // How to convert `Pattern<T>` to `Vec3<T>`.
-/// Vec3<T> operator()(const Pattern<T> &v) const { return {v.x, v.y, v.z}; }
+/// // Define the mosaic for `double` and `float`.
+/// template <>
+/// struct Mosaic<double, float> {
+///   // How to convert `double` to `float`.
+///   float operator()(double v) const { return v; }
+///
+///   // How to convert `float` to `double`.
+///   double operator()(float v) const { return v; }
 /// };
 /// ```
 template <typename T, typename TMosaicPattern>
