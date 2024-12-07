@@ -88,7 +88,9 @@ concept MosaicPattern = is_mosaic_pattern_v<T>;
 //
 //
 //
-// Since `MosaicPattern`s are introduced for serialization.
+// As we have known, one of the mean features of `MosaicPattern` is
+// compile-time number of elements (tuple size).
+// It should be computed non-recursively or recursively.
 template <MosaicPattern T>
 [[nodiscard]] static consteval auto TupleSizeRecursiveImpl() {
   using TInteger = std::decay_t<decltype(boost::pfr::tuple_size_v<T>)>;
