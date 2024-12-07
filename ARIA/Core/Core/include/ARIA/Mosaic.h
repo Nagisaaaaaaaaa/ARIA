@@ -56,7 +56,7 @@ template <MosaicPattern T>
 
   if constexpr (std::is_scalar_v<T>)
     return TInteger{1};
-  else if constexpr (std::is_aggregate_v<T>) {
+  else {
     TInteger sum = 0;
     ForEach<boost::pfr::tuple_size_v<T>>([&](auto i) {
       using U = decltype(boost::pfr::get<i>(std::declval<T>()));
@@ -157,7 +157,7 @@ template <auto iRec, typename T>
 
   if constexpr (std::is_scalar_v<TDecayed>)
     return boost::pfr::get<iRec>(std::forward<T>(v));
-  else if constexpr (std::is_aggregate_v<TDecayed>) {
+  else {
     constexpr TInteger iNonRec = IRec2INonRec<iRec, TDecayed>();
     return get_recursive<iRec - INonRec2IRec<iNonRec, TDecayed>()>(boost::pfr::get<iNonRec>(std::forward<T>(v)));
   }
@@ -193,6 +193,6 @@ using MosaicTiles = typename mosaic::detail::MosaicTilesImpl<T, 0, MakeTypeArray
 //
 //
 template <typename T, MosaicPattern U>
-class Mosaic {};
+class Mosaic;
 
 } // namespace ARIA
