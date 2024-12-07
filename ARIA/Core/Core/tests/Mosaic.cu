@@ -608,7 +608,7 @@ struct Mosaic<float, double> {
 
 template <typename T>
 struct Mosaic<Vec3<T>, TestVec3<T>> {
-  TestVec3<T> operator()(const Vec3<T> &v) const { return {.x = v.x, .y = v.y, .z = v.z}; }
+  TestVec3<T> operator()(const Vec3<T> &v) const { return {.x = v.x(), .y = v.y(), .z = v.z()}; }
 
   Vec3<T> operator()(const TestVec3<T> &v) const { return {v.x, v.y, v.z}; }
 };
