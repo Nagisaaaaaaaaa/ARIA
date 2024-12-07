@@ -23,12 +23,12 @@ template <typename T>
         std::is_move_assignable_v<T>))
     return false;
 
-  // For scalar types.
-  if constexpr (std::is_scalar_v<T>)
-    return true;
   // For aggregate types.
   //! `> 1` is required here because classes with only one member are considered unnecessary.
-  else if constexpr (std::is_aggregate_v<T> && boost::pfr::tuple_size_v<T> > 1) {
+  if constexpr (std::is_aggregate_v<T>) {
+    if (boost::pfr::tuple_size_v<T> <= 1)
+      return false;
+
     bool res = true;
     ForEach<boost::pfr::tuple_size_v<T>>([&](auto i) {
       using U = decltype(boost::pfr::get<i>(std::declval<T>()));
@@ -37,6 +37,9 @@ template <typename T>
     });
     return res;
   }
+  // For non-aggregate types (scalar types, or non-scalar-and-non-aggregate types).
+  else
+    return true;
 
   return false;
 }
@@ -54,16 +57,15 @@ template <MosaicPattern T>
 [[nodiscard]] static consteval auto TupleSizeRecursiveImpl() {
   using TInteger = std::decay_t<decltype(boost::pfr::tuple_size_v<T>)>;
 
-  if constexpr (std::is_scalar_v<T>)
-    return TInteger{1};
-  else {
+  if constexpr (std::is_aggregate_v<T>) {
     TInteger sum = 0;
     ForEach<boost::pfr::tuple_size_v<T>>([&](auto i) {
       using U = decltype(boost::pfr::get<i>(std::declval<T>()));
       sum += TupleSizeRecursiveImpl<U>();
     });
     return sum;
-  }
+  } else
+    return TInteger{1};
 }
 
 template <MosaicPattern T>
@@ -155,12 +157,11 @@ template <auto iRec, typename T>
 
   using TInteger = std::decay_t<decltype(boost::pfr::tuple_size_v<TDecayed>)>;
 
-  if constexpr (std::is_scalar_v<TDecayed>)
-    return boost::pfr::get<iRec>(std::forward<T>(v));
-  else {
+  if constexpr (std::is_aggregate_v<TDecayed>) {
     constexpr TInteger iNonRec = IRec2INonRec<iRec, TDecayed>();
     return get_recursive<iRec - INonRec2IRec<iNonRec, TDecayed>()>(boost::pfr::get<iNonRec>(std::forward<T>(v)));
-  }
+  } else
+    return boost::pfr::get<iRec>(std::forward<T>(v));
 }
 
 //
