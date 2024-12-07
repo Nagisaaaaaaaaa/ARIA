@@ -225,24 +225,24 @@ template <typename TMosaic>
                     std::is_move_assignable_v<T>,
                 "The \"strongest\" copy and move ability is required");
 
-  if constexpr (!(std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<T>())), U> &&
-                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<U>())), T> &&
+  static_assert(std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<T>())), U> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<U>())), T> &&
 
-                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<T &>())), U> &&
-                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<U &>())), T> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<T &>())), U> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<U &>())), T> &&
 
-                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<T &&>())), U> &&
-                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<U &&>())), T> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<T &&>())), U> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<U &&>())), T> &&
 
-                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const T>())), U> &&
-                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const U>())), T> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const T>())), U> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const U>())), T> &&
 
-                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const T &>())), U> &&
-                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const U &>())), T> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const T &>())), U> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const U &>())), T> &&
 
-                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const T &&>())), U> &&
-                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const U &&>())), T>))
-    return false;
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const T &&>())), U> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const U &&>())), T>,
+                "`operator()` should be overloaded to support conversions to and from the mosaic pattern");
 
   return true;
 }
