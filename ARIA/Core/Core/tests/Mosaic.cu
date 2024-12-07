@@ -625,7 +625,7 @@ TEST(Mosaic, Base) {
     static_assert(INonRec2IRec<0, int>() == 0);
     static_assert(INonRec2IRec<1, int>() == 1);
     static_assert(INonRec2IRec<99999, int>() == 1);
-    static_assert(std::is_same_v<MosaicTiles<int>, TypeArray<int>>);
+    static_assert(std::is_same_v<mosaic_pattern_types_recursive_t<int>, TypeArray<int>>);
 
     static_assert(!std::is_scalar_v<Test0Member>);
     static_assert(std::is_aggregate_v<Test0Member>);
@@ -650,7 +650,7 @@ TEST(Mosaic, Base) {
     static_assert(INonRec2IRec<1, Test2Members>() == 1);
     static_assert(INonRec2IRec<2, Test2Members>() == 2);
     static_assert(INonRec2IRec<99999, Test2Members>() == 2);
-    static_assert(std::is_same_v<MosaicTiles<Test2Members>, TypeArray<int, double>>);
+    static_assert(std::is_same_v<mosaic_pattern_types_recursive_t<Test2Members>, TypeArray<int, double>>);
 
     static_assert(!std::is_scalar_v<TestPrivateMembers>);
     static_assert(!std::is_aggregate_v<TestPrivateMembers>);
@@ -696,7 +696,8 @@ TEST(Mosaic, Base) {
     static_assert(INonRec2IRec<1, TestRecursion2Members>() == 1);
     static_assert(INonRec2IRec<2, TestRecursion2Members>() == 3);
     static_assert(INonRec2IRec<99999, TestRecursion2Members>() == 3);
-    static_assert(std::is_same_v<MosaicTiles<TestRecursion2Members>, TypeArray<int, double, int *>>);
+    static_assert(
+        std::is_same_v<mosaic_pattern_types_recursive_t<TestRecursion2Members>, TypeArray<int, double, int *>>);
 
     static_assert(!std::is_scalar_v<TestRecursionLValueMembers>);
     static_assert(std::is_aggregate_v<TestRecursionLValueMembers>);
@@ -744,7 +745,7 @@ TEST(Mosaic, Base) {
     static_assert(INonRec2IRec<13, TestRecursionComplex>() == 34);
     static_assert(INonRec2IRec<99999, TestRecursionComplex>() == 34);
     static_assert(std::is_same_v<
-                  MosaicTiles<TestRecursionComplex>,
+                  mosaic_pattern_types_recursive_t<TestRecursionComplex>,
                   TypeArray<int, int, int, double, int *, int64, float, int64, float, double *, double, int *, int64,
                             float, int64, float, double *, double, double, float, int *, double *, float *, float,
                             int *, double *, float *, float, int *, double *, float *, int *, double *, float *>>);
@@ -763,7 +764,7 @@ TEST(Mosaic, Base) {
       static_assert(IRec2INonRec<0, T *>() == 0);
       static_assert(IRec2INonRec<1, T *>() == 1);
       static_assert(IRec2INonRec<99999, T *>() == 1);
-      static_assert(std::is_same_v<MosaicTiles<T *>, TypeArray<T *>>);
+      static_assert(std::is_same_v<mosaic_pattern_types_recursive_t<T *>, TypeArray<T *>>);
     };
 
     testPointerType.operator()<double>();

@@ -206,28 +206,27 @@ template <auto iRec, typename T>
 //
 //
 //
-namespace mosaic::detail {
-
+// We can recursively gather all the types of a `MosaicPattern` into a `TypeArray`.
 template <MosaicPattern T, auto i, typename TArray>
-struct MosaicTilesImpl;
+struct mosaic_pattern_types_recursive_impl;
 
 template <MosaicPattern T, auto i, typename TArray>
   requires(i < tuple_size_recursive_v<T>)
-struct MosaicTilesImpl<T, i, TArray> {
-  using type =
-      typename MosaicTilesImpl<T, i + 1, MakeTypeArray<TArray, decltype(get_recursive<i>(std::declval<T>()))>>::type;
+struct mosaic_pattern_types_recursive_impl<T, i, TArray> {
+  using type = typename mosaic_pattern_types_recursive_impl<
+      T,
+      i + 1,
+      MakeTypeArray<TArray, decltype(get_recursive<i>(std::declval<T>()))>>::type;
 };
 
 template <MosaicPattern T, auto i, typename TArray>
   requires(i == tuple_size_recursive_v<T>)
-struct MosaicTilesImpl<T, i, TArray> {
+struct mosaic_pattern_types_recursive_impl<T, i, TArray> {
   using type = TArray;
 };
 
-} // namespace mosaic::detail
-
 template <MosaicPattern T>
-using MosaicTiles = typename mosaic::detail::MosaicTilesImpl<T, 0, MakeTypeArray<>>::type;
+using mosaic_pattern_types_recursive_t = typename mosaic_pattern_types_recursive_impl<T, 0, MakeTypeArray<>>::type;
 
 //
 //
