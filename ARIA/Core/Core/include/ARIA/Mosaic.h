@@ -219,23 +219,23 @@ template <typename TMosaic>
   using T = typename is_mosaic<TMosaic>::T;
   using U = typename is_mosaic<TMosaic>::U;
 
-  if constexpr (!(std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<T>())), U> &&
-                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<U>())), T> &&
+  if constexpr (!(std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<T>())), U> &&
+                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<U>())), T> &&
 
-                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<T &>())), U> &&
-                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<U &>())), T> &&
+                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<T &>())), U> &&
+                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<U &>())), T> &&
 
-                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<T &&>())), U> &&
-                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<U &&>())), T> &&
+                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<T &&>())), U> &&
+                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<U &&>())), T> &&
 
-                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<const T>())), U> &&
-                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<const U>())), T> &&
+                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const T>())), U> &&
+                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const U>())), T> &&
 
-                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<const T &>())), U> &&
-                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<const U &>())), T> &&
+                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const T &>())), U> &&
+                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const U &>())), T> &&
 
-                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<const T &&>())), U> &&
-                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<const U &&>())), T>))
+                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const T &&>())), U> &&
+                  std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const U &&>())), T>))
     return false;
 
   return true;
