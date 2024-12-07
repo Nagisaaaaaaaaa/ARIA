@@ -219,6 +219,12 @@ template <typename TMosaic>
   using T = typename is_mosaic<TMosaic>::T;
   using U = typename is_mosaic<TMosaic>::U;
 
+  static_assert(std::is_same_v<T, std::decay_t<T>>, "The given type should be a decayed type");
+
+  static_assert(std::is_copy_constructible_v<T> && std::is_copy_assignable_v<T> && std::is_move_constructible_v<T> &&
+                    std::is_move_assignable_v<T>,
+                "The \"strongest\" copy and move ability is required");
+
   if constexpr (!(std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<T>())), U> &&
                   std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<U>())), T> &&
 
