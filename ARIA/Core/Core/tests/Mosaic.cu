@@ -1,5 +1,6 @@
 #include "ARIA/Launcher.h"
 #include "ARIA/Mosaic.h"
+#include "ARIA/Property.h"
 
 #include <gtest/gtest.h>
 
@@ -562,8 +563,46 @@ void TestGetRecursive() {
   cuda::device::current::get().synchronize();
 }
 
+//
+//
+//
+template <typename T>
+class Vec3 {
+public:
+  Vec3(const T &x, const T &y, const T &z) : x_(x), y_(y), z_(z) {}
+
+  ARIA_COPY_MOVE_ABILITY(Vec3, default, default);
+
+  ARIA_REF_PROP(public, , x, x_);
+  ARIA_REF_PROP(public, , y, y_);
+  ARIA_REF_PROP(public, , z, z_);
+
+private:
+  T x_{}, y_{}, z_{};
+};
+
+template <typename T>
+struct TestVec3 {
+  T x, y, z;
+};
+
 } // namespace
 
+template <typename T>
+struct Mosaic<Vec3<T>, TestVec3<T>> {
+  Vec3<T> operator()(const TestVec3<T> &v) const { return {v.x, v.y, v.z}; }
+
+  TestVec3<T> operator()(const Vec3<T> &v) const { return {.x = v.x, .y = v.y, .z = v.z}; }
+};
+
+static_assert(ValidMosaic<Mosaic<Vec3<int>, TestVec3<int>>>);
+static_assert(ValidMosaic<Mosaic<Vec3<double>, TestVec3<double>>>);
+static_assert(ValidMosaic<Mosaic<Vec3<int *>, TestVec3<int *>>>);
+static_assert(ValidMosaic<Mosaic<Vec3<double *>, TestVec3<double *>>>);
+
+//
+//
+//
 TEST(Mosaic, Base) {
   // Non-pointer types.
   {
