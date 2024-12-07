@@ -64,6 +64,10 @@ namespace ARIA {
 ///   double operator()(float v) const { return v; }
 /// };
 /// ```
+///
+/// \note Very complex pattern structures are also supported, but
+/// member variables should be either "scalar" or "aggregate".
+/// See `std::scalar` and `std::aggregate`.
 template <typename T, typename TMosaicPattern>
 class Mosaic;
 
