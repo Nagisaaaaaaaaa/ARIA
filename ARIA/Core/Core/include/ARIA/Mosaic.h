@@ -186,6 +186,8 @@ template <auto iNonRec, MosaicPattern T>
 //
 //
 //
+// We should be able to recursively or non-recursively
+// iterate through all the elements of a `MosaicPattern` instance.
 template <auto iRec, typename T>
 [[nodiscard]] static inline constexpr decltype(auto) get_recursive(T &&v) noexcept {
   using TDecayed = std::decay_t<T>;
