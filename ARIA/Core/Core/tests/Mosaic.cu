@@ -600,6 +600,8 @@ static_assert(ValidMosaic<Mosaic<Vec3<double>, TestVec3<double>>>);
 static_assert(ValidMosaic<Mosaic<Vec3<int *>, TestVec3<int *>>>);
 static_assert(ValidMosaic<Mosaic<Vec3<double *>, TestVec3<double *>>>);
 
+// static_assert(ValidMosaic<Mosaic<Vec3<std::string>, TestVec3<std::string>>>);
+
 //
 //
 //

@@ -6,6 +6,12 @@
 //       Eg 2. `double` can be described with `double` itself.
 //       Eg 3. `Vec3f` can be described with `struct { float, float, float }`.
 
+// TODO: Document that `boost::pfr` fails to handle:
+//       1. Classes with only one member.
+//       2. Inheritance.
+//       3. All non-scalar and non-aggregate classes, for example,
+//          `boost::pfr::get<0>(std::string{})` will fails to compile.
+
 #include "ARIA/ForEach.h"
 #include "ARIA/TypeArray.h"
 
@@ -38,8 +44,12 @@ template <typename T>
     return res;
   }
   // For non-aggregate types (scalar types, or non-scalar-and-non-aggregate types).
-  else
+  else {
+    static_assert(std::is_scalar_v<T>, "Non-scalar-and-non-aggregate types such as `std::string` cannot be "
+                                       "perfectly handled by `boost::pfr`, so these types are strictly forbidden.");
+
     return true;
+  }
 
   return false;
 }
