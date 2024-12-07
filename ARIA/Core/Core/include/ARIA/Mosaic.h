@@ -195,4 +195,56 @@ using MosaicTiles = typename mosaic::detail::MosaicTilesImpl<T, 0, MakeTypeArray
 template <typename T, MosaicPattern U>
 class Mosaic;
 
+//
+//
+//
+template <typename T>
+struct is_mosaic : std::false_type {};
+
+template <typename T_, MosaicPattern U_>
+struct is_mosaic<Mosaic<T_, U_>> : std::true_type {
+  using T = T_;
+  using U = U_;
+};
+
+template <typename T>
+static constexpr bool is_mosaic_v = is_mosaic<T>::value;
+
+//
+//
+//
+template <typename TMosaic>
+  requires(is_mosaic_v<TMosaic>)
+[[nodiscard]] static consteval bool IsValidMosaicImpl() {
+  using T = typename is_mosaic<TMosaic>::T;
+  using U = typename is_mosaic<TMosaic>::U;
+
+  if constexpr (!(std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<T>())), U> &&
+                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<U>())), T> &&
+
+                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<T &>())), U> &&
+                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<U &>())), T> &&
+
+                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<T &&>())), U> &&
+                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<U &&>())), T> &&
+
+                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<const T>())), U> &&
+                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<const U>())), T> &&
+
+                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<const T &>())), U> &&
+                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<const U &>())), T> &&
+
+                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<const T &&>())), U> &&
+                  std::is_same_v<decltype(std::declval<TMosaic>()(std::declval<const U &&>())), T>))
+    return false;
+
+  return true;
+}
+
+template <typename T>
+static constexpr bool is_valid_mosaic_v = IsValidMosaicImpl<T>();
+
+template <typename T>
+concept ValidMosaic = is_valid_mosaic_v<T>;
+
 } // namespace ARIA
