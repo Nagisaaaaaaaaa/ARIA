@@ -42,7 +42,7 @@ struct TestRValueMembers {
   double &&v1 = 6;
 };
 
-struct TestRecursive0Member {
+struct TestRecursion0Member {
   int v0 = 5;
 
   struct {
@@ -50,7 +50,7 @@ struct TestRecursive0Member {
 };
 
 //! Structures with 1 member is considered unnecessary.
-struct TestRecursive1Member {
+struct TestRecursion1Member {
   int v0 = 5;
 
   struct {
@@ -58,7 +58,7 @@ struct TestRecursive1Member {
   } s0;
 };
 
-struct TestRecursive2Members {
+struct TestRecursion2Members {
   int v0 = 5;
 
   struct {
@@ -67,7 +67,7 @@ struct TestRecursive2Members {
   } s0;
 };
 
-struct TestRecursiveLValueMembers {
+struct TestRecursionLValueMembers {
   int v0 = 5;
 
   struct {
@@ -76,7 +76,7 @@ struct TestRecursiveLValueMembers {
   } s0;
 };
 
-struct TestRecursiveRValueMembers {
+struct TestRecursionRValueMembers {
   int v0 = 5;
 
   struct {
@@ -85,7 +85,7 @@ struct TestRecursiveRValueMembers {
   } s0;
 };
 
-struct TestRecursiveComplex {
+struct TestRecursionComplex {
   int v0 = 5, v1 = 6, v2 = 7;
 
   struct {
@@ -164,46 +164,46 @@ void TestGetRecursive() {
   cuda::device::current::get().synchronize();
 
   {
-    TestRecursive2Members v;
+    TestRecursion2Members v;
     static_assert(std::is_same_v<decltype(get_recursive<0>(v)), int &>);
     static_assert(std::is_same_v<decltype(get_recursive<1>(v)), double &>);
     static_assert(std::is_same_v<decltype(get_recursive<2>(v)), int *&>);
-    static_assert(std::is_same_v<decltype(get_recursive<0>(TestRecursive2Members{})), int>);
-    static_assert(std::is_same_v<decltype(get_recursive<1>(TestRecursive2Members{})), double>);
-    static_assert(std::is_same_v<decltype(get_recursive<2>(TestRecursive2Members{})), int *>);
+    static_assert(std::is_same_v<decltype(get_recursive<0>(TestRecursion2Members{})), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(TestRecursion2Members{})), double>);
+    static_assert(std::is_same_v<decltype(get_recursive<2>(TestRecursion2Members{})), int *>);
     EXPECT_EQ(get_recursive<0>(v), 5);
     EXPECT_EQ(get_recursive<1>(v), 6);
     EXPECT_EQ(get_recursive<2>(v), nullptr);
-    EXPECT_EQ(get_recursive<0>(TestRecursive2Members{}), 5);
-    EXPECT_EQ(get_recursive<1>(TestRecursive2Members{}), 6);
-    EXPECT_EQ(get_recursive<2>(TestRecursive2Members{}), nullptr);
-    static_assert(get_recursive<0>(TestRecursive2Members{}) == 5);
-    static_assert(get_recursive<1>(TestRecursive2Members{}) == 6);
-    static_assert(get_recursive<2>(TestRecursive2Members{}) == nullptr);
+    EXPECT_EQ(get_recursive<0>(TestRecursion2Members{}), 5);
+    EXPECT_EQ(get_recursive<1>(TestRecursion2Members{}), 6);
+    EXPECT_EQ(get_recursive<2>(TestRecursion2Members{}), nullptr);
+    static_assert(get_recursive<0>(TestRecursion2Members{}) == 5);
+    static_assert(get_recursive<1>(TestRecursion2Members{}) == 6);
+    static_assert(get_recursive<2>(TestRecursion2Members{}) == nullptr);
   }
 
   Launcher(1, [] ARIA_DEVICE(int i) {
-    TestRecursive2Members v;
+    TestRecursion2Members v;
     static_assert(std::is_same_v<decltype(get_recursive<0>(v)), int &>);
     static_assert(std::is_same_v<decltype(get_recursive<1>(v)), double &>);
     static_assert(std::is_same_v<decltype(get_recursive<2>(v)), int *&>);
-    static_assert(std::is_same_v<decltype(get_recursive<0>(TestRecursive2Members{})), int>);
-    static_assert(std::is_same_v<decltype(get_recursive<1>(TestRecursive2Members{})), double>);
-    static_assert(std::is_same_v<decltype(get_recursive<2>(TestRecursive2Members{})), int *>);
+    static_assert(std::is_same_v<decltype(get_recursive<0>(TestRecursion2Members{})), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(TestRecursion2Members{})), double>);
+    static_assert(std::is_same_v<decltype(get_recursive<2>(TestRecursion2Members{})), int *>);
     ARIA_ASSERT(get_recursive<0>(v) == 5);
     ARIA_ASSERT(get_recursive<1>(v) == 6);
     ARIA_ASSERT(get_recursive<2>(v) == nullptr);
-    ARIA_ASSERT(get_recursive<0>(TestRecursive2Members{}) == 5);
-    ARIA_ASSERT(get_recursive<1>(TestRecursive2Members{}) == 6);
-    ARIA_ASSERT(get_recursive<2>(TestRecursive2Members{}) == nullptr);
-    static_assert(get_recursive<0>(TestRecursive2Members{}) == 5);
-    static_assert(get_recursive<1>(TestRecursive2Members{}) == 6);
-    static_assert(get_recursive<2>(TestRecursive2Members{}) == nullptr);
+    ARIA_ASSERT(get_recursive<0>(TestRecursion2Members{}) == 5);
+    ARIA_ASSERT(get_recursive<1>(TestRecursion2Members{}) == 6);
+    ARIA_ASSERT(get_recursive<2>(TestRecursion2Members{}) == nullptr);
+    static_assert(get_recursive<0>(TestRecursion2Members{}) == 5);
+    static_assert(get_recursive<1>(TestRecursion2Members{}) == 6);
+    static_assert(get_recursive<2>(TestRecursion2Members{}) == nullptr);
   }).Launch();
   cuda::device::current::get().synchronize();
 
   {
-    TestRecursiveComplex v;
+    TestRecursionComplex v;
 
     static_assert(std::is_same_v<decltype(get_recursive<0>(v)), int &>);
     static_assert(std::is_same_v<decltype(get_recursive<1>(v)), int &>);
@@ -240,40 +240,40 @@ void TestGetRecursive() {
     static_assert(std::is_same_v<decltype(get_recursive<32>(v)), double *&>);
     static_assert(std::is_same_v<decltype(get_recursive<33>(v)), float *&>);
 
-    static_assert(std::is_same_v<decltype(get_recursive<0>(TestRecursiveComplex{})), int>);
-    static_assert(std::is_same_v<decltype(get_recursive<1>(TestRecursiveComplex{})), int>);
-    static_assert(std::is_same_v<decltype(get_recursive<2>(TestRecursiveComplex{})), int>);
-    static_assert(std::is_same_v<decltype(get_recursive<3>(TestRecursiveComplex{})), double>);
-    static_assert(std::is_same_v<decltype(get_recursive<4>(TestRecursiveComplex{})), int *>);
-    static_assert(std::is_same_v<decltype(get_recursive<5>(TestRecursiveComplex{})), int64>);
-    static_assert(std::is_same_v<decltype(get_recursive<6>(TestRecursiveComplex{})), float>);
-    static_assert(std::is_same_v<decltype(get_recursive<7>(TestRecursiveComplex{})), int64>);
-    static_assert(std::is_same_v<decltype(get_recursive<8>(TestRecursiveComplex{})), float>);
-    static_assert(std::is_same_v<decltype(get_recursive<9>(TestRecursiveComplex{})), double *>);
-    static_assert(std::is_same_v<decltype(get_recursive<10>(TestRecursiveComplex{})), double>);
-    static_assert(std::is_same_v<decltype(get_recursive<11>(TestRecursiveComplex{})), int *>);
-    static_assert(std::is_same_v<decltype(get_recursive<12>(TestRecursiveComplex{})), int64>);
-    static_assert(std::is_same_v<decltype(get_recursive<13>(TestRecursiveComplex{})), float>);
-    static_assert(std::is_same_v<decltype(get_recursive<14>(TestRecursiveComplex{})), int64>);
-    static_assert(std::is_same_v<decltype(get_recursive<15>(TestRecursiveComplex{})), float>);
-    static_assert(std::is_same_v<decltype(get_recursive<16>(TestRecursiveComplex{})), double *>);
-    static_assert(std::is_same_v<decltype(get_recursive<17>(TestRecursiveComplex{})), double>);
-    static_assert(std::is_same_v<decltype(get_recursive<18>(TestRecursiveComplex{})), double>);
-    static_assert(std::is_same_v<decltype(get_recursive<19>(TestRecursiveComplex{})), float>);
-    static_assert(std::is_same_v<decltype(get_recursive<20>(TestRecursiveComplex{})), int *>);
-    static_assert(std::is_same_v<decltype(get_recursive<21>(TestRecursiveComplex{})), double *>);
-    static_assert(std::is_same_v<decltype(get_recursive<22>(TestRecursiveComplex{})), float *>);
-    static_assert(std::is_same_v<decltype(get_recursive<23>(TestRecursiveComplex{})), float>);
-    static_assert(std::is_same_v<decltype(get_recursive<24>(TestRecursiveComplex{})), int *>);
-    static_assert(std::is_same_v<decltype(get_recursive<25>(TestRecursiveComplex{})), double *>);
-    static_assert(std::is_same_v<decltype(get_recursive<26>(TestRecursiveComplex{})), float *>);
-    static_assert(std::is_same_v<decltype(get_recursive<27>(TestRecursiveComplex{})), float>);
-    static_assert(std::is_same_v<decltype(get_recursive<28>(TestRecursiveComplex{})), int *>);
-    static_assert(std::is_same_v<decltype(get_recursive<29>(TestRecursiveComplex{})), double *>);
-    static_assert(std::is_same_v<decltype(get_recursive<30>(TestRecursiveComplex{})), float *>);
-    static_assert(std::is_same_v<decltype(get_recursive<31>(TestRecursiveComplex{})), int *>);
-    static_assert(std::is_same_v<decltype(get_recursive<32>(TestRecursiveComplex{})), double *>);
-    static_assert(std::is_same_v<decltype(get_recursive<33>(TestRecursiveComplex{})), float *>);
+    static_assert(std::is_same_v<decltype(get_recursive<0>(TestRecursionComplex{})), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(TestRecursionComplex{})), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<2>(TestRecursionComplex{})), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<3>(TestRecursionComplex{})), double>);
+    static_assert(std::is_same_v<decltype(get_recursive<4>(TestRecursionComplex{})), int *>);
+    static_assert(std::is_same_v<decltype(get_recursive<5>(TestRecursionComplex{})), int64>);
+    static_assert(std::is_same_v<decltype(get_recursive<6>(TestRecursionComplex{})), float>);
+    static_assert(std::is_same_v<decltype(get_recursive<7>(TestRecursionComplex{})), int64>);
+    static_assert(std::is_same_v<decltype(get_recursive<8>(TestRecursionComplex{})), float>);
+    static_assert(std::is_same_v<decltype(get_recursive<9>(TestRecursionComplex{})), double *>);
+    static_assert(std::is_same_v<decltype(get_recursive<10>(TestRecursionComplex{})), double>);
+    static_assert(std::is_same_v<decltype(get_recursive<11>(TestRecursionComplex{})), int *>);
+    static_assert(std::is_same_v<decltype(get_recursive<12>(TestRecursionComplex{})), int64>);
+    static_assert(std::is_same_v<decltype(get_recursive<13>(TestRecursionComplex{})), float>);
+    static_assert(std::is_same_v<decltype(get_recursive<14>(TestRecursionComplex{})), int64>);
+    static_assert(std::is_same_v<decltype(get_recursive<15>(TestRecursionComplex{})), float>);
+    static_assert(std::is_same_v<decltype(get_recursive<16>(TestRecursionComplex{})), double *>);
+    static_assert(std::is_same_v<decltype(get_recursive<17>(TestRecursionComplex{})), double>);
+    static_assert(std::is_same_v<decltype(get_recursive<18>(TestRecursionComplex{})), double>);
+    static_assert(std::is_same_v<decltype(get_recursive<19>(TestRecursionComplex{})), float>);
+    static_assert(std::is_same_v<decltype(get_recursive<20>(TestRecursionComplex{})), int *>);
+    static_assert(std::is_same_v<decltype(get_recursive<21>(TestRecursionComplex{})), double *>);
+    static_assert(std::is_same_v<decltype(get_recursive<22>(TestRecursionComplex{})), float *>);
+    static_assert(std::is_same_v<decltype(get_recursive<23>(TestRecursionComplex{})), float>);
+    static_assert(std::is_same_v<decltype(get_recursive<24>(TestRecursionComplex{})), int *>);
+    static_assert(std::is_same_v<decltype(get_recursive<25>(TestRecursionComplex{})), double *>);
+    static_assert(std::is_same_v<decltype(get_recursive<26>(TestRecursionComplex{})), float *>);
+    static_assert(std::is_same_v<decltype(get_recursive<27>(TestRecursionComplex{})), float>);
+    static_assert(std::is_same_v<decltype(get_recursive<28>(TestRecursionComplex{})), int *>);
+    static_assert(std::is_same_v<decltype(get_recursive<29>(TestRecursionComplex{})), double *>);
+    static_assert(std::is_same_v<decltype(get_recursive<30>(TestRecursionComplex{})), float *>);
+    static_assert(std::is_same_v<decltype(get_recursive<31>(TestRecursionComplex{})), int *>);
+    static_assert(std::is_same_v<decltype(get_recursive<32>(TestRecursionComplex{})), double *>);
+    static_assert(std::is_same_v<decltype(get_recursive<33>(TestRecursionComplex{})), float *>);
 
     EXPECT_EQ(get_recursive<0>(v), 5);
     EXPECT_EQ(get_recursive<1>(v), 6);
@@ -310,79 +310,79 @@ void TestGetRecursive() {
     EXPECT_EQ(get_recursive<32>(v), nullptr);
     EXPECT_EQ(get_recursive<33>(v), nullptr);
 
-    EXPECT_EQ(get_recursive<0>(TestRecursiveComplex{}), 5);
-    EXPECT_EQ(get_recursive<1>(TestRecursiveComplex{}), 6);
-    EXPECT_EQ(get_recursive<2>(TestRecursiveComplex{}), 7);
-    EXPECT_EQ(get_recursive<3>(TestRecursiveComplex{}), 8);
-    EXPECT_EQ(get_recursive<4>(TestRecursiveComplex{}), nullptr);
-    EXPECT_EQ(get_recursive<5>(TestRecursiveComplex{}), 9);
-    EXPECT_EQ(get_recursive<6>(TestRecursiveComplex{}), 10);
-    EXPECT_EQ(get_recursive<7>(TestRecursiveComplex{}), 9);
-    EXPECT_EQ(get_recursive<8>(TestRecursiveComplex{}), 10);
-    EXPECT_EQ(get_recursive<9>(TestRecursiveComplex{}), nullptr);
-    EXPECT_EQ(get_recursive<10>(TestRecursiveComplex{}), 8);
-    EXPECT_EQ(get_recursive<11>(TestRecursiveComplex{}), nullptr);
-    EXPECT_EQ(get_recursive<12>(TestRecursiveComplex{}), 9);
-    EXPECT_EQ(get_recursive<13>(TestRecursiveComplex{}), 10);
-    EXPECT_EQ(get_recursive<14>(TestRecursiveComplex{}), 9);
-    EXPECT_EQ(get_recursive<15>(TestRecursiveComplex{}), 10);
-    EXPECT_EQ(get_recursive<16>(TestRecursiveComplex{}), nullptr);
-    EXPECT_EQ(get_recursive<17>(TestRecursiveComplex{}), 11);
-    EXPECT_EQ(get_recursive<18>(TestRecursiveComplex{}), 12);
-    EXPECT_EQ(get_recursive<19>(TestRecursiveComplex{}), 13);
-    EXPECT_EQ(get_recursive<20>(TestRecursiveComplex{}), nullptr);
-    EXPECT_EQ(get_recursive<21>(TestRecursiveComplex{}), nullptr);
-    EXPECT_EQ(get_recursive<22>(TestRecursiveComplex{}), nullptr);
-    EXPECT_EQ(get_recursive<23>(TestRecursiveComplex{}), 13);
-    EXPECT_EQ(get_recursive<24>(TestRecursiveComplex{}), nullptr);
-    EXPECT_EQ(get_recursive<25>(TestRecursiveComplex{}), nullptr);
-    EXPECT_EQ(get_recursive<26>(TestRecursiveComplex{}), nullptr);
-    EXPECT_EQ(get_recursive<27>(TestRecursiveComplex{}), 13);
-    EXPECT_EQ(get_recursive<28>(TestRecursiveComplex{}), nullptr);
-    EXPECT_EQ(get_recursive<29>(TestRecursiveComplex{}), nullptr);
-    EXPECT_EQ(get_recursive<30>(TestRecursiveComplex{}), nullptr);
-    EXPECT_EQ(get_recursive<31>(TestRecursiveComplex{}), nullptr);
-    EXPECT_EQ(get_recursive<32>(TestRecursiveComplex{}), nullptr);
-    EXPECT_EQ(get_recursive<33>(TestRecursiveComplex{}), nullptr);
+    EXPECT_EQ(get_recursive<0>(TestRecursionComplex{}), 5);
+    EXPECT_EQ(get_recursive<1>(TestRecursionComplex{}), 6);
+    EXPECT_EQ(get_recursive<2>(TestRecursionComplex{}), 7);
+    EXPECT_EQ(get_recursive<3>(TestRecursionComplex{}), 8);
+    EXPECT_EQ(get_recursive<4>(TestRecursionComplex{}), nullptr);
+    EXPECT_EQ(get_recursive<5>(TestRecursionComplex{}), 9);
+    EXPECT_EQ(get_recursive<6>(TestRecursionComplex{}), 10);
+    EXPECT_EQ(get_recursive<7>(TestRecursionComplex{}), 9);
+    EXPECT_EQ(get_recursive<8>(TestRecursionComplex{}), 10);
+    EXPECT_EQ(get_recursive<9>(TestRecursionComplex{}), nullptr);
+    EXPECT_EQ(get_recursive<10>(TestRecursionComplex{}), 8);
+    EXPECT_EQ(get_recursive<11>(TestRecursionComplex{}), nullptr);
+    EXPECT_EQ(get_recursive<12>(TestRecursionComplex{}), 9);
+    EXPECT_EQ(get_recursive<13>(TestRecursionComplex{}), 10);
+    EXPECT_EQ(get_recursive<14>(TestRecursionComplex{}), 9);
+    EXPECT_EQ(get_recursive<15>(TestRecursionComplex{}), 10);
+    EXPECT_EQ(get_recursive<16>(TestRecursionComplex{}), nullptr);
+    EXPECT_EQ(get_recursive<17>(TestRecursionComplex{}), 11);
+    EXPECT_EQ(get_recursive<18>(TestRecursionComplex{}), 12);
+    EXPECT_EQ(get_recursive<19>(TestRecursionComplex{}), 13);
+    EXPECT_EQ(get_recursive<20>(TestRecursionComplex{}), nullptr);
+    EXPECT_EQ(get_recursive<21>(TestRecursionComplex{}), nullptr);
+    EXPECT_EQ(get_recursive<22>(TestRecursionComplex{}), nullptr);
+    EXPECT_EQ(get_recursive<23>(TestRecursionComplex{}), 13);
+    EXPECT_EQ(get_recursive<24>(TestRecursionComplex{}), nullptr);
+    EXPECT_EQ(get_recursive<25>(TestRecursionComplex{}), nullptr);
+    EXPECT_EQ(get_recursive<26>(TestRecursionComplex{}), nullptr);
+    EXPECT_EQ(get_recursive<27>(TestRecursionComplex{}), 13);
+    EXPECT_EQ(get_recursive<28>(TestRecursionComplex{}), nullptr);
+    EXPECT_EQ(get_recursive<29>(TestRecursionComplex{}), nullptr);
+    EXPECT_EQ(get_recursive<30>(TestRecursionComplex{}), nullptr);
+    EXPECT_EQ(get_recursive<31>(TestRecursionComplex{}), nullptr);
+    EXPECT_EQ(get_recursive<32>(TestRecursionComplex{}), nullptr);
+    EXPECT_EQ(get_recursive<33>(TestRecursionComplex{}), nullptr);
 
-    static_assert(get_recursive<0>(TestRecursiveComplex{}) == 5);
-    static_assert(get_recursive<1>(TestRecursiveComplex{}) == 6);
-    static_assert(get_recursive<2>(TestRecursiveComplex{}) == 7);
-    static_assert(get_recursive<3>(TestRecursiveComplex{}) == 8);
-    static_assert(get_recursive<4>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<5>(TestRecursiveComplex{}) == 9);
-    static_assert(get_recursive<6>(TestRecursiveComplex{}) == 10);
-    static_assert(get_recursive<7>(TestRecursiveComplex{}) == 9);
-    static_assert(get_recursive<8>(TestRecursiveComplex{}) == 10);
-    static_assert(get_recursive<9>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<10>(TestRecursiveComplex{}) == 8);
-    static_assert(get_recursive<11>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<12>(TestRecursiveComplex{}) == 9);
-    static_assert(get_recursive<13>(TestRecursiveComplex{}) == 10);
-    static_assert(get_recursive<14>(TestRecursiveComplex{}) == 9);
-    static_assert(get_recursive<15>(TestRecursiveComplex{}) == 10);
-    static_assert(get_recursive<16>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<17>(TestRecursiveComplex{}) == 11);
-    static_assert(get_recursive<18>(TestRecursiveComplex{}) == 12);
-    static_assert(get_recursive<19>(TestRecursiveComplex{}) == 13);
-    static_assert(get_recursive<20>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<21>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<22>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<23>(TestRecursiveComplex{}) == 13);
-    static_assert(get_recursive<24>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<25>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<26>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<27>(TestRecursiveComplex{}) == 13);
-    static_assert(get_recursive<28>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<29>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<30>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<31>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<32>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<33>(TestRecursiveComplex{}) == nullptr);
+    static_assert(get_recursive<0>(TestRecursionComplex{}) == 5);
+    static_assert(get_recursive<1>(TestRecursionComplex{}) == 6);
+    static_assert(get_recursive<2>(TestRecursionComplex{}) == 7);
+    static_assert(get_recursive<3>(TestRecursionComplex{}) == 8);
+    static_assert(get_recursive<4>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<5>(TestRecursionComplex{}) == 9);
+    static_assert(get_recursive<6>(TestRecursionComplex{}) == 10);
+    static_assert(get_recursive<7>(TestRecursionComplex{}) == 9);
+    static_assert(get_recursive<8>(TestRecursionComplex{}) == 10);
+    static_assert(get_recursive<9>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<10>(TestRecursionComplex{}) == 8);
+    static_assert(get_recursive<11>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<12>(TestRecursionComplex{}) == 9);
+    static_assert(get_recursive<13>(TestRecursionComplex{}) == 10);
+    static_assert(get_recursive<14>(TestRecursionComplex{}) == 9);
+    static_assert(get_recursive<15>(TestRecursionComplex{}) == 10);
+    static_assert(get_recursive<16>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<17>(TestRecursionComplex{}) == 11);
+    static_assert(get_recursive<18>(TestRecursionComplex{}) == 12);
+    static_assert(get_recursive<19>(TestRecursionComplex{}) == 13);
+    static_assert(get_recursive<20>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<21>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<22>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<23>(TestRecursionComplex{}) == 13);
+    static_assert(get_recursive<24>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<25>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<26>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<27>(TestRecursionComplex{}) == 13);
+    static_assert(get_recursive<28>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<29>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<30>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<31>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<32>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<33>(TestRecursionComplex{}) == nullptr);
   }
 
   Launcher(1, [] ARIA_DEVICE(int i) {
-    TestRecursiveComplex v;
+    TestRecursionComplex v;
 
     static_assert(std::is_same_v<decltype(get_recursive<0>(v)), int &>);
     static_assert(std::is_same_v<decltype(get_recursive<1>(v)), int &>);
@@ -419,40 +419,40 @@ void TestGetRecursive() {
     static_assert(std::is_same_v<decltype(get_recursive<32>(v)), double *&>);
     static_assert(std::is_same_v<decltype(get_recursive<33>(v)), float *&>);
 
-    static_assert(std::is_same_v<decltype(get_recursive<0>(TestRecursiveComplex{})), int>);
-    static_assert(std::is_same_v<decltype(get_recursive<1>(TestRecursiveComplex{})), int>);
-    static_assert(std::is_same_v<decltype(get_recursive<2>(TestRecursiveComplex{})), int>);
-    static_assert(std::is_same_v<decltype(get_recursive<3>(TestRecursiveComplex{})), double>);
-    static_assert(std::is_same_v<decltype(get_recursive<4>(TestRecursiveComplex{})), int *>);
-    static_assert(std::is_same_v<decltype(get_recursive<5>(TestRecursiveComplex{})), int64>);
-    static_assert(std::is_same_v<decltype(get_recursive<6>(TestRecursiveComplex{})), float>);
-    static_assert(std::is_same_v<decltype(get_recursive<7>(TestRecursiveComplex{})), int64>);
-    static_assert(std::is_same_v<decltype(get_recursive<8>(TestRecursiveComplex{})), float>);
-    static_assert(std::is_same_v<decltype(get_recursive<9>(TestRecursiveComplex{})), double *>);
-    static_assert(std::is_same_v<decltype(get_recursive<10>(TestRecursiveComplex{})), double>);
-    static_assert(std::is_same_v<decltype(get_recursive<11>(TestRecursiveComplex{})), int *>);
-    static_assert(std::is_same_v<decltype(get_recursive<12>(TestRecursiveComplex{})), int64>);
-    static_assert(std::is_same_v<decltype(get_recursive<13>(TestRecursiveComplex{})), float>);
-    static_assert(std::is_same_v<decltype(get_recursive<14>(TestRecursiveComplex{})), int64>);
-    static_assert(std::is_same_v<decltype(get_recursive<15>(TestRecursiveComplex{})), float>);
-    static_assert(std::is_same_v<decltype(get_recursive<16>(TestRecursiveComplex{})), double *>);
-    static_assert(std::is_same_v<decltype(get_recursive<17>(TestRecursiveComplex{})), double>);
-    static_assert(std::is_same_v<decltype(get_recursive<18>(TestRecursiveComplex{})), double>);
-    static_assert(std::is_same_v<decltype(get_recursive<19>(TestRecursiveComplex{})), float>);
-    static_assert(std::is_same_v<decltype(get_recursive<20>(TestRecursiveComplex{})), int *>);
-    static_assert(std::is_same_v<decltype(get_recursive<21>(TestRecursiveComplex{})), double *>);
-    static_assert(std::is_same_v<decltype(get_recursive<22>(TestRecursiveComplex{})), float *>);
-    static_assert(std::is_same_v<decltype(get_recursive<23>(TestRecursiveComplex{})), float>);
-    static_assert(std::is_same_v<decltype(get_recursive<24>(TestRecursiveComplex{})), int *>);
-    static_assert(std::is_same_v<decltype(get_recursive<25>(TestRecursiveComplex{})), double *>);
-    static_assert(std::is_same_v<decltype(get_recursive<26>(TestRecursiveComplex{})), float *>);
-    static_assert(std::is_same_v<decltype(get_recursive<27>(TestRecursiveComplex{})), float>);
-    static_assert(std::is_same_v<decltype(get_recursive<28>(TestRecursiveComplex{})), int *>);
-    static_assert(std::is_same_v<decltype(get_recursive<29>(TestRecursiveComplex{})), double *>);
-    static_assert(std::is_same_v<decltype(get_recursive<30>(TestRecursiveComplex{})), float *>);
-    static_assert(std::is_same_v<decltype(get_recursive<31>(TestRecursiveComplex{})), int *>);
-    static_assert(std::is_same_v<decltype(get_recursive<32>(TestRecursiveComplex{})), double *>);
-    static_assert(std::is_same_v<decltype(get_recursive<33>(TestRecursiveComplex{})), float *>);
+    static_assert(std::is_same_v<decltype(get_recursive<0>(TestRecursionComplex{})), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(TestRecursionComplex{})), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<2>(TestRecursionComplex{})), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<3>(TestRecursionComplex{})), double>);
+    static_assert(std::is_same_v<decltype(get_recursive<4>(TestRecursionComplex{})), int *>);
+    static_assert(std::is_same_v<decltype(get_recursive<5>(TestRecursionComplex{})), int64>);
+    static_assert(std::is_same_v<decltype(get_recursive<6>(TestRecursionComplex{})), float>);
+    static_assert(std::is_same_v<decltype(get_recursive<7>(TestRecursionComplex{})), int64>);
+    static_assert(std::is_same_v<decltype(get_recursive<8>(TestRecursionComplex{})), float>);
+    static_assert(std::is_same_v<decltype(get_recursive<9>(TestRecursionComplex{})), double *>);
+    static_assert(std::is_same_v<decltype(get_recursive<10>(TestRecursionComplex{})), double>);
+    static_assert(std::is_same_v<decltype(get_recursive<11>(TestRecursionComplex{})), int *>);
+    static_assert(std::is_same_v<decltype(get_recursive<12>(TestRecursionComplex{})), int64>);
+    static_assert(std::is_same_v<decltype(get_recursive<13>(TestRecursionComplex{})), float>);
+    static_assert(std::is_same_v<decltype(get_recursive<14>(TestRecursionComplex{})), int64>);
+    static_assert(std::is_same_v<decltype(get_recursive<15>(TestRecursionComplex{})), float>);
+    static_assert(std::is_same_v<decltype(get_recursive<16>(TestRecursionComplex{})), double *>);
+    static_assert(std::is_same_v<decltype(get_recursive<17>(TestRecursionComplex{})), double>);
+    static_assert(std::is_same_v<decltype(get_recursive<18>(TestRecursionComplex{})), double>);
+    static_assert(std::is_same_v<decltype(get_recursive<19>(TestRecursionComplex{})), float>);
+    static_assert(std::is_same_v<decltype(get_recursive<20>(TestRecursionComplex{})), int *>);
+    static_assert(std::is_same_v<decltype(get_recursive<21>(TestRecursionComplex{})), double *>);
+    static_assert(std::is_same_v<decltype(get_recursive<22>(TestRecursionComplex{})), float *>);
+    static_assert(std::is_same_v<decltype(get_recursive<23>(TestRecursionComplex{})), float>);
+    static_assert(std::is_same_v<decltype(get_recursive<24>(TestRecursionComplex{})), int *>);
+    static_assert(std::is_same_v<decltype(get_recursive<25>(TestRecursionComplex{})), double *>);
+    static_assert(std::is_same_v<decltype(get_recursive<26>(TestRecursionComplex{})), float *>);
+    static_assert(std::is_same_v<decltype(get_recursive<27>(TestRecursionComplex{})), float>);
+    static_assert(std::is_same_v<decltype(get_recursive<28>(TestRecursionComplex{})), int *>);
+    static_assert(std::is_same_v<decltype(get_recursive<29>(TestRecursionComplex{})), double *>);
+    static_assert(std::is_same_v<decltype(get_recursive<30>(TestRecursionComplex{})), float *>);
+    static_assert(std::is_same_v<decltype(get_recursive<31>(TestRecursionComplex{})), int *>);
+    static_assert(std::is_same_v<decltype(get_recursive<32>(TestRecursionComplex{})), double *>);
+    static_assert(std::is_same_v<decltype(get_recursive<33>(TestRecursionComplex{})), float *>);
 
     ARIA_ASSERT(get_recursive<0>(v) == 5);
     ARIA_ASSERT(get_recursive<1>(v) == 6);
@@ -489,75 +489,75 @@ void TestGetRecursive() {
     ARIA_ASSERT(get_recursive<32>(v) == nullptr);
     ARIA_ASSERT(get_recursive<33>(v) == nullptr);
 
-    ARIA_ASSERT(get_recursive<0>(TestRecursiveComplex{}) == 5);
-    ARIA_ASSERT(get_recursive<1>(TestRecursiveComplex{}) == 6);
-    ARIA_ASSERT(get_recursive<2>(TestRecursiveComplex{}) == 7);
-    ARIA_ASSERT(get_recursive<3>(TestRecursiveComplex{}) == 8);
-    ARIA_ASSERT(get_recursive<4>(TestRecursiveComplex{}) == nullptr);
-    ARIA_ASSERT(get_recursive<5>(TestRecursiveComplex{}) == 9);
-    ARIA_ASSERT(get_recursive<6>(TestRecursiveComplex{}) == 10);
-    ARIA_ASSERT(get_recursive<7>(TestRecursiveComplex{}) == 9);
-    ARIA_ASSERT(get_recursive<8>(TestRecursiveComplex{}) == 10);
-    ARIA_ASSERT(get_recursive<9>(TestRecursiveComplex{}) == nullptr);
-    ARIA_ASSERT(get_recursive<10>(TestRecursiveComplex{}) == 8);
-    ARIA_ASSERT(get_recursive<11>(TestRecursiveComplex{}) == nullptr);
-    ARIA_ASSERT(get_recursive<12>(TestRecursiveComplex{}) == 9);
-    ARIA_ASSERT(get_recursive<13>(TestRecursiveComplex{}) == 10);
-    ARIA_ASSERT(get_recursive<14>(TestRecursiveComplex{}) == 9);
-    ARIA_ASSERT(get_recursive<15>(TestRecursiveComplex{}) == 10);
-    ARIA_ASSERT(get_recursive<16>(TestRecursiveComplex{}) == nullptr);
-    ARIA_ASSERT(get_recursive<17>(TestRecursiveComplex{}) == 11);
-    ARIA_ASSERT(get_recursive<18>(TestRecursiveComplex{}) == 12);
-    ARIA_ASSERT(get_recursive<19>(TestRecursiveComplex{}) == 13);
-    ARIA_ASSERT(get_recursive<20>(TestRecursiveComplex{}) == nullptr);
-    ARIA_ASSERT(get_recursive<21>(TestRecursiveComplex{}) == nullptr);
-    ARIA_ASSERT(get_recursive<22>(TestRecursiveComplex{}) == nullptr);
-    ARIA_ASSERT(get_recursive<23>(TestRecursiveComplex{}) == 13);
-    ARIA_ASSERT(get_recursive<24>(TestRecursiveComplex{}) == nullptr);
-    ARIA_ASSERT(get_recursive<25>(TestRecursiveComplex{}) == nullptr);
-    ARIA_ASSERT(get_recursive<26>(TestRecursiveComplex{}) == nullptr);
-    ARIA_ASSERT(get_recursive<27>(TestRecursiveComplex{}) == 13);
-    ARIA_ASSERT(get_recursive<28>(TestRecursiveComplex{}) == nullptr);
-    ARIA_ASSERT(get_recursive<29>(TestRecursiveComplex{}) == nullptr);
-    ARIA_ASSERT(get_recursive<30>(TestRecursiveComplex{}) == nullptr);
-    ARIA_ASSERT(get_recursive<31>(TestRecursiveComplex{}) == nullptr);
-    ARIA_ASSERT(get_recursive<32>(TestRecursiveComplex{}) == nullptr);
-    ARIA_ASSERT(get_recursive<33>(TestRecursiveComplex{}) == nullptr);
+    ARIA_ASSERT(get_recursive<0>(TestRecursionComplex{}) == 5);
+    ARIA_ASSERT(get_recursive<1>(TestRecursionComplex{}) == 6);
+    ARIA_ASSERT(get_recursive<2>(TestRecursionComplex{}) == 7);
+    ARIA_ASSERT(get_recursive<3>(TestRecursionComplex{}) == 8);
+    ARIA_ASSERT(get_recursive<4>(TestRecursionComplex{}) == nullptr);
+    ARIA_ASSERT(get_recursive<5>(TestRecursionComplex{}) == 9);
+    ARIA_ASSERT(get_recursive<6>(TestRecursionComplex{}) == 10);
+    ARIA_ASSERT(get_recursive<7>(TestRecursionComplex{}) == 9);
+    ARIA_ASSERT(get_recursive<8>(TestRecursionComplex{}) == 10);
+    ARIA_ASSERT(get_recursive<9>(TestRecursionComplex{}) == nullptr);
+    ARIA_ASSERT(get_recursive<10>(TestRecursionComplex{}) == 8);
+    ARIA_ASSERT(get_recursive<11>(TestRecursionComplex{}) == nullptr);
+    ARIA_ASSERT(get_recursive<12>(TestRecursionComplex{}) == 9);
+    ARIA_ASSERT(get_recursive<13>(TestRecursionComplex{}) == 10);
+    ARIA_ASSERT(get_recursive<14>(TestRecursionComplex{}) == 9);
+    ARIA_ASSERT(get_recursive<15>(TestRecursionComplex{}) == 10);
+    ARIA_ASSERT(get_recursive<16>(TestRecursionComplex{}) == nullptr);
+    ARIA_ASSERT(get_recursive<17>(TestRecursionComplex{}) == 11);
+    ARIA_ASSERT(get_recursive<18>(TestRecursionComplex{}) == 12);
+    ARIA_ASSERT(get_recursive<19>(TestRecursionComplex{}) == 13);
+    ARIA_ASSERT(get_recursive<20>(TestRecursionComplex{}) == nullptr);
+    ARIA_ASSERT(get_recursive<21>(TestRecursionComplex{}) == nullptr);
+    ARIA_ASSERT(get_recursive<22>(TestRecursionComplex{}) == nullptr);
+    ARIA_ASSERT(get_recursive<23>(TestRecursionComplex{}) == 13);
+    ARIA_ASSERT(get_recursive<24>(TestRecursionComplex{}) == nullptr);
+    ARIA_ASSERT(get_recursive<25>(TestRecursionComplex{}) == nullptr);
+    ARIA_ASSERT(get_recursive<26>(TestRecursionComplex{}) == nullptr);
+    ARIA_ASSERT(get_recursive<27>(TestRecursionComplex{}) == 13);
+    ARIA_ASSERT(get_recursive<28>(TestRecursionComplex{}) == nullptr);
+    ARIA_ASSERT(get_recursive<29>(TestRecursionComplex{}) == nullptr);
+    ARIA_ASSERT(get_recursive<30>(TestRecursionComplex{}) == nullptr);
+    ARIA_ASSERT(get_recursive<31>(TestRecursionComplex{}) == nullptr);
+    ARIA_ASSERT(get_recursive<32>(TestRecursionComplex{}) == nullptr);
+    ARIA_ASSERT(get_recursive<33>(TestRecursionComplex{}) == nullptr);
 
-    static_assert(get_recursive<0>(TestRecursiveComplex{}) == 5);
-    static_assert(get_recursive<1>(TestRecursiveComplex{}) == 6);
-    static_assert(get_recursive<2>(TestRecursiveComplex{}) == 7);
-    static_assert(get_recursive<3>(TestRecursiveComplex{}) == 8);
-    static_assert(get_recursive<4>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<5>(TestRecursiveComplex{}) == 9);
-    static_assert(get_recursive<6>(TestRecursiveComplex{}) == 10);
-    static_assert(get_recursive<7>(TestRecursiveComplex{}) == 9);
-    static_assert(get_recursive<8>(TestRecursiveComplex{}) == 10);
-    static_assert(get_recursive<9>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<10>(TestRecursiveComplex{}) == 8);
-    static_assert(get_recursive<11>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<12>(TestRecursiveComplex{}) == 9);
-    static_assert(get_recursive<13>(TestRecursiveComplex{}) == 10);
-    static_assert(get_recursive<14>(TestRecursiveComplex{}) == 9);
-    static_assert(get_recursive<15>(TestRecursiveComplex{}) == 10);
-    static_assert(get_recursive<16>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<17>(TestRecursiveComplex{}) == 11);
-    static_assert(get_recursive<18>(TestRecursiveComplex{}) == 12);
-    static_assert(get_recursive<19>(TestRecursiveComplex{}) == 13);
-    static_assert(get_recursive<20>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<21>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<22>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<23>(TestRecursiveComplex{}) == 13);
-    static_assert(get_recursive<24>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<25>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<26>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<27>(TestRecursiveComplex{}) == 13);
-    static_assert(get_recursive<28>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<29>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<30>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<31>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<32>(TestRecursiveComplex{}) == nullptr);
-    static_assert(get_recursive<33>(TestRecursiveComplex{}) == nullptr);
+    static_assert(get_recursive<0>(TestRecursionComplex{}) == 5);
+    static_assert(get_recursive<1>(TestRecursionComplex{}) == 6);
+    static_assert(get_recursive<2>(TestRecursionComplex{}) == 7);
+    static_assert(get_recursive<3>(TestRecursionComplex{}) == 8);
+    static_assert(get_recursive<4>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<5>(TestRecursionComplex{}) == 9);
+    static_assert(get_recursive<6>(TestRecursionComplex{}) == 10);
+    static_assert(get_recursive<7>(TestRecursionComplex{}) == 9);
+    static_assert(get_recursive<8>(TestRecursionComplex{}) == 10);
+    static_assert(get_recursive<9>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<10>(TestRecursionComplex{}) == 8);
+    static_assert(get_recursive<11>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<12>(TestRecursionComplex{}) == 9);
+    static_assert(get_recursive<13>(TestRecursionComplex{}) == 10);
+    static_assert(get_recursive<14>(TestRecursionComplex{}) == 9);
+    static_assert(get_recursive<15>(TestRecursionComplex{}) == 10);
+    static_assert(get_recursive<16>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<17>(TestRecursionComplex{}) == 11);
+    static_assert(get_recursive<18>(TestRecursionComplex{}) == 12);
+    static_assert(get_recursive<19>(TestRecursionComplex{}) == 13);
+    static_assert(get_recursive<20>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<21>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<22>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<23>(TestRecursionComplex{}) == 13);
+    static_assert(get_recursive<24>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<25>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<26>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<27>(TestRecursionComplex{}) == 13);
+    static_assert(get_recursive<28>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<29>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<30>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<31>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<32>(TestRecursionComplex{}) == nullptr);
+    static_assert(get_recursive<33>(TestRecursionComplex{}) == nullptr);
   }).Launch();
   cuda::device::current::get().synchronize();
 }
@@ -625,79 +625,79 @@ TEST(Mosaic, Base) {
     static_assert(boost::pfr::tuple_size_v<TestRValueMembers> == 2);
     static_assert(!MosaicPattern<TestRValueMembers>);
 
-    static_assert(!std::is_scalar_v<TestRecursive0Member>);
-    static_assert(std::is_aggregate_v<TestRecursive0Member>);
-    static_assert(boost::pfr::tuple_size_v<TestRecursive0Member> == 2);
-    static_assert(!MosaicPattern<TestRecursive0Member>);
+    static_assert(!std::is_scalar_v<TestRecursion0Member>);
+    static_assert(std::is_aggregate_v<TestRecursion0Member>);
+    static_assert(boost::pfr::tuple_size_v<TestRecursion0Member> == 2);
+    static_assert(!MosaicPattern<TestRecursion0Member>);
 
-    static_assert(!std::is_scalar_v<TestRecursive1Member>);
-    static_assert(std::is_aggregate_v<TestRecursive1Member>);
-    static_assert(boost::pfr::tuple_size_v<TestRecursive1Member> == 2);
-    // static_assert(!MosaicPattern<TestRecursive1Member>);
+    static_assert(!std::is_scalar_v<TestRecursion1Member>);
+    static_assert(std::is_aggregate_v<TestRecursion1Member>);
+    static_assert(boost::pfr::tuple_size_v<TestRecursion1Member> == 2);
+    // static_assert(!MosaicPattern<TestRecursion1Member>);
 
-    static_assert(!std::is_scalar_v<TestRecursive2Members>);
-    static_assert(std::is_aggregate_v<TestRecursive2Members>);
-    static_assert(boost::pfr::tuple_size_v<TestRecursive2Members> == 2);
-    static_assert(MosaicPattern<TestRecursive2Members>);
-    static_assert(tuple_size_recursive_v<TestRecursive2Members> == 3);
-    static_assert(IRec2INonRec<0, TestRecursive2Members>() == 0);
-    static_assert(IRec2INonRec<1, TestRecursive2Members>() == 1);
-    static_assert(IRec2INonRec<2, TestRecursive2Members>() == 1);
-    static_assert(IRec2INonRec<3, TestRecursive2Members>() == 2);
-    static_assert(IRec2INonRec<99999, TestRecursive2Members>() == 2);
-    static_assert(INonRec2IRec<0, TestRecursive2Members>() == 0);
-    static_assert(INonRec2IRec<1, TestRecursive2Members>() == 1);
-    static_assert(INonRec2IRec<2, TestRecursive2Members>() == 3);
-    static_assert(INonRec2IRec<99999, TestRecursive2Members>() == 3);
-    static_assert(std::is_same_v<MosaicTiles<TestRecursive2Members>, TypeArray<int, double, int *>>);
+    static_assert(!std::is_scalar_v<TestRecursion2Members>);
+    static_assert(std::is_aggregate_v<TestRecursion2Members>);
+    static_assert(boost::pfr::tuple_size_v<TestRecursion2Members> == 2);
+    static_assert(MosaicPattern<TestRecursion2Members>);
+    static_assert(tuple_size_recursive_v<TestRecursion2Members> == 3);
+    static_assert(IRec2INonRec<0, TestRecursion2Members>() == 0);
+    static_assert(IRec2INonRec<1, TestRecursion2Members>() == 1);
+    static_assert(IRec2INonRec<2, TestRecursion2Members>() == 1);
+    static_assert(IRec2INonRec<3, TestRecursion2Members>() == 2);
+    static_assert(IRec2INonRec<99999, TestRecursion2Members>() == 2);
+    static_assert(INonRec2IRec<0, TestRecursion2Members>() == 0);
+    static_assert(INonRec2IRec<1, TestRecursion2Members>() == 1);
+    static_assert(INonRec2IRec<2, TestRecursion2Members>() == 3);
+    static_assert(INonRec2IRec<99999, TestRecursion2Members>() == 3);
+    static_assert(std::is_same_v<MosaicTiles<TestRecursion2Members>, TypeArray<int, double, int *>>);
 
-    static_assert(!std::is_scalar_v<TestRecursiveLValueMembers>);
-    static_assert(std::is_aggregate_v<TestRecursiveLValueMembers>);
-    static_assert(boost::pfr::tuple_size_v<TestRecursiveLValueMembers> == 2);
-    static_assert(!MosaicPattern<TestRecursiveLValueMembers>);
+    static_assert(!std::is_scalar_v<TestRecursionLValueMembers>);
+    static_assert(std::is_aggregate_v<TestRecursionLValueMembers>);
+    static_assert(boost::pfr::tuple_size_v<TestRecursionLValueMembers> == 2);
+    static_assert(!MosaicPattern<TestRecursionLValueMembers>);
 
-    static_assert(!std::is_scalar_v<TestRecursiveRValueMembers>);
-    static_assert(std::is_aggregate_v<TestRecursiveRValueMembers>);
-    static_assert(boost::pfr::tuple_size_v<TestRecursiveRValueMembers> == 2);
-    static_assert(!MosaicPattern<TestRecursiveRValueMembers>);
+    static_assert(!std::is_scalar_v<TestRecursionRValueMembers>);
+    static_assert(std::is_aggregate_v<TestRecursionRValueMembers>);
+    static_assert(boost::pfr::tuple_size_v<TestRecursionRValueMembers> == 2);
+    static_assert(!MosaicPattern<TestRecursionRValueMembers>);
 
-    static_assert(!std::is_scalar_v<TestRecursiveComplex>);
-    static_assert(std::is_aggregate_v<TestRecursiveComplex>);
-    static_assert(boost::pfr::tuple_size_v<TestRecursiveComplex> == 13);
-    static_assert(MosaicPattern<TestRecursiveComplex>);
-    static_assert(tuple_size_recursive_v<TestRecursiveComplex> == 34);
-    static_assert(IRec2INonRec<0, TestRecursiveComplex>() == 0);
-    static_assert(IRec2INonRec<1, TestRecursiveComplex>() == 1);
-    static_assert(IRec2INonRec<2, TestRecursiveComplex>() == 2);
-    ForEach<7>([&]<auto i>() { static_assert(IRec2INonRec<3 + i, TestRecursiveComplex>() == 3); });
-    ForEach<7>([&]<auto i>() { static_assert(IRec2INonRec<10 + i, TestRecursiveComplex>() == 4); });
-    static_assert(IRec2INonRec<17, TestRecursiveComplex>() == 5);
-    static_assert(IRec2INonRec<18, TestRecursiveComplex>() == 6);
-    ForEach<4>([&]<auto i>() { static_assert(IRec2INonRec<19 + i, TestRecursiveComplex>() == 7); });
-    ForEach<4>([&]<auto i>() { static_assert(IRec2INonRec<23 + i, TestRecursiveComplex>() == 8); });
-    ForEach<4>([&]<auto i>() { static_assert(IRec2INonRec<27 + i, TestRecursiveComplex>() == 9); });
-    static_assert(IRec2INonRec<31, TestRecursiveComplex>() == 10);
-    static_assert(IRec2INonRec<32, TestRecursiveComplex>() == 11);
-    static_assert(IRec2INonRec<33, TestRecursiveComplex>() == 12);
-    static_assert(IRec2INonRec<34, TestRecursiveComplex>() == 13);
-    static_assert(IRec2INonRec<99999, TestRecursiveComplex>() == 13);
-    static_assert(INonRec2IRec<0, TestRecursiveComplex>() == 0);
-    static_assert(INonRec2IRec<1, TestRecursiveComplex>() == 1);
-    static_assert(INonRec2IRec<2, TestRecursiveComplex>() == 2);
-    static_assert(INonRec2IRec<3, TestRecursiveComplex>() == 3);
-    static_assert(INonRec2IRec<4, TestRecursiveComplex>() == 10);
-    static_assert(INonRec2IRec<5, TestRecursiveComplex>() == 17);
-    static_assert(INonRec2IRec<6, TestRecursiveComplex>() == 18);
-    static_assert(INonRec2IRec<7, TestRecursiveComplex>() == 19);
-    static_assert(INonRec2IRec<8, TestRecursiveComplex>() == 23);
-    static_assert(INonRec2IRec<9, TestRecursiveComplex>() == 27);
-    static_assert(INonRec2IRec<10, TestRecursiveComplex>() == 31);
-    static_assert(INonRec2IRec<11, TestRecursiveComplex>() == 32);
-    static_assert(INonRec2IRec<12, TestRecursiveComplex>() == 33);
-    static_assert(INonRec2IRec<13, TestRecursiveComplex>() == 34);
-    static_assert(INonRec2IRec<99999, TestRecursiveComplex>() == 34);
+    static_assert(!std::is_scalar_v<TestRecursionComplex>);
+    static_assert(std::is_aggregate_v<TestRecursionComplex>);
+    static_assert(boost::pfr::tuple_size_v<TestRecursionComplex> == 13);
+    static_assert(MosaicPattern<TestRecursionComplex>);
+    static_assert(tuple_size_recursive_v<TestRecursionComplex> == 34);
+    static_assert(IRec2INonRec<0, TestRecursionComplex>() == 0);
+    static_assert(IRec2INonRec<1, TestRecursionComplex>() == 1);
+    static_assert(IRec2INonRec<2, TestRecursionComplex>() == 2);
+    ForEach<7>([&]<auto i>() { static_assert(IRec2INonRec<3 + i, TestRecursionComplex>() == 3); });
+    ForEach<7>([&]<auto i>() { static_assert(IRec2INonRec<10 + i, TestRecursionComplex>() == 4); });
+    static_assert(IRec2INonRec<17, TestRecursionComplex>() == 5);
+    static_assert(IRec2INonRec<18, TestRecursionComplex>() == 6);
+    ForEach<4>([&]<auto i>() { static_assert(IRec2INonRec<19 + i, TestRecursionComplex>() == 7); });
+    ForEach<4>([&]<auto i>() { static_assert(IRec2INonRec<23 + i, TestRecursionComplex>() == 8); });
+    ForEach<4>([&]<auto i>() { static_assert(IRec2INonRec<27 + i, TestRecursionComplex>() == 9); });
+    static_assert(IRec2INonRec<31, TestRecursionComplex>() == 10);
+    static_assert(IRec2INonRec<32, TestRecursionComplex>() == 11);
+    static_assert(IRec2INonRec<33, TestRecursionComplex>() == 12);
+    static_assert(IRec2INonRec<34, TestRecursionComplex>() == 13);
+    static_assert(IRec2INonRec<99999, TestRecursionComplex>() == 13);
+    static_assert(INonRec2IRec<0, TestRecursionComplex>() == 0);
+    static_assert(INonRec2IRec<1, TestRecursionComplex>() == 1);
+    static_assert(INonRec2IRec<2, TestRecursionComplex>() == 2);
+    static_assert(INonRec2IRec<3, TestRecursionComplex>() == 3);
+    static_assert(INonRec2IRec<4, TestRecursionComplex>() == 10);
+    static_assert(INonRec2IRec<5, TestRecursionComplex>() == 17);
+    static_assert(INonRec2IRec<6, TestRecursionComplex>() == 18);
+    static_assert(INonRec2IRec<7, TestRecursionComplex>() == 19);
+    static_assert(INonRec2IRec<8, TestRecursionComplex>() == 23);
+    static_assert(INonRec2IRec<9, TestRecursionComplex>() == 27);
+    static_assert(INonRec2IRec<10, TestRecursionComplex>() == 31);
+    static_assert(INonRec2IRec<11, TestRecursionComplex>() == 32);
+    static_assert(INonRec2IRec<12, TestRecursionComplex>() == 33);
+    static_assert(INonRec2IRec<13, TestRecursionComplex>() == 34);
+    static_assert(INonRec2IRec<99999, TestRecursionComplex>() == 34);
     static_assert(std::is_same_v<
-                  MosaicTiles<TestRecursiveComplex>,
+                  MosaicTiles<TestRecursionComplex>,
                   TypeArray<int, int, int, double, int *, int64, float, int64, float, double *, double, int *, int64,
                             float, int64, float, double *, double, double, float, int *, double *, float *, float,
                             int *, double *, float *, float, int *, double *, float *, int *, double *, float *>>);
@@ -724,12 +724,15 @@ TEST(Mosaic, Base) {
     testPointerType.operator()<Test1Member>();
     testPointerType.operator()<Test2Members>();
     testPointerType.operator()<TestPrivateMembers>();
+    testPointerType.operator()<TestInheritance>();
     testPointerType.operator()<TestLValueMembers>();
     testPointerType.operator()<TestRValueMembers>();
-    testPointerType.operator()<TestRecursive0Member>();
-    testPointerType.operator()<TestRecursive1Member>();
-    testPointerType.operator()<TestRecursive2Members>();
-    testPointerType.operator()<TestRecursiveComplex>();
+    testPointerType.operator()<TestRecursion0Member>();
+    testPointerType.operator()<TestRecursion1Member>();
+    testPointerType.operator()<TestRecursion2Members>();
+    testPointerType.operator()<TestRecursionLValueMembers>();
+    testPointerType.operator()<TestRecursionRValueMembers>();
+    testPointerType.operator()<TestRecursionComplex>();
   }
 }
 
