@@ -2,6 +2,8 @@
 
 namespace ARIA {
 
+namespace mosaic::detail {
+
 // `MosaicPattern`s are classes which can be easily serialized.
 // For example:
 // 1. `int` and `int *` are "scalar" types, which
@@ -270,5 +272,7 @@ static constexpr bool is_valid_mosaic_v = IsValidMosaicImpl<T>();
 
 template <typename T>
 concept ValidMosaic = is_valid_mosaic_v<T>;
+
+} // namespace mosaic::detail
 
 } // namespace ARIA

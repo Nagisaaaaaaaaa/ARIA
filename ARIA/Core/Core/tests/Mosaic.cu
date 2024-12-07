@@ -116,6 +116,8 @@ struct TestRecursionComplex {
 };
 
 void TestGetRecursive() {
+  using namespace mosaic::detail;
+
   {
     int v = 5;
     static_assert(std::is_same_v<decltype(get_recursive<0>(v)), int &>);
@@ -612,6 +614,8 @@ struct Mosaic<Vec3<T>, TestVec3<T>> {
 };
 
 TEST(Mosaic, Base) {
+  using namespace mosaic::detail;
+
   // Non-pointer types.
   {
     static_assert(std::is_scalar_v<int>);
@@ -789,6 +793,8 @@ TEST(Mosaic, GetRecursive) {
 }
 
 TEST(Mosaic, ValidMoasic) {
+  using namespace mosaic::detail;
+
   static_assert(ValidMosaic<Mosaic<float, float>>);
   static_assert(ValidMosaic<Mosaic<double, float>>);
   static_assert(ValidMosaic<Mosaic<float, double>>);
