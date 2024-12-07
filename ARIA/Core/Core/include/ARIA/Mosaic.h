@@ -31,6 +31,19 @@ namespace ARIA {
 // It is named as "pattern" because, you can imagine that,
 // small classes can be arbitrary placed together and be merged into a large class.
 // For example, `Vec3f` = 3 `float`s = `struct { float x, y; }` + `float`.
+//
+//! This kind of serialization may be different from others.
+//! Here are the main features:
+//! 1. Compile-time number of elements (tuple size):
+//!    `Vec3f` may be split into 3 `float`s at compile time, and
+//!    it is unable to serialize `std::string`.
+//! 2. Named elements:
+//!    `MosaicPattern`s are defined by structures, not tuples, so
+//!    every elements are required to be named.
+//! 3. Any definition is allowed, as long as you can recover the type:
+//!    `double` can be serialized with `float`, but precision lost.
+//!    `float` can be serialized with `double`, but nothing better.
+//!    `float` can be serialized with `float`, of course.
 template <typename T>
 [[nodiscard]] static consteval bool IsMosaicPatternImpl() {
   static_assert(std::is_same_v<T, std::decay_t<T>>, "The given type should be a decayed type");
@@ -75,6 +88,7 @@ concept MosaicPattern = is_mosaic_pattern_v<T>;
 //
 //
 //
+// Since `MosaicPattern`s are introduced for serialization.
 template <MosaicPattern T>
 [[nodiscard]] static consteval auto TupleSizeRecursiveImpl() {
   using TInteger = std::decay_t<decltype(boost::pfr::tuple_size_v<T>)>;
