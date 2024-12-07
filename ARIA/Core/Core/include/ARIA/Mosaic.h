@@ -12,7 +12,6 @@
 //       3. All non-scalar and non-aggregate classes, for example,
 //          `boost::pfr::get<0>(std::string{})` will fails to compile.
 
-#include "ARIA/ForEach.h"
 #include "ARIA/TypeArray.h"
 
 #include <boost/pfr.hpp>
