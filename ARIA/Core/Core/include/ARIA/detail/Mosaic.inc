@@ -218,13 +218,15 @@ using mosaic_pattern_types_recursive_t = typename mosaic_pattern_types_recursive
 //
 //
 //
+// Whether the given type is `Mosaic<T, TMosaicPattern>`.
+// Here, the second template parameter is restricted with concept.
 template <typename T>
 struct is_mosaic : std::false_type {};
 
-template <typename T_, MosaicPattern U_>
-struct is_mosaic<Mosaic<T_, U_>> : std::true_type {
+template <typename T_, MosaicPattern TMosaicPattern_>
+struct is_mosaic<Mosaic<T_, TMosaicPattern_>> : std::true_type {
   using T = T_;
-  using U = U_;
+  using TMosaicPattern = TMosaicPattern_;
 };
 
 template <typename T>
@@ -237,7 +239,7 @@ template <typename TMosaic>
   requires(is_mosaic_v<TMosaic>)
 [[nodiscard]] static consteval bool IsValidMosaicImpl() {
   using T = typename is_mosaic<TMosaic>::T;
-  using U = typename is_mosaic<TMosaic>::U;
+  using P = typename is_mosaic<TMosaic>::TMosaicPattern;
 
   static_assert(std::is_same_v<T, std::decay_t<T>>, "The given type should be a decayed type");
 
@@ -245,23 +247,23 @@ template <typename TMosaic>
                     std::is_move_assignable_v<T>,
                 "The \"strongest\" copy and move ability is required");
 
-  static_assert(std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<T>())), U> &&
-                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<U>())), T> &&
+  static_assert(std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<T>())), P> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<P>())), T> &&
 
-                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<T &>())), U> &&
-                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<U &>())), T> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<T &>())), P> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<P &>())), T> &&
 
-                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<T &&>())), U> &&
-                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<U &&>())), T> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<T &&>())), P> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<P &&>())), T> &&
 
-                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const T>())), U> &&
-                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const U>())), T> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const T>())), P> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const P>())), T> &&
 
-                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const T &>())), U> &&
-                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const U &>())), T> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const T &>())), P> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const P &>())), T> &&
 
-                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const T &&>())), U> &&
-                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const U &&>())), T>,
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const T &&>())), P> &&
+                    std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<const P &&>())), T>,
                 "`operator()` should be overloaded to support conversions to and from the mosaic pattern");
 
   return true;
