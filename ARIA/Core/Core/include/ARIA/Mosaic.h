@@ -63,6 +63,16 @@ namespace ARIA {
 ///   // How to convert `float` to `double`.
 ///   double operator()(float v) const { return v; }
 /// };
+///
+/// // Define the mosaic for `float` and `float`.
+/// template <>
+/// struct Mosaic<float, float> {
+///   // Check whether the floating point is still valid.
+///   float operator()(float v) const {
+///     ARIA_ASSERT(!std::isnan(v));
+///     return v;
+///   }
+/// };
 /// ```
 ///
 /// \note Very complex pattern structures are also supported, but
