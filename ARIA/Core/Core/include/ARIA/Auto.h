@@ -87,18 +87,18 @@ template <property::detail::ProxyType T>
 ARIA_HOST_DEVICE auto Auto(T &&v) {
   if constexpr //! For ARIA property, note that this should be checked before any other proxy systems.
       (property::detail::PropertyType<std::decay_t<T>>)
-    return v.value();
+    return std::forward<T>(v).value();
   else if constexpr (std::is_same_v<std::decay_t<T>,
                                     std::decay_t<decltype(std::vector<bool>()[0])>>) //! For `std::vector<bool>`.
-    return static_cast<bool>(v);
+    return static_cast<bool>(std::forward<T>(v));
   else if constexpr (!std::is_same_v<std::decay_t<T>,
                                      std::decay_t<decltype(thrust::raw_reference_cast(v))>>) //! For `thrust`.
-    return thrust::raw_reference_cast(v);
+    return static_cast<typename std::decay_t<T>::value_type>(std::forward<T>(v));
   else if constexpr //! For `Eigen`.
       (requires {
-         { v.eval() };
+         { std::forward<T>(v).eval() };
        })
-    return v.eval();
+    return std::forward<T>(v).eval();
   else //! Non-proxy types.
     ARIA_STATIC_ASSERT_FALSE("Bugs detected in the ARIA property system, please contact the developers to fix them");
 }
