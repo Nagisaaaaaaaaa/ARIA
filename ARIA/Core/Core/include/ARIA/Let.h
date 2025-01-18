@@ -56,7 +56,7 @@ namespace ARIA {
 /// ```
 ///
 /// \see Auto.h
-template <ARIA::property::detail::ProxyType T>
+template <property::detail::ProxyType T>
 ARIA_HOST_DEVICE decltype(auto) Let(T &&v) {
   return Auto(std::forward<T>(v)); // `decltype(auto)` is used to let `Auto` deduce the return type.
 }

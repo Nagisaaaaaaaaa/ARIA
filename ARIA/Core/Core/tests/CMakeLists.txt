@@ -3,7 +3,7 @@ if (ARIA_BUILD_TESTS)
       SOURCES
       detail/Macros.cpp
       #experimental/Lua.cpp
-      Auto.cpp
+      Auto.cu
       BFloat16.cu
       BitArray.cu
       BitVector.cu
@@ -14,7 +14,7 @@ if (ARIA_BUILD_TESTS)
       Invocations.cpp
       Launcher.cu
       Layout.cu
-      Let.cpp
+      Let.cu
       Mosaic.cu
       Property.cpp
       PropertySTL.cpp

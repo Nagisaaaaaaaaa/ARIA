@@ -223,7 +223,7 @@ using mosaic_pattern_types_recursive_t = typename mosaic_pattern_types_recursive
 template <typename T>
 struct is_mosaic : std::false_type {};
 
-template <typename T_, MosaicPattern TMosaicPattern_>
+template <typename T_, typename TMosaicPattern_>
 struct is_mosaic<Mosaic<T_, TMosaicPattern_>> : std::true_type {
   using T = T_;
   using TMosaicPattern = TMosaicPattern_;
@@ -249,6 +249,8 @@ template <typename TMosaic>
   static_assert(std::is_copy_constructible_v<T> && std::is_copy_assignable_v<T> && std::is_move_constructible_v<T> &&
                     std::is_move_assignable_v<T>,
                 "The \"strongest\" copy and move ability is required");
+
+  static_assert(MosaicPattern<P>, "The given type should satisfy `MosaicPattern`");
 
   static_assert(std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<T>())), P> &&
                     std::is_same_v<decltype(std::declval<const TMosaic>()(std::declval<P>())), T> &&

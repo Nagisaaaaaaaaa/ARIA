@@ -122,16 +122,9 @@ TEST(Let, Thrust) {
   }
 
   {
-    float storage = 0;
-    thrust::device_reference<float> storageRef{thrust::device_reference<float>::pointer{&storage}};
-    // let v0 = storageRef;
-    let v1 = Let(storageRef);
-    static_assert(std::is_same_v<decltype(v1), float>);
-  }
-
-  {
-    thrust::device_vector<float> storage;
+    thrust::device_vector<float> storage{3.14F};
     static_assert(std::is_same_v<decltype(Let(storage[0])), float>);
+    EXPECT_FLOAT_EQ(Let(storage[0]), 3.14F);
   }
 }
 

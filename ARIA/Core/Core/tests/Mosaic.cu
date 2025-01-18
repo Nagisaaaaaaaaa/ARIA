@@ -589,7 +589,10 @@ struct TestVec3 {
 
 template <>
 struct Mosaic<float, float> {
-  float operator()(float v) const { return v; }
+  float operator()(float v) const {
+    ARIA_ASSERT(!std::isnan(v));
+    return v;
+  }
 };
 
 template <>
