@@ -113,15 +113,9 @@ TEST(Auto, Thrust) {
   }
 
   {
-    float storage = 0;
-    thrust::device_reference<float> storageRef{thrust::device_reference<float>::pointer{&storage}};
-    auto v = Auto(storageRef);
-    static_assert(std::is_same_v<decltype(v), float>);
-  }
-
-  {
-    thrust::device_vector<float> storage;
+    thrust::device_vector<float> storage{3.14F};
     static_assert(std::is_same_v<decltype(Auto(storage[0])), float>);
+    EXPECT_FLOAT_EQ(Auto(storage[0]), 3.14F);
   }
 }
 
