@@ -1,4 +1,5 @@
 #include "ARIA/Layout.h"
+#include "ARIA/Let.h"
 
 #include <gtest/gtest.h>
 
@@ -306,8 +307,8 @@ TEST(Layout, Operators) {
   {
     Coord2 a = cute::aria::layout::detail::FillCoords<int, int>(233);
     Coord3 b = cute::aria::layout::detail::FillCoords<int, int, int>(233);
-    constexpr auto c = cute::aria::layout::detail::FillCoords<C<233>, C<233>>(C<233>{});
-    constexpr auto d = cute::aria::layout::detail::FillCoords<C<233>, C<233>, C<233>>(C<233>{});
+    constexpr let c = cute::aria::layout::detail::FillCoords<C<233>, C<233>>(C<233>{});
+    constexpr let d = cute::aria::layout::detail::FillCoords<C<233>, C<233>, C<233>>(C<233>{});
     expectCoord2(a, 233, 233);
     expectCoord3(b, 233, 233, 233);
     static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_coord(233_I, 233_I))>>);
@@ -326,11 +327,11 @@ TEST(Layout, Operators) {
   }
 
   {
-    constexpr auto a = make_coord(2_I, 7_I);
-    constexpr auto b = make_coord(5_I, 11_I);
-    constexpr auto c = a + b;
-    constexpr auto d = a - b;
-    constexpr auto e = a * b;
+    constexpr let a = make_coord(2_I, 7_I);
+    constexpr let b = make_coord(5_I, 11_I);
+    constexpr let c = a + b;
+    constexpr let d = a - b;
+    constexpr let e = a * b;
     static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_coord(7_I, 18_I))>>);
     static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(make_coord(-3_I, -4_I))>>);
     static_assert(std::is_same_v<decltype(e), std::add_const_t<decltype(make_coord(10_I, 77_I))>>);
@@ -354,14 +355,14 @@ TEST(Layout, Operators) {
   }
 
   {
-    constexpr auto a = make_coord(2_I, 7_I);
-    constexpr auto b = 5_I;
-    constexpr auto c0 = a + b;
-    constexpr auto c1 = a - b;
-    constexpr auto c2 = a * b;
-    constexpr auto c3 = b + a;
-    constexpr auto c4 = b - a;
-    constexpr auto c5 = b * a;
+    constexpr let a = make_coord(2_I, 7_I);
+    constexpr let b = 5_I;
+    constexpr let c0 = a + b;
+    constexpr let c1 = a - b;
+    constexpr let c2 = a * b;
+    constexpr let c3 = b + a;
+    constexpr let c4 = b - a;
+    constexpr let c5 = b * a;
     static_assert(std::is_same_v<decltype(c0), std::add_const_t<decltype(make_coord(7_I, 12_I))>>);
     static_assert(std::is_same_v<decltype(c1), std::add_const_t<decltype(make_coord(-3_I, 2_I))>>);
     static_assert(std::is_same_v<decltype(c2), std::add_const_t<decltype(make_coord(10_I, 35_I))>>);
@@ -382,11 +383,11 @@ TEST(Layout, Operators) {
   }
 
   {
-    constexpr auto a = make_coord(2_I, 7_I, -5_I);
-    constexpr auto b = make_coord(5_I, 11_I, -4_I);
-    constexpr auto c = a + b;
-    constexpr auto d = a - b;
-    constexpr auto e = a * b;
+    constexpr let a = make_coord(2_I, 7_I, -5_I);
+    constexpr let b = make_coord(5_I, 11_I, -4_I);
+    constexpr let c = a + b;
+    constexpr let d = a - b;
+    constexpr let e = a * b;
     static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_coord(7_I, 18_I, -9_I))>>);
     static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(make_coord(-3_I, -4_I, -1_I))>>);
     static_assert(std::is_same_v<decltype(e), std::add_const_t<decltype(make_coord(10_I, 77_I, 20_I))>>);
@@ -410,14 +411,14 @@ TEST(Layout, Operators) {
   }
 
   {
-    constexpr auto a = make_coord(2_I, 7_I, -5_I);
-    constexpr auto b = 5_I;
-    constexpr auto c0 = a + b;
-    constexpr auto c1 = a - b;
-    constexpr auto c2 = a * b;
-    constexpr auto c3 = b + a;
-    constexpr auto c4 = b - a;
-    constexpr auto c5 = b * a;
+    constexpr let a = make_coord(2_I, 7_I, -5_I);
+    constexpr let b = 5_I;
+    constexpr let c0 = a + b;
+    constexpr let c1 = a - b;
+    constexpr let c2 = a * b;
+    constexpr let c3 = b + a;
+    constexpr let c4 = b - a;
+    constexpr let c5 = b * a;
     static_assert(std::is_same_v<decltype(c0), std::add_const_t<decltype(make_coord(7_I, 12_I, 0_I))>>);
     static_assert(std::is_same_v<decltype(c1), std::add_const_t<decltype(make_coord(-3_I, 2_I, -10_I))>>);
     static_assert(std::is_same_v<decltype(c2), std::add_const_t<decltype(make_coord(10_I, 35_I, -25_I))>>);
