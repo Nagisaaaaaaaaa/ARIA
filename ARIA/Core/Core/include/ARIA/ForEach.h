@@ -7,10 +7,10 @@
 /// ```cpp
 /// int n = 3;
 ///
-/// ForEach(n, ...);      // Runtime integral.
-/// ForEach(C<3>{}, ...); // Compile-time constant integral.
-/// ForEach<3>(...);      // Compile-time constant integral.
-/// ForEach<C<3>>(...);   // Compile-time constant integral.
+/// ForEach(n, ...);    // Runtime integral.
+/// ForEach(3_I, ...);  // Compile-time constant integral.
+/// ForEach<3>(...);    // Compile-time constant integral.
+/// ForEach<C<3>>(...); // Compile-time constant integral.
 /// ```
 ///
 /// For compile-time constant integrals,
@@ -61,7 +61,7 @@ ARIA_HOST_DEVICE constexpr void ForEach(const T &n, F &&f) {
 /// \brief For each compile-time constant integral `i` from 0 to `N`, calls `f(i)` or `f<i>()`.
 ///
 /// \example ```cpp
-/// ForEach(C<3>{}, [&](auto i) {
+/// ForEach(3_I, [&](auto i) {
 ///   static_assert(ConstantIntegral<decltype(i)>);
 ///
 ///   constexpr auto x = i;
@@ -69,9 +69,9 @@ ARIA_HOST_DEVICE constexpr void ForEach(const T &n, F &&f) {
 ///   ...
 /// });
 ///
-/// ForEach(C<3>{}, [&]<auto i> {
-///   ForEach(C<3>{}, [&]<auto j> {
-///     ForEach(C<3>{}, [&]<auto k> {
+/// ForEach(3_I, [&]<auto i> {
+///   ForEach(3_I, [&]<auto j> {
+///     ForEach(3_I, [&]<auto k> {
 ///       static_assert(std::is_same_v<decltype(i), int>);
 ///       static_assert(std::is_same_v<decltype(j), int>);
 ///       static_assert(std::is_same_v<decltype(k), int>);

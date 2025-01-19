@@ -46,7 +46,7 @@ TEST(ForEach, Base) {
     std::vector<int> one0;
     std::vector<std::array<int, 3>> three0;
 
-    ForEach(C<3>{}, [&](auto i) {
+    ForEach(3_I, [&](auto i) {
       static_assert(ConstantIntegral<decltype(i)>);
 
       constexpr auto x = i;
@@ -54,9 +54,9 @@ TEST(ForEach, Base) {
       one0.push_back(x);
     });
 
-    ForEach(C<3>{}, [&]<auto i>(C<i>) {
-      ForEach(C<3>{}, [&]<auto j>(C<j>) {
-        ForEach(C<3>{}, [&]<auto k>(C<k>) {
+    ForEach(3_I, [&]<auto i>(C<i>) {
+      ForEach(3_I, [&]<auto j>(C<j>) {
+        ForEach(3_I, [&]<auto k>(C<k>) {
           static_assert(std::is_same_v<decltype(i), int>);
           static_assert(std::is_same_v<decltype(j), int>);
           static_assert(std::is_same_v<decltype(k), int>);
@@ -78,9 +78,9 @@ TEST(ForEach, Base) {
   {
     std::vector<std::array<int, 3>> three0;
 
-    ForEach(C<3>{}, [&]<auto i> {
-      ForEach(C<3>{}, [&]<auto j> {
-        ForEach(C<3>{}, [&]<auto k> {
+    ForEach(3_I, [&]<auto i> {
+      ForEach(3_I, [&]<auto j> {
+        ForEach(3_I, [&]<auto k> {
           static_assert(std::is_same_v<decltype(i), int>);
           static_assert(std::is_same_v<decltype(j), int>);
           static_assert(std::is_same_v<decltype(k), int>);
