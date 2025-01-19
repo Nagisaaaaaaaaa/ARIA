@@ -294,14 +294,14 @@ TEST(Layout, Operators) {
   using Coord3 = Coord<int, int, int>;
 
   auto expectCoord2 = [](const Coord2 &coord, int x, int y) {
-    EXPECT_EQ(cute::get<0>(coord), x);
-    EXPECT_EQ(cute::get<1>(coord), y);
+    EXPECT_EQ(get<0>(coord), x);
+    EXPECT_EQ(get<1>(coord), y);
   };
 
   auto expectCoord3 = [](const Coord3 &coord, int x, int y, int z) {
-    EXPECT_EQ(cute::get<0>(coord), x);
-    EXPECT_EQ(cute::get<1>(coord), y);
-    EXPECT_EQ(cute::get<2>(coord), z);
+    EXPECT_EQ(get<0>(coord), x);
+    EXPECT_EQ(get<1>(coord), y);
+    EXPECT_EQ(get<2>(coord), z);
   };
 
   {
