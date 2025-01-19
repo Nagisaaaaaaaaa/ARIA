@@ -108,7 +108,7 @@ private:
 
   // Set default rank to a compile time constant.
   // If there already exist some layout, use the corresponding rank, else, use the dummy rank-1 layout.
-  using DefaultRank = C<TLayoutsFetchedDummyed::template Get<0>::rank>;
+  using DefaultRank = UInt<TLayoutsFetchedDummyed::template Get<0>::rank>;
 
   // If the type array is empty, add default rank to it.
   using ArgsRank0 = std::conditional_t<Args::size == 0, typename Args::template PushFront<DefaultRank>, Args>;
@@ -119,7 +119,7 @@ private:
                                        ArgsRank0>;
 
   // Parse rank from the type array and pop front.
-  using TRank = C<ArgsRank1::template Get<0>::value>;
+  using TRank = UInt<ArgsRank1::template Get<0>::value>;
   static_assert(TLayoutsFetched::size == 0 || std::is_same_v<TRank, DefaultRank>,
                 "Tensor vector is defined with inconsistent rank");
   using ArgsRankDone = ArgsRank1::template PopFront<>;
@@ -357,8 +357,8 @@ public:
 // Host + static.
 template <NonArrayType T, NonArrayType TStaticLayout>
   requires is_static_v<TStaticLayout>
-class TensorVectorReduced<T, TypeArray<cute::C<TStaticLayout::rank>, SpaceHost, TStaticLayout>>
-    : public TensorVectorMembers<T, cute::C<TStaticLayout::rank>, SpaceHost, TStaticLayout> {
+class TensorVectorReduced<T, TypeArray<UInt<TStaticLayout::rank>, SpaceHost, TStaticLayout>>
+    : public TensorVectorMembers<T, UInt<TStaticLayout::rank>, SpaceHost, TStaticLayout> {
 public:
   using Layout = TStaticLayout;
   using Tensor = cute::Tensor<cute::ArrayEngine<T, cosize_safe_v<TStaticLayout>>, TStaticLayout>;
@@ -392,8 +392,8 @@ private:
 // Host + dynamic.
 template <NonArrayType T, NonArrayType TDynLayout>
   requires(!is_static_v<TDynLayout>)
-class TensorVectorReduced<T, TypeArray<cute::C<TDynLayout::rank>, SpaceHost, TDynLayout>>
-    : public TensorVectorMembers<T, cute::C<TDynLayout::rank>, SpaceHost, TDynLayout> {
+class TensorVectorReduced<T, TypeArray<UInt<TDynLayout::rank>, SpaceHost, TDynLayout>>
+    : public TensorVectorMembers<T, UInt<TDynLayout::rank>, SpaceHost, TDynLayout> {
 public:
   using Layout = TDynLayout;
   using Tensor = std::decay_t<decltype(cute::make_tensor(std::declval<thrust::host_vector<T>>().data(),
@@ -429,8 +429,8 @@ private:
 // Device + static.
 template <NonArrayType T, NonArrayType TStaticLayout>
   requires is_static_v<TStaticLayout>
-class TensorVectorReduced<T, TypeArray<cute::C<TStaticLayout::rank>, SpaceDevice, TStaticLayout>>
-    : public TensorVectorMembers<T, cute::C<TStaticLayout::rank>, SpaceDevice, TStaticLayout> {
+class TensorVectorReduced<T, TypeArray<UInt<TStaticLayout::rank>, SpaceDevice, TStaticLayout>>
+    : public TensorVectorMembers<T, UInt<TStaticLayout::rank>, SpaceDevice, TStaticLayout> {
 public:
   using Layout = TStaticLayout;
   using Tensor = std::decay_t<decltype(cute::make_tensor(std::declval<thrust::device_vector<T>>().data(),
@@ -470,8 +470,8 @@ private:
 // Device + dynamic.
 template <NonArrayType T, NonArrayType TDynLayout>
   requires(!is_static_v<TDynLayout>)
-class TensorVectorReduced<T, TypeArray<cute::C<TDynLayout::rank>, SpaceDevice, TDynLayout>>
-    : public TensorVectorMembers<T, cute::C<TDynLayout::rank>, SpaceDevice, TDynLayout> {
+class TensorVectorReduced<T, TypeArray<UInt<TDynLayout::rank>, SpaceDevice, TDynLayout>>
+    : public TensorVectorMembers<T, UInt<TDynLayout::rank>, SpaceDevice, TDynLayout> {
 public:
   using Layout = TDynLayout;
   using Tensor = std::decay_t<decltype(cute::make_tensor(std::declval<thrust::device_vector<T>>().data(),

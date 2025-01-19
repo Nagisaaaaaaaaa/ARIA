@@ -141,6 +141,52 @@ TEST(TensorVector, DeviceDynamic) {
   static_assert(std::is_same_v<decltype(rawTensor), decltype(cute::make_tensor(tensor.data().get(), layout))>);
 }
 
+TEST(TensorVector, RankTypeDeduction) {
+  // 1D.
+  {
+    TensorVector<float, SpaceHost> tvH;
+    TensorVector<float, SpaceDevice> tvD;
+    static_assert(std::is_same_v<decltype(tvH), TensorVector<float, _1, SpaceHost>>);
+    static_assert(std::is_same_v<decltype(tvD), TensorVector<float, _1, SpaceDevice>>);
+    static_assert(std::is_same_v<decltype(tvH), TensorVector<float, Int<1>, SpaceHost>>);
+    static_assert(std::is_same_v<decltype(tvD), TensorVector<float, Int<1>, SpaceDevice>>);
+    static_assert(std::is_same_v<decltype(tvH), TensorVector<float, UInt<1>, SpaceHost>>);
+    static_assert(std::is_same_v<decltype(tvD), TensorVector<float, UInt<1>, SpaceDevice>>);
+    static_assert(std::is_same_v<decltype(tvH), TensorVector<float, std::integral_constant<int, 1>, SpaceHost>>);
+    static_assert(std::is_same_v<decltype(tvD), TensorVector<float, std::integral_constant<int, 1>, SpaceDevice>>);
+    static_assert(std::is_same_v<decltype(tvH), TensorVector<float, std::integral_constant<uint, 1>, SpaceHost>>);
+    static_assert(std::is_same_v<decltype(tvD), TensorVector<float, std::integral_constant<uint, 1>, SpaceDevice>>);
+  }
+
+  // 2D.
+  {
+    TensorVector<float, _2, SpaceHost> tvH;
+    TensorVector<float, _2, SpaceDevice> tvD;
+    static_assert(std::is_same_v<decltype(tvH), TensorVector<float, Int<2>, SpaceHost>>);
+    static_assert(std::is_same_v<decltype(tvD), TensorVector<float, Int<2>, SpaceDevice>>);
+    static_assert(std::is_same_v<decltype(tvH), TensorVector<float, UInt<2>, SpaceHost>>);
+    static_assert(std::is_same_v<decltype(tvD), TensorVector<float, UInt<2>, SpaceDevice>>);
+    static_assert(std::is_same_v<decltype(tvH), TensorVector<float, std::integral_constant<int, 2>, SpaceHost>>);
+    static_assert(std::is_same_v<decltype(tvD), TensorVector<float, std::integral_constant<int, 2>, SpaceDevice>>);
+    static_assert(std::is_same_v<decltype(tvH), TensorVector<float, std::integral_constant<uint, 2>, SpaceHost>>);
+    static_assert(std::is_same_v<decltype(tvD), TensorVector<float, std::integral_constant<uint, 2>, SpaceDevice>>);
+  }
+
+  // 3D.
+  {
+    TensorVector<float, _3, SpaceHost> tvH;
+    TensorVector<float, _3, SpaceDevice> tvD;
+    static_assert(std::is_same_v<decltype(tvH), TensorVector<float, Int<3>, SpaceHost>>);
+    static_assert(std::is_same_v<decltype(tvD), TensorVector<float, Int<3>, SpaceDevice>>);
+    static_assert(std::is_same_v<decltype(tvH), TensorVector<float, UInt<3>, SpaceHost>>);
+    static_assert(std::is_same_v<decltype(tvD), TensorVector<float, UInt<3>, SpaceDevice>>);
+    static_assert(std::is_same_v<decltype(tvH), TensorVector<float, std::integral_constant<int, 3>, SpaceHost>>);
+    static_assert(std::is_same_v<decltype(tvD), TensorVector<float, std::integral_constant<int, 3>, SpaceDevice>>);
+    static_assert(std::is_same_v<decltype(tvH), TensorVector<float, std::integral_constant<uint, 3>, SpaceHost>>);
+    static_assert(std::is_same_v<decltype(tvD), TensorVector<float, std::integral_constant<uint, 3>, SpaceDevice>>);
+  }
+}
+
 TEST(TensorVector, Major) {
   // 1D.
   {
