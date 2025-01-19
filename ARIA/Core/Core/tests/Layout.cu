@@ -315,6 +315,17 @@ TEST(Layout, Operators) {
   }
 
   {
+    constexpr auto a = make_coord(2_I, 7_I);
+    constexpr auto b = make_coord(5_I, 11_I);
+    constexpr auto c = a + b;
+    constexpr auto d = a - b;
+    constexpr auto e = a * b;
+    static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_coord(7_I, 18_I))>>);
+    static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(make_coord(-3_I, -4_I))>>);
+    static_assert(std::is_same_v<decltype(e), std::add_const_t<decltype(make_coord(10_I, 77_I))>>);
+  }
+
+  {
     Coord2 a{2, 7};
     int b = 5;
     Coord2 c0 = a + b;
@@ -340,6 +351,17 @@ TEST(Layout, Operators) {
     expectCoord3(c, 7, 18, -9);
     expectCoord3(d, -3, -4, -1);
     expectCoord3(e, 10, 77, 20);
+  }
+
+  {
+    constexpr auto a = make_coord(2_I, 7_I, -5_I);
+    constexpr auto b = make_coord(5_I, 11_I, -4_I);
+    constexpr auto c = a + b;
+    constexpr auto d = a - b;
+    constexpr auto e = a * b;
+    static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_coord(7_I, 18_I, -9_I))>>);
+    static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(make_coord(-3_I, -4_I, -1_I))>>);
+    static_assert(std::is_same_v<decltype(e), std::add_const_t<decltype(make_coord(10_I, 77_I, 20_I))>>);
   }
 
   {
