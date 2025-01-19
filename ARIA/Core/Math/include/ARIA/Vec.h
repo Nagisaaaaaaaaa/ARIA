@@ -93,7 +93,9 @@ using vec::detail::ToCoord;
 /// \brief Cast `Coord` to `Vec`.
 ///
 /// \example ```cpp
-/// Vec2i vec = ToVec(make_coord(5, 6));
+/// Vec2i vec0 = ToVec(make_coord(5, 6));
+/// Vec2i vec1 = ToVec(make_coord(5_I, 6));
+/// Vec2i vec2 = ToVec(make_coord(5_I, 6_I));
 /// ```
 using vec::detail::ToVec;
 
