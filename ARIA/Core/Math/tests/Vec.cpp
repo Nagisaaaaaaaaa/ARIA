@@ -73,24 +73,36 @@ TEST(Vec, Cast) {
 
   // To `Vec`.
   {
-    static_assert(std::is_same_v<decltype(ToVec(make_coord(5u))), Vec1u>);
-    Vec1u v = ToVec(make_coord(5u));
-    EXPECT_EQ(v.x(), 5);
+    static_assert(std::is_same_v<decltype(ToVec(make_coord(5U))), Vec1u>);
+    static_assert(std::is_same_v<decltype(ToVec(make_coord(C<5U>{}))), Vec1u>);
+    Vec1u v0 = ToVec(make_coord(5U));
+    Vec1u v1 = ToVec(make_coord(C<5U>{}));
+    EXPECT_EQ(v0.x(), 5);
+    EXPECT_EQ(v1.x(), 5);
   }
 
   {
     static_assert(std::is_same_v<decltype(ToVec(make_coord(5, 6))), Vec2i>);
-    Vec2i v = ToVec(make_coord(5, 6));
-    EXPECT_EQ(v.x(), 5);
-    EXPECT_EQ(v.y(), 6);
+    static_assert(std::is_same_v<decltype(ToVec(make_coord(5, C<6>{}))), Vec2i>);
+    Vec2i v0 = ToVec(make_coord(5, 6));
+    Vec2i v1 = ToVec(make_coord(5, C<6>{}));
+    EXPECT_EQ(v0.x(), 5);
+    EXPECT_EQ(v0.y(), 6);
+    EXPECT_EQ(v1.x(), 5);
+    EXPECT_EQ(v1.y(), 6);
   }
 
   {
     static_assert(std::is_same_v<decltype(ToVec(make_coord(size_t{5}, size_t{6}, size_t{30}))), Vec3<size_t>>);
-    Vec3<size_t> v = ToVec(make_coord(size_t{5}, size_t{6}, size_t{30}));
-    EXPECT_EQ(v.x(), 5);
-    EXPECT_EQ(v.y(), 6);
-    EXPECT_EQ(v.z(), 30);
+    static_assert(std::is_same_v<decltype(ToVec(make_coord(size_t{5}, C<size_t{6}>{}, size_t{30}))), Vec3<size_t>>);
+    Vec3<size_t> v0 = ToVec(make_coord(size_t{5}, size_t{6}, size_t{30}));
+    Vec3<size_t> v1 = ToVec(make_coord(size_t{5}, C<size_t{6}>{}, size_t{30}));
+    EXPECT_EQ(v0.x(), 5);
+    EXPECT_EQ(v0.y(), 6);
+    EXPECT_EQ(v0.z(), 30);
+    EXPECT_EQ(v1.x(), 5);
+    EXPECT_EQ(v1.y(), 6);
+    EXPECT_EQ(v1.z(), 30);
   }
 }
 
