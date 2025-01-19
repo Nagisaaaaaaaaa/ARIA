@@ -612,7 +612,7 @@ TEST(Layout, OperatorsFloat) {
 
   {
     let a = make_coord(C<2.1F>{}, 7.2F);
-    let b = make_coord(C<5.3F>{}, 11.4F);
+    let b = make_coord(C<5.3F>{}, C<11.4F>{});
     let c = a + b;
     let d = a - b;
     let e = a * b;
@@ -696,11 +696,11 @@ TEST(Layout, OperatorsFloat) {
   }
 
   {
-    constexpr let a = make_coord(C<2.1F>{}, 7.2F, C<-5.5F>{});
-    constexpr let b = make_coord(C<5.3F>{}, C<11.4F>{}, C<-4.5F>{});
-    constexpr let c = a + b;
-    constexpr let d = a - b;
-    constexpr let e = a * b;
+    let a = make_coord(C<2.1F>{}, 7.2F, C<-5.5F>{});
+    let b = make_coord(C<5.3F>{}, C<11.4F>{}, C<-4.5F>{});
+    let c = a + b;
+    let d = a - b;
+    let e = a * b;
     expectCoord3(c, 7.4F, 18.6F, -10.0F);
     expectCoord3(d, -3.2F, -4.2F, -1.0F);
     expectCoord3(e, 11.13F, 82.08F, 24.75F);
