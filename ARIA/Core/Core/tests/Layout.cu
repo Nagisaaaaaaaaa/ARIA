@@ -307,6 +307,7 @@ TEST(Layout, Is) {
 }
 
 TEST(Layout, Cast) {
+  // To `std::array`.
   {
     static_assert(ToArray(make_coord(0)) == std::array{0});
     static_assert(ToArray(make_coord(0_I)) == std::array{0});
