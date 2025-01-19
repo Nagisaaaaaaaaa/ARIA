@@ -87,12 +87,15 @@ template <typename T, auto n>
 // Cast `Coord` to `Vec`.
 template <typename T, typename... Ts>
 [[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToVec(const Coord<T, Ts...> &coord) {
-  static_assert((std::is_same_v<T, Ts> && ...), "Element types of `Coord` should be the same");
-  constexpr auto n = sizeof...(Ts) + 1;
+  using value_type = layout::detail::arithmetic_type_v<T>;
+  static_assert((std::is_same_v<value_type, layout::detail::arithmetic_type_v<Ts>> && ...),
+                "Element types of `Coord` should be \"as similar as possible\"");
 
-  Vec<T, n> vec;
-  ForEach<n>([&]<auto i>() { vec[i] = get<i>(coord); });
-  return vec;
+  constexpr uint rank = rank_v<Coord<T, Ts...>>;
+
+  Vec<value_type, rank> res;
+  ForEach<rank>([&]<auto i>() { res[i] = get<i>(coord); });
+  return res;
 }
 
 } // namespace vec::detail
