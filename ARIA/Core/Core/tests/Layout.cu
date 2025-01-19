@@ -304,6 +304,17 @@ TEST(Layout, Operators) {
   };
 
   {
+    Coord2 a = cute::aria::layout::detail::FillCoords<int, int>(233);
+    Coord3 b = cute::aria::layout::detail::FillCoords<int, int, int>(233);
+    constexpr auto c = cute::aria::layout::detail::FillCoords<C<233>, C<233>>(C<233>{});
+    constexpr auto d = cute::aria::layout::detail::FillCoords<C<233>, C<233>, C<233>>(C<233>{});
+    expectCoord2(a, 233, 233);
+    expectCoord3(b, 233, 233, 233);
+    static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_coord(233_I, 233_I))>>);
+    static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(make_coord(233_I, 233_I, 233_I))>>);
+  }
+
+  {
     Coord2 a{2, 7};
     Coord2 b{5, 11};
     Coord2 c = a + b;
