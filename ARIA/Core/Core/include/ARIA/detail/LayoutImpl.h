@@ -4,6 +4,8 @@
 
 #include <cute/layout.hpp>
 
+#include <array>
+
 namespace ARIA {
 
 namespace layout::detail {
@@ -168,7 +170,7 @@ struct cosize_safe_impl<TLayout> {
 
 //! The compile-time cosize can be safely fetched from `cosize_unsafe_v` only when:
 //! 1. `size_v` exists.
-//! 2. `size_v > 0`
+//! 2. `size_v > 0`.
 //! 3. `cosize_unsafe_v` exists.
 template <LayoutType TLayout>
   requires(is_layout_const_size_v<TLayout> && size_v<TLayout> > 0 && is_layout_const_cosize_unsafe_v<TLayout>)
@@ -190,7 +192,7 @@ ARIA_HOST_DEVICE constexpr auto cosize_safe(const TLayout &layout) {
     else // Const and non-zero size.
       return cosize_unsafe(layout);
   } else {                 // Non-const size.
-    if (size(layout) == 0) // Non-const and zero size
+    if (size(layout) == 0) // Non-const and zero size.
       return 0;
     else // Non-const and non-zero size.
       return cosize_unsafe(layout);
@@ -234,6 +236,53 @@ constexpr bool is_co_layout_v = size_v<TLayout> == cosize_safe_v<TLayout>;
 
 template <typename TLayout>
 concept CoLayout = is_co_layout_v<TLayout>;
+
+//
+//
+//
+//
+//
+// Get the underlying arithmetic type.
+// Examples:
+//   int         -> int
+//   const int   -> int
+//   const int&  -> int
+//   C<1>        -> int
+//   const C<1>  -> int
+//   const C<1>& -> int
+template <typename T>
+struct arithmetic_type;
+
+template <typename T>
+  requires(!ConstantArithmetic<std::decay_t<T>> && std::is_arithmetic_v<std::decay_t<T>>)
+struct arithmetic_type<T> {
+  using type = std::decay_t<T>;
+};
+
+template <typename T>
+  requires(ConstantArithmetic<std::decay_t<T>>)
+struct arithmetic_type<T> {
+  using type = std::decay_t<decltype(std::decay_t<T>::value)>;
+};
+
+template <typename T>
+using arithmetic_type_v = typename arithmetic_type<T>::type;
+
+//
+//
+//
+template <typename T, typename... Ts>
+[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToArray(const Coord<T, Ts...> &coord) {
+  using value_type = arithmetic_type_v<T>;
+  static_assert((std::is_same_v<value_type, arithmetic_type_v<Ts>> && ...),
+                "Element types of `Coord` should be \"as similar as possible\"");
+
+  constexpr uint rank = rank_v<Coord<T, Ts...>>;
+
+  std::array<value_type, rank> res;
+  ForEach<rank>([&]<auto i>() { res[i] = get<i>(coord); });
+  return res;
+}
 
 } // namespace layout::detail
 
