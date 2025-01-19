@@ -338,6 +338,20 @@ TEST(Layout, Operators) {
   }
 
   {
+    let a = make_coord(2_I, 7);
+    let b = make_coord(5_I, 11_I);
+    let c = a + b;
+    let d = a - b;
+    let e = a * b;
+    static_assert(std::is_same_v<decltype(c), decltype(make_coord(7_I, 18))>);
+    static_assert(std::is_same_v<decltype(d), decltype(make_coord(-3_I, -4))>);
+    static_assert(std::is_same_v<decltype(e), decltype(make_coord(10_I, 77))>);
+    EXPECT_EQ(get<1>(c), 18);
+    EXPECT_EQ(get<1>(d), -4);
+    EXPECT_EQ(get<1>(e), 77);
+  }
+
+  {
     Coord2 a{2, 7};
     int b = 5;
     Coord2 c0 = a + b;
@@ -372,6 +386,29 @@ TEST(Layout, Operators) {
   }
 
   {
+    constexpr let a = make_coord(2_I, 7);
+    constexpr let b = 5_I;
+    constexpr let c0 = a + b;
+    constexpr let c1 = a - b;
+    constexpr let c2 = a * b;
+    constexpr let c3 = b + a;
+    constexpr let c4 = b - a;
+    constexpr let c5 = b * a;
+    static_assert(std::is_same_v<decltype(c0), std::add_const_t<decltype(make_coord(7_I, 12))>>);
+    static_assert(std::is_same_v<decltype(c1), std::add_const_t<decltype(make_coord(-3_I, 2))>>);
+    static_assert(std::is_same_v<decltype(c2), std::add_const_t<decltype(make_coord(10_I, 35))>>);
+    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(make_coord(7_I, 12))>>);
+    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(make_coord(3_I, -2))>>);
+    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(make_coord(10_I, 35))>>);
+    EXPECT_EQ(get<1>(c0), 12);
+    EXPECT_EQ(get<1>(c1), 2);
+    EXPECT_EQ(get<1>(c2), 35);
+    EXPECT_EQ(get<1>(c3), 12);
+    EXPECT_EQ(get<1>(c4), -2);
+    EXPECT_EQ(get<1>(c5), 35);
+  }
+
+  {
     Coord3 a{2, 7, -5};
     Coord3 b{5, 11, -4};
     Coord3 c = a + b;
@@ -391,6 +428,20 @@ TEST(Layout, Operators) {
     static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_coord(7_I, 18_I, -9_I))>>);
     static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(make_coord(-3_I, -4_I, -1_I))>>);
     static_assert(std::is_same_v<decltype(e), std::add_const_t<decltype(make_coord(10_I, 77_I, 20_I))>>);
+  }
+
+  {
+    constexpr let a = make_coord(2_I, 7, -5_I);
+    constexpr let b = make_coord(5_I, 11_I, -4_I);
+    constexpr let c = a + b;
+    constexpr let d = a - b;
+    constexpr let e = a * b;
+    static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_coord(7_I, 18, -9_I))>>);
+    static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(make_coord(-3_I, -4, -1_I))>>);
+    static_assert(std::is_same_v<decltype(e), std::add_const_t<decltype(make_coord(10_I, 77, 20_I))>>);
+    EXPECT_EQ(get<1>(c), 18);
+    EXPECT_EQ(get<1>(d), -4);
+    EXPECT_EQ(get<1>(e), 77);
   }
 
   {
@@ -425,6 +476,29 @@ TEST(Layout, Operators) {
     static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(make_coord(7_I, 12_I, 0_I))>>);
     static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(make_coord(3_I, -2_I, 10_I))>>);
     static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(make_coord(10_I, 35_I, -25_I))>>);
+  }
+
+  {
+    constexpr let a = make_coord(2_I, 7, -5_I);
+    constexpr let b = 5_I;
+    constexpr let c0 = a + b;
+    constexpr let c1 = a - b;
+    constexpr let c2 = a * b;
+    constexpr let c3 = b + a;
+    constexpr let c4 = b - a;
+    constexpr let c5 = b * a;
+    static_assert(std::is_same_v<decltype(c0), std::add_const_t<decltype(make_coord(7_I, 12, 0_I))>>);
+    static_assert(std::is_same_v<decltype(c1), std::add_const_t<decltype(make_coord(-3_I, 2, -10_I))>>);
+    static_assert(std::is_same_v<decltype(c2), std::add_const_t<decltype(make_coord(10_I, 35, -25_I))>>);
+    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(make_coord(7_I, 12, 0_I))>>);
+    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(make_coord(3_I, -2, 10_I))>>);
+    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(make_coord(10_I, 35, -25_I))>>);
+    EXPECT_EQ(get<1>(c0), 12);
+    EXPECT_EQ(get<1>(c1), 2);
+    EXPECT_EQ(get<1>(c2), 35);
+    EXPECT_EQ(get<1>(c3), 12);
+    EXPECT_EQ(get<1>(c4), -2);
+    EXPECT_EQ(get<1>(c5), 35);
   }
 }
 
