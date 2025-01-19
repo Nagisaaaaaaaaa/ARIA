@@ -271,6 +271,7 @@ using arithmetic_type_v = typename arithmetic_type<T>::type;
 //
 //
 //
+// Cast `Coord` to `std::array`.
 template <typename T, typename... Ts>
 [[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToArray(const Coord<T, Ts...> &coord) {
   using value_type = arithmetic_type_v<T>;
