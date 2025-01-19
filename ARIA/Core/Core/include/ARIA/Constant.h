@@ -85,6 +85,7 @@ consteval auto make_integral_udl() {
 /// \example ```cpp
 /// auto one = 1_I;
 /// static_assert(std::is_same_v<decltype(one), C<1>>);
+/// static_assert(std::is_same_v<decltype(one), Int<1>>);
 /// static_assert(one == 1_I);
 /// static_assert(one == 1_U);
 /// ```
@@ -99,6 +100,7 @@ consteval auto operator""_I() {
 /// \example ```cpp
 /// auto one = 1_U;
 /// static_assert(std::is_same_v<decltype(one), C<1U>>);
+/// static_assert(std::is_same_v<decltype(one), UInt<1>>);
 /// static_assert(one == 1_I);
 /// static_assert(one == 1_U);
 /// ```
