@@ -26,14 +26,6 @@ namespace ARIA {
 /// similar to `std::integral_constants` but support floating point types.
 ///
 /// \example ```cpp
-/// template <int v>
-/// using Int = C<v>;
-/// using _0 = C<0>;
-/// using _1 = Int<1>;
-///
-/// C<0> i0 = 0_I;
-/// C<1U> u1 = 1_U;
-///
 /// C<1> a{};
 /// C<3> b = a + C<2>{};
 /// C<2> c = b - 1_I;
@@ -44,15 +36,35 @@ using C = cute::C<T>;
 //
 //
 //
+/// \brief A wrapper class for compile-time signed `int`.
+///
+/// \example ```cpp
+/// Int<1> a{};
+/// Int<3> b = a + Int<2>{};
+/// Int<2> c = b - 1_I;
+/// ```
+template <int v>
+using Int = C<v>;
+
+//
+//
+//
+/// \brief A wrapper class for compile-time `unsigned int`.
+///
+/// \example ```cpp
+/// UInt<1> a{};
+/// UInt<3> b = a + UInt<2>{};
+/// UInt<2> c = b - 1_U;
+/// ```
+template <uint v>
+using UInt = C<v>;
+
+//
+//
+//
 //
 //
 namespace constant::detail {
-
-template <int v>
-using CInt = C<v>;
-
-template <uint v>
-using CUInt = C<v>;
 
 template <typename T, char... cs>
 consteval auto make_integral_udl() {
@@ -79,7 +91,7 @@ consteval auto make_integral_udl() {
 template <char... cs>
 consteval auto operator""_I() {
   constexpr auto value = constant::detail::make_integral_udl<int, cs...>();
-  return constant::detail::CInt<value>{};
+  return Int<value>{};
 }
 
 /// \brief UDL for constant unsigned integers.
@@ -93,7 +105,7 @@ consteval auto operator""_I() {
 template <char... cs>
 consteval auto operator""_U() {
   constexpr auto value = constant::detail::make_integral_udl<uint, cs...>();
-  return constant::detail::CUInt<value>{};
+  return UInt<value>{};
 }
 
 //
