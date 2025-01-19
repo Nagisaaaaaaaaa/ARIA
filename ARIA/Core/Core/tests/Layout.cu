@@ -14,6 +14,23 @@ using cute::_3;
 using cute::_4;
 
 TEST(Layout, Base) {
+  // Make coord.
+  static_assert(rank(make_coord()) == 0);
+  static_assert(rank(make_coord(0)) == 1);
+  static_assert(rank(make_coord(_0{})) == 1);
+  static_assert(rank(make_coord(0, 1)) == 2);
+  static_assert(rank(make_coord(_0{}, 1)) == 2);
+  static_assert(rank(make_coord(0, _1{})) == 2);
+  static_assert(rank(make_coord(_0{}, _1{})) == 2);
+
+  static_assert(is_static_v<decltype(make_coord())>);
+  static_assert(!is_static_v<decltype(make_coord(0))>);
+  static_assert(is_static_v<decltype(make_coord(_0{}))>);
+  static_assert(!is_static_v<decltype(make_coord(0, 1))>);
+  static_assert(!is_static_v<decltype(make_coord(_0{}, 1))>);
+  static_assert(!is_static_v<decltype(make_coord(0, _1{}))>);
+  static_assert(is_static_v<decltype(make_coord(_0{}, _1{}))>);
+
   // Make shape.
   static_assert(is_static_v<decltype(make_shape(_2{}, make_shape(_2{}, _2{})))>);
   static_assert(!is_static_v<decltype(make_shape(2, make_shape(_2{}, _2{})))>);
@@ -289,19 +306,58 @@ TEST(Layout, Is) {
   EXPECT_FALSE(is_co_layout(make_layout(make_shape(2, make_shape(2, 2)), make_stride(4, make_stride(2, 2)))));
 }
 
-TEST(Layout, Operators) {
+TEST(Layout, Cast) {
+  // To `std::array`.
+  {
+    static_assert(ToArray(make_coord(0)) == std::array{0});
+    static_assert(ToArray(make_coord(0_I)) == std::array{0});
+
+    static_assert(ToArray(make_coord(0U)) == std::array{0U});
+    static_assert(ToArray(make_coord(0_U)) == std::array{0U});
+
+    static_assert(ToArray(make_coord(0, 1)) == std::array{0, 1});
+    static_assert(ToArray(make_coord(0_I, 1)) == std::array{0, 1});
+    static_assert(ToArray(make_coord(0, 1_I)) == std::array{0, 1});
+    static_assert(ToArray(make_coord(0_I, 1_I)) == std::array{0, 1});
+
+    static_assert(ToArray(make_coord(0U, 1U)) == std::array{0U, 1U});
+    static_assert(ToArray(make_coord(0_U, 1U)) == std::array{0U, 1U});
+    static_assert(ToArray(make_coord(0U, 1_U)) == std::array{0U, 1U});
+    static_assert(ToArray(make_coord(0_U, 1_U)) == std::array{0U, 1U});
+
+    static_assert(ToArray(make_coord(0, 1, 2)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_coord(0_I, 1, 2)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_coord(0, 1_I, 2)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_coord(0_I, 1_I, 2)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_coord(0, 1, 2_I)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_coord(0_I, 1, 2_I)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_coord(0, 1_I, 2_I)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_coord(0_I, 1_I, 2_I)) == std::array{0, 1, 2});
+
+    static_assert(ToArray(make_coord(0U, 1U, 2U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_coord(0_U, 1U, 2U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_coord(0U, 1_U, 2U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_coord(0_U, 1_U, 2U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_coord(0U, 1U, 2_U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_coord(0_U, 1U, 2_U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_coord(0U, 1_U, 2_U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_coord(0_U, 1_U, 2_U)) == std::array{0U, 1U, 2U});
+  }
+}
+
+TEST(Layout, OperatorsInt) {
   using Coord2 = Coord<int, int>;
   using Coord3 = Coord<int, int, int>;
 
   auto expectCoord2 = [](const Coord2 &coord, int x, int y) {
-    EXPECT_EQ(cute::get<0>(coord), x);
-    EXPECT_EQ(cute::get<1>(coord), y);
+    EXPECT_EQ(get<0>(coord), x);
+    EXPECT_EQ(get<1>(coord), y);
   };
 
   auto expectCoord3 = [](const Coord3 &coord, int x, int y, int z) {
-    EXPECT_EQ(cute::get<0>(coord), x);
-    EXPECT_EQ(cute::get<1>(coord), y);
-    EXPECT_EQ(cute::get<2>(coord), z);
+    EXPECT_EQ(get<0>(coord), x);
+    EXPECT_EQ(get<1>(coord), y);
+    EXPECT_EQ(get<2>(coord), z);
   };
 
   {
@@ -315,6 +371,7 @@ TEST(Layout, Operators) {
     static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(make_coord(233_I, 233_I, 233_I))>>);
   }
 
+  // 2D.
   {
     Coord2 a{2, 7};
     Coord2 b{5, 11};
@@ -408,6 +465,7 @@ TEST(Layout, Operators) {
     EXPECT_EQ(get<1>(c5), 35);
   }
 
+  // 3D.
   {
     Coord3 a{2, 7, -5};
     Coord3 b{5, 11, -4};
@@ -431,14 +489,14 @@ TEST(Layout, Operators) {
   }
 
   {
-    constexpr let a = make_coord(2_I, 7, -5_I);
-    constexpr let b = make_coord(5_I, 11_I, -4_I);
-    constexpr let c = a + b;
-    constexpr let d = a - b;
-    constexpr let e = a * b;
-    static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_coord(7_I, 18, -9_I))>>);
-    static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(make_coord(-3_I, -4, -1_I))>>);
-    static_assert(std::is_same_v<decltype(e), std::add_const_t<decltype(make_coord(10_I, 77, 20_I))>>);
+    let a = make_coord(2_I, 7, -5_I);
+    let b = make_coord(5_I, 11_I, -4_I);
+    let c = a + b;
+    let d = a - b;
+    let e = a * b;
+    static_assert(std::is_same_v<decltype(c), decltype(make_coord(7_I, 18, -9_I))>);
+    static_assert(std::is_same_v<decltype(d), decltype(make_coord(-3_I, -4, -1_I))>);
+    static_assert(std::is_same_v<decltype(e), decltype(make_coord(10_I, 77, 20_I))>);
     EXPECT_EQ(get<1>(c), 18);
     EXPECT_EQ(get<1>(d), -4);
     EXPECT_EQ(get<1>(e), 77);
@@ -499,6 +557,204 @@ TEST(Layout, Operators) {
     EXPECT_EQ(get<1>(c3), 12);
     EXPECT_EQ(get<1>(c4), -2);
     EXPECT_EQ(get<1>(c5), 35);
+  }
+}
+
+TEST(Layout, OperatorsFloat) {
+  using Coord2 = Coord<float, float>;
+  using Coord3 = Coord<float, float, float>;
+
+  auto expectCoord2 = [](const Coord2 &coord, float x, float y) {
+    EXPECT_FLOAT_EQ(get<0>(coord), x);
+    EXPECT_FLOAT_EQ(get<1>(coord), y);
+  };
+
+  auto expectCoord3 = [](const Coord3 &coord, float x, float y, float z) {
+    EXPECT_FLOAT_EQ(get<0>(coord), x);
+    EXPECT_FLOAT_EQ(get<1>(coord), y);
+    EXPECT_FLOAT_EQ(get<2>(coord), z);
+  };
+
+  {
+    Coord2 a = cute::aria::layout::detail::FillCoords<float, float>(233.3F);
+    Coord3 b = cute::aria::layout::detail::FillCoords<float, float, float>(233.3F);
+    constexpr let c = cute::aria::layout::detail::FillCoords<C<233.3F>, C<233.3F>>(C<233.3F>{});
+    constexpr let d = cute::aria::layout::detail::FillCoords<C<233.3F>, C<233.3F>, C<233.3F>>(C<233.3F>{});
+    expectCoord2(a, 233.3F, 233.3F);
+    expectCoord3(b, 233.3F, 233.3F, 233.3F);
+    static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_coord(C<233.3F>{}, C<233.3F>{}))>>);
+    static_assert(
+        std::is_same_v<decltype(d), std::add_const_t<decltype(make_coord(C<233.3F>{}, C<233.3F>{}, C<233.3F>{}))>>);
+  }
+
+  // 2D.
+  {
+    Coord2 a{2.1F, 7.2F};
+    Coord2 b{5.3F, 11.4F};
+    Coord2 c = a + b;
+    Coord2 d = a - b;
+    Coord2 e = a * b;
+    expectCoord2(c, 7.4F, 18.6F);
+    expectCoord2(d, -3.2F, -4.2F);
+    expectCoord2(e, 11.13F, 82.08F);
+  }
+
+  {
+    constexpr let a = make_coord(C<2.1F>{}, C<7.2F>{});
+    constexpr let b = make_coord(C<5.3F>{}, C<11.4F>{});
+    constexpr let c = a + b;
+    constexpr let d = a - b;
+    constexpr let e = a * b;
+    expectCoord2(c, 7.4F, 18.6F);
+    expectCoord2(d, -3.2F, -4.2F);
+    expectCoord2(e, 11.13F, 82.08F);
+  }
+
+  {
+    let a = make_coord(C<2.1F>{}, 7.2F);
+    let b = make_coord(C<5.3F>{}, C<11.4F>{});
+    let c = a + b;
+    let d = a - b;
+    let e = a * b;
+    expectCoord2(c, 7.4F, 18.6F);
+    expectCoord2(d, -3.2F, -4.2F);
+    expectCoord2(e, 11.13F, 82.08F);
+  }
+
+  {
+    Coord2 a{2.1F, 7.2F};
+    float b = 5.3F;
+    Coord2 c0 = a + b;
+    Coord2 c1 = a - b;
+    Coord2 c2 = a * b;
+    Coord2 c3 = b + a;
+    Coord2 c4 = b - a;
+    Coord2 c5 = b * a;
+    expectCoord2(c0, 7.4F, 12.5F);
+    expectCoord2(c1, -3.2F, 1.9F);
+    expectCoord2(c2, 11.13F, 38.16F);
+    expectCoord2(c3, 7.4F, 12.5F);
+    expectCoord2(c4, 3.2F, -1.9F);
+    expectCoord2(c5, 11.13F, 38.16F);
+  }
+
+  {
+    constexpr let a = make_coord(C<2.1F>{}, C<7.2F>{});
+    constexpr let b = C<5.3F>{};
+    constexpr let c0 = a + b;
+    constexpr let c1 = a - b;
+    constexpr let c2 = a * b;
+    constexpr let c3 = b + a;
+    constexpr let c4 = b - a;
+    constexpr let c5 = b * a;
+    expectCoord2(c0, 7.4F, 12.5F);
+    expectCoord2(c1, -3.2F, 1.9F);
+    expectCoord2(c2, 11.13F, 38.16F);
+    expectCoord2(c3, 7.4F, 12.5F);
+    expectCoord2(c4, 3.2F, -1.9F);
+    expectCoord2(c5, 11.13F, 38.16F);
+  }
+
+  {
+    constexpr let a = make_coord(C<2.1F>{}, 7.2F);
+    constexpr let b = C<5.3F>{};
+    constexpr let c0 = a + b;
+    constexpr let c1 = a - b;
+    constexpr let c2 = a * b;
+    constexpr let c3 = b + a;
+    constexpr let c4 = b - a;
+    constexpr let c5 = b * a;
+    expectCoord2(c0, 7.4F, 12.5F);
+    expectCoord2(c1, -3.2F, 1.9F);
+    expectCoord2(c2, 11.13F, 38.16F);
+    expectCoord2(c3, 7.4F, 12.5F);
+    expectCoord2(c4, 3.2F, -1.9F);
+    expectCoord2(c5, 11.13F, 38.16F);
+  }
+
+  // 3D.
+  {
+    Coord3 a{2.1F, 7.2F, -5.5F};
+    Coord3 b{5.3F, 11.4F, -4.5F};
+    Coord3 c = a + b;
+    Coord3 d = a - b;
+    Coord3 e = a * b;
+    expectCoord3(c, 7.4F, 18.6F, -10.0F);
+    expectCoord3(d, -3.2F, -4.2F, -1.0F);
+    expectCoord3(e, 11.13F, 82.08F, 24.75F);
+  }
+
+  {
+    constexpr let a = make_coord(C<2.1F>{}, C<7.2F>{}, C<-5.5F>{});
+    constexpr let b = make_coord(C<5.3F>{}, C<11.4F>{}, C<-4.5F>{});
+    constexpr let c = a + b;
+    constexpr let d = a - b;
+    constexpr let e = a * b;
+    expectCoord3(c, 7.4F, 18.6F, -10.0F);
+    expectCoord3(d, -3.2F, -4.2F, -1.0F);
+    expectCoord3(e, 11.13F, 82.08F, 24.75F);
+  }
+
+  {
+    let a = make_coord(C<2.1F>{}, 7.2F, C<-5.5F>{});
+    let b = make_coord(C<5.3F>{}, C<11.4F>{}, C<-4.5F>{});
+    let c = a + b;
+    let d = a - b;
+    let e = a * b;
+    expectCoord3(c, 7.4F, 18.6F, -10.0F);
+    expectCoord3(d, -3.2F, -4.2F, -1.0F);
+    expectCoord3(e, 11.13F, 82.08F, 24.75F);
+  }
+
+  {
+    Coord3 a{2.1F, 7.2F, -5.5F};
+    float b = 5.3F;
+    Coord3 c0 = a + b;
+    Coord3 c1 = a - b;
+    Coord3 c2 = a * b;
+    Coord3 c3 = b + a;
+    Coord3 c4 = b - a;
+    Coord3 c5 = b * a;
+    expectCoord3(c0, 7.4F, 12.5F, -5.5F + 5.3F);
+    expectCoord3(c1, -3.2F, 1.9F, -10.8F);
+    expectCoord3(c2, 11.13F, 38.16F, -29.15F);
+    expectCoord3(c3, 7.4F, 12.5F, -5.5F + 5.3F);
+    expectCoord3(c4, 3.2F, -1.9F, 10.8F);
+    expectCoord3(c5, 11.13F, 38.16F, -29.15F);
+  }
+
+  {
+    constexpr let a = make_coord(C<2.1F>{}, C<7.2F>{}, C<-5.5F>{});
+    constexpr let b = C<5.3F>{};
+    constexpr let c0 = a + b;
+    constexpr let c1 = a - b;
+    constexpr let c2 = a * b;
+    constexpr let c3 = b + a;
+    constexpr let c4 = b - a;
+    constexpr let c5 = b * a;
+    expectCoord3(c0, 7.4F, 12.5F, -5.5F + 5.3F);
+    expectCoord3(c1, -3.2F, 1.9F, -10.8F);
+    expectCoord3(c2, 11.13F, 38.16F, -29.15F);
+    expectCoord3(c3, 7.4F, 12.5F, -5.5F + 5.3F);
+    expectCoord3(c4, 3.2F, -1.9F, 10.8F);
+    expectCoord3(c5, 11.13F, 38.16F, -29.15F);
+  }
+
+  {
+    constexpr let a = make_coord(C<2.1F>{}, 7.2F, C<-5.5F>{});
+    constexpr let b = C<5.3F>{};
+    constexpr let c0 = a + b;
+    constexpr let c1 = a - b;
+    constexpr let c2 = a * b;
+    constexpr let c3 = b + a;
+    constexpr let c4 = b - a;
+    constexpr let c5 = b * a;
+    expectCoord3(c0, 7.4F, 12.5F, -5.5F + 5.3F);
+    expectCoord3(c1, -3.2F, 1.9F, -10.8F);
+    expectCoord3(c2, 11.13F, 38.16F, -29.15F);
+    expectCoord3(c3, 7.4F, 12.5F, -5.5F + 5.3F);
+    expectCoord3(c4, 3.2F, -1.9F, 10.8F);
+    expectCoord3(c5, 11.13F, 38.16F, -29.15F);
   }
 }
 
