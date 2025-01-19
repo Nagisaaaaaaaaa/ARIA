@@ -35,6 +35,12 @@
 
 namespace ARIA {
 
+using layout::detail::rank;
+
+using layout::detail::rank_t;
+
+using layout::detail::rank_v;
+
 using layout::detail::get;
 
 //

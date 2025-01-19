@@ -10,6 +10,10 @@ namespace layout::detail {
 
 // Fetch implementations from CuTe.
 
+using cute::rank;
+using cute::rank_t;
+using cute::rank_v;
+
 using cute::get;
 
 //
