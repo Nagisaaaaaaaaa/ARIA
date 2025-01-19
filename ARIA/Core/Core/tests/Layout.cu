@@ -354,6 +354,23 @@ TEST(Layout, Operators) {
   }
 
   {
+    constexpr auto a = make_coord(2_I, 7_I);
+    constexpr auto b = 5_I;
+    constexpr auto c0 = a + b;
+    constexpr auto c1 = a - b;
+    constexpr auto c2 = a * b;
+    constexpr auto c3 = b + a;
+    constexpr auto c4 = b - a;
+    constexpr auto c5 = b * a;
+    static_assert(std::is_same_v<decltype(c0), std::add_const_t<decltype(make_coord(7_I, 12_I))>>);
+    static_assert(std::is_same_v<decltype(c1), std::add_const_t<decltype(make_coord(-3_I, 2_I))>>);
+    static_assert(std::is_same_v<decltype(c2), std::add_const_t<decltype(make_coord(10_I, 35_I))>>);
+    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(make_coord(7_I, 12_I))>>);
+    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(make_coord(3_I, -2_I))>>);
+    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(make_coord(10_I, 35_I))>>);
+  }
+
+  {
     Coord3 a{2, 7, -5};
     Coord3 b{5, 11, -4};
     Coord3 c = a + b;
@@ -390,6 +407,23 @@ TEST(Layout, Operators) {
     expectCoord3(c3, 7, 12, 0);
     expectCoord3(c4, 3, -2, 10);
     expectCoord3(c5, 10, 35, -25);
+  }
+
+  {
+    constexpr auto a = make_coord(2_I, 7_I, -5_I);
+    constexpr auto b = 5_I;
+    constexpr auto c0 = a + b;
+    constexpr auto c1 = a - b;
+    constexpr auto c2 = a * b;
+    constexpr auto c3 = b + a;
+    constexpr auto c4 = b - a;
+    constexpr auto c5 = b * a;
+    static_assert(std::is_same_v<decltype(c0), std::add_const_t<decltype(make_coord(7_I, 12_I, 0_I))>>);
+    static_assert(std::is_same_v<decltype(c1), std::add_const_t<decltype(make_coord(-3_I, 2_I, -10_I))>>);
+    static_assert(std::is_same_v<decltype(c2), std::add_const_t<decltype(make_coord(10_I, 35_I, -25_I))>>);
+    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(make_coord(7_I, 12_I, 0_I))>>);
+    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(make_coord(3_I, -2_I, 10_I))>>);
+    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(make_coord(10_I, 35_I, -25_I))>>);
   }
 }
 
