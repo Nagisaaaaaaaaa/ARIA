@@ -14,7 +14,7 @@ using cute::_3;
 using cute::_4;
 
 TEST(Layout, Base) {
-  // Rank.
+  // Make coord.
   static_assert(rank(make_coord()) == 0);
   static_assert(rank(make_coord(0)) == 1);
   static_assert(rank(make_coord(_0{})) == 1);
@@ -22,6 +22,14 @@ TEST(Layout, Base) {
   static_assert(rank(make_coord(_0{}, 1)) == 2);
   static_assert(rank(make_coord(0, _1{})) == 2);
   static_assert(rank(make_coord(_0{}, _1{})) == 2);
+
+  static_assert(is_static_v<decltype(make_coord())>);
+  static_assert(!is_static_v<decltype(make_coord(0))>);
+  static_assert(is_static_v<decltype(make_coord(_0{}))>);
+  static_assert(!is_static_v<decltype(make_coord(0, 1))>);
+  static_assert(!is_static_v<decltype(make_coord(_0{}, 1))>);
+  static_assert(!is_static_v<decltype(make_coord(0, _1{}))>);
+  static_assert(is_static_v<decltype(make_coord(_0{}, _1{}))>);
 
   // Make shape.
   static_assert(is_static_v<decltype(make_shape(_2{}, make_shape(_2{}, _2{})))>);
