@@ -205,4 +205,18 @@ using layout::detail::is_co_layout_v;
 /// ```
 using layout::detail::CoLayout;
 
+//
+//
+//
+//
+//
+/// \brief Cast `Coord` to `std::array`.
+///
+/// \example ```cpp
+/// std::array<int, 2> array0 = ToArray(make_coord(5, 6));
+/// std::array<int, 2> array1 = ToArray(make_coord(5_I, 6));
+/// std::array<int, 2> array2 = ToArray(make_coord(5_I, 6_I));
+/// ```
+using layout::detail::ToArray;
+
 } // namespace ARIA

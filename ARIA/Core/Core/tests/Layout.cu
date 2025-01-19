@@ -298,6 +298,44 @@ TEST(Layout, Is) {
   EXPECT_FALSE(is_co_layout(make_layout(make_shape(2, make_shape(2, 2)), make_stride(4, make_stride(2, 2)))));
 }
 
+TEST(Layout, Cast) {
+  {
+    static_assert(ToArray(make_coord(0)) == std::array{0});
+    static_assert(ToArray(make_coord(0_I)) == std::array{0});
+
+    static_assert(ToArray(make_coord(0U)) == std::array{0U});
+    static_assert(ToArray(make_coord(0_U)) == std::array{0U});
+
+    static_assert(ToArray(make_coord(0, 1)) == std::array{0, 1});
+    static_assert(ToArray(make_coord(0_I, 1)) == std::array{0, 1});
+    static_assert(ToArray(make_coord(0, 1_I)) == std::array{0, 1});
+    static_assert(ToArray(make_coord(0_I, 1_I)) == std::array{0, 1});
+
+    static_assert(ToArray(make_coord(0U, 1U)) == std::array{0U, 1U});
+    static_assert(ToArray(make_coord(0_U, 1U)) == std::array{0U, 1U});
+    static_assert(ToArray(make_coord(0U, 1_U)) == std::array{0U, 1U});
+    static_assert(ToArray(make_coord(0_U, 1_U)) == std::array{0U, 1U});
+
+    static_assert(ToArray(make_coord(0, 1, 2)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_coord(0_I, 1, 2)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_coord(0, 1_I, 2)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_coord(0_I, 1_I, 2)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_coord(0, 1, 2_I)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_coord(0_I, 1, 2_I)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_coord(0, 1_I, 2_I)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_coord(0_I, 1_I, 2_I)) == std::array{0, 1, 2});
+
+    static_assert(ToArray(make_coord(0U, 1U, 2U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_coord(0_U, 1U, 2U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_coord(0U, 1_U, 2U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_coord(0_U, 1_U, 2U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_coord(0U, 1U, 2_U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_coord(0_U, 1U, 2_U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_coord(0U, 1_U, 2_U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_coord(0_U, 1_U, 2_U)) == std::array{0U, 1U, 2U});
+  }
+}
+
 TEST(Layout, Operators) {
   using Coord2 = Coord<int, int>;
   using Coord3 = Coord<int, int, int>;
