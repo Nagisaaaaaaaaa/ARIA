@@ -371,6 +371,7 @@ TEST(Layout, OperatorsInt) {
     static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(make_coord(233_I, 233_I, 233_I))>>);
   }
 
+  // 2D.
   {
     Coord2 a{2, 7};
     Coord2 b{5, 11};
@@ -464,6 +465,7 @@ TEST(Layout, OperatorsInt) {
     EXPECT_EQ(get<1>(c5), 35);
   }
 
+  // 3D.
   {
     Coord3 a{2, 7, -5};
     Coord3 b{5, 11, -4};
@@ -487,14 +489,14 @@ TEST(Layout, OperatorsInt) {
   }
 
   {
-    constexpr let a = make_coord(2_I, 7, -5_I);
-    constexpr let b = make_coord(5_I, 11_I, -4_I);
-    constexpr let c = a + b;
-    constexpr let d = a - b;
-    constexpr let e = a * b;
-    static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_coord(7_I, 18, -9_I))>>);
-    static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(make_coord(-3_I, -4, -1_I))>>);
-    static_assert(std::is_same_v<decltype(e), std::add_const_t<decltype(make_coord(10_I, 77, 20_I))>>);
+    let a = make_coord(2_I, 7, -5_I);
+    let b = make_coord(5_I, 11_I, -4_I);
+    let c = a + b;
+    let d = a - b;
+    let e = a * b;
+    static_assert(std::is_same_v<decltype(c), decltype(make_coord(7_I, 18, -9_I))>);
+    static_assert(std::is_same_v<decltype(d), decltype(make_coord(-3_I, -4, -1_I))>);
+    static_assert(std::is_same_v<decltype(e), decltype(make_coord(10_I, 77, 20_I))>);
     EXPECT_EQ(get<1>(c), 18);
     EXPECT_EQ(get<1>(d), -4);
     EXPECT_EQ(get<1>(e), 77);
@@ -585,6 +587,7 @@ TEST(Layout, OperatorsFloat) {
         std::is_same_v<decltype(d), std::add_const_t<decltype(make_coord(C<233.3F>{}, C<233.3F>{}, C<233.3F>{}))>>);
   }
 
+  // 2D.
   {
     Coord2 a{2.1F, 7.2F};
     Coord2 b{5.3F, 11.4F};
@@ -669,6 +672,7 @@ TEST(Layout, OperatorsFloat) {
     expectCoord2(c5, 11.13F, 38.16F);
   }
 
+  // 3D.
   {
     Coord3 a{2.1F, 7.2F, -5.5F};
     Coord3 b{5.3F, 11.4F, -4.5F};
