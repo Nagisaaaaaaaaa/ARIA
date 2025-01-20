@@ -309,6 +309,8 @@ concept CoLayout = is_co_layout_v<TLayout>;
 template <typename T, typename... Ts>
 [[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToArray(const Crd<T, Ts...> &crd) {
   using value_type = arithmetic_type_t<T>;
+  static_assert(is_same_arithmetic_type_v<T, Ts...>, "Element types of `Coord` should be \"as similar as possible\"");
+
   constexpr uint rank = rank_v<Crd<T, Ts...>>;
 
   std::array<value_type, rank> res;
