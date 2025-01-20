@@ -23,6 +23,37 @@ namespace ARIA {
 
 namespace layout::detail {
 
+// Get the underlying arithmetic type.
+// Examples:
+//   int         -> int
+//   const int   -> int
+//   const int&  -> int
+//   C<1>        -> int
+//   const C<1>  -> int
+//   const C<1>& -> int
+template <typename T>
+struct arithmetic_type;
+
+template <typename T>
+  requires(!ConstantArithmetic<std::decay_t<T>> && std::is_arithmetic_v<std::decay_t<T>>)
+struct arithmetic_type<T> {
+  using type = std::decay_t<T>;
+};
+
+template <typename T>
+  requires(ConstantArithmetic<std::decay_t<T>>)
+struct arithmetic_type<T> {
+  using type = std::decay_t<decltype(std::decay_t<T>::value)>;
+};
+
+template <typename T>
+using arithmetic_type_v = typename arithmetic_type<T>::type;
+
+//
+//
+//
+//
+//
 // Fetch implementations from CuTe.
 
 using cute::rank;
@@ -37,14 +68,19 @@ using cute::get;
 template <typename... Ts>
 using Tup = cute::tuple<Ts...>;
 
-using cute::Coord;
+template <typename T, typename... Ts>
+  requires(std::is_same_v<arithmetic_type_v<T>, arithmetic_type_v<Ts>> && ...)
+using Coord = cute::Coord<T, Ts...>;
 
 template <typename... Ts>
 ARIA_HOST_DEVICE constexpr Tup<Ts...> make_tup(const Ts &...ts) {
   return cute::make_tuple(ts...);
 }
 
-using cute::make_coord;
+template <typename... Ts>
+ARIA_HOST_DEVICE constexpr Coord<Ts...> make_coord(const Ts &...ts) {
+  return cute::make_coord(ts...);
+}
 
 //
 //
@@ -260,35 +296,6 @@ concept CoLayout = is_co_layout_v<TLayout>;
 
 //
 //
-//
-//
-//
-// Get the underlying arithmetic type.
-// Examples:
-//   int         -> int
-//   const int   -> int
-//   const int&  -> int
-//   C<1>        -> int
-//   const C<1>  -> int
-//   const C<1>& -> int
-template <typename T>
-struct arithmetic_type;
-
-template <typename T>
-  requires(!ConstantArithmetic<std::decay_t<T>> && std::is_arithmetic_v<std::decay_t<T>>)
-struct arithmetic_type<T> {
-  using type = std::decay_t<T>;
-};
-
-template <typename T>
-  requires(ConstantArithmetic<std::decay_t<T>>)
-struct arithmetic_type<T> {
-  using type = std::decay_t<decltype(std::decay_t<T>::value)>;
-};
-
-template <typename T>
-using arithmetic_type_v = typename arithmetic_type<T>::type;
-
 //
 //
 //
