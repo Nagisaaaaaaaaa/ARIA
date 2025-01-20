@@ -49,23 +49,23 @@ TEST(Vec, Base) {
 }
 
 TEST(Vec, Cast) {
-  // To `Coord`.
+  // To `Crd`.
   {
-    static_assert(std::is_same_v<decltype(ToCoord(Vec1u{5})), Coord<uint>>);
-    Coord<uint> c = ToCoord(Vec1u{5});
+    static_assert(std::is_same_v<decltype(ToCrd(Vec1u{5})), Crd<uint>>);
+    Crd<uint> c = ToCrd(Vec1u{5});
     EXPECT_EQ(get<0>(c), 5);
   }
 
   {
-    static_assert(std::is_same_v<decltype(ToCoord(Vec2i{5, 6})), Coord<int, int>>);
-    Coord<int, int> c = ToCoord(Vec2i{5, 6});
+    static_assert(std::is_same_v<decltype(ToCrd(Vec2i{5, 6})), Crd<int, int>>);
+    Crd<int, int> c = ToCrd(Vec2i{5, 6});
     EXPECT_EQ(get<0>(c), 5);
     EXPECT_EQ(get<1>(c), 6);
   }
 
   {
-    static_assert(std::is_same_v<decltype(ToCoord(Vec3<size_t>{5, 6, 30})), Coord<size_t, size_t, size_t>>);
-    Coord<size_t, size_t, size_t> c = ToCoord(Vec3<size_t>{5, 6, 30});
+    static_assert(std::is_same_v<decltype(ToCrd(Vec3<size_t>{5, 6, 30})), Crd<size_t, size_t, size_t>>);
+    Crd<size_t, size_t, size_t> c = ToCrd(Vec3<size_t>{5, 6, 30});
     EXPECT_EQ(get<0>(c), 5);
     EXPECT_EQ(get<1>(c), 6);
     EXPECT_EQ(get<2>(c), 30);
@@ -73,19 +73,19 @@ TEST(Vec, Cast) {
 
   // To `Vec`.
   {
-    static_assert(std::is_same_v<decltype(ToVec(make_coord(5U))), Vec1u>);
-    static_assert(std::is_same_v<decltype(ToVec(make_coord(C<5U>{}))), Vec1u>);
-    Vec1u v0 = ToVec(make_coord(5U));
-    Vec1u v1 = ToVec(make_coord(C<5U>{}));
+    static_assert(std::is_same_v<decltype(ToVec(make_crd(5U))), Vec1u>);
+    static_assert(std::is_same_v<decltype(ToVec(make_crd(C<5U>{}))), Vec1u>);
+    Vec1u v0 = ToVec(make_crd(5U));
+    Vec1u v1 = ToVec(make_crd(C<5U>{}));
     EXPECT_EQ(v0.x(), 5);
     EXPECT_EQ(v1.x(), 5);
   }
 
   {
-    static_assert(std::is_same_v<decltype(ToVec(make_coord(5, 6))), Vec2i>);
-    static_assert(std::is_same_v<decltype(ToVec(make_coord(5, C<6>{}))), Vec2i>);
-    Vec2i v0 = ToVec(make_coord(5, 6));
-    Vec2i v1 = ToVec(make_coord(5, C<6>{}));
+    static_assert(std::is_same_v<decltype(ToVec(make_crd(5, 6))), Vec2i>);
+    static_assert(std::is_same_v<decltype(ToVec(make_crd(5, C<6>{}))), Vec2i>);
+    Vec2i v0 = ToVec(make_crd(5, 6));
+    Vec2i v1 = ToVec(make_crd(5, C<6>{}));
     EXPECT_EQ(v0.x(), 5);
     EXPECT_EQ(v0.y(), 6);
     EXPECT_EQ(v1.x(), 5);
@@ -93,10 +93,10 @@ TEST(Vec, Cast) {
   }
 
   {
-    static_assert(std::is_same_v<decltype(ToVec(make_coord(size_t{5}, size_t{6}, size_t{30}))), Vec3<size_t>>);
-    static_assert(std::is_same_v<decltype(ToVec(make_coord(size_t{5}, C<size_t{6}>{}, size_t{30}))), Vec3<size_t>>);
-    Vec3<size_t> v0 = ToVec(make_coord(size_t{5}, size_t{6}, size_t{30}));
-    Vec3<size_t> v1 = ToVec(make_coord(size_t{5}, C<size_t{6}>{}, size_t{30}));
+    static_assert(std::is_same_v<decltype(ToVec(make_crd(size_t{5}, size_t{6}, size_t{30}))), Vec3<size_t>>);
+    static_assert(std::is_same_v<decltype(ToVec(make_crd(size_t{5}, C<size_t{6}>{}, size_t{30}))), Vec3<size_t>>);
+    Vec3<size_t> v0 = ToVec(make_crd(size_t{5}, size_t{6}, size_t{30}));
+    Vec3<size_t> v1 = ToVec(make_crd(size_t{5}, C<size_t{6}>{}, size_t{30}));
     EXPECT_EQ(v0.x(), 5);
     EXPECT_EQ(v0.y(), 6);
     EXPECT_EQ(v0.z(), 30);
