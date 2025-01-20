@@ -77,7 +77,7 @@ ARIA_HOST_DEVICE constexpr Tup<Ts...> make_tup(const Ts &...ts) {
   return cute::make_tuple(ts...);
 }
 
-// TODO: NVCC bug here.
+// TODO: MSVC bug here.
 template <typename T, typename... Ts>
   requires(std::is_same_v<arithmetic_type_v<T>, arithmetic_type_v<Ts>> && ...)
 ARIA_HOST_DEVICE constexpr cute::Coord<T, Ts...> make_crd(const T &t, const Ts &...ts) {
@@ -305,9 +305,6 @@ concept CoLayout = is_co_layout_v<TLayout>;
 template <typename T, typename... Ts>
 [[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToArray(const Crd<T, Ts...> &coord) {
   using value_type = arithmetic_type_v<T>;
-  static_assert((std::is_same_v<value_type, arithmetic_type_v<Ts>> && ...),
-                "Element types of `Coord` should be \"as similar as possible\"");
-
   constexpr uint rank = rank_v<Crd<T, Ts...>>;
 
   std::array<value_type, rank> res;

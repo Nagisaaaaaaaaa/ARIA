@@ -67,31 +67,28 @@ static constexpr bool is_vec_s_v = is_vec_s<T, s>::value;
 //
 //
 //
-// Cast `Vec` to `Coord`.
+// Cast `Vec` to `Crd`.
 template <typename T, auto n, auto i, typename... TValues>
-[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToCoordImpl(const Vec<T, n> &vec, TValues &&...values) {
+[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToCrdImpl(const Vec<T, n> &vec, TValues &&...values) {
   if constexpr (i == 0)
-    return make_coord(std::forward<TValues>(values)...);
+    return make_crd(std::forward<TValues>(values)...);
   else
-    return ToCoordImpl<T, n, i - 1>(vec, vec[i - 1], std::forward<TValues>(values)...);
+    return ToCrdImpl<T, n, i - 1>(vec, vec[i - 1], std::forward<TValues>(values)...);
 }
 
 template <typename T, auto n>
-[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToCoord(const Vec<T, n> &vec) {
-  return ToCoordImpl<T, n, n>(vec);
+[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToCrd(const Vec<T, n> &vec) {
+  return ToCrdImpl<T, n, n>(vec);
 }
 
 //
 //
 //
-// Cast `Coord` to `Vec`.
+// Cast `Crd` to `Vec`.
 template <typename T, typename... Ts>
-[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToVec(const Coord<T, Ts...> &coord) {
+[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToVec(const Crd<T, Ts...> &coord) {
   using value_type = layout::detail::arithmetic_type_v<T>;
-  static_assert((std::is_same_v<value_type, layout::detail::arithmetic_type_v<Ts>> && ...),
-                "Element types of `Coord` should be \"as similar as possible\"");
-
-  constexpr uint rank = rank_v<Coord<T, Ts...>>;
+  constexpr uint rank = rank_v<Crd<T, Ts...>>;
 
   Vec<value_type, rank> res;
   ForEach<rank>([&]<auto i>() { res[i] = get<i>(coord); });
