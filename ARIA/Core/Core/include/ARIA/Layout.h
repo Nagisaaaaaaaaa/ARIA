@@ -47,9 +47,18 @@ using layout::detail::get;
 //
 //
 /// \brief The same type as `cute::tuple`.
+///
+/// \example ```cpp
+/// Tup tup{1, C<2U>{}, Tup{3.0F, std::string{"4"}}};
+/// ```
 using layout::detail::Tup;
 
-/// \brief The same type as `cute::Coord` but with restrictions.
+/// \brief The same type as `cute::Coord` but with restrictions, where
+/// The elements are required to be arithmetic types.
+///
+/// \example ```cpp
+/// Crd crd{1, C<2U>{}, 3.0F, C<4.0>{}};
+/// ```
 using layout::detail::Crd;
 
 using layout::detail::make_tup;
