@@ -15,12 +15,12 @@ using cute::_4;
 
 TEST(Layout, Base) {
   // Arithmetic type.
-  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<int>, int>);
-  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<const int>, int>);
-  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<const int &>, int>);
-  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<C<1>>, int>);
-  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<const C<1>>, int>);
-  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<const C<1> &>, int>);
+  static_assert(std::is_same_v<layout::detail::arithmetic_type_t<int>, int>);
+  static_assert(std::is_same_v<layout::detail::arithmetic_type_t<const int>, int>);
+  static_assert(std::is_same_v<layout::detail::arithmetic_type_t<const int &>, int>);
+  static_assert(std::is_same_v<layout::detail::arithmetic_type_t<C<1>>, int>);
+  static_assert(std::is_same_v<layout::detail::arithmetic_type_t<const C<1>>, int>);
+  static_assert(std::is_same_v<layout::detail::arithmetic_type_t<const C<1> &>, int>);
 
   // Make tup.
   {

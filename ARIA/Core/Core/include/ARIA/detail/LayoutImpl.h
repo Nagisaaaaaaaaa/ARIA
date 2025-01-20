@@ -47,13 +47,13 @@ struct arithmetic_type<T> {
 };
 
 template <typename T>
-using arithmetic_type_v = typename arithmetic_type<T>::type;
+using arithmetic_type_t = typename arithmetic_type<T>::type;
 
 //
 //
 //
 template <typename T, typename... Ts>
-constexpr bool is_same_arithmetic_type_v = (std::is_same_v<arithmetic_type_v<T>, arithmetic_type_v<Ts>> && ...);
+constexpr bool is_same_arithmetic_type_v = (std::is_same_v<arithmetic_type_t<T>, arithmetic_type_t<Ts>> && ...);
 
 //
 //
@@ -75,7 +75,7 @@ template <typename... Ts>
 using Tup = cute::tuple<Ts...>;
 
 template <typename... Ts>
-  requires(!std::is_void_v<arithmetic_type_v<Ts>> && ...)
+  requires(!std::is_void_v<arithmetic_type_t<Ts>> && ...)
 using Crd = cute::Coord<Ts...>;
 
 template <typename... Ts>
@@ -308,7 +308,7 @@ concept CoLayout = is_co_layout_v<TLayout>;
 // Cast `Crd` to `std::array`.
 template <typename T, typename... Ts>
 [[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToArray(const Crd<T, Ts...> &crd) {
-  using value_type = arithmetic_type_v<T>;
+  using value_type = arithmetic_type_t<T>;
   constexpr uint rank = rank_v<Crd<T, Ts...>>;
 
   std::array<value_type, rank> res;
