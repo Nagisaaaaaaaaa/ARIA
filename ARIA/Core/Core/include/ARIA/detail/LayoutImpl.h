@@ -34,10 +34,15 @@ using cute::get;
 //
 //
 //
-template <typename... Coords>
-using Tup = cute::tuple<Coords...>;
+template <typename... Ts>
+using Tup = cute::tuple<Ts...>;
 
 using cute::Coord;
+
+template <typename... Ts>
+ARIA_HOST_DEVICE constexpr Tup<Ts...> make_tup(const Ts &...ts) {
+  return cute::make_tuple(ts...);
+}
 
 using cute::make_coord;
 

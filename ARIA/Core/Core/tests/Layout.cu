@@ -78,7 +78,7 @@ TEST(Layout, Base) {
 
 TEST(Layout, Tuple) {
   Tup v{1, 2.0F, Tup{3.0, std::string{"4"}}};
-  let vSub = Tup{3.0, std::string{"4"}};
+  let vSub = make_tup(3.0, std::string{"4"});
   EXPECT_EQ(get<0>(v), 1);
   EXPECT_EQ(get<1>(v), 2.0F);
   EXPECT_EQ(get<2>(v), vSub);

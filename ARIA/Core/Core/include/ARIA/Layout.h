@@ -50,6 +50,8 @@ using layout::detail::Tup;
 
 using layout::detail::Coord;
 
+using layout::detail::make_tup;
+
 using layout::detail::make_coord;
 
 //
