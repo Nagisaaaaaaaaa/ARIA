@@ -214,12 +214,12 @@ using layout::detail::CoLayout;
 //
 //
 //
-/// \brief Cast `Coord` to `std::array`.
+/// \brief Cast `Crd` to `std::array`.
 ///
 /// \example ```cpp
-/// std::array<int, 2> array0 = ToArray(make_coord(5, 6));
-/// std::array<int, 2> array1 = ToArray(make_coord(5_I, 6));
-/// std::array<int, 2> array2 = ToArray(make_coord(5_I, 6_I));
+/// std::array<int, 2> array0 = ToArray(make_crd(5, 6));
+/// std::array<int, 2> array1 = ToArray(make_crd(5_I, 6));
+/// std::array<int, 2> array2 = ToArray(make_crd(5_I, 6_I));
 /// ```
 using layout::detail::ToArray;
 
