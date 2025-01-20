@@ -46,8 +46,10 @@ using layout::detail::get;
 //
 //
 //
+/// \brief The same type as `cute::tuple`.
 using layout::detail::Tup;
 
+/// \brief The same type as `cute::Coord` but with restrictions.
 using layout::detail::Crd;
 
 using layout::detail::make_tup;
