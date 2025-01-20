@@ -6,6 +6,19 @@
 
 #include <array>
 
+// Define CTAD for CuTe types.
+namespace cute {
+
+template <typename... Ts>
+tuple(Ts...) -> tuple<Ts...>;
+
+}
+
+//
+//
+//
+//
+//
 namespace ARIA {
 
 namespace layout::detail {
@@ -21,6 +34,9 @@ using cute::get;
 //
 //
 //
+template <typename... Coords>
+using Tup = cute::tuple<Coords...>;
+
 using cute::Coord;
 
 using cute::make_coord;

@@ -76,6 +76,16 @@ TEST(Layout, Base) {
   static_assert(std::is_same_v<decltype(make_layout(make_shape(1, 2))), decltype(make_layout_major(3, 4))>);
 }
 
+TEST(Layout, Tuple) {
+  Tup v{1, 2.0F, Tup{3.0, std::string{"4"}}};
+  let vSub = Tup{3.0, std::string{"4"}};
+  EXPECT_EQ(get<0>(v), 1);
+  EXPECT_EQ(get<1>(v), 2.0F);
+  EXPECT_EQ(get<2>(v), vSub);
+  EXPECT_EQ(get<0>(get<2>(v)), 3.0);
+  EXPECT_EQ(get<1>(get<2>(v)), std::string{"4"});
+}
+
 TEST(Layout, SizeAndCosize) {
   auto testDynamic1 = [&](auto x) {
     auto layout = make_layout_major(x);
