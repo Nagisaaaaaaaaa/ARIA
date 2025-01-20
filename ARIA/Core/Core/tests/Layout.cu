@@ -14,7 +14,7 @@ using cute::_3;
 using cute::_4;
 
 TEST(Layout, Base) {
-  // Make coord.
+  // Make crd.
   // static_assert(rank(make_crd()) == 0);
   static_assert(rank(make_crd(0)) == 1);
   static_assert(rank(make_crd(_0{})) == 1);
@@ -76,7 +76,7 @@ TEST(Layout, Base) {
   static_assert(std::is_same_v<decltype(make_layout(make_shape(1, 2))), decltype(make_layout_major(3, 4))>);
 }
 
-TEST(Layout, Tuple) {
+TEST(Layout, Tup) {
   Tup v{1, 2.0F, Tup{3.0, std::string{"4"}}};
   let vSub = make_tup(3.0, std::string{"4"});
   EXPECT_EQ(get<0>(v), 1);
@@ -86,7 +86,7 @@ TEST(Layout, Tuple) {
   EXPECT_EQ(get<1>(get<2>(v)), std::string{"4"});
 }
 
-TEST(Layout, Coord) {
+TEST(Layout, Crd) {
   static_assert(std::is_same_v<layout::detail::arithmetic_type_v<int>, int>);
   static_assert(std::is_same_v<layout::detail::arithmetic_type_v<const int>, int>);
   static_assert(std::is_same_v<layout::detail::arithmetic_type_v<const int &>, int>);
@@ -365,41 +365,41 @@ TEST(Layout, Cast) {
 }
 
 TEST(Layout, OperatorsInt) {
-  using Coord2 = Crd<int, int>;
-  using Coord3 = Crd<int, int, int>;
+  using Crd2 = Crd<int, int>;
+  using Crd3 = Crd<int, int, int>;
 
-  auto expectCoord2 = [](const Coord2 &coord, int x, int y) {
+  auto expectCrd2 = [](const Crd2 &coord, int x, int y) {
     EXPECT_EQ(get<0>(coord), x);
     EXPECT_EQ(get<1>(coord), y);
   };
 
-  auto expectCoord3 = [](const Coord3 &coord, int x, int y, int z) {
+  auto expectCrd3 = [](const Crd3 &coord, int x, int y, int z) {
     EXPECT_EQ(get<0>(coord), x);
     EXPECT_EQ(get<1>(coord), y);
     EXPECT_EQ(get<2>(coord), z);
   };
 
   {
-    Coord2 a = cute::aria::layout::detail::FillCoords<int, int>(233);
-    Coord3 b = cute::aria::layout::detail::FillCoords<int, int, int>(233);
+    Crd2 a = cute::aria::layout::detail::FillCoords<int, int>(233);
+    Crd3 b = cute::aria::layout::detail::FillCoords<int, int, int>(233);
     constexpr let c = cute::aria::layout::detail::FillCoords<C<233>, C<233>>(C<233>{});
     constexpr let d = cute::aria::layout::detail::FillCoords<C<233>, C<233>, C<233>>(C<233>{});
-    expectCoord2(a, 233, 233);
-    expectCoord3(b, 233, 233, 233);
+    expectCrd2(a, 233, 233);
+    expectCrd3(b, 233, 233, 233);
     static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_crd(233_I, 233_I))>>);
     static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(make_crd(233_I, 233_I, 233_I))>>);
   }
 
   // 2D.
   {
-    Coord2 a{2, 7};
-    Coord2 b{5, 11};
-    Coord2 c = a + b;
-    Coord2 d = a - b;
-    Coord2 e = a * b;
-    expectCoord2(c, 7, 18);
-    expectCoord2(d, -3, -4);
-    expectCoord2(e, 10, 77);
+    Crd2 a{2, 7};
+    Crd2 b{5, 11};
+    Crd2 c = a + b;
+    Crd2 d = a - b;
+    Crd2 e = a * b;
+    expectCrd2(c, 7, 18);
+    expectCrd2(d, -3, -4);
+    expectCrd2(e, 10, 77);
   }
 
   {
@@ -428,20 +428,20 @@ TEST(Layout, OperatorsInt) {
   }
 
   {
-    Coord2 a{2, 7};
+    Crd2 a{2, 7};
     int b = 5;
-    Coord2 c0 = a + b;
-    Coord2 c1 = a - b;
-    Coord2 c2 = a * b;
-    Coord2 c3 = b + a;
-    Coord2 c4 = b - a;
-    Coord2 c5 = b * a;
-    expectCoord2(c0, 7, 12);
-    expectCoord2(c1, -3, 2);
-    expectCoord2(c2, 10, 35);
-    expectCoord2(c3, 7, 12);
-    expectCoord2(c4, 3, -2);
-    expectCoord2(c5, 10, 35);
+    Crd2 c0 = a + b;
+    Crd2 c1 = a - b;
+    Crd2 c2 = a * b;
+    Crd2 c3 = b + a;
+    Crd2 c4 = b - a;
+    Crd2 c5 = b * a;
+    expectCrd2(c0, 7, 12);
+    expectCrd2(c1, -3, 2);
+    expectCrd2(c2, 10, 35);
+    expectCrd2(c3, 7, 12);
+    expectCrd2(c4, 3, -2);
+    expectCrd2(c5, 10, 35);
   }
 
   {
@@ -486,14 +486,14 @@ TEST(Layout, OperatorsInt) {
 
   // 3D.
   {
-    Coord3 a{2, 7, -5};
-    Coord3 b{5, 11, -4};
-    Coord3 c = a + b;
-    Coord3 d = a - b;
-    Coord3 e = a * b;
-    expectCoord3(c, 7, 18, -9);
-    expectCoord3(d, -3, -4, -1);
-    expectCoord3(e, 10, 77, 20);
+    Crd3 a{2, 7, -5};
+    Crd3 b{5, 11, -4};
+    Crd3 c = a + b;
+    Crd3 d = a - b;
+    Crd3 e = a * b;
+    expectCrd3(c, 7, 18, -9);
+    expectCrd3(d, -3, -4, -1);
+    expectCrd3(e, 10, 77, 20);
   }
 
   {
@@ -522,20 +522,20 @@ TEST(Layout, OperatorsInt) {
   }
 
   {
-    Coord3 a{2, 7, -5};
+    Crd3 a{2, 7, -5};
     int b = 5;
-    Coord3 c0 = a + b;
-    Coord3 c1 = a - b;
-    Coord3 c2 = a * b;
-    Coord3 c3 = b + a;
-    Coord3 c4 = b - a;
-    Coord3 c5 = b * a;
-    expectCoord3(c0, 7, 12, 0);
-    expectCoord3(c1, -3, 2, -10);
-    expectCoord3(c2, 10, 35, -25);
-    expectCoord3(c3, 7, 12, 0);
-    expectCoord3(c4, 3, -2, 10);
-    expectCoord3(c5, 10, 35, -25);
+    Crd3 c0 = a + b;
+    Crd3 c1 = a - b;
+    Crd3 c2 = a * b;
+    Crd3 c3 = b + a;
+    Crd3 c4 = b - a;
+    Crd3 c5 = b * a;
+    expectCrd3(c0, 7, 12, 0);
+    expectCrd3(c1, -3, 2, -10);
+    expectCrd3(c2, 10, 35, -25);
+    expectCrd3(c3, 7, 12, 0);
+    expectCrd3(c4, 3, -2, 10);
+    expectCrd3(c5, 10, 35, -25);
   }
 
   {
@@ -580,27 +580,27 @@ TEST(Layout, OperatorsInt) {
 }
 
 TEST(Layout, OperatorsFloat) {
-  using Coord2 = Crd<float, float>;
-  using Coord3 = Crd<float, float, float>;
+  using Crd2 = Crd<float, float>;
+  using Crd3 = Crd<float, float, float>;
 
-  auto expectCoord2 = [](const Coord2 &coord, float x, float y) {
+  auto expectCrd2 = [](const Crd2 &coord, float x, float y) {
     EXPECT_FLOAT_EQ(get<0>(coord), x);
     EXPECT_FLOAT_EQ(get<1>(coord), y);
   };
 
-  auto expectCoord3 = [](const Coord3 &coord, float x, float y, float z) {
+  auto expectCrd3 = [](const Crd3 &coord, float x, float y, float z) {
     EXPECT_FLOAT_EQ(get<0>(coord), x);
     EXPECT_FLOAT_EQ(get<1>(coord), y);
     EXPECT_FLOAT_EQ(get<2>(coord), z);
   };
 
   {
-    Coord2 a = cute::aria::layout::detail::FillCoords<float, float>(233.3F);
-    Coord3 b = cute::aria::layout::detail::FillCoords<float, float, float>(233.3F);
+    Crd2 a = cute::aria::layout::detail::FillCoords<float, float>(233.3F);
+    Crd3 b = cute::aria::layout::detail::FillCoords<float, float, float>(233.3F);
     constexpr let c = cute::aria::layout::detail::FillCoords<C<233.3F>, C<233.3F>>(C<233.3F>{});
     constexpr let d = cute::aria::layout::detail::FillCoords<C<233.3F>, C<233.3F>, C<233.3F>>(C<233.3F>{});
-    expectCoord2(a, 233.3F, 233.3F);
-    expectCoord3(b, 233.3F, 233.3F, 233.3F);
+    expectCrd2(a, 233.3F, 233.3F);
+    expectCrd3(b, 233.3F, 233.3F, 233.3F);
     static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_crd(C<233.3F>{}, C<233.3F>{}))>>);
     static_assert(
         std::is_same_v<decltype(d), std::add_const_t<decltype(make_crd(C<233.3F>{}, C<233.3F>{}, C<233.3F>{}))>>);
@@ -608,14 +608,14 @@ TEST(Layout, OperatorsFloat) {
 
   // 2D.
   {
-    Coord2 a{2.1F, 7.2F};
-    Coord2 b{5.3F, 11.4F};
-    Coord2 c = a + b;
-    Coord2 d = a - b;
-    Coord2 e = a * b;
-    expectCoord2(c, 7.4F, 18.6F);
-    expectCoord2(d, -3.2F, -4.2F);
-    expectCoord2(e, 11.13F, 82.08F);
+    Crd2 a{2.1F, 7.2F};
+    Crd2 b{5.3F, 11.4F};
+    Crd2 c = a + b;
+    Crd2 d = a - b;
+    Crd2 e = a * b;
+    expectCrd2(c, 7.4F, 18.6F);
+    expectCrd2(d, -3.2F, -4.2F);
+    expectCrd2(e, 11.13F, 82.08F);
   }
 
   {
@@ -624,9 +624,9 @@ TEST(Layout, OperatorsFloat) {
     constexpr let c = a + b;
     constexpr let d = a - b;
     constexpr let e = a * b;
-    expectCoord2(c, 7.4F, 18.6F);
-    expectCoord2(d, -3.2F, -4.2F);
-    expectCoord2(e, 11.13F, 82.08F);
+    expectCrd2(c, 7.4F, 18.6F);
+    expectCrd2(d, -3.2F, -4.2F);
+    expectCrd2(e, 11.13F, 82.08F);
   }
 
   {
@@ -635,26 +635,26 @@ TEST(Layout, OperatorsFloat) {
     let c = a + b;
     let d = a - b;
     let e = a * b;
-    expectCoord2(c, 7.4F, 18.6F);
-    expectCoord2(d, -3.2F, -4.2F);
-    expectCoord2(e, 11.13F, 82.08F);
+    expectCrd2(c, 7.4F, 18.6F);
+    expectCrd2(d, -3.2F, -4.2F);
+    expectCrd2(e, 11.13F, 82.08F);
   }
 
   {
-    Coord2 a{2.1F, 7.2F};
+    Crd2 a{2.1F, 7.2F};
     float b = 5.3F;
-    Coord2 c0 = a + b;
-    Coord2 c1 = a - b;
-    Coord2 c2 = a * b;
-    Coord2 c3 = b + a;
-    Coord2 c4 = b - a;
-    Coord2 c5 = b * a;
-    expectCoord2(c0, 7.4F, 12.5F);
-    expectCoord2(c1, -3.2F, 1.9F);
-    expectCoord2(c2, 11.13F, 38.16F);
-    expectCoord2(c3, 7.4F, 12.5F);
-    expectCoord2(c4, 3.2F, -1.9F);
-    expectCoord2(c5, 11.13F, 38.16F);
+    Crd2 c0 = a + b;
+    Crd2 c1 = a - b;
+    Crd2 c2 = a * b;
+    Crd2 c3 = b + a;
+    Crd2 c4 = b - a;
+    Crd2 c5 = b * a;
+    expectCrd2(c0, 7.4F, 12.5F);
+    expectCrd2(c1, -3.2F, 1.9F);
+    expectCrd2(c2, 11.13F, 38.16F);
+    expectCrd2(c3, 7.4F, 12.5F);
+    expectCrd2(c4, 3.2F, -1.9F);
+    expectCrd2(c5, 11.13F, 38.16F);
   }
 
   {
@@ -666,12 +666,12 @@ TEST(Layout, OperatorsFloat) {
     constexpr let c3 = b + a;
     constexpr let c4 = b - a;
     constexpr let c5 = b * a;
-    expectCoord2(c0, 7.4F, 12.5F);
-    expectCoord2(c1, -3.2F, 1.9F);
-    expectCoord2(c2, 11.13F, 38.16F);
-    expectCoord2(c3, 7.4F, 12.5F);
-    expectCoord2(c4, 3.2F, -1.9F);
-    expectCoord2(c5, 11.13F, 38.16F);
+    expectCrd2(c0, 7.4F, 12.5F);
+    expectCrd2(c1, -3.2F, 1.9F);
+    expectCrd2(c2, 11.13F, 38.16F);
+    expectCrd2(c3, 7.4F, 12.5F);
+    expectCrd2(c4, 3.2F, -1.9F);
+    expectCrd2(c5, 11.13F, 38.16F);
   }
 
   {
@@ -683,24 +683,24 @@ TEST(Layout, OperatorsFloat) {
     constexpr let c3 = b + a;
     constexpr let c4 = b - a;
     constexpr let c5 = b * a;
-    expectCoord2(c0, 7.4F, 12.5F);
-    expectCoord2(c1, -3.2F, 1.9F);
-    expectCoord2(c2, 11.13F, 38.16F);
-    expectCoord2(c3, 7.4F, 12.5F);
-    expectCoord2(c4, 3.2F, -1.9F);
-    expectCoord2(c5, 11.13F, 38.16F);
+    expectCrd2(c0, 7.4F, 12.5F);
+    expectCrd2(c1, -3.2F, 1.9F);
+    expectCrd2(c2, 11.13F, 38.16F);
+    expectCrd2(c3, 7.4F, 12.5F);
+    expectCrd2(c4, 3.2F, -1.9F);
+    expectCrd2(c5, 11.13F, 38.16F);
   }
 
   // 3D.
   {
-    Coord3 a{2.1F, 7.2F, -5.5F};
-    Coord3 b{5.3F, 11.4F, -4.5F};
-    Coord3 c = a + b;
-    Coord3 d = a - b;
-    Coord3 e = a * b;
-    expectCoord3(c, 7.4F, 18.6F, -10.0F);
-    expectCoord3(d, -3.2F, -4.2F, -1.0F);
-    expectCoord3(e, 11.13F, 82.08F, 24.75F);
+    Crd3 a{2.1F, 7.2F, -5.5F};
+    Crd3 b{5.3F, 11.4F, -4.5F};
+    Crd3 c = a + b;
+    Crd3 d = a - b;
+    Crd3 e = a * b;
+    expectCrd3(c, 7.4F, 18.6F, -10.0F);
+    expectCrd3(d, -3.2F, -4.2F, -1.0F);
+    expectCrd3(e, 11.13F, 82.08F, 24.75F);
   }
 
   {
@@ -709,9 +709,9 @@ TEST(Layout, OperatorsFloat) {
     constexpr let c = a + b;
     constexpr let d = a - b;
     constexpr let e = a * b;
-    expectCoord3(c, 7.4F, 18.6F, -10.0F);
-    expectCoord3(d, -3.2F, -4.2F, -1.0F);
-    expectCoord3(e, 11.13F, 82.08F, 24.75F);
+    expectCrd3(c, 7.4F, 18.6F, -10.0F);
+    expectCrd3(d, -3.2F, -4.2F, -1.0F);
+    expectCrd3(e, 11.13F, 82.08F, 24.75F);
   }
 
   {
@@ -720,26 +720,26 @@ TEST(Layout, OperatorsFloat) {
     let c = a + b;
     let d = a - b;
     let e = a * b;
-    expectCoord3(c, 7.4F, 18.6F, -10.0F);
-    expectCoord3(d, -3.2F, -4.2F, -1.0F);
-    expectCoord3(e, 11.13F, 82.08F, 24.75F);
+    expectCrd3(c, 7.4F, 18.6F, -10.0F);
+    expectCrd3(d, -3.2F, -4.2F, -1.0F);
+    expectCrd3(e, 11.13F, 82.08F, 24.75F);
   }
 
   {
-    Coord3 a{2.1F, 7.2F, -5.5F};
+    Crd3 a{2.1F, 7.2F, -5.5F};
     float b = 5.3F;
-    Coord3 c0 = a + b;
-    Coord3 c1 = a - b;
-    Coord3 c2 = a * b;
-    Coord3 c3 = b + a;
-    Coord3 c4 = b - a;
-    Coord3 c5 = b * a;
-    expectCoord3(c0, 7.4F, 12.5F, -5.5F + 5.3F);
-    expectCoord3(c1, -3.2F, 1.9F, -10.8F);
-    expectCoord3(c2, 11.13F, 38.16F, -29.15F);
-    expectCoord3(c3, 7.4F, 12.5F, -5.5F + 5.3F);
-    expectCoord3(c4, 3.2F, -1.9F, 10.8F);
-    expectCoord3(c5, 11.13F, 38.16F, -29.15F);
+    Crd3 c0 = a + b;
+    Crd3 c1 = a - b;
+    Crd3 c2 = a * b;
+    Crd3 c3 = b + a;
+    Crd3 c4 = b - a;
+    Crd3 c5 = b * a;
+    expectCrd3(c0, 7.4F, 12.5F, -5.5F + 5.3F);
+    expectCrd3(c1, -3.2F, 1.9F, -10.8F);
+    expectCrd3(c2, 11.13F, 38.16F, -29.15F);
+    expectCrd3(c3, 7.4F, 12.5F, -5.5F + 5.3F);
+    expectCrd3(c4, 3.2F, -1.9F, 10.8F);
+    expectCrd3(c5, 11.13F, 38.16F, -29.15F);
   }
 
   {
@@ -751,12 +751,12 @@ TEST(Layout, OperatorsFloat) {
     constexpr let c3 = b + a;
     constexpr let c4 = b - a;
     constexpr let c5 = b * a;
-    expectCoord3(c0, 7.4F, 12.5F, -5.5F + 5.3F);
-    expectCoord3(c1, -3.2F, 1.9F, -10.8F);
-    expectCoord3(c2, 11.13F, 38.16F, -29.15F);
-    expectCoord3(c3, 7.4F, 12.5F, -5.5F + 5.3F);
-    expectCoord3(c4, 3.2F, -1.9F, 10.8F);
-    expectCoord3(c5, 11.13F, 38.16F, -29.15F);
+    expectCrd3(c0, 7.4F, 12.5F, -5.5F + 5.3F);
+    expectCrd3(c1, -3.2F, 1.9F, -10.8F);
+    expectCrd3(c2, 11.13F, 38.16F, -29.15F);
+    expectCrd3(c3, 7.4F, 12.5F, -5.5F + 5.3F);
+    expectCrd3(c4, 3.2F, -1.9F, 10.8F);
+    expectCrd3(c5, 11.13F, 38.16F, -29.15F);
   }
 
   {
@@ -768,12 +768,12 @@ TEST(Layout, OperatorsFloat) {
     constexpr let c3 = b + a;
     constexpr let c4 = b - a;
     constexpr let c5 = b * a;
-    expectCoord3(c0, 7.4F, 12.5F, -5.5F + 5.3F);
-    expectCoord3(c1, -3.2F, 1.9F, -10.8F);
-    expectCoord3(c2, 11.13F, 38.16F, -29.15F);
-    expectCoord3(c3, 7.4F, 12.5F, -5.5F + 5.3F);
-    expectCoord3(c4, 3.2F, -1.9F, 10.8F);
-    expectCoord3(c5, 11.13F, 38.16F, -29.15F);
+    expectCrd3(c0, 7.4F, 12.5F, -5.5F + 5.3F);
+    expectCrd3(c1, -3.2F, 1.9F, -10.8F);
+    expectCrd3(c2, 11.13F, 38.16F, -29.15F);
+    expectCrd3(c3, 7.4F, 12.5F, -5.5F + 5.3F);
+    expectCrd3(c4, 3.2F, -1.9F, 10.8F);
+    expectCrd3(c5, 11.13F, 38.16F, -29.15F);
   }
 }
 
