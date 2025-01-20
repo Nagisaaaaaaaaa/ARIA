@@ -34,6 +34,14 @@ TEST(Layout, Base) {
   }
 
   // Make crd.
+  {
+    Crd v{1, 2.0F, C<3U>{}, C<4.0>{}};
+    EXPECT_EQ(get<0>(v), 1);
+    EXPECT_EQ(get<1>(v), 2.0F);
+    static_assert(get<2>(v) == C<3U>{});
+    static_assert(get<3>(v) == C<4.0>{});
+  }
+
   // static_assert(rank(make_crd()) == 0);
   static_assert(rank(make_crd(0)) == 1);
   static_assert(rank(make_crd(_0{})) == 1);

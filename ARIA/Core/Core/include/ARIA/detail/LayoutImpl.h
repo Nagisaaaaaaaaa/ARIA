@@ -52,6 +52,12 @@ using arithmetic_type_v = typename arithmetic_type<T>::type;
 //
 //
 //
+template <typename T, typename... Ts>
+constexpr bool is_same_arithmetic_type_v = (std::is_same_v<arithmetic_type_v<T>, arithmetic_type_v<Ts>> && ...);
+
+//
+//
+//
 //
 //
 // Fetch implementations from CuTe.
@@ -68,9 +74,9 @@ using cute::get;
 template <typename... Ts>
 using Tup = cute::tuple<Ts...>;
 
-template <typename T, typename... Ts>
-  requires(std::is_same_v<arithmetic_type_v<T>, arithmetic_type_v<Ts>> && ...)
-using Crd = cute::Coord<T, Ts...>;
+template <typename... Ts>
+  requires(!std::is_void_v<arithmetic_type_v<Ts>> && ...)
+using Crd = cute::Coord<Ts...>;
 
 template <typename... Ts>
 ARIA_HOST_DEVICE constexpr Tup<Ts...> make_tup(const Ts &...ts) {
