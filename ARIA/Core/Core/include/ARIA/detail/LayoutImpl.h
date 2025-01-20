@@ -6,10 +6,60 @@
 
 #include <array>
 
+// Define CTAD for CuTe types.
+namespace cute {
+
+template <typename... Ts>
+tuple(Ts...) -> tuple<Ts...>;
+
+}
+
+//
+//
+//
+//
+//
 namespace ARIA {
 
 namespace layout::detail {
 
+// Get the underlying arithmetic type.
+// Examples:
+//   int         -> int
+//   const int   -> int
+//   const int&  -> int
+//   C<1>        -> int
+//   const C<1>  -> int
+//   const C<1>& -> int
+template <typename T>
+struct arithmetic_type;
+
+template <typename T>
+  requires(!ConstantArithmetic<std::decay_t<T>> && std::is_arithmetic_v<std::decay_t<T>>)
+struct arithmetic_type<T> {
+  using type = std::decay_t<T>;
+};
+
+template <typename T>
+  requires(ConstantArithmetic<std::decay_t<T>>)
+struct arithmetic_type<T> {
+  using type = std::decay_t<decltype(std::decay_t<T>::value)>;
+};
+
+template <typename T>
+using arithmetic_type_t = typename arithmetic_type<T>::type;
+
+//
+//
+//
+template <typename T, typename... Ts>
+constexpr bool is_same_arithmetic_type_v = (std::is_same_v<arithmetic_type_t<T>, arithmetic_type_t<Ts>> && ...);
+
+//
+//
+//
+//
+//
 // Fetch implementations from CuTe.
 
 using cute::rank;
@@ -21,9 +71,22 @@ using cute::get;
 //
 //
 //
-using cute::Coord;
+template <typename... Ts>
+using Tup = cute::tuple<Ts...>;
 
-using cute::make_coord;
+template <typename... Ts>
+  requires(!std::is_void_v<arithmetic_type_t<Ts>> && ...)
+using Crd = cute::Coord<Ts...>;
+
+template <typename... Ts>
+ARIA_HOST_DEVICE constexpr Tup<Ts...> make_tup(const Ts &...ts) {
+  return cute::make_tuple(ts...);
+}
+
+template <typename... Ts>
+ARIA_HOST_DEVICE constexpr Crd<Ts...> make_crd(const Ts &...ts) {
+  return cute::make_coord(ts...);
+}
 
 //
 //
@@ -242,46 +305,16 @@ concept CoLayout = is_co_layout_v<TLayout>;
 //
 //
 //
-// Get the underlying arithmetic type.
-// Examples:
-//   int         -> int
-//   const int   -> int
-//   const int&  -> int
-//   C<1>        -> int
-//   const C<1>  -> int
-//   const C<1>& -> int
-template <typename T>
-struct arithmetic_type;
-
-template <typename T>
-  requires(!ConstantArithmetic<std::decay_t<T>> && std::is_arithmetic_v<std::decay_t<T>>)
-struct arithmetic_type<T> {
-  using type = std::decay_t<T>;
-};
-
-template <typename T>
-  requires(ConstantArithmetic<std::decay_t<T>>)
-struct arithmetic_type<T> {
-  using type = std::decay_t<decltype(std::decay_t<T>::value)>;
-};
-
-template <typename T>
-using arithmetic_type_v = typename arithmetic_type<T>::type;
-
-//
-//
-//
-// Cast `Coord` to `std::array`.
+// Cast `Crd` to `std::array`.
 template <typename T, typename... Ts>
-[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToArray(const Coord<T, Ts...> &coord) {
-  using value_type = arithmetic_type_v<T>;
-  static_assert((std::is_same_v<value_type, arithmetic_type_v<Ts>> && ...),
-                "Element types of `Coord` should be \"as similar as possible\"");
+[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToArray(const Crd<T, Ts...> &crd) {
+  using value_type = arithmetic_type_t<T>;
+  static_assert(is_same_arithmetic_type_v<T, Ts...>, "Element types of `Crd` should be \"as similar as possible\"");
 
-  constexpr uint rank = rank_v<Coord<T, Ts...>>;
+  constexpr uint rank = rank_v<Crd<T, Ts...>>;
 
   std::array<value_type, rank> res;
-  ForEach<rank>([&]<auto i>() { res[i] = get<i>(coord); });
+  ForEach<rank>([&]<auto i>() { res[i] = get<i>(crd); });
   return res;
 }
 

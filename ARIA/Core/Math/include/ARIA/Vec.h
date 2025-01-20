@@ -83,19 +83,19 @@ using Vec4r = Vec4<Real>;
 //
 //
 //
-/// \brief Cast `Vec` to `Coord`.
+/// \brief Cast `Vec` to `Crd`.
 ///
 /// \example ```cpp
-/// Coord<int, int> coord = ToCoord(Vec2i{5, 6});
+/// Crd<int, int> crd = ToCrd(Vec2i{5, 6});
 /// ```
-using vec::detail::ToCoord;
+using vec::detail::ToCrd;
 
-/// \brief Cast `Coord` to `Vec`.
+/// \brief Cast `Crd` to `Vec`.
 ///
 /// \example ```cpp
-/// Vec2i vec0 = ToVec(make_coord(5, 6));
-/// Vec2i vec1 = ToVec(make_coord(5_I, 6));
-/// Vec2i vec2 = ToVec(make_coord(5_I, 6_I));
+/// Vec2i vec0 = ToVec(make_crd(5, 6));
+/// Vec2i vec1 = ToVec(make_crd(5_I, 6));
+/// Vec2i vec2 = ToVec(make_crd(5_I, 6_I));
 /// ```
 using vec::detail::ToVec;
 

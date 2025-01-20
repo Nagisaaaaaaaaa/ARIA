@@ -191,8 +191,8 @@ public:
   // Type of the coordinate, represented with `Vec`.
   using TVec = Vec<int, dim>;
 
-  // Type of the coordinate, represented with `Coord`.
-  using TCoord = decltype(ToCoord(TVec{}));
+  // Type of the coordinate, represented with `Crd`.
+  using TCrd = decltype(ToCrd(TVec{}));
 
   // Type of the space filling curve encoder and decoder, which
   // is used to hash the block coord to and from the block index.
@@ -371,7 +371,7 @@ private:
 public:
   // clang-format off
   using typename Base::TVec;
-  using typename Base::TCoord;
+  using typename Base::TCrd;
   using typename Base::TCode;
   using typename Base::TBlockLayout;
   using typename Base::TBlockStorageOnOff;
@@ -462,7 +462,7 @@ private:
   }
 
   [[nodiscard]] ARIA_HOST_DEVICE static auto CellCoord2CellIdxInBlock(const TVec &cellCoord) {
-    return Auto(TBlockLayout{}(ToCoord(CellCoord2CellCoordInBlock(cellCoord))));
+    return Auto(TBlockLayout{}(ToCrd(CellCoord2CellCoordInBlock(cellCoord))));
   }
 
   //
@@ -915,7 +915,7 @@ public:
     thrust::device_vector<bool> shouldPreserveD(blocks_.max_size());
 
     // If there exists one `cellCoord` which is "on" within this block, mark the block as preserved.
-    Launcher(*this, [=, *this, shouldPreserve = shouldPreserveD.data()] ARIA_DEVICE(const TCoord &cellCoord) {
+    Launcher(*this, [=, *this, shouldPreserve = shouldPreserveD.data()] ARIA_DEVICE(const TCrd &cellCoord) {
       // In `[0, max_size())`.
       size_t blockIdxInMap = blocks_.find(CellCoord2BlockIdx(ToVec(cellCoord))) - blocks_.begin();
       shouldPreserve[blockIdxInMap] = true;
@@ -977,7 +977,7 @@ template <typename T, auto dim, typename TSpace, typename TAccessor>
 class VDBAccessor<T, dim, TSpace, TAccessor> {
 private:
   using THandle = VDBHandle<T, dim, TSpace>;
-  using TCoord = THandle::TCoord;
+  using TCrd = THandle::TCrd;
   using TCache = THandle::TCache;
 
 public:
@@ -992,7 +992,7 @@ private:
   friend ARIA_KERNEL void KernelLaunchVDBBlock(UHandle handle,
                                                uint64 blkIdx,
                                                typename UHandle::TBlockStorage *blockStorage,
-                                               typename UHandle::TCoord cellCoordOffset,
+                                               typename UHandle::TCrd cellCoordOffset,
                                                F f);
 
   // This constructor should only be called by the above friends.
@@ -1000,7 +1000,7 @@ private:
 
 public:
   /// \brief Get or set the value at `cellCoord`.
-  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCoord &cellCoord) {
+  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCrd &cellCoord) {
     if constexpr (allocateIfNotExist)
       return handle_.value_AllocateIfNotExist(ToVec(cellCoord), cache_);
     else
@@ -1008,7 +1008,7 @@ public:
   }
 
   /// \brief Get or set the value at `cellCoord`.
-  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCoord &cellCoord) const {
+  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCrd &cellCoord) const {
     if constexpr (allocateIfNotExist)
       return handle_.value_AllocateIfNotExist(ToVec(cellCoord), cache_);
     else
@@ -1016,7 +1016,7 @@ public:
   }
 
   /// \brief Whether the value at `cellCoord` is "on" or "off".
-  [[nodiscard]] ARIA_HOST_DEVICE bool IsValueOn(const TCoord &cellCoord) const {
+  [[nodiscard]] ARIA_HOST_DEVICE bool IsValueOn(const TCrd &cellCoord) const {
     return handle_.IsValueOn(ToVec(cellCoord), cache_);
   }
 
@@ -1033,7 +1033,7 @@ template <typename T, auto dim, typename TSpace, typename TAccessor>
 class VDBAccessor<T, dim, TSpace, TAccessor> {
 private:
   using THandle = VDBHandle<T, dim, TSpace>;
-  using TCoord = THandle::TCoord;
+  using TCrd = THandle::TCrd;
   using TCache = THandle::TCache;
 
 public:
@@ -1048,19 +1048,19 @@ private:
   friend ARIA_KERNEL void KernelLaunchVDBBlock(UHandle handle,
                                                uint64 blkIdx,
                                                typename UHandle::TBlockStorage *blockStorage,
-                                               typename UHandle::TCoord cellCoordOffset,
+                                               typename UHandle::TCrd cellCoordOffset,
                                                F f);
 
   ARIA_HOST_DEVICE explicit VDBAccessor(THandle handle) : handle_(std::move(handle)) {}
 
 public:
   /// \brief Get or set the value at `cellCoord`.
-  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCoord &cellCoord) const {
+  [[nodiscard]] ARIA_HOST_DEVICE decltype(auto) value(const TCrd &cellCoord) const {
     return handle_.value_AssumeExist(ToVec(cellCoord), cache_);
   }
 
   /// \brief Whether the value at `cellCoord` is "on" or "off".
-  [[nodiscard]] ARIA_HOST_DEVICE bool IsValueOn(const TCoord &cellCoord) const {
+  [[nodiscard]] ARIA_HOST_DEVICE bool IsValueOn(const TCrd &cellCoord) const {
     return handle_.IsValueOn(ToVec(cellCoord), cache_);
   }
 
@@ -1128,28 +1128,28 @@ template <vdb::detail::DeviceVDBHandleType THandle, typename F>
 ARIA_KERNEL static void KernelLaunchVDBBlock(THandle handle,
                                              uint64 blkIdx,
                                              typename THandle::TBlockStorage *blockStorage,
-                                             typename THandle::TCoord cellCoordOffset,
+                                             typename THandle::TCrd cellCoordOffset,
                                              F f) {
   using T = typename THandle::value_type;
   static constexpr auto dim = THandle::dim;
   using TSpace = typename THandle::TSpace;
 
-  using TCoord = typename THandle::TCoord;
+  using TCrd = typename THandle::TCrd;
   using TBlockLayout = typename THandle::TBlockLayout;
 
   using TAllocateWriteAccessor = VDBAccessor<T, dim, TSpace, AllocateWrite>;
   using TWriteAccessor = VDBAccessor<T, dim, TSpace, Write>;
   using TReadAccessor = VDBAccessor<T, dim, TSpace, Read>;
 
-  constexpr bool isInvocableWithAllocateWriteAccessor = std::is_invocable_v<F, TCoord, TAllocateWriteAccessor> ||
-                                                        std::is_invocable_v<F, TCoord, TAllocateWriteAccessor &>;
+  constexpr bool isInvocableWithAllocateWriteAccessor =
+      std::is_invocable_v<F, TCrd, TAllocateWriteAccessor> || std::is_invocable_v<F, TCrd, TAllocateWriteAccessor &>;
   constexpr bool isInvocableWithWriteAccessor =
-      std::is_invocable_v<F, TCoord, TWriteAccessor> || std::is_invocable_v<F, TCoord, TWriteAccessor &>;
+      std::is_invocable_v<F, TCrd, TWriteAccessor> || std::is_invocable_v<F, TCrd, TWriteAccessor &>;
   constexpr bool isInvocableWithReadAccessor =
-      std::is_invocable_v<F, TCoord, TReadAccessor> || std::is_invocable_v<F, TCoord, TReadAccessor &>;
+      std::is_invocable_v<F, TCrd, TReadAccessor> || std::is_invocable_v<F, TCrd, TReadAccessor &>;
 
   using TAccessor = std::conditional_t<
-      std::is_invocable_v<F, TCoord>, void,
+      std::is_invocable_v<F, TCrd>, void,
       std::conditional_t<isInvocableWithAllocateWriteAccessor, TAllocateWriteAccessor,
                          std::conditional_t<isInvocableWithWriteAccessor, TWriteAccessor,
                                             std::conditional_t<isInvocableWithReadAccessor, TReadAccessor, void>>>>;
@@ -1161,8 +1161,8 @@ ARIA_KERNEL static void KernelLaunchVDBBlock(THandle handle,
   if (!blockStorage->onOff[cellIdxInBlock])
     return;
 
-  TCoord cellCoordInBlock = TBlockLayout{}.get_hier_coord(cellIdxInBlock);
-  TCoord cellCoord = cellCoordOffset + cellCoordInBlock;
+  TCrd cellCoordInBlock = TBlockLayout{}.get_hier_coord(cellIdxInBlock);
+  TCrd cellCoord = cellCoordOffset + cellCoordInBlock;
 
   if constexpr (std::is_void_v<TAccessor>)
     f(cellCoord);
@@ -1216,7 +1216,7 @@ public:
 
       // Launch.
       Base::Launch(vdb::detail::KernelLaunchVDBBlock<THandle, F>, handle_, block.first, block.second.storage(),
-                   ToCoord(cellCoordOffset), f_);
+                   ToCrd(cellCoordOffset), f_);
     }
   }
 

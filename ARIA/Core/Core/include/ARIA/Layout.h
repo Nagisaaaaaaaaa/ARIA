@@ -46,9 +46,24 @@ using layout::detail::get;
 //
 //
 //
-using layout::detail::Coord;
+/// \brief The same type as `cute::tuple`.
+///
+/// \example ```cpp
+/// Tup tup{1, C<2U>{}, Tup{3.0F, std::string{"4"}}};
+/// ```
+using layout::detail::Tup;
 
-using layout::detail::make_coord;
+/// \brief The same type as `cute::Coord` but with restrictions, where
+/// The elements are required to be arithmetic types.
+///
+/// \example ```cpp
+/// Crd crd{1, C<2U>{}, 3.0F, C<4.0>{}};
+/// ```
+using layout::detail::Crd;
+
+using layout::detail::make_tup;
+
+using layout::detail::make_crd;
 
 //
 //
@@ -210,12 +225,12 @@ using layout::detail::CoLayout;
 //
 //
 //
-/// \brief Cast `Coord` to `std::array`.
+/// \brief Cast `Crd` to `std::array`.
 ///
 /// \example ```cpp
-/// std::array<int, 2> array0 = ToArray(make_coord(5, 6));
-/// std::array<int, 2> array1 = ToArray(make_coord(5_I, 6));
-/// std::array<int, 2> array2 = ToArray(make_coord(5_I, 6_I));
+/// std::array<int, 2> array0 = ToArray(make_crd(5, 6));
+/// std::array<int, 2> array1 = ToArray(make_crd(5_I, 6));
+/// std::array<int, 2> array2 = ToArray(make_crd(5_I, 6_I));
 /// ```
 using layout::detail::ToArray;
 
