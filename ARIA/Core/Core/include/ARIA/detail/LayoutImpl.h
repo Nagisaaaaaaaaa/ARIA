@@ -303,12 +303,12 @@ concept CoLayout = is_co_layout_v<TLayout>;
 //
 // Cast `Crd` to `std::array`.
 template <typename T, typename... Ts>
-[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToArray(const Crd<T, Ts...> &coord) {
+[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToArray(const Crd<T, Ts...> &crd) {
   using value_type = arithmetic_type_v<T>;
   constexpr uint rank = rank_v<Crd<T, Ts...>>;
 
   std::array<value_type, rank> res;
-  ForEach<rank>([&]<auto i>() { res[i] = get<i>(coord); });
+  ForEach<rank>([&]<auto i>() { res[i] = get<i>(crd); });
   return res;
 }
 

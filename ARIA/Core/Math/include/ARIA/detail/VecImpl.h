@@ -86,12 +86,12 @@ template <typename T, auto n>
 //
 // Cast `Crd` to `Vec`.
 template <typename T, typename... Ts>
-[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToVec(const Crd<T, Ts...> &coord) {
+[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToVec(const Crd<T, Ts...> &crd) {
   using value_type = layout::detail::arithmetic_type_v<T>;
   constexpr uint rank = rank_v<Crd<T, Ts...>>;
 
   Vec<value_type, rank> res;
-  ForEach<rank>([&]<auto i>() { res[i] = get<i>(coord); });
+  ForEach<rank>([&]<auto i>() { res[i] = get<i>(crd); });
   return res;
 }
 
