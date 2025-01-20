@@ -83,11 +83,9 @@ ARIA_HOST_DEVICE constexpr Tup<Ts...> make_tup(const Ts &...ts) {
   return cute::make_tuple(ts...);
 }
 
-// TODO: MSVC bug here.
-template <typename T, typename... Ts>
-  requires(std::is_same_v<arithmetic_type_v<T>, arithmetic_type_v<Ts>> && ...)
-ARIA_HOST_DEVICE constexpr cute::Coord<T, Ts...> make_crd(const T &t, const Ts &...ts) {
-  return cute::make_coord(t, ts...);
+template <typename... Ts>
+ARIA_HOST_DEVICE constexpr Crd<Ts...> make_crd(const Ts &...ts) {
+  return cute::make_coord(ts...);
 }
 
 //

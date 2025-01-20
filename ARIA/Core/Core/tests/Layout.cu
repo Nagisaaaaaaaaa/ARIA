@@ -42,7 +42,7 @@ TEST(Layout, Base) {
     static_assert(get<3>(v) == C<4.0>{});
   }
 
-  // static_assert(rank(make_crd()) == 0);
+  static_assert(rank(make_crd()) == 0);
   static_assert(rank(make_crd(0)) == 1);
   static_assert(rank(make_crd(_0{})) == 1);
   static_assert(rank(make_crd(0, 1)) == 2);
@@ -50,7 +50,7 @@ TEST(Layout, Base) {
   static_assert(rank(make_crd(0, _1{})) == 2);
   static_assert(rank(make_crd(_0{}, _1{})) == 2);
 
-  // static_assert(is_static_v<decltype(make_crd())>);
+  static_assert(is_static_v<decltype(make_crd())>);
   static_assert(!is_static_v<decltype(make_crd(0))>);
   static_assert(is_static_v<decltype(make_crd(_0{}))>);
   static_assert(!is_static_v<decltype(make_crd(0, 1))>);
