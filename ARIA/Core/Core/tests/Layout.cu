@@ -14,6 +14,25 @@ using cute::_3;
 using cute::_4;
 
 TEST(Layout, Base) {
+  // Arithmetic type.
+  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<int>, int>);
+  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<const int>, int>);
+  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<const int &>, int>);
+  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<C<1>>, int>);
+  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<const C<1>>, int>);
+  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<const C<1> &>, int>);
+
+  // Make tup.
+  {
+    Tup v{1, 2.0F, Tup{3.0, std::string{"4"}}};
+    let vSub = make_tup(3.0, std::string{"4"});
+    EXPECT_EQ(get<0>(v), 1);
+    EXPECT_EQ(get<1>(v), 2.0F);
+    EXPECT_EQ(get<2>(v), vSub);
+    EXPECT_EQ(get<0>(get<2>(v)), 3.0);
+    EXPECT_EQ(get<1>(get<2>(v)), std::string{"4"});
+  }
+
   // Make crd.
   // static_assert(rank(make_crd()) == 0);
   static_assert(rank(make_crd(0)) == 1);
@@ -74,25 +93,6 @@ TEST(Layout, Base) {
   static_assert(
       !std::is_same_v<decltype(make_layout(make_shape(1, 2))), decltype(make_layout_major<LayoutRight>(3, 4))>);
   static_assert(std::is_same_v<decltype(make_layout(make_shape(1, 2))), decltype(make_layout_major(3, 4))>);
-}
-
-TEST(Layout, Tup) {
-  Tup v{1, 2.0F, Tup{3.0, std::string{"4"}}};
-  let vSub = make_tup(3.0, std::string{"4"});
-  EXPECT_EQ(get<0>(v), 1);
-  EXPECT_EQ(get<1>(v), 2.0F);
-  EXPECT_EQ(get<2>(v), vSub);
-  EXPECT_EQ(get<0>(get<2>(v)), 3.0);
-  EXPECT_EQ(get<1>(get<2>(v)), std::string{"4"});
-}
-
-TEST(Layout, Crd) {
-  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<int>, int>);
-  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<const int>, int>);
-  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<const int &>, int>);
-  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<C<1>>, int>);
-  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<const C<1>>, int>);
-  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<const C<1> &>, int>);
 }
 
 TEST(Layout, SizeAndCosize) {
