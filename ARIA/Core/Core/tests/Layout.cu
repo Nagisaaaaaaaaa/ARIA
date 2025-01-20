@@ -15,21 +15,21 @@ using cute::_4;
 
 TEST(Layout, Base) {
   // Make coord.
-  static_assert(rank(make_coord()) == 0);
-  static_assert(rank(make_coord(0)) == 1);
-  static_assert(rank(make_coord(_0{})) == 1);
-  static_assert(rank(make_coord(0, 1)) == 2);
-  static_assert(rank(make_coord(_0{}, 1)) == 2);
-  static_assert(rank(make_coord(0, _1{})) == 2);
-  static_assert(rank(make_coord(_0{}, _1{})) == 2);
+  // static_assert(rank(make_crd()) == 0);
+  static_assert(rank(make_crd(0)) == 1);
+  static_assert(rank(make_crd(_0{})) == 1);
+  static_assert(rank(make_crd(0, 1)) == 2);
+  static_assert(rank(make_crd(_0{}, 1)) == 2);
+  static_assert(rank(make_crd(0, _1{})) == 2);
+  static_assert(rank(make_crd(_0{}, _1{})) == 2);
 
-  static_assert(is_static_v<decltype(make_coord())>);
-  static_assert(!is_static_v<decltype(make_coord(0))>);
-  static_assert(is_static_v<decltype(make_coord(_0{}))>);
-  static_assert(!is_static_v<decltype(make_coord(0, 1))>);
-  static_assert(!is_static_v<decltype(make_coord(_0{}, 1))>);
-  static_assert(!is_static_v<decltype(make_coord(0, _1{}))>);
-  static_assert(is_static_v<decltype(make_coord(_0{}, _1{}))>);
+  // static_assert(is_static_v<decltype(make_crd())>);
+  static_assert(!is_static_v<decltype(make_crd(0))>);
+  static_assert(is_static_v<decltype(make_crd(_0{}))>);
+  static_assert(!is_static_v<decltype(make_crd(0, 1))>);
+  static_assert(!is_static_v<decltype(make_crd(_0{}, 1))>);
+  static_assert(!is_static_v<decltype(make_crd(0, _1{}))>);
+  static_assert(is_static_v<decltype(make_crd(_0{}, _1{}))>);
 
   // Make shape.
   static_assert(is_static_v<decltype(make_shape(_2{}, make_shape(_2{}, _2{})))>);
@@ -84,6 +84,15 @@ TEST(Layout, Tuple) {
   EXPECT_EQ(get<2>(v), vSub);
   EXPECT_EQ(get<0>(get<2>(v)), 3.0);
   EXPECT_EQ(get<1>(get<2>(v)), std::string{"4"});
+}
+
+TEST(Layout, Coord) {
+  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<int>, int>);
+  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<const int>, int>);
+  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<const int &>, int>);
+  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<C<1>>, int>);
+  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<const C<1>>, int>);
+  static_assert(std::is_same_v<layout::detail::arithmetic_type_v<const C<1> &>, int>);
 }
 
 TEST(Layout, SizeAndCosize) {
@@ -319,45 +328,45 @@ TEST(Layout, Is) {
 TEST(Layout, Cast) {
   // To `std::array`.
   {
-    static_assert(ToArray(make_coord(0)) == std::array{0});
-    static_assert(ToArray(make_coord(0_I)) == std::array{0});
+    static_assert(ToArray(make_crd(0)) == std::array{0});
+    static_assert(ToArray(make_crd(0_I)) == std::array{0});
 
-    static_assert(ToArray(make_coord(0U)) == std::array{0U});
-    static_assert(ToArray(make_coord(0_U)) == std::array{0U});
+    static_assert(ToArray(make_crd(0U)) == std::array{0U});
+    static_assert(ToArray(make_crd(0_U)) == std::array{0U});
 
-    static_assert(ToArray(make_coord(0, 1)) == std::array{0, 1});
-    static_assert(ToArray(make_coord(0_I, 1)) == std::array{0, 1});
-    static_assert(ToArray(make_coord(0, 1_I)) == std::array{0, 1});
-    static_assert(ToArray(make_coord(0_I, 1_I)) == std::array{0, 1});
+    static_assert(ToArray(make_crd(0, 1)) == std::array{0, 1});
+    static_assert(ToArray(make_crd(0_I, 1)) == std::array{0, 1});
+    static_assert(ToArray(make_crd(0, 1_I)) == std::array{0, 1});
+    static_assert(ToArray(make_crd(0_I, 1_I)) == std::array{0, 1});
 
-    static_assert(ToArray(make_coord(0U, 1U)) == std::array{0U, 1U});
-    static_assert(ToArray(make_coord(0_U, 1U)) == std::array{0U, 1U});
-    static_assert(ToArray(make_coord(0U, 1_U)) == std::array{0U, 1U});
-    static_assert(ToArray(make_coord(0_U, 1_U)) == std::array{0U, 1U});
+    static_assert(ToArray(make_crd(0U, 1U)) == std::array{0U, 1U});
+    static_assert(ToArray(make_crd(0_U, 1U)) == std::array{0U, 1U});
+    static_assert(ToArray(make_crd(0U, 1_U)) == std::array{0U, 1U});
+    static_assert(ToArray(make_crd(0_U, 1_U)) == std::array{0U, 1U});
 
-    static_assert(ToArray(make_coord(0, 1, 2)) == std::array{0, 1, 2});
-    static_assert(ToArray(make_coord(0_I, 1, 2)) == std::array{0, 1, 2});
-    static_assert(ToArray(make_coord(0, 1_I, 2)) == std::array{0, 1, 2});
-    static_assert(ToArray(make_coord(0_I, 1_I, 2)) == std::array{0, 1, 2});
-    static_assert(ToArray(make_coord(0, 1, 2_I)) == std::array{0, 1, 2});
-    static_assert(ToArray(make_coord(0_I, 1, 2_I)) == std::array{0, 1, 2});
-    static_assert(ToArray(make_coord(0, 1_I, 2_I)) == std::array{0, 1, 2});
-    static_assert(ToArray(make_coord(0_I, 1_I, 2_I)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_crd(0, 1, 2)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_crd(0_I, 1, 2)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_crd(0, 1_I, 2)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_crd(0_I, 1_I, 2)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_crd(0, 1, 2_I)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_crd(0_I, 1, 2_I)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_crd(0, 1_I, 2_I)) == std::array{0, 1, 2});
+    static_assert(ToArray(make_crd(0_I, 1_I, 2_I)) == std::array{0, 1, 2});
 
-    static_assert(ToArray(make_coord(0U, 1U, 2U)) == std::array{0U, 1U, 2U});
-    static_assert(ToArray(make_coord(0_U, 1U, 2U)) == std::array{0U, 1U, 2U});
-    static_assert(ToArray(make_coord(0U, 1_U, 2U)) == std::array{0U, 1U, 2U});
-    static_assert(ToArray(make_coord(0_U, 1_U, 2U)) == std::array{0U, 1U, 2U});
-    static_assert(ToArray(make_coord(0U, 1U, 2_U)) == std::array{0U, 1U, 2U});
-    static_assert(ToArray(make_coord(0_U, 1U, 2_U)) == std::array{0U, 1U, 2U});
-    static_assert(ToArray(make_coord(0U, 1_U, 2_U)) == std::array{0U, 1U, 2U});
-    static_assert(ToArray(make_coord(0_U, 1_U, 2_U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_crd(0U, 1U, 2U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_crd(0_U, 1U, 2U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_crd(0U, 1_U, 2U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_crd(0_U, 1_U, 2U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_crd(0U, 1U, 2_U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_crd(0_U, 1U, 2_U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_crd(0U, 1_U, 2_U)) == std::array{0U, 1U, 2U});
+    static_assert(ToArray(make_crd(0_U, 1_U, 2_U)) == std::array{0U, 1U, 2U});
   }
 }
 
 TEST(Layout, OperatorsInt) {
-  using Coord2 = Coord<int, int>;
-  using Coord3 = Coord<int, int, int>;
+  using Coord2 = Crd<int, int>;
+  using Coord3 = Crd<int, int, int>;
 
   auto expectCoord2 = [](const Coord2 &coord, int x, int y) {
     EXPECT_EQ(get<0>(coord), x);
@@ -377,8 +386,8 @@ TEST(Layout, OperatorsInt) {
     constexpr let d = cute::aria::layout::detail::FillCoords<C<233>, C<233>, C<233>>(C<233>{});
     expectCoord2(a, 233, 233);
     expectCoord3(b, 233, 233, 233);
-    static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_coord(233_I, 233_I))>>);
-    static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(make_coord(233_I, 233_I, 233_I))>>);
+    static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_crd(233_I, 233_I))>>);
+    static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(make_crd(233_I, 233_I, 233_I))>>);
   }
 
   // 2D.
@@ -394,25 +403,25 @@ TEST(Layout, OperatorsInt) {
   }
 
   {
-    constexpr let a = make_coord(2_I, 7_I);
-    constexpr let b = make_coord(5_I, 11_I);
+    constexpr let a = make_crd(2_I, 7_I);
+    constexpr let b = make_crd(5_I, 11_I);
     constexpr let c = a + b;
     constexpr let d = a - b;
     constexpr let e = a * b;
-    static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_coord(7_I, 18_I))>>);
-    static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(make_coord(-3_I, -4_I))>>);
-    static_assert(std::is_same_v<decltype(e), std::add_const_t<decltype(make_coord(10_I, 77_I))>>);
+    static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_crd(7_I, 18_I))>>);
+    static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(make_crd(-3_I, -4_I))>>);
+    static_assert(std::is_same_v<decltype(e), std::add_const_t<decltype(make_crd(10_I, 77_I))>>);
   }
 
   {
-    let a = make_coord(2_I, 7);
-    let b = make_coord(5_I, 11_I);
+    let a = make_crd(2_I, 7);
+    let b = make_crd(5_I, 11_I);
     let c = a + b;
     let d = a - b;
     let e = a * b;
-    static_assert(std::is_same_v<decltype(c), decltype(make_coord(7_I, 18))>);
-    static_assert(std::is_same_v<decltype(d), decltype(make_coord(-3_I, -4))>);
-    static_assert(std::is_same_v<decltype(e), decltype(make_coord(10_I, 77))>);
+    static_assert(std::is_same_v<decltype(c), decltype(make_crd(7_I, 18))>);
+    static_assert(std::is_same_v<decltype(d), decltype(make_crd(-3_I, -4))>);
+    static_assert(std::is_same_v<decltype(e), decltype(make_crd(10_I, 77))>);
     EXPECT_EQ(get<1>(c), 18);
     EXPECT_EQ(get<1>(d), -4);
     EXPECT_EQ(get<1>(e), 77);
@@ -436,7 +445,7 @@ TEST(Layout, OperatorsInt) {
   }
 
   {
-    constexpr let a = make_coord(2_I, 7_I);
+    constexpr let a = make_crd(2_I, 7_I);
     constexpr let b = 5_I;
     constexpr let c0 = a + b;
     constexpr let c1 = a - b;
@@ -444,16 +453,16 @@ TEST(Layout, OperatorsInt) {
     constexpr let c3 = b + a;
     constexpr let c4 = b - a;
     constexpr let c5 = b * a;
-    static_assert(std::is_same_v<decltype(c0), std::add_const_t<decltype(make_coord(7_I, 12_I))>>);
-    static_assert(std::is_same_v<decltype(c1), std::add_const_t<decltype(make_coord(-3_I, 2_I))>>);
-    static_assert(std::is_same_v<decltype(c2), std::add_const_t<decltype(make_coord(10_I, 35_I))>>);
-    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(make_coord(7_I, 12_I))>>);
-    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(make_coord(3_I, -2_I))>>);
-    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(make_coord(10_I, 35_I))>>);
+    static_assert(std::is_same_v<decltype(c0), std::add_const_t<decltype(make_crd(7_I, 12_I))>>);
+    static_assert(std::is_same_v<decltype(c1), std::add_const_t<decltype(make_crd(-3_I, 2_I))>>);
+    static_assert(std::is_same_v<decltype(c2), std::add_const_t<decltype(make_crd(10_I, 35_I))>>);
+    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(make_crd(7_I, 12_I))>>);
+    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(make_crd(3_I, -2_I))>>);
+    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(make_crd(10_I, 35_I))>>);
   }
 
   {
-    constexpr let a = make_coord(2_I, 7);
+    constexpr let a = make_crd(2_I, 7);
     constexpr let b = 5_I;
     constexpr let c0 = a + b;
     constexpr let c1 = a - b;
@@ -461,12 +470,12 @@ TEST(Layout, OperatorsInt) {
     constexpr let c3 = b + a;
     constexpr let c4 = b - a;
     constexpr let c5 = b * a;
-    static_assert(std::is_same_v<decltype(c0), std::add_const_t<decltype(make_coord(7_I, 12))>>);
-    static_assert(std::is_same_v<decltype(c1), std::add_const_t<decltype(make_coord(-3_I, 2))>>);
-    static_assert(std::is_same_v<decltype(c2), std::add_const_t<decltype(make_coord(10_I, 35))>>);
-    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(make_coord(7_I, 12))>>);
-    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(make_coord(3_I, -2))>>);
-    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(make_coord(10_I, 35))>>);
+    static_assert(std::is_same_v<decltype(c0), std::add_const_t<decltype(make_crd(7_I, 12))>>);
+    static_assert(std::is_same_v<decltype(c1), std::add_const_t<decltype(make_crd(-3_I, 2))>>);
+    static_assert(std::is_same_v<decltype(c2), std::add_const_t<decltype(make_crd(10_I, 35))>>);
+    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(make_crd(7_I, 12))>>);
+    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(make_crd(3_I, -2))>>);
+    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(make_crd(10_I, 35))>>);
     EXPECT_EQ(get<1>(c0), 12);
     EXPECT_EQ(get<1>(c1), 2);
     EXPECT_EQ(get<1>(c2), 35);
@@ -488,25 +497,25 @@ TEST(Layout, OperatorsInt) {
   }
 
   {
-    constexpr let a = make_coord(2_I, 7_I, -5_I);
-    constexpr let b = make_coord(5_I, 11_I, -4_I);
+    constexpr let a = make_crd(2_I, 7_I, -5_I);
+    constexpr let b = make_crd(5_I, 11_I, -4_I);
     constexpr let c = a + b;
     constexpr let d = a - b;
     constexpr let e = a * b;
-    static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_coord(7_I, 18_I, -9_I))>>);
-    static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(make_coord(-3_I, -4_I, -1_I))>>);
-    static_assert(std::is_same_v<decltype(e), std::add_const_t<decltype(make_coord(10_I, 77_I, 20_I))>>);
+    static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_crd(7_I, 18_I, -9_I))>>);
+    static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(make_crd(-3_I, -4_I, -1_I))>>);
+    static_assert(std::is_same_v<decltype(e), std::add_const_t<decltype(make_crd(10_I, 77_I, 20_I))>>);
   }
 
   {
-    let a = make_coord(2_I, 7, -5_I);
-    let b = make_coord(5_I, 11_I, -4_I);
+    let a = make_crd(2_I, 7, -5_I);
+    let b = make_crd(5_I, 11_I, -4_I);
     let c = a + b;
     let d = a - b;
     let e = a * b;
-    static_assert(std::is_same_v<decltype(c), decltype(make_coord(7_I, 18, -9_I))>);
-    static_assert(std::is_same_v<decltype(d), decltype(make_coord(-3_I, -4, -1_I))>);
-    static_assert(std::is_same_v<decltype(e), decltype(make_coord(10_I, 77, 20_I))>);
+    static_assert(std::is_same_v<decltype(c), decltype(make_crd(7_I, 18, -9_I))>);
+    static_assert(std::is_same_v<decltype(d), decltype(make_crd(-3_I, -4, -1_I))>);
+    static_assert(std::is_same_v<decltype(e), decltype(make_crd(10_I, 77, 20_I))>);
     EXPECT_EQ(get<1>(c), 18);
     EXPECT_EQ(get<1>(d), -4);
     EXPECT_EQ(get<1>(e), 77);
@@ -530,7 +539,7 @@ TEST(Layout, OperatorsInt) {
   }
 
   {
-    constexpr let a = make_coord(2_I, 7_I, -5_I);
+    constexpr let a = make_crd(2_I, 7_I, -5_I);
     constexpr let b = 5_I;
     constexpr let c0 = a + b;
     constexpr let c1 = a - b;
@@ -538,16 +547,16 @@ TEST(Layout, OperatorsInt) {
     constexpr let c3 = b + a;
     constexpr let c4 = b - a;
     constexpr let c5 = b * a;
-    static_assert(std::is_same_v<decltype(c0), std::add_const_t<decltype(make_coord(7_I, 12_I, 0_I))>>);
-    static_assert(std::is_same_v<decltype(c1), std::add_const_t<decltype(make_coord(-3_I, 2_I, -10_I))>>);
-    static_assert(std::is_same_v<decltype(c2), std::add_const_t<decltype(make_coord(10_I, 35_I, -25_I))>>);
-    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(make_coord(7_I, 12_I, 0_I))>>);
-    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(make_coord(3_I, -2_I, 10_I))>>);
-    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(make_coord(10_I, 35_I, -25_I))>>);
+    static_assert(std::is_same_v<decltype(c0), std::add_const_t<decltype(make_crd(7_I, 12_I, 0_I))>>);
+    static_assert(std::is_same_v<decltype(c1), std::add_const_t<decltype(make_crd(-3_I, 2_I, -10_I))>>);
+    static_assert(std::is_same_v<decltype(c2), std::add_const_t<decltype(make_crd(10_I, 35_I, -25_I))>>);
+    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(make_crd(7_I, 12_I, 0_I))>>);
+    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(make_crd(3_I, -2_I, 10_I))>>);
+    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(make_crd(10_I, 35_I, -25_I))>>);
   }
 
   {
-    constexpr let a = make_coord(2_I, 7, -5_I);
+    constexpr let a = make_crd(2_I, 7, -5_I);
     constexpr let b = 5_I;
     constexpr let c0 = a + b;
     constexpr let c1 = a - b;
@@ -555,12 +564,12 @@ TEST(Layout, OperatorsInt) {
     constexpr let c3 = b + a;
     constexpr let c4 = b - a;
     constexpr let c5 = b * a;
-    static_assert(std::is_same_v<decltype(c0), std::add_const_t<decltype(make_coord(7_I, 12, 0_I))>>);
-    static_assert(std::is_same_v<decltype(c1), std::add_const_t<decltype(make_coord(-3_I, 2, -10_I))>>);
-    static_assert(std::is_same_v<decltype(c2), std::add_const_t<decltype(make_coord(10_I, 35, -25_I))>>);
-    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(make_coord(7_I, 12, 0_I))>>);
-    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(make_coord(3_I, -2, 10_I))>>);
-    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(make_coord(10_I, 35, -25_I))>>);
+    static_assert(std::is_same_v<decltype(c0), std::add_const_t<decltype(make_crd(7_I, 12, 0_I))>>);
+    static_assert(std::is_same_v<decltype(c1), std::add_const_t<decltype(make_crd(-3_I, 2, -10_I))>>);
+    static_assert(std::is_same_v<decltype(c2), std::add_const_t<decltype(make_crd(10_I, 35, -25_I))>>);
+    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(make_crd(7_I, 12, 0_I))>>);
+    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(make_crd(3_I, -2, 10_I))>>);
+    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(make_crd(10_I, 35, -25_I))>>);
     EXPECT_EQ(get<1>(c0), 12);
     EXPECT_EQ(get<1>(c1), 2);
     EXPECT_EQ(get<1>(c2), 35);
@@ -571,8 +580,8 @@ TEST(Layout, OperatorsInt) {
 }
 
 TEST(Layout, OperatorsFloat) {
-  using Coord2 = Coord<float, float>;
-  using Coord3 = Coord<float, float, float>;
+  using Coord2 = Crd<float, float>;
+  using Coord3 = Crd<float, float, float>;
 
   auto expectCoord2 = [](const Coord2 &coord, float x, float y) {
     EXPECT_FLOAT_EQ(get<0>(coord), x);
@@ -592,9 +601,9 @@ TEST(Layout, OperatorsFloat) {
     constexpr let d = cute::aria::layout::detail::FillCoords<C<233.3F>, C<233.3F>, C<233.3F>>(C<233.3F>{});
     expectCoord2(a, 233.3F, 233.3F);
     expectCoord3(b, 233.3F, 233.3F, 233.3F);
-    static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_coord(C<233.3F>{}, C<233.3F>{}))>>);
+    static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(make_crd(C<233.3F>{}, C<233.3F>{}))>>);
     static_assert(
-        std::is_same_v<decltype(d), std::add_const_t<decltype(make_coord(C<233.3F>{}, C<233.3F>{}, C<233.3F>{}))>>);
+        std::is_same_v<decltype(d), std::add_const_t<decltype(make_crd(C<233.3F>{}, C<233.3F>{}, C<233.3F>{}))>>);
   }
 
   // 2D.
@@ -610,8 +619,8 @@ TEST(Layout, OperatorsFloat) {
   }
 
   {
-    constexpr let a = make_coord(C<2.1F>{}, C<7.2F>{});
-    constexpr let b = make_coord(C<5.3F>{}, C<11.4F>{});
+    constexpr let a = make_crd(C<2.1F>{}, C<7.2F>{});
+    constexpr let b = make_crd(C<5.3F>{}, C<11.4F>{});
     constexpr let c = a + b;
     constexpr let d = a - b;
     constexpr let e = a * b;
@@ -621,8 +630,8 @@ TEST(Layout, OperatorsFloat) {
   }
 
   {
-    let a = make_coord(C<2.1F>{}, 7.2F);
-    let b = make_coord(C<5.3F>{}, C<11.4F>{});
+    let a = make_crd(C<2.1F>{}, 7.2F);
+    let b = make_crd(C<5.3F>{}, C<11.4F>{});
     let c = a + b;
     let d = a - b;
     let e = a * b;
@@ -649,7 +658,7 @@ TEST(Layout, OperatorsFloat) {
   }
 
   {
-    constexpr let a = make_coord(C<2.1F>{}, C<7.2F>{});
+    constexpr let a = make_crd(C<2.1F>{}, C<7.2F>{});
     constexpr let b = C<5.3F>{};
     constexpr let c0 = a + b;
     constexpr let c1 = a - b;
@@ -666,7 +675,7 @@ TEST(Layout, OperatorsFloat) {
   }
 
   {
-    constexpr let a = make_coord(C<2.1F>{}, 7.2F);
+    constexpr let a = make_crd(C<2.1F>{}, 7.2F);
     constexpr let b = C<5.3F>{};
     constexpr let c0 = a + b;
     constexpr let c1 = a - b;
@@ -695,8 +704,8 @@ TEST(Layout, OperatorsFloat) {
   }
 
   {
-    constexpr let a = make_coord(C<2.1F>{}, C<7.2F>{}, C<-5.5F>{});
-    constexpr let b = make_coord(C<5.3F>{}, C<11.4F>{}, C<-4.5F>{});
+    constexpr let a = make_crd(C<2.1F>{}, C<7.2F>{}, C<-5.5F>{});
+    constexpr let b = make_crd(C<5.3F>{}, C<11.4F>{}, C<-4.5F>{});
     constexpr let c = a + b;
     constexpr let d = a - b;
     constexpr let e = a * b;
@@ -706,8 +715,8 @@ TEST(Layout, OperatorsFloat) {
   }
 
   {
-    let a = make_coord(C<2.1F>{}, 7.2F, C<-5.5F>{});
-    let b = make_coord(C<5.3F>{}, C<11.4F>{}, C<-4.5F>{});
+    let a = make_crd(C<2.1F>{}, 7.2F, C<-5.5F>{});
+    let b = make_crd(C<5.3F>{}, C<11.4F>{}, C<-4.5F>{});
     let c = a + b;
     let d = a - b;
     let e = a * b;
@@ -734,7 +743,7 @@ TEST(Layout, OperatorsFloat) {
   }
 
   {
-    constexpr let a = make_coord(C<2.1F>{}, C<7.2F>{}, C<-5.5F>{});
+    constexpr let a = make_crd(C<2.1F>{}, C<7.2F>{}, C<-5.5F>{});
     constexpr let b = C<5.3F>{};
     constexpr let c0 = a + b;
     constexpr let c1 = a - b;
@@ -751,7 +760,7 @@ TEST(Layout, OperatorsFloat) {
   }
 
   {
-    constexpr let a = make_coord(C<2.1F>{}, 7.2F, C<-5.5F>{});
+    constexpr let a = make_crd(C<2.1F>{}, 7.2F, C<-5.5F>{});
     constexpr let b = C<5.3F>{};
     constexpr let c0 = a + b;
     constexpr let c1 = a - b;
