@@ -70,16 +70,18 @@ using Tup = cute::tuple<Ts...>;
 
 template <typename T, typename... Ts>
   requires(std::is_same_v<arithmetic_type_v<T>, arithmetic_type_v<Ts>> && ...)
-using Coord = cute::Coord<T, Ts...>;
+using Crd = cute::Coord<T, Ts...>;
 
 template <typename... Ts>
 ARIA_HOST_DEVICE constexpr Tup<Ts...> make_tup(const Ts &...ts) {
   return cute::make_tuple(ts...);
 }
 
-template <typename... Ts>
-ARIA_HOST_DEVICE constexpr Coord<Ts...> make_coord(const Ts &...ts) {
-  return cute::make_coord(ts...);
+// TODO: NVCC bug here.
+template <typename T, typename... Ts>
+  requires(std::is_same_v<arithmetic_type_v<T>, arithmetic_type_v<Ts>> && ...)
+ARIA_HOST_DEVICE constexpr cute::Coord<T, Ts...> make_crd(const T &t, const Ts &...ts) {
+  return cute::make_coord(t, ts...);
 }
 
 //
@@ -299,14 +301,14 @@ concept CoLayout = is_co_layout_v<TLayout>;
 //
 //
 //
-// Cast `Coord` to `std::array`.
+// Cast `Crd` to `std::array`.
 template <typename T, typename... Ts>
-[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToArray(const Coord<T, Ts...> &coord) {
+[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToArray(const Crd<T, Ts...> &coord) {
   using value_type = arithmetic_type_v<T>;
   static_assert((std::is_same_v<value_type, arithmetic_type_v<Ts>> && ...),
                 "Element types of `Coord` should be \"as similar as possible\"");
 
-  constexpr uint rank = rank_v<Coord<T, Ts...>>;
+  constexpr uint rank = rank_v<Crd<T, Ts...>>;
 
   std::array<value_type, rank> res;
   ForEach<rank>([&]<auto i>() { res[i] = get<i>(coord); });
