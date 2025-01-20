@@ -368,15 +368,15 @@ TEST(Layout, OperatorsInt) {
   using Crd2 = Crd<int, int>;
   using Crd3 = Crd<int, int, int>;
 
-  auto expectCrd2 = [](const Crd2 &coord, int x, int y) {
-    EXPECT_EQ(get<0>(coord), x);
-    EXPECT_EQ(get<1>(coord), y);
+  auto expectCrd2 = [](const Crd2 &crd, int x, int y) {
+    EXPECT_EQ(get<0>(crd), x);
+    EXPECT_EQ(get<1>(crd), y);
   };
 
-  auto expectCrd3 = [](const Crd3 &coord, int x, int y, int z) {
-    EXPECT_EQ(get<0>(coord), x);
-    EXPECT_EQ(get<1>(coord), y);
-    EXPECT_EQ(get<2>(coord), z);
+  auto expectCrd3 = [](const Crd3 &crd, int x, int y, int z) {
+    EXPECT_EQ(get<0>(crd), x);
+    EXPECT_EQ(get<1>(crd), y);
+    EXPECT_EQ(get<2>(crd), z);
   };
 
   {
@@ -583,15 +583,15 @@ TEST(Layout, OperatorsFloat) {
   using Crd2 = Crd<float, float>;
   using Crd3 = Crd<float, float, float>;
 
-  auto expectCrd2 = [](const Crd2 &coord, float x, float y) {
-    EXPECT_FLOAT_EQ(get<0>(coord), x);
-    EXPECT_FLOAT_EQ(get<1>(coord), y);
+  auto expectCrd2 = [](const Crd2 &crd, float x, float y) {
+    EXPECT_FLOAT_EQ(get<0>(crd), x);
+    EXPECT_FLOAT_EQ(get<1>(crd), y);
   };
 
-  auto expectCrd3 = [](const Crd3 &coord, float x, float y, float z) {
-    EXPECT_FLOAT_EQ(get<0>(coord), x);
-    EXPECT_FLOAT_EQ(get<1>(coord), y);
-    EXPECT_FLOAT_EQ(get<2>(coord), z);
+  auto expectCrd3 = [](const Crd3 &crd, float x, float y, float z) {
+    EXPECT_FLOAT_EQ(get<0>(crd), x);
+    EXPECT_FLOAT_EQ(get<1>(crd), y);
+    EXPECT_FLOAT_EQ(get<2>(crd), z);
   };
 
   {
