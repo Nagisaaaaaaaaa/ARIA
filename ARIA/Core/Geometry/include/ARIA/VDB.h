@@ -26,7 +26,7 @@ namespace ARIA {
 /// \example ```cpp
 /// // Define the volume type and the coordinate type.
 /// using Volume = DeviceVDB<float, 2>;
-/// using VCrd = Crd<int, int>;
+/// using VTec = Tec<int, int>;
 ///
 /// // Instantiate a volume.
 /// Volume volume;
@@ -40,35 +40,35 @@ namespace ARIA {
 /// VDBAccessor readAccessor = volume.readAccessor();
 ///
 /// // Launch for each coord in the layout.
-/// Launcher(layout, [=] ARIA_DEVICE(const VCrd &crd) mutable {
+/// Launcher(layout, [=] ARIA_DEVICE(const VTec &tec) mutable {
 ///   // An `AllocateWriteAccessor` will automatically allocate memory when
 ///   // value of an unallocated coord is set.
-///   allocateWriteAccessor.value(crd) = static_cast<float>(layout(crd));
+///   allocateWriteAccessor.value(tec) = static_cast<float>(layout(tec));
 /// }).Launch();
 ///
 /// // Launch for each coord in the VDB whose value is "on".
-/// Launcher(volume, [=] ARIA_DEVICE(const VCrd &crd) mutable {
+/// Launcher(volume, [=] ARIA_DEVICE(const VTec &tec) mutable {
 ///   // A `WriteAccessor` assumes the memory of the value has always been allocated before.
-///   writeAccessor.value(crd) *= 2;
+///   writeAccessor.value(tec) *= 2;
 /// }).Launch();
 ///
-/// Launcher(volume, [=] ARIA_DEVICE(const VCrd &crd) {
+/// Launcher(volume, [=] ARIA_DEVICE(const VTec &tec) {
 ///   // A `ReadAccessor` can only get and cannot set the values.
-///   ARIA_ASSERT(readAccessor.value(crd) == layout(crd) * 2);
+///   ARIA_ASSERT(readAccessor.value(tec) == layout(tec) * 2);
 /// }).Launch();
 ///
 /// // Set some values to "off".
-/// Launcher(volume, [=] ARIA_DEVICE(const VCrd &crd) mutable {
-///   if (get<0>(crd) % 2 == 0)
-///     writeAccessor.value(crd) = Off{}; // This will set the value at `crd` to "off".
+/// Launcher(volume, [=] ARIA_DEVICE(const VTec &tec) mutable {
+///   if (get<0>(tec) % 2 == 0)
+///     writeAccessor.value(tec) = Off{}; // This will set the value at `tec` to "off".
 /// }).Launch();
 ///
 /// // Check whether the values are "on" or "off".
-/// Launcher(volume, [=] ARIA_DEVICE(const VCrd &crd) {
-///   if (get<0>(crd) % 2 == 0)
-///     ARIA_ASSERT(!readAccessor.IsValueOn(crd)); // Value at this `crd` should be "off".
+/// Launcher(volume, [=] ARIA_DEVICE(const VTec &tec) {
+///   if (get<0>(tec) % 2 == 0)
+///     ARIA_ASSERT(!readAccessor.IsValueOn(tec)); // Value at this `tec` should be "off".
 ///   else
-///     ARIA_ASSERT(readAccessor.IsValueOn(crd)); // Value at this `crd` should be "on".
+///     ARIA_ASSERT(readAccessor.IsValueOn(tec)); // Value at this `tec` should be "on".
 /// }).Launch();
 ///
 /// // After setting some values to "off", you can shrink to fit the `VDB` to save memory.
@@ -76,10 +76,10 @@ namespace ARIA {
 ///
 /// // The `Launcher` can also automatically create accessors for each thread.
 /// // These `Launcher`-generated accessors are initialized with caches (like openvdb and nanovdb), which
-/// // contain information about the per-thread `crd`.
-/// Launcher(volume, [=] ARIA_DEVICE(const VCrd &crd, AllocateWriteAccessor& accessor) { ... }).Launch();
-/// Launcher(volume, [=] ARIA_DEVICE(const VCrd &crd, WriteAccessor& accessor) { ... }).Launch();
-/// Launcher(volume, [=] ARIA_DEVICE(const VCrd &crd, const ReadAccessor& accessor) { ... }).Launch();
+/// // contain information about the per-thread `tec`.
+/// Launcher(volume, [=] ARIA_DEVICE(const VTec &tec, AllocateWriteAccessor& accessor) { ... }).Launch();
+/// Launcher(volume, [=] ARIA_DEVICE(const VTec &tec, WriteAccessor& accessor) { ... }).Launch();
+/// Launcher(volume, [=] ARIA_DEVICE(const VTec &tec, const ReadAccessor& accessor) { ... }).Launch();
 /// ```
 ///
 /// \todo `HostVDB`s have not been implemented yet.
@@ -150,17 +150,17 @@ using VDBReadAccessor = typename VDB::ReadAccessor;
 ///
 /// \example ```cpp
 /// using Volume = DeviceVDB<float, 2>;
-/// using VCrd = Crd<int, int>;
+/// using VTec = Tec<int, int>;
 ///
 /// Volume volume;
 /// ...
 ///
-/// Launcher(volume, [=, accessor = volume.writeAccessor()] ARIA_DEVICE(const VCrd &crd) mutable {
-///   accessor.value(crd) *= 2;
+/// Launcher(volume, [=, accessor = volume.writeAccessor()] ARIA_DEVICE(const VTec &tec) mutable {
+///   accessor.value(tec) *= 2;
 /// }).Launch();
 ///
-/// Launcher(volume, [=, accessor = volume.readAccessor()] ARIA_DEVICE(const VCrd &crd) {
-///   ARIA_ASSERT(accessor.value(crd) == layout(crd) * 2);
+/// Launcher(volume, [=, accessor = volume.readAccessor()] ARIA_DEVICE(const VTec &tec) {
+///   ARIA_ASSERT(accessor.value(tec) == layout(tec) * 2);
 /// }).Launch();
 /// ```
 template <vdb::detail::DeviceVDBType TVDB, typename F>
