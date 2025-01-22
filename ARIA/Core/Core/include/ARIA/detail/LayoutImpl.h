@@ -23,7 +23,7 @@ namespace ARIA {
 
 namespace layout::detail {
 
-// Get the underlying arithmetic type.
+// Get the underlying arithmetic domain.
 // Examples:
 //   int         -> int
 //   const int   -> int
@@ -31,29 +31,33 @@ namespace layout::detail {
 //   C<1>        -> int
 //   const C<1>  -> int
 //   const C<1>& -> int
+//   std::string -> void
 template <typename T>
-struct arithmetic_type;
+struct arithmetic_domain {
+  using type = void;
+};
 
 template <typename T>
   requires(!ConstantArithmetic<std::decay_t<T>> && std::is_arithmetic_v<std::decay_t<T>>)
-struct arithmetic_type<T> {
+struct arithmetic_domain<T> {
   using type = std::decay_t<T>;
 };
 
 template <typename T>
   requires(ConstantArithmetic<std::decay_t<T>>)
-struct arithmetic_type<T> {
+struct arithmetic_domain<T> {
   using type = std::decay_t<decltype(std::decay_t<T>::value)>;
 };
 
 template <typename T>
-using arithmetic_type_t = typename arithmetic_type<T>::type;
+using arithmetic_domain_t = typename arithmetic_domain<T>::type;
 
-//
-//
-//
+template <typename T>
+constexpr bool has_arithmetic_domain_v = !std::is_void_v<arithmetic_domain_t<T>>;
+
 template <typename T, typename... Ts>
-constexpr bool is_same_arithmetic_type_v = (std::is_same_v<arithmetic_type_t<T>, arithmetic_type_t<Ts>> && ...);
+constexpr bool is_same_arithmetic_domain_v =
+    has_arithmetic_domain_v<T> && (std::is_same_v<arithmetic_domain_t<T>, arithmetic_domain_t<Ts>> && ...);
 
 //
 //
@@ -75,19 +79,148 @@ template <typename... Ts>
 using Tup = cute::tuple<Ts...>;
 
 template <typename... Ts>
-  requires(!std::is_void_v<arithmetic_type_t<Ts>> && ...)
-using Crd = cute::Coord<Ts...>;
+  requires(has_arithmetic_domain_v<Ts> && ...)
+using Tec = cute::tuple<Ts...>;
+
+//
+//
+//
+//
+//
+// TODO: Great efforts are made to bypass the MSVC bug.
+template <typename... Ts>
+  requires((sizeof...(Ts) == 1 && has_arithmetic_domain_v<Ts>) && ...)
+using Tec1 = cute::tuple<Ts...>;
 
 template <typename... Ts>
-ARIA_HOST_DEVICE constexpr Tup<Ts...> make_tup(const Ts &...ts) {
-  return cute::make_tuple(ts...);
-}
+  requires((sizeof...(Ts) == 2 && has_arithmetic_domain_v<Ts>) && ...)
+using Tec2 = cute::tuple<Ts...>;
 
 template <typename... Ts>
-ARIA_HOST_DEVICE constexpr Crd<Ts...> make_crd(const Ts &...ts) {
-  return cute::make_coord(ts...);
-}
+  requires((sizeof...(Ts) == 3 && has_arithmetic_domain_v<Ts>) && ...)
+using Tec3 = cute::tuple<Ts...>;
 
+template <typename... Ts>
+  requires((sizeof...(Ts) == 4 && has_arithmetic_domain_v<Ts>) && ...)
+using Tec4 = cute::tuple<Ts...>;
+
+//
+//
+//
+template <typename... Ts>
+  requires(std::is_same_v<arithmetic_domain_t<Ts>, int> && ...)
+using Teci = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires(std::is_same_v<arithmetic_domain_t<Ts>, uint> && ...)
+using Tecu = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires(std::is_same_v<arithmetic_domain_t<Ts>, float> && ...)
+using Tecf = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires(std::is_same_v<arithmetic_domain_t<Ts>, double> && ...)
+using Tecd = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires(std::is_same_v<arithmetic_domain_t<Ts>, Real> && ...)
+using Tecr = cute::tuple<Ts...>;
+
+//
+//
+//
+template <typename... Ts>
+  requires((sizeof...(Ts) == 1 && std::is_same_v<arithmetic_domain_t<Ts>, int>) && ...)
+using Tec1i = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 1 && std::is_same_v<arithmetic_domain_t<Ts>, uint>) && ...)
+using Tec1u = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 1 && std::is_same_v<arithmetic_domain_t<Ts>, float>) && ...)
+using Tec1f = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 1 && std::is_same_v<arithmetic_domain_t<Ts>, double>) && ...)
+using Tec1d = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 1 && std::is_same_v<arithmetic_domain_t<Ts>, Real>) && ...)
+using Tec1r = cute::tuple<Ts...>;
+
+//
+//
+//
+template <typename... Ts>
+  requires((sizeof...(Ts) == 2 && std::is_same_v<arithmetic_domain_t<Ts>, int>) && ...)
+using Tec2i = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 2 && std::is_same_v<arithmetic_domain_t<Ts>, uint>) && ...)
+using Tec2u = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 2 && std::is_same_v<arithmetic_domain_t<Ts>, float>) && ...)
+using Tec2f = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 2 && std::is_same_v<arithmetic_domain_t<Ts>, double>) && ...)
+using Tec2d = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 2 && std::is_same_v<arithmetic_domain_t<Ts>, Real>) && ...)
+using Tec2r = cute::tuple<Ts...>;
+
+//
+//
+//
+template <typename... Ts>
+  requires((sizeof...(Ts) == 3 && std::is_same_v<arithmetic_domain_t<Ts>, int>) && ...)
+using Tec3i = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 3 && std::is_same_v<arithmetic_domain_t<Ts>, uint>) && ...)
+using Tec3u = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 3 && std::is_same_v<arithmetic_domain_t<Ts>, float>) && ...)
+using Tec3f = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 3 && std::is_same_v<arithmetic_domain_t<Ts>, double>) && ...)
+using Tec3d = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 3 && std::is_same_v<arithmetic_domain_t<Ts>, Real>) && ...)
+using Tec3r = cute::tuple<Ts...>;
+
+//
+//
+//
+template <typename... Ts>
+  requires((sizeof...(Ts) == 4 && std::is_same_v<arithmetic_domain_t<Ts>, int>) && ...)
+using Tec4i = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 4 && std::is_same_v<arithmetic_domain_t<Ts>, uint>) && ...)
+using Tec4u = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 4 && std::is_same_v<arithmetic_domain_t<Ts>, float>) && ...)
+using Tec4f = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 4 && std::is_same_v<arithmetic_domain_t<Ts>, double>) && ...)
+using Tec4d = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 4 && std::is_same_v<arithmetic_domain_t<Ts>, Real>) && ...)
+using Tec4r = cute::tuple<Ts...>;
+
+//
+//
 //
 //
 //
@@ -305,16 +438,16 @@ concept CoLayout = is_co_layout_v<TLayout>;
 //
 //
 //
-// Cast `Crd` to `std::array`.
+// Cast `Tec` to `std::array`.
 template <typename T, typename... Ts>
-[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToArray(const Crd<T, Ts...> &crd) {
-  using value_type = arithmetic_type_t<T>;
-  static_assert(is_same_arithmetic_type_v<T, Ts...>, "Element types of `Crd` should be \"as similar as possible\"");
+[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToArray(const Tec<T, Ts...> &tec) {
+  static_assert(is_same_arithmetic_domain_v<T, Ts...>, "Element types of `Tec` should be \"as similar as possible\"");
+  using value_type = arithmetic_domain_t<T>;
 
-  constexpr uint rank = rank_v<Crd<T, Ts...>>;
+  constexpr uint rank = rank_v<Tec<T, Ts...>>;
 
   std::array<value_type, rank> res;
-  ForEach<rank>([&]<auto i>() { res[i] = get<i>(crd); });
+  ForEach<rank>([&]<auto i>() { res[i] = get<i>(tec); });
   return res;
 }
 
