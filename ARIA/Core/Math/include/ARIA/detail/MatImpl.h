@@ -30,7 +30,7 @@ using Mat = Eigen::Matrix<T, row, col>;
 //
 //
 //
-// Whether the given type is `Mat<T, ...>`.
+// Whether the given type is `Mat<...>`.
 template <typename T>
 struct is_mat : std::false_type {};
 
@@ -43,7 +43,7 @@ static constexpr bool is_mat_v = is_mat<T>::value;
 //
 //
 //
-// Whether the given type is `Mat<T, row, col>.
+// Whether the given type is `Mat<..., row, col>`.
 template <typename T, auto row, auto col>
 struct is_mat_rc : std::false_type {};
 

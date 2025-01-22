@@ -14,7 +14,7 @@ using Vec = Eigen::Vector<T, size>;
 //
 //
 //
-// Whether the given type is `Vec<T, ...>`.
+// Whether the given type is `Vec<...>`.
 template <typename T>
 struct is_vec : std::false_type {};
 
@@ -27,7 +27,7 @@ static constexpr bool is_vec_v = is_vec<T>::value;
 //
 //
 //
-// Whether the given type is `Vec<T, s>`.
+// Whether the given type is `Vec<..., s>`.
 template <typename T, auto s>
 struct is_vec_s : std::false_type {};
 
