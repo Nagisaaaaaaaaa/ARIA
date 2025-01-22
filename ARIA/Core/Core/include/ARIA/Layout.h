@@ -58,6 +58,9 @@ using layout::detail::Tup;
 ///
 /// \example ```cpp
 /// Tec tec{1, C<2U>{}, 3.0F, C<4.0>{}};
+/// Tec3 tec3{1, C<2U>{}, 3.0F};
+/// Teci teci{1, C<2>{}, 3, C<4>{}};
+/// Tec3i tec3i{1, C<2>{}, 3};
 /// ```
 using layout::detail::Tec;
 
