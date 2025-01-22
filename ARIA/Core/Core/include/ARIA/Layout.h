@@ -64,18 +64,6 @@ using layout::detail::Tec;
 //
 //
 //
-template <typename T0>
-using Tec1 = Tec<T0>;
-template <typename T0, typename T1>
-using Tec2 = Tec<T0, T1>;
-template <typename T0, typename T1, typename T2>
-using Tec3 = Tec<T0, T1, T2>;
-template <typename T0, typename T1, typename T2, typename T3>
-using Tec4 = Tec<T0, T1, T2, T3>;
-
-//
-//
-//
 using layout::detail::is_static;
 
 using layout::detail::is_static_v;
