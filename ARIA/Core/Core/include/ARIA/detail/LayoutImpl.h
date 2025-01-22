@@ -23,7 +23,7 @@ namespace ARIA {
 
 namespace layout::detail {
 
-// Get the underlying arithmetic type.
+// Get the underlying arithmetic domain.
 // Examples:
 //   int         -> int
 //   const int   -> int
@@ -32,28 +32,28 @@ namespace layout::detail {
 //   const C<1>  -> int
 //   const C<1>& -> int
 template <typename T>
-struct arithmetic_type;
+struct arithmetic_domain;
 
 template <typename T>
   requires(!ConstantArithmetic<std::decay_t<T>> && std::is_arithmetic_v<std::decay_t<T>>)
-struct arithmetic_type<T> {
+struct arithmetic_domain<T> {
   using type = std::decay_t<T>;
 };
 
 template <typename T>
   requires(ConstantArithmetic<std::decay_t<T>>)
-struct arithmetic_type<T> {
+struct arithmetic_domain<T> {
   using type = std::decay_t<decltype(std::decay_t<T>::value)>;
 };
 
 template <typename T>
-using arithmetic_type_t = typename arithmetic_type<T>::type;
+using arithmetic_domain_t = typename arithmetic_domain<T>::type;
 
 //
 //
 //
 template <typename T, typename... Ts>
-constexpr bool is_same_arithmetic_type_v = (std::is_same_v<arithmetic_type_t<T>, arithmetic_type_t<Ts>> && ...);
+constexpr bool is_same_arithmetic_domain_v = (std::is_same_v<arithmetic_domain_t<T>, arithmetic_domain_t<Ts>> && ...);
 
 //
 //
@@ -75,7 +75,7 @@ template <typename... Ts>
 using Tup = cute::tuple<Ts...>;
 
 template <typename... Ts>
-  requires(!std::is_void_v<arithmetic_type_t<Ts>> && ...)
+  requires(!std::is_void_v<arithmetic_domain_t<Ts>> && ...)
 using Crd = cute::Coord<Ts...>;
 
 //
@@ -298,8 +298,8 @@ concept CoLayout = is_co_layout_v<TLayout>;
 // Cast `Crd` to `std::array`.
 template <typename T, typename... Ts>
 [[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToArray(const Crd<T, Ts...> &crd) {
-  using value_type = arithmetic_type_t<T>;
-  static_assert(is_same_arithmetic_type_v<T, Ts...>, "Element types of `Crd` should be \"as similar as possible\"");
+  using value_type = arithmetic_domain_t<T>;
+  static_assert(is_same_arithmetic_domain_v<T, Ts...>, "Element types of `Crd` should be \"as similar as possible\"");
 
   constexpr uint rank = rank_v<Crd<T, Ts...>>;
 
