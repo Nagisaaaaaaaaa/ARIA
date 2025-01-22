@@ -59,17 +59,43 @@ TEST(Layout, Base) {
   }
 
   {
-    constexpr Tec1i u1i{1};
-    constexpr Tec1u u1u{1U};
-    constexpr Tec1f u1f{1.0F};
-    constexpr Tec1d u1d{1.0};
-    constexpr Tec1r u1r{1_R};
+    constexpr Tec1i vi_0{1};
+    constexpr Tec1u vu_0{1U};
+    constexpr Tec1f vf_0{1.0F};
+    constexpr Tec1d vd_0{1.0};
+    constexpr Tec1r vr_0{1_R};
 
-    constexpr Tec1i v1i{C<1>{}};
-    constexpr Tec1u v1u{C<1U>{}};
-    constexpr Tec1f v1f{C<1.0F>{}};
-    constexpr Tec1d v1d{C<1.0>{}};
-    constexpr Tec1r v1r{C<1_R>{}};
+    constexpr Tec1i vi_1{C<1>{}};
+    constexpr Tec1u vu_1{C<1U>{}};
+    constexpr Tec1f vf_1{C<1.0F>{}};
+    constexpr Tec1d vd_1{C<1.0>{}};
+    constexpr Tec1r vr_1{C<1_R>{}};
+  }
+
+  {
+    constexpr Tec2i vi_00{1, 2};
+    constexpr Tec2u vu_00{1U, 2U};
+    constexpr Tec2f vf_00{1.0F, 2.0F};
+    constexpr Tec2d vd_00{1.0, 2.0};
+    constexpr Tec2r vr_00{1_R, 2_R};
+
+    constexpr Tec2i vi_01{1, C<2>{}};
+    constexpr Tec2u vu_01{1U, C<2U>{}};
+    constexpr Tec2f vf_01{1.0F, C<2.0F>{}};
+    constexpr Tec2d vd_01{1.0, C<2.0>{}};
+    constexpr Tec2r vr_01{1_R, C<2_R>{}};
+
+    constexpr Tec2i vi_10{C<1>{}, 2};
+    constexpr Tec2u vu_10{C<1U>{}, 2U};
+    constexpr Tec2f vf_10{C<1.0F>{}, 2.0F};
+    constexpr Tec2d vd_10{C<1.0>{}, 2.0};
+    constexpr Tec2r vr_10{C<1_R>{}, 2_R};
+
+    constexpr Tec2i vi_11{C<1>{}, C<2>{}};
+    constexpr Tec2u vu_11{C<1U>{}, C<2U>{}};
+    constexpr Tec2f vf_11{C<1.0F>{}, C<2.0F>{}};
+    constexpr Tec2d vd_11{C<1.0>{}, C<2.0>{}};
+    constexpr Tec2r vr_11{C<1_R>{}, C<2_R>{}};
   }
 
   static_assert(rank(Tec{}) == 0);
