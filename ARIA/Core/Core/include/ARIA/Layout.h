@@ -78,6 +78,24 @@ using layout::detail::Tec1i;
 using layout::detail::Tec1r;
 using layout::detail::Tec1u;
 
+using layout::detail::Tec2d;
+using layout::detail::Tec2f;
+using layout::detail::Tec2i;
+using layout::detail::Tec2r;
+using layout::detail::Tec2u;
+
+using layout::detail::Tec3d;
+using layout::detail::Tec3f;
+using layout::detail::Tec3i;
+using layout::detail::Tec3r;
+using layout::detail::Tec3u;
+
+using layout::detail::Tec4d;
+using layout::detail::Tec4f;
+using layout::detail::Tec4i;
+using layout::detail::Tec4r;
+using layout::detail::Tec4u;
+
 //
 //
 //

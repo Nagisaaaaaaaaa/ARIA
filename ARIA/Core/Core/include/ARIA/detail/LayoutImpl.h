@@ -151,6 +151,75 @@ using Tec1r = cute::tuple<Ts...>;
 //
 //
 //
+template <typename... Ts>
+  requires((sizeof...(Ts) == 2 && std::is_same_v<arithmetic_domain_t<Ts>, int>) && ...)
+using Tec2i = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 2 && std::is_same_v<arithmetic_domain_t<Ts>, uint>) && ...)
+using Tec2u = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 2 && std::is_same_v<arithmetic_domain_t<Ts>, float>) && ...)
+using Tec2f = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 2 && std::is_same_v<arithmetic_domain_t<Ts>, double>) && ...)
+using Tec2d = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 2 && std::is_same_v<arithmetic_domain_t<Ts>, Real>) && ...)
+using Tec2r = cute::tuple<Ts...>;
+
+//
+//
+//
+template <typename... Ts>
+  requires((sizeof...(Ts) == 3 && std::is_same_v<arithmetic_domain_t<Ts>, int>) && ...)
+using Tec3i = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 3 && std::is_same_v<arithmetic_domain_t<Ts>, uint>) && ...)
+using Tec3u = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 3 && std::is_same_v<arithmetic_domain_t<Ts>, float>) && ...)
+using Tec3f = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 3 && std::is_same_v<arithmetic_domain_t<Ts>, double>) && ...)
+using Tec3d = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 3 && std::is_same_v<arithmetic_domain_t<Ts>, Real>) && ...)
+using Tec3r = cute::tuple<Ts...>;
+
+//
+//
+//
+template <typename... Ts>
+  requires((sizeof...(Ts) == 4 && std::is_same_v<arithmetic_domain_t<Ts>, int>) && ...)
+using Tec4i = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 4 && std::is_same_v<arithmetic_domain_t<Ts>, uint>) && ...)
+using Tec4u = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 4 && std::is_same_v<arithmetic_domain_t<Ts>, float>) && ...)
+using Tec4f = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 4 && std::is_same_v<arithmetic_domain_t<Ts>, double>) && ...)
+using Tec4d = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 4 && std::is_same_v<arithmetic_domain_t<Ts>, Real>) && ...)
+using Tec4r = cute::tuple<Ts...>;
+
+//
+//
+//
 using cute::is_static;
 using cute::is_static_v;
 
