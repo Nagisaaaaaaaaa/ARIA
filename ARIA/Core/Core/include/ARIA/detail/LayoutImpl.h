@@ -31,8 +31,11 @@ namespace layout::detail {
 //   C<1>        -> int
 //   const C<1>  -> int
 //   const C<1>& -> int
+//   std::string -> void
 template <typename T>
-struct arithmetic_domain;
+struct arithmetic_domain {
+  using type = void;
+};
 
 template <typename T>
   requires(!ConstantArithmetic<std::decay_t<T>> && std::is_arithmetic_v<std::decay_t<T>>)
@@ -49,11 +52,12 @@ struct arithmetic_domain<T> {
 template <typename T>
 using arithmetic_domain_t = typename arithmetic_domain<T>::type;
 
-//
-//
-//
+template <typename T>
+constexpr bool has_arithmetic_domain_v = !std::is_void_v<arithmetic_domain_t<T>>;
+
 template <typename T, typename... Ts>
-constexpr bool is_same_arithmetic_domain_v = (std::is_same_v<arithmetic_domain_t<T>, arithmetic_domain_t<Ts>> && ...);
+constexpr bool is_same_arithmetic_domain_v =
+    has_arithmetic_domain_v<T> && (std::is_same_v<arithmetic_domain_t<T>, arithmetic_domain_t<Ts>> && ...);
 
 //
 //
@@ -75,7 +79,7 @@ template <typename... Ts>
 using Tup = cute::tuple<Ts...>;
 
 template <typename... Ts>
-  requires(!std::is_void_v<arithmetic_domain_t<Ts>> && ...)
+  requires(has_arithmetic_domain_v<Ts> && ...)
 using Crd = cute::Coord<Ts...>;
 
 //
@@ -298,8 +302,8 @@ concept CoLayout = is_co_layout_v<TLayout>;
 // Cast `Crd` to `std::array`.
 template <typename T, typename... Ts>
 [[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToArray(const Crd<T, Ts...> &crd) {
-  using value_type = arithmetic_domain_t<T>;
   static_assert(is_same_arithmetic_domain_v<T, Ts...>, "Element types of `Crd` should be \"as similar as possible\"");
+  using value_type = arithmetic_domain_t<T>;
 
   constexpr uint rank = rank_v<Crd<T, Ts...>>;
 

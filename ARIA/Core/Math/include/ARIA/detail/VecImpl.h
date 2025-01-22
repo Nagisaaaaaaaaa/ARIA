@@ -87,9 +87,9 @@ template <typename T, auto n>
 // Cast `Crd` to `Vec`.
 template <typename T, typename... Ts>
 [[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToVec(const Crd<T, Ts...> &crd) {
-  using value_type = layout::detail::arithmetic_domain_t<T>;
   static_assert(layout::detail::is_same_arithmetic_domain_v<T, Ts...>,
                 "Element types of `Crd` should be \"as similar as possible\"");
+  using value_type = layout::detail::arithmetic_domain_t<T>;
 
   constexpr uint rank = rank_v<Crd<T, Ts...>>;
 

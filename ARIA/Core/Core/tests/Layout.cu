@@ -21,6 +21,7 @@ TEST(Layout, Base) {
   static_assert(std::is_same_v<layout::detail::arithmetic_domain_t<C<1>>, int>);
   static_assert(std::is_same_v<layout::detail::arithmetic_domain_t<const C<1>>, int>);
   static_assert(std::is_same_v<layout::detail::arithmetic_domain_t<const C<1> &>, int>);
+  static_assert(std::is_same_v<layout::detail::arithmetic_domain_t<std::string>, void>);
 
   // Make tup.
   {
