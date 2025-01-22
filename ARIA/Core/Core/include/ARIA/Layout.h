@@ -53,7 +53,7 @@ using layout::detail::get;
 /// ```
 using layout::detail::Tup;
 
-/// \brief The same type as `cute::Coord` but with restrictions, where
+/// \brief The same type as `cute::tuple` but with restrictions, where
 /// The elements are required to be arithmetic types.
 ///
 /// \example ```cpp
