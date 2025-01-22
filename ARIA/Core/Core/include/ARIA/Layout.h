@@ -61,6 +61,11 @@ using layout::detail::Tup;
 /// ```
 using layout::detail::Tec;
 
+using layout::detail::Tec1;
+using layout::detail::Tec2;
+using layout::detail::Tec3;
+using layout::detail::Tec4;
+
 //
 //
 //

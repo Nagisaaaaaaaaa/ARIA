@@ -85,6 +85,25 @@ using Tec = cute::tuple<Ts...>;
 //
 //
 //
+template <typename... Ts>
+  requires((sizeof...(Ts) == 1 && has_arithmetic_domain_v<Ts>) && ...)
+using Tec1 = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 2 && has_arithmetic_domain_v<Ts>) && ...)
+using Tec2 = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 3 && has_arithmetic_domain_v<Ts>) && ...)
+using Tec3 = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires((sizeof...(Ts) == 4 && has_arithmetic_domain_v<Ts>) && ...)
+using Tec4 = cute::tuple<Ts...>;
+
+//
+//
+//
 using cute::is_static;
 using cute::is_static_v;
 
