@@ -98,6 +98,56 @@ TEST(Layout, Base) {
     constexpr Tec2r vr_11{C<1_R>{}, C<2_R>{}};
   }
 
+  {
+    constexpr Tec3i vi_000{1, 2, 3};
+    constexpr Tec3u vu_000{1U, 2U, 3U};
+    constexpr Tec3f vf_000{1.0F, 2.0F, 3.0F};
+    constexpr Tec3d vd_000{1.0, 2.0, 3.0};
+    constexpr Tec3r vr_000{1_R, 2_R, 3_R};
+
+    constexpr Tec3i vi_100{C<1>{}, 2, 3};
+    constexpr Tec3u vu_100{C<1U>{}, 2U, 3U};
+    constexpr Tec3f vf_100{C<1.0F>{}, 2.0F, 3.0F};
+    constexpr Tec3d vd_100{C<1.0>{}, 2.0, 3.0};
+    constexpr Tec3r vr_100{C<1_R>{}, 2_R, 3_R};
+
+    constexpr Tec3i vi_010{1, C<2>{}, 3};
+    constexpr Tec3u vu_010{1U, C<2U>{}, 3U};
+    constexpr Tec3f vf_010{1.0F, C<2.0F>{}, 3.0F};
+    constexpr Tec3d vd_010{1.0, C<2.0>{}, 3.0};
+    constexpr Tec3r vr_010{1_R, C<2_R>{}, 3_R};
+
+    constexpr Tec3i vi_110{C<1>{}, C<2>{}, 3};
+    constexpr Tec3u vu_110{C<1U>{}, C<2U>{}, 3U};
+    constexpr Tec3f vf_110{C<1.0F>{}, C<2.0F>{}, 3.0F};
+    constexpr Tec3d vd_110{C<1.0>{}, C<2.0>{}, 3.0};
+    constexpr Tec3r vr_110{C<1_R>{}, C<2_R>{}, 3_R};
+
+    constexpr Tec3i vi_001{1, 2, C<3>{}};
+    constexpr Tec3u vu_001{1U, 2U, C<3U>{}};
+    constexpr Tec3f vf_001{1.0F, 2.0F, C<3.0F>{}};
+    constexpr Tec3d vd_001{1.0, 2.0, C<3.0>{}};
+    constexpr Tec3r vr_001{1_R, 2_R, C<3_R>{}};
+
+    constexpr Tec3i vi_101{C<1>{}, 2, C<3>{}};
+    constexpr Tec3u vu_101{C<1U>{}, 2U, C<3U>{}};
+    constexpr Tec3f vf_101{C<1.0F>{}, 2.0F, C<3.0F>{}};
+    constexpr Tec3d vd_101{C<1.0>{}, 2.0, C<3.0>{}};
+    constexpr Tec3r vr_101{C<1_R>{}, 2_R, C<3_R>{}};
+
+    constexpr Tec3i vi_011{1, C<2>{}, C<3>{}};
+    constexpr Tec3u vu_011{1U, C<2U>{}, C<3U>{}};
+    constexpr Tec3f vf_011{1.0F, C<2.0F>{}, C<3.0F>{}};
+    constexpr Tec3d vd_011{1.0, C<2.0>{}, C<3.0>{}};
+    constexpr Tec3r vr_011{1_R, C<2_R>{}, C<3_R>{}};
+
+    constexpr Tec3i vi_111{C<1>{}, C<2>{}, C<3>{}};
+    constexpr Tec3u vu_111{C<1U>{}, C<2U>{}, C<3U>{}};
+    constexpr Tec3f vf_111{C<1.0F>{}, C<2.0F>{}, C<3.0F>{}};
+    constexpr Tec3d vd_111{C<1.0>{}, C<2.0>{}, C<3.0>{}};
+    constexpr Tec3r vr_111{C<1_R>{}, C<2_R>{}, C<3_R>{}};
+  }
+
   static_assert(rank(Tec{}) == 0);
   static_assert(rank(Tec{0}) == 1);
   static_assert(rank(Tec{_0{}}) == 1);
