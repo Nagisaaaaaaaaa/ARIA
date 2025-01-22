@@ -98,6 +98,9 @@ TEST(Layout, Base) {
     static_assert(layout::detail::is_tec_tr_v<std::decay_t<decltype(vf_1)>, float, 1>);
     static_assert(layout::detail::is_tec_tr_v<std::decay_t<decltype(vd_1)>, double, 1>);
     static_assert(layout::detail::is_tec_tr_v<std::decay_t<decltype(vr_1)>, Real, 1>);
+
+    static_assert(!layout::detail::is_tec_tr_v<std::decay_t<decltype(vi_0)>, int, 2>);
+    static_assert(!layout::detail::is_tec_tr_v<std::decay_t<decltype(vi_0)>, uint, 1>);
   }
 
   {
@@ -148,6 +151,9 @@ TEST(Layout, Base) {
     static_assert(layout::detail::is_tec_tr_v<std::decay_t<decltype(vf_11)>, float, 2>);
     static_assert(layout::detail::is_tec_tr_v<std::decay_t<decltype(vd_11)>, double, 2>);
     static_assert(layout::detail::is_tec_tr_v<std::decay_t<decltype(vr_11)>, Real, 2>);
+
+    static_assert(!layout::detail::is_tec_tr_v<std::decay_t<decltype(vi_00)>, int, 3>);
+    static_assert(!layout::detail::is_tec_tr_v<std::decay_t<decltype(vi_00)>, uint, 2>);
   }
 
   {
@@ -246,6 +252,9 @@ TEST(Layout, Base) {
     static_assert(layout::detail::is_tec_tr_v<std::decay_t<decltype(vf_111)>, float, 3>);
     static_assert(layout::detail::is_tec_tr_v<std::decay_t<decltype(vd_111)>, double, 3>);
     static_assert(layout::detail::is_tec_tr_v<std::decay_t<decltype(vr_111)>, Real, 3>);
+
+    static_assert(!layout::detail::is_tec_tr_v<std::decay_t<decltype(vi_000)>, int, 4>);
+    static_assert(!layout::detail::is_tec_tr_v<std::decay_t<decltype(vi_000)>, uint, 3>);
   }
 
   static_assert(rank(Tec{}) == 0);
