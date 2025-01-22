@@ -98,6 +98,30 @@ TEST(Layout, Base) {
     constexpr Tec1d vd_1{C<1.0>{}};
     constexpr Tec1r vr_1{C<1_R>{}};
 
+    static_assert(layout::detail::is_tec_r_v<std::decay_t<decltype(vi_0)>, 1>);
+    static_assert(layout::detail::is_tec_r_v<std::decay_t<decltype(vu_0)>, 1>);
+    static_assert(layout::detail::is_tec_r_v<std::decay_t<decltype(vf_0)>, 1>);
+    static_assert(layout::detail::is_tec_r_v<std::decay_t<decltype(vd_0)>, 1>);
+    static_assert(layout::detail::is_tec_r_v<std::decay_t<decltype(vr_0)>, 1>);
+
+    static_assert(layout::detail::is_tec_r_v<std::decay_t<decltype(vi_1)>, 1>);
+    static_assert(layout::detail::is_tec_r_v<std::decay_t<decltype(vu_1)>, 1>);
+    static_assert(layout::detail::is_tec_r_v<std::decay_t<decltype(vf_1)>, 1>);
+    static_assert(layout::detail::is_tec_r_v<std::decay_t<decltype(vd_1)>, 1>);
+    static_assert(layout::detail::is_tec_r_v<std::decay_t<decltype(vr_1)>, 1>);
+
+    static_assert(layout::detail::is_tec_t_v<std::decay_t<decltype(vi_0)>, int>);
+    static_assert(layout::detail::is_tec_t_v<std::decay_t<decltype(vu_0)>, uint>);
+    static_assert(layout::detail::is_tec_t_v<std::decay_t<decltype(vf_0)>, float>);
+    static_assert(layout::detail::is_tec_t_v<std::decay_t<decltype(vd_0)>, double>);
+    static_assert(layout::detail::is_tec_t_v<std::decay_t<decltype(vr_0)>, Real>);
+
+    static_assert(layout::detail::is_tec_t_v<std::decay_t<decltype(vi_1)>, int>);
+    static_assert(layout::detail::is_tec_t_v<std::decay_t<decltype(vu_1)>, uint>);
+    static_assert(layout::detail::is_tec_t_v<std::decay_t<decltype(vf_1)>, float>);
+    static_assert(layout::detail::is_tec_t_v<std::decay_t<decltype(vd_1)>, double>);
+    static_assert(layout::detail::is_tec_t_v<std::decay_t<decltype(vr_1)>, Real>);
+
     static_assert(layout::detail::is_tec_tr_v<std::decay_t<decltype(vi_0)>, int, 1>);
     static_assert(layout::detail::is_tec_tr_v<std::decay_t<decltype(vu_0)>, uint, 1>);
     static_assert(layout::detail::is_tec_tr_v<std::decay_t<decltype(vf_0)>, float, 1>);
