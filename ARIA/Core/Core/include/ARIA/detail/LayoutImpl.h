@@ -222,6 +222,33 @@ using Tec4r = cute::tuple<Ts...>;
 //
 //
 //
+// Whether the given type is `Tec<...>`.
+template <typename T>
+struct is_tec : std::false_type {};
+
+template <typename... Ts>
+struct is_tec<Tec<Ts...>> : std::true_type {};
+
+template <typename T>
+constexpr bool is_tec_v = is_tec<T>::value;
+
+//
+//
+//
+// Whether the given `Tec` has "arithmetic" type `T` and rank `r`.
+template <typename TTec, typename T, auto r>
+struct is_tec_tr : std::false_type {};
+
+template <typename... Ts, typename T, auto r>
+  requires((sizeof...(Ts) == r && std::is_same_v<arithmetic_domain_t<Ts>, T>) && ...)
+struct is_tec_tr<Tec<Ts...>, T, r> : std::true_type {};
+
+template <typename TTec, typename T, auto r>
+constexpr bool is_tec_tr_v = is_tec_tr<TTec, T, r>::value;
+
+//
+//
+//
 //
 //
 using cute::is_static;
