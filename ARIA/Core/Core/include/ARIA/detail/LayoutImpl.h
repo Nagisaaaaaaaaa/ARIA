@@ -80,7 +80,7 @@ using Tup = cute::tuple<Ts...>;
 
 template <typename... Ts>
   requires(has_arithmetic_domain_v<Ts> && ...)
-using Crd = cute::Coord<Ts...>;
+using Tec = cute::Coord<Ts...>;
 
 //
 //
@@ -299,16 +299,16 @@ concept CoLayout = is_co_layout_v<TLayout>;
 //
 //
 //
-// Cast `Crd` to `std::array`.
+// Cast `Tec` to `std::array`.
 template <typename T, typename... Ts>
-[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToArray(const Crd<T, Ts...> &crd) {
-  static_assert(is_same_arithmetic_domain_v<T, Ts...>, "Element types of `Crd` should be \"as similar as possible\"");
+[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToArray(const Tec<T, Ts...> &tec) {
+  static_assert(is_same_arithmetic_domain_v<T, Ts...>, "Element types of `Tec` should be \"as similar as possible\"");
   using value_type = arithmetic_domain_t<T>;
 
-  constexpr uint rank = rank_v<Crd<T, Ts...>>;
+  constexpr uint rank = rank_v<Tec<T, Ts...>>;
 
   std::array<value_type, rank> res;
-  ForEach<rank>([&]<auto i>() { res[i] = get<i>(crd); });
+  ForEach<rank>([&]<auto i>() { res[i] = get<i>(tec); });
   return res;
 }
 
