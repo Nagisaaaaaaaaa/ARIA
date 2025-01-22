@@ -235,6 +235,34 @@ constexpr bool is_tec_v = is_tec<T>::value;
 //
 //
 //
+// Whether the given `Tec` has rank `r`.
+template <typename TTec, auto r>
+struct is_tec_r : std::false_type {};
+
+template <typename... Ts, auto r>
+  requires(sizeof...(Ts) == r)
+struct is_tec_r<Tec<Ts...>, r> : std::true_type {};
+
+template <typename TTec, auto r>
+constexpr bool is_tec_r_v = is_tec_r<TTec, r>::value;
+
+//
+//
+//
+// Whether the given `Tec` has "arithmetic" type `T`.
+template <typename TTec, typename T>
+struct is_tec_t : std::false_type {};
+
+template <typename... Ts, typename T>
+  requires(std::is_same_v<arithmetic_domain_t<Ts>, T> && ...)
+struct is_tec_t<Tec<Ts...>, T> : std::true_type {};
+
+template <typename TTec, typename T>
+constexpr bool is_tec_t_v = is_tec_t<TTec, T>::value;
+
+//
+//
+//
 // Whether the given `Tec` has "arithmetic" type `T` and rank `r`.
 template <typename TTec, typename T, auto r>
 struct is_tec_tr : std::false_type {};
