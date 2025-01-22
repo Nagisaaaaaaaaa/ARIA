@@ -80,7 +80,7 @@ using Tup = cute::tuple<Ts...>;
 
 template <typename... Ts>
   requires(has_arithmetic_domain_v<Ts> && ...)
-using Tec = cute::Coord<Ts...>;
+using Tec = cute::tuple<Ts...>;
 
 //
 //
