@@ -46,15 +46,16 @@ using layout::detail::get;
 //
 //
 //
-/// \brief The same type as `cute::tuple`.
+/// \brief `Tup` (tuple) is a fixed-size collection of heterogeneous values.
 ///
 /// \example ```cpp
 /// Tup tup{1, C<2U>{}, Tup{3.0F, std::string{"4"}}};
 /// ```
+///
+/// \warning `Tup` has the same type as `cute::tuple`.
 using layout::detail::Tup;
 
-/// \brief The same type as `cute::tuple` but with restrictions, where
-/// The elements are required to be arithmetic types.
+/// \brief `Tec` (tuple + vec) is a fixed-size collection of heterogeneous "arithmetic" values.
 ///
 /// \example ```cpp
 /// Tec tec{1, C<2U>{}, 3.0F, C<4.0>{}};
@@ -62,6 +63,9 @@ using layout::detail::Tup;
 /// Teci teci{1, C<2>{}, 3, C<4>{}};
 /// Tec3i tec3i{1, C<2>{}, 3};
 /// ```
+///
+/// \warning `Tec` has the same type as `cute::tuple` but with restrictions, where
+/// the elements are required to be "arithmetic" types.
 using layout::detail::Tec;
 
 using layout::detail::Tec1;
