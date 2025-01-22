@@ -61,10 +61,6 @@ using layout::detail::Tup;
 /// ```
 using layout::detail::Crd;
 
-using layout::detail::make_tup;
-
-using layout::detail::make_crd;
-
 //
 //
 //

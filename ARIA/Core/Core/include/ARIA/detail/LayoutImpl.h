@@ -78,16 +78,6 @@ template <typename... Ts>
   requires(!std::is_void_v<arithmetic_type_t<Ts>> && ...)
 using Crd = cute::Coord<Ts...>;
 
-template <typename... Ts>
-ARIA_HOST_DEVICE constexpr Tup<Ts...> make_tup(const Ts &...ts) {
-  return cute::make_tuple(ts...);
-}
-
-template <typename... Ts>
-ARIA_HOST_DEVICE constexpr Crd<Ts...> make_crd(const Ts &...ts) {
-  return cute::make_coord(ts...);
-}
-
 //
 //
 //
