@@ -79,17 +79,17 @@ TEST(Layout, Base) {
     constexpr Tec2d vd_00{1.0, 2.0};
     constexpr Tec2r vr_00{1_R, 2_R};
 
-    constexpr Tec2i vi_01{1, C<2>{}};
-    constexpr Tec2u vu_01{1U, C<2U>{}};
-    constexpr Tec2f vf_01{1.0F, C<2.0F>{}};
-    constexpr Tec2d vd_01{1.0, C<2.0>{}};
-    constexpr Tec2r vr_01{1_R, C<2_R>{}};
-
     constexpr Tec2i vi_10{C<1>{}, 2};
     constexpr Tec2u vu_10{C<1U>{}, 2U};
     constexpr Tec2f vf_10{C<1.0F>{}, 2.0F};
     constexpr Tec2d vd_10{C<1.0>{}, 2.0};
     constexpr Tec2r vr_10{C<1_R>{}, 2_R};
+
+    constexpr Tec2i vi_01{1, C<2>{}};
+    constexpr Tec2u vu_01{1U, C<2U>{}};
+    constexpr Tec2f vf_01{1.0F, C<2.0F>{}};
+    constexpr Tec2d vd_01{1.0, C<2.0>{}};
+    constexpr Tec2r vr_01{1_R, C<2_R>{}};
 
     constexpr Tec2i vi_11{C<1>{}, C<2>{}};
     constexpr Tec2u vu_11{C<1U>{}, C<2U>{}};
