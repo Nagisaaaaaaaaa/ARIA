@@ -85,6 +85,7 @@ using Tec = cute::tuple<Ts...>;
 //
 //
 //
+// TODO: Great efforts are made to bypass the MSVC bug.
 template <typename... Ts>
   requires((sizeof...(Ts) == 1 && has_arithmetic_domain_v<Ts>) && ...)
 using Tec1 = cute::tuple<Ts...>;
