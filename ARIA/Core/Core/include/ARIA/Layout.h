@@ -66,6 +66,12 @@ using layout::detail::Tec2;
 using layout::detail::Tec3;
 using layout::detail::Tec4;
 
+using layout::detail::Tecd;
+using layout::detail::Tecf;
+using layout::detail::Teci;
+using layout::detail::Tecr;
+using layout::detail::Tecu;
+
 //
 //
 //

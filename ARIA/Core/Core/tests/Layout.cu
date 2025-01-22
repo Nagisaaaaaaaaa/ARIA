@@ -43,6 +43,21 @@ TEST(Layout, Base) {
     static_assert(get<3>(v) == C<4.0>{});
   }
 
+  {
+    Tec1 v1{1};
+    Tec2 v2{1, 2.0F};
+    Tec3 v3{1, 2.0F, C<3U>{}};
+    Tec4 v4{1, 2.0F, C<3U>{}, C<4.0>{}};
+  }
+
+  {
+    Teci vi{1, C<2>{}, 3, C<4>{}, 5};
+    Tecu vu{1U, C<2U>{}, 3U, C<4U>{}, 5U};
+    Tecf vf{1.0F, C<2.0F>{}, 3.0F, C<4.0F>{}, 5.0F};
+    Tecd vd{1.0, C<2.0>{}, 3.0, C<4.0>{}, 5.0};
+    Tecr vr{1_R, C<2_R>{}, 3_R, C<4_R>{}, 5_R};
+  }
+
   static_assert(rank(Tec{}) == 0);
   static_assert(rank(Tec{0}) == 1);
   static_assert(rank(Tec{_0{}}) == 1);

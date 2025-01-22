@@ -105,6 +105,29 @@ using Tec4 = cute::tuple<Ts...>;
 //
 //
 //
+template <typename... Ts>
+  requires(std::is_same_v<arithmetic_domain_t<Ts>, int> && ...)
+using Teci = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires(std::is_same_v<arithmetic_domain_t<Ts>, uint> && ...)
+using Tecu = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires(std::is_same_v<arithmetic_domain_t<Ts>, float> && ...)
+using Tecf = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires(std::is_same_v<arithmetic_domain_t<Ts>, double> && ...)
+using Tecd = cute::tuple<Ts...>;
+
+template <typename... Ts>
+  requires(std::is_same_v<arithmetic_domain_t<Ts>, Real> && ...)
+using Tecr = cute::tuple<Ts...>;
+
+//
+//
+//
 using cute::is_static;
 using cute::is_static_v;
 
