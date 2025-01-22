@@ -44,18 +44,32 @@ TEST(Layout, Base) {
   }
 
   {
-    Tec1 v1{1};
-    Tec2 v2{1, 2.0F};
-    Tec3 v3{1, 2.0F, C<3U>{}};
-    Tec4 v4{1, 2.0F, C<3U>{}, C<4.0>{}};
+    constexpr Tec1 v1{1};
+    constexpr Tec2 v2{1, 2.0F};
+    constexpr Tec3 v3{1, 2.0F, C<3U>{}};
+    constexpr Tec4 v4{1, 2.0F, C<3U>{}, C<4.0>{}};
   }
 
   {
-    Teci vi{1, C<2>{}, 3, C<4>{}, 5};
-    Tecu vu{1U, C<2U>{}, 3U, C<4U>{}, 5U};
-    Tecf vf{1.0F, C<2.0F>{}, 3.0F, C<4.0F>{}, 5.0F};
-    Tecd vd{1.0, C<2.0>{}, 3.0, C<4.0>{}, 5.0};
-    Tecr vr{1_R, C<2_R>{}, 3_R, C<4_R>{}, 5_R};
+    constexpr Teci vi{1, C<2>{}, 3, C<4>{}, 5};
+    constexpr Tecu vu{1U, C<2U>{}, 3U, C<4U>{}, 5U};
+    constexpr Tecf vf{1.0F, C<2.0F>{}, 3.0F, C<4.0F>{}, 5.0F};
+    constexpr Tecd vd{1.0, C<2.0>{}, 3.0, C<4.0>{}, 5.0};
+    constexpr Tecr vr{1_R, C<2_R>{}, 3_R, C<4_R>{}, 5_R};
+  }
+
+  {
+    constexpr Tec1i u1i{1};
+    constexpr Tec1u u1u{1U};
+    constexpr Tec1f u1f{1.0F};
+    constexpr Tec1d u1d{1.0};
+    constexpr Tec1r u1r{1_R};
+
+    constexpr Tec1i v1i{C<1>{}};
+    constexpr Tec1u v1u{C<1U>{}};
+    constexpr Tec1f v1f{C<1.0F>{}};
+    constexpr Tec1d v1d{C<1.0>{}};
+    constexpr Tec1r v1r{C<1_R>{}};
   }
 
   static_assert(rank(Tec{}) == 0);
