@@ -38,7 +38,7 @@ using ToTec_t = decltype(ToTec(TArray{}));
 template <typename... Ts>
 consteval auto PopBack(Tec<Ts...>) {
   using TArray = MakeTypeArray<Ts...>;
-  using TArrayBackPopped = TArray::Slice<0, TArray::size - 1, 1>;
+  using TArrayBackPopped = TArray::template Slice<0, TArray::size - 1, 1>;
   return ToTec(TArrayBackPopped{});
 }
 
@@ -48,7 +48,7 @@ using PopBack_t = decltype(PopBack(TTec{}));
 template <typename... Ts>
 consteval auto Tail(Tec<Ts...>) {
   using TArray = MakeTypeArray<Ts...>;
-  using TArrayTail = TArray::Slice<TArray::size - 1, TArray::size, 1>;
+  using TArrayTail = TArray::template Slice<TArray::size - 1, TArray::size, 1>;
   return ToTec(TArrayTail{});
 }
 
@@ -115,6 +115,21 @@ public:
   template <typename TOrder, typename TDomain, typename TU>
   [[nodiscard]] ARIA_HOST_DEVICE static constexpr Real Moment(const TU &u) {
     boltzmann_distribution::detail::StaticTestMoment<dim, TOrder, TDomain, TU>();
+
+    using TOrderL = boltzmann_distribution::detail::PopBack_t<TOrder>;
+    using TOrderR = boltzmann_distribution::detail::Tail_t<TOrder>;
+    using TDomainL = boltzmann_distribution::detail::PopBack_t<TDomain>;
+    using TDomainR = boltzmann_distribution::detail::Tail_t<TDomain>;
+    using TUL = boltzmann_distribution::detail::PopBack_t<TU>;
+    using TUR = boltzmann_distribution::detail::Tail_t<TU>;
+
+    TUL uL;
+    ForEach<dim - 1>([&]<auto i>() { get<i>(uL) = get<i>(u); });
+    TUR uR;
+    get<0>(uR) = get<dim - 1>(u);
+
+    return BoltzmannDistribution<dim - 1, lambda>::template Moment<TOrderL, TDomainL, TUL>(uL) *
+           BoltzmannDistribution<1, lambda>::template Moment<TOrderR, TDomainR, TUR>(uR);
   }
 };
 
