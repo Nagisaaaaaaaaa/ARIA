@@ -8,6 +8,9 @@ namespace ARIA {
 template <uint dim, Real lambda>
 class BoltzmannDistribution;
 
+//
+//
+//
 template <Real lambda>
 class BoltzmannDistribution<1, lambda> {
 public:
@@ -50,6 +53,17 @@ public:
              ((order - 1) * cs2) * Moment<decltype(TOrder{} - Tec<UInt<2>>{}), TDomain>(u);
     }
   }
+};
+
+//
+//
+//
+template <uint dim, Real lambda>
+  requires(dim > 1)
+class BoltzmannDistribution<dim, lambda> {
+public:
+  template <typename TOrder, typename TDomain, typename TU>
+  [[nodiscard]] ARIA_HOST_DEVICE static constexpr Real Moment(const TU &u) {}
 };
 
 } // namespace ARIA
