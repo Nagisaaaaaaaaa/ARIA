@@ -33,6 +33,15 @@ TEST(Tup, Base) {
 
     static_assert(!tup::detail::is_tec_v<decltype(v)>);
     static_assert(!tup::detail::is_tec_v<decltype(vSub)>);
+
+    static_assert(tup_size_v<decltype(v)> == 3);
+    static_assert(tup_size_v<decltype(vSub)> == 2);
+
+    static_assert(std::is_same_v<tup_elem_t<0, decltype(v)>, int>);
+    static_assert(std::is_same_v<tup_elem_t<1, decltype(v)>, float>);
+    static_assert(std::is_same_v<tup_elem_t<2, decltype(v)>, Tup<double, std::string>>);
+    static_assert(std::is_same_v<tup_elem_t<0, decltype(vSub)>, double>);
+    static_assert(std::is_same_v<tup_elem_t<1, decltype(vSub)>, std::string>);
   }
 
   // Make tec.
@@ -44,6 +53,13 @@ TEST(Tup, Base) {
     static_assert(get<3>(v) == C<4.0>{});
 
     static_assert(tup::detail::is_tec_v<decltype(v)>);
+
+    static_assert(tup_size_v<decltype(v)> == 4);
+
+    static_assert(std::is_same_v<tup_elem_t<0, decltype(v)>, int>);
+    static_assert(std::is_same_v<tup_elem_t<1, decltype(v)>, float>);
+    static_assert(std::is_same_v<tup_elem_t<2, decltype(v)>, C<3U>>);
+    static_assert(std::is_same_v<tup_elem_t<3, decltype(v)>, C<4.0>>);
   }
 
   {
