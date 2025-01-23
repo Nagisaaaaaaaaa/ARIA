@@ -123,38 +123,6 @@ TEST(BoltzmannDistribution, D2) {
   Real o13dPP = BD::Moment<Order13, DomainPP>(u);
   Real o04dPP = BD::Moment<Order04, DomainPP>(u);
 
-  Real o00dOP = BD::Moment<Order00, DomainOP>(u);
-  Real o10dOP = BD::Moment<Order10, DomainOP>(u);
-  Real o01dOP = BD::Moment<Order01, DomainOP>(u);
-  Real o20dOP = BD::Moment<Order20, DomainOP>(u);
-  Real o11dOP = BD::Moment<Order11, DomainOP>(u);
-  Real o02dOP = BD::Moment<Order02, DomainOP>(u);
-  Real o30dOP = BD::Moment<Order30, DomainOP>(u);
-  Real o21dOP = BD::Moment<Order21, DomainOP>(u);
-  Real o12dOP = BD::Moment<Order12, DomainOP>(u);
-  Real o03dOP = BD::Moment<Order03, DomainOP>(u);
-  Real o40dOP = BD::Moment<Order40, DomainOP>(u);
-  Real o31dOP = BD::Moment<Order31, DomainOP>(u);
-  Real o22dOP = BD::Moment<Order22, DomainOP>(u);
-  Real o13dOP = BD::Moment<Order13, DomainOP>(u);
-  Real o04dOP = BD::Moment<Order04, DomainOP>(u);
-
-  Real o00dNP = BD::Moment<Order00, DomainNP>(u);
-  Real o10dNP = BD::Moment<Order10, DomainNP>(u);
-  Real o01dNP = BD::Moment<Order01, DomainNP>(u);
-  Real o20dNP = BD::Moment<Order20, DomainNP>(u);
-  Real o11dNP = BD::Moment<Order11, DomainNP>(u);
-  Real o02dNP = BD::Moment<Order02, DomainNP>(u);
-  Real o30dNP = BD::Moment<Order30, DomainNP>(u);
-  Real o21dNP = BD::Moment<Order21, DomainNP>(u);
-  Real o12dNP = BD::Moment<Order12, DomainNP>(u);
-  Real o03dNP = BD::Moment<Order03, DomainNP>(u);
-  Real o40dNP = BD::Moment<Order40, DomainNP>(u);
-  Real o31dNP = BD::Moment<Order31, DomainNP>(u);
-  Real o22dNP = BD::Moment<Order22, DomainNP>(u);
-  Real o13dNP = BD::Moment<Order13, DomainNP>(u);
-  Real o04dNP = BD::Moment<Order04, DomainNP>(u);
-
   Real o00dPO = BD::Moment<Order00, DomainPO>(u);
   Real o10dPO = BD::Moment<Order10, DomainPO>(u);
   Real o01dPO = BD::Moment<Order01, DomainPO>(u);
@@ -218,38 +186,6 @@ TEST(BoltzmannDistribution, D2) {
   Real o22dPN = BD::Moment<Order22, DomainPN>(u);
   Real o13dPN = BD::Moment<Order13, DomainPN>(u);
   Real o04dPN = BD::Moment<Order04, DomainPN>(u);
-
-  Real o00dON = BD::Moment<Order00, DomainON>(u);
-  Real o10dON = BD::Moment<Order10, DomainON>(u);
-  Real o01dON = BD::Moment<Order01, DomainON>(u);
-  Real o20dON = BD::Moment<Order20, DomainON>(u);
-  Real o11dON = BD::Moment<Order11, DomainON>(u);
-  Real o02dON = BD::Moment<Order02, DomainON>(u);
-  Real o30dON = BD::Moment<Order30, DomainON>(u);
-  Real o21dON = BD::Moment<Order21, DomainON>(u);
-  Real o12dON = BD::Moment<Order12, DomainON>(u);
-  Real o03dON = BD::Moment<Order03, DomainON>(u);
-  Real o40dON = BD::Moment<Order40, DomainON>(u);
-  Real o31dON = BD::Moment<Order31, DomainON>(u);
-  Real o22dON = BD::Moment<Order22, DomainON>(u);
-  Real o13dON = BD::Moment<Order13, DomainON>(u);
-  Real o04dON = BD::Moment<Order04, DomainON>(u);
-
-  Real o00dNN = BD::Moment<Order00, DomainNN>(u);
-  Real o10dNN = BD::Moment<Order10, DomainNN>(u);
-  Real o01dNN = BD::Moment<Order01, DomainNN>(u);
-  Real o20dNN = BD::Moment<Order20, DomainNN>(u);
-  Real o11dNN = BD::Moment<Order11, DomainNN>(u);
-  Real o02dNN = BD::Moment<Order02, DomainNN>(u);
-  Real o30dNN = BD::Moment<Order30, DomainNN>(u);
-  Real o21dNN = BD::Moment<Order21, DomainNN>(u);
-  Real o12dNN = BD::Moment<Order12, DomainNN>(u);
-  Real o03dNN = BD::Moment<Order03, DomainNN>(u);
-  Real o40dNN = BD::Moment<Order40, DomainNN>(u);
-  Real o31dNN = BD::Moment<Order31, DomainNN>(u);
-  Real o22dNN = BD::Moment<Order22, DomainNN>(u);
-  Real o13dNN = BD::Moment<Order13, DomainNN>(u);
-  Real o04dNN = BD::Moment<Order04, DomainNN>(u);
 
   EXPECT_FLOAT_EQ(o00dPP, 0.4703254347);
   EXPECT_FLOAT_EQ(o10dPP, 0.2373368200);
