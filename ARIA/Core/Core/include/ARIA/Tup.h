@@ -1,7 +1,30 @@
 #pragma once
 
 /// \file
-/// \brief TODO: Document this.
+/// \brief A tuple abstraction based on NVIDIA CuTe.
+/// See https://github.com/NVIDIA/cutlass/blob/main/media/docs/cute/00_quickstart.md.
+///
+/// CuTe is a collection of C++ CUDA template abstractions for
+/// defining and operating on hierarchically multidimensional layouts of threads and data.
+/// CuTe provides `Layout` and `Tensor` objects that
+/// compactly packages the type, shape, memory space, and layout of data, while
+/// performing the complicated indexing for the user.
+/// This lets programmers focus on the logical descriptions of their algorithms while
+/// CuTe does the mechanical bookkeeping for them.
+/// With these tools, we can quickly design, implement, and modify all dense linear algebra operations.
+///
+/// The core abstraction of CuTe are the hierarchically multidimensional layouts which
+/// can be composed with data arrays to represent tensors.
+/// The representation of layouts is powerful enough to represent nearly everything
+/// we need to implement efficient dense linear algebra.
+/// Layouts can also be combined and manipulated via functional composition, on which
+/// we build a large set of common operations such as tiling and partitioning.
+///
+/// \note This file is not fully documented, since we assume that the users have basic knowledge about CuTe.
+/// If you are not familiar with CuTe, please read the tutorials of NVIDIA CuTe before continue:
+/// 0. https://github.com/NVIDIA/cutlass/blob/main/media/docs/cute/00_quickstart.md.
+/// 1. https://github.com/NVIDIA/cutlass/blob/main/media/docs/cute/01_layout.md.
+/// 2. ...
 
 //
 //

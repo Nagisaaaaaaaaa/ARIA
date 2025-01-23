@@ -1,7 +1,7 @@
 #pragma once
 
 /// \file
-/// \brief A Layout abstraction based on NVIDIA CuTe.
+/// \brief A layout abstraction based on NVIDIA CuTe.
 /// See https://github.com/NVIDIA/cutlass/blob/main/media/docs/cute/00_quickstart.md.
 ///
 /// CuTe is a collection of C++ CUDA template abstractions for
