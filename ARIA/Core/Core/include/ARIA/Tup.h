@@ -55,6 +55,10 @@ using tup::detail::Tup;
 /// Tec3 tec3{1, C<2U>{}, 3.0F};
 /// Teci teci{1, C<2>{}, 3, C<4>{}};
 /// Tec3i tec3i{1, C<2>{}, 3};
+///
+/// Tec3i a = {1, 2_I, 3};
+/// Tec3i b = {0, 2_I, 4};
+/// Tec3i c = a + b; // `c` contains `1`, `4_I`, `7`.
 /// ```
 ///
 /// \warning `Tec` has the same type as `cute::tuple` but with restrictions, where
