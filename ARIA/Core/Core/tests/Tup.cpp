@@ -5,6 +5,12 @@
 
 namespace ARIA {
 
+using cute::_0;
+using cute::_1;
+using cute::_2;
+using cute::_3;
+using cute::_4;
+
 TEST(Tup, Base) {
   // Arithmetic type.
   static_assert(std::is_same_v<tup::detail::arithmetic_domain_t<int>, int>);

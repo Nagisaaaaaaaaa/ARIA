@@ -319,9 +319,9 @@ namespace aria::tup::detail {
 
 // Fill a `Coord` with a same value.
 template <typename... Coords>
-[[nodiscard]] ARIA_HOST_DEVICE constexpr Coord<Coords...>
-FillCoords(const std::decay_t<decltype(get<0>(std::declval<Coord<Coords...>>()))> &v) {
-  Coord<Coords...> c;
+[[nodiscard]] ARIA_HOST_DEVICE constexpr ARIA::tup::detail::Tec<Coords...>
+FillCoords(const std::decay_t<decltype(get<0>(std::declval<ARIA::tup::detail::Tec<Coords...>>()))> &v) {
+  ARIA::tup::detail::Tec<Coords...> c;
   ARIA::ForEach<sizeof...(Coords)>([&]<auto i>() {
     static_assert(std::is_same_v<std::decay_t<decltype(cute::get<i>(c))>, std::decay_t<decltype(v)>>,
                   "Element types of the `Coord` should be the same");
@@ -334,55 +334,64 @@ FillCoords(const std::decay_t<decltype(get<0>(std::declval<Coord<Coords...>>()))
 } // namespace aria::tup::detail
 
 template <typename... Coords0, typename... Coords1>
-[[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator+(const Coord<Coords0...> &lhs, const Coord<Coords1...> &rhs) {
+[[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator+(const ARIA::tup::detail::Tec<Coords0...> &lhs,
+                                                        const ARIA::tup::detail::Tec<Coords1...> &rhs) {
   //! `Coords0` is automatically required to have the same number of elements as `Coords1` at next line.
-  Coord<decltype(std::declval<Coords0>() + std::declval<Coords1>())...> res;
+  ARIA::tup::detail::Tec<decltype(std::declval<Coords0>() + std::declval<Coords1>())...> res;
   ARIA::ForEach<sizeof...(Coords0)>([&]<auto i>() { cute::get<i>(res) = cute::get<i>(lhs) + cute::get<i>(rhs); });
   return res;
 }
 
 template <typename... Coords0, typename... Coords1>
-[[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator-(const Coord<Coords0...> &lhs, const Coord<Coords1...> &rhs) {
-  Coord<decltype(std::declval<Coords0>() - std::declval<Coords1>())...> res;
+[[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator-(const ARIA::tup::detail::Tec<Coords0...> &lhs,
+                                                        const ARIA::tup::detail::Tec<Coords1...> &rhs) {
+  ARIA::tup::detail::Tec<decltype(std::declval<Coords0>() - std::declval<Coords1>())...> res;
   ARIA::ForEach<sizeof...(Coords0)>([&]<auto i>() { cute::get<i>(res) = cute::get<i>(lhs) - cute::get<i>(rhs); });
   return res;
 }
 
 template <typename... Coords0, typename... Coords1>
-[[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator*(const Coord<Coords0...> &lhs, const Coord<Coords1...> &rhs) {
-  Coord<decltype(std::declval<Coords0>() * std::declval<Coords1>())...> res;
+[[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator*(const ARIA::tup::detail::Tec<Coords0...> &lhs,
+                                                        const ARIA::tup::detail::Tec<Coords1...> &rhs) {
+  ARIA::tup::detail::Tec<decltype(std::declval<Coords0>() * std::declval<Coords1>())...> res;
   ARIA::ForEach<sizeof...(Coords0)>([&]<auto i>() { cute::get<i>(res) = cute::get<i>(lhs) * cute::get<i>(rhs); });
   return res;
 }
 
 template <typename... Coords0, typename Coords1>
-[[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator+(const Coord<Coords0...> &lhs, const Coords1 &rhs) {
+[[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator+(const ARIA::tup::detail::Tec<Coords0...> &lhs,
+                                                        const Coords1 &rhs) {
   //! `std::conditional_t<...>` at the following line is used to generate such a pack `<Coords1, Coords1, ...>`.
   return lhs + aria::tup::detail::FillCoords<std::conditional_t<true, Coords1, Coords0>...>(rhs);
 }
 
 template <typename... Coords0, typename Coords1>
-[[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator+(const Coords1 &lhs, const Coord<Coords0...> &rhs) {
+[[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator+(const Coords1 &lhs,
+                                                        const ARIA::tup::detail::Tec<Coords0...> &rhs) {
   return aria::tup::detail::FillCoords<std::conditional_t<true, Coords1, Coords0>...>(lhs) + rhs;
 }
 
 template <typename... Coords0, typename Coords1>
-[[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator-(const Coord<Coords0...> &lhs, const Coords1 &rhs) {
+[[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator-(const ARIA::tup::detail::Tec<Coords0...> &lhs,
+                                                        const Coords1 &rhs) {
   return lhs - aria::tup::detail::FillCoords<std::conditional_t<true, Coords1, Coords0>...>(rhs);
 }
 
 template <typename... Coords0, typename Coords1>
-[[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator-(const Coords1 &lhs, const Coord<Coords0...> &rhs) {
+[[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator-(const Coords1 &lhs,
+                                                        const ARIA::tup::detail::Tec<Coords0...> &rhs) {
   return aria::tup::detail::FillCoords<std::conditional_t<true, Coords1, Coords0>...>(lhs) - rhs;
 }
 
 template <typename... Coords0, typename Coords1>
-[[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator*(const Coord<Coords0...> &lhs, const Coords1 &rhs) {
+[[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator*(const ARIA::tup::detail::Tec<Coords0...> &lhs,
+                                                        const Coords1 &rhs) {
   return lhs * aria::tup::detail::FillCoords<std::conditional_t<true, Coords1, Coords0>...>(rhs);
 }
 
 template <typename... Coords0, typename Coords1>
-[[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator*(const Coords1 &lhs, const Coord<Coords0...> &rhs) {
+[[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator*(const Coords1 &lhs,
+                                                        const ARIA::tup::detail::Tec<Coords0...> &rhs) {
   return aria::tup::detail::FillCoords<std::conditional_t<true, Coords1, Coords0>...>(lhs) * rhs;
 }
 

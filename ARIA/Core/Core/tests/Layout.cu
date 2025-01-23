@@ -344,10 +344,10 @@ TEST(Layout, OperatorsInt) {
   };
 
   {
-    Tec2 a = cute::aria::layout::detail::FillCoords<int, int>(233);
-    Tec3 b = cute::aria::layout::detail::FillCoords<int, int, int>(233);
-    constexpr let c = cute::aria::layout::detail::FillCoords<C<233>, C<233>>(C<233>{});
-    constexpr let d = cute::aria::layout::detail::FillCoords<C<233>, C<233>, C<233>>(C<233>{});
+    Tec2 a = cute::aria::tup::detail::FillCoords<int, int>(233);
+    Tec3 b = cute::aria::tup::detail::FillCoords<int, int, int>(233);
+    constexpr let c = cute::aria::tup::detail::FillCoords<C<233>, C<233>>(C<233>{});
+    constexpr let d = cute::aria::tup::detail::FillCoords<C<233>, C<233>, C<233>>(C<233>{});
     expectTec2(a, 233, 233);
     expectTec3(b, 233, 233, 233);
     static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(Tec{233_I, 233_I})>>);
@@ -559,10 +559,10 @@ TEST(Layout, OperatorsFloat) {
   };
 
   {
-    Tec2 a = cute::aria::layout::detail::FillCoords<float, float>(233.3F);
-    Tec3 b = cute::aria::layout::detail::FillCoords<float, float, float>(233.3F);
-    constexpr let c = cute::aria::layout::detail::FillCoords<C<233.3F>, C<233.3F>>(C<233.3F>{});
-    constexpr let d = cute::aria::layout::detail::FillCoords<C<233.3F>, C<233.3F>, C<233.3F>>(C<233.3F>{});
+    Tec2 a = cute::aria::tup::detail::FillCoords<float, float>(233.3F);
+    Tec3 b = cute::aria::tup::detail::FillCoords<float, float, float>(233.3F);
+    constexpr let c = cute::aria::tup::detail::FillCoords<C<233.3F>, C<233.3F>>(C<233.3F>{});
+    constexpr let d = cute::aria::tup::detail::FillCoords<C<233.3F>, C<233.3F>, C<233.3F>>(C<233.3F>{});
     expectTec2(a, 233.3F, 233.3F);
     expectTec3(b, 233.3F, 233.3F, 233.3F);
     static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(Tec{C<233.3F>{}, C<233.3F>{}})>>);
