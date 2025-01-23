@@ -317,14 +317,14 @@ namespace cute {
 
 namespace aria::tup::detail {
 
-// Fill a `Coord` with a same value.
+// Fill a `Tec` with a same value.
 template <typename... Coords>
 [[nodiscard]] ARIA_HOST_DEVICE constexpr ARIA::tup::detail::Tec<Coords...>
-FillCoords(const std::decay_t<decltype(get<0>(std::declval<ARIA::tup::detail::Tec<Coords...>>()))> &v) {
+FillTec(const std::decay_t<decltype(get<0>(std::declval<ARIA::tup::detail::Tec<Coords...>>()))> &v) {
   ARIA::tup::detail::Tec<Coords...> c;
   ARIA::ForEach<sizeof...(Coords)>([&]<auto i>() {
     static_assert(std::is_same_v<std::decay_t<decltype(cute::get<i>(c))>, std::decay_t<decltype(v)>>,
-                  "Element types of the `Coord` should be the same");
+                  "Element types of the `Tec` should be the same");
     cute::get<i>(c) = v;
   });
 
@@ -365,37 +365,37 @@ template <typename... Coords0, typename Coords1>
 [[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator+(const ARIA::tup::detail::Tec<Coords0...> &lhs,
                                                         const Coords1 &rhs) {
   //! `std::conditional_t<...>` at the following line is used to generate such a pack `<Coords1, Coords1, ...>`.
-  return lhs + aria::tup::detail::FillCoords<std::conditional_t<true, Coords1, Coords0>...>(rhs);
+  return lhs + aria::tup::detail::FillTec<std::conditional_t<true, Coords1, Coords0>...>(rhs);
 }
 
 template <typename... Coords0, typename Coords1>
 [[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator+(const Coords1 &lhs,
                                                         const ARIA::tup::detail::Tec<Coords0...> &rhs) {
-  return aria::tup::detail::FillCoords<std::conditional_t<true, Coords1, Coords0>...>(lhs) + rhs;
+  return aria::tup::detail::FillTec<std::conditional_t<true, Coords1, Coords0>...>(lhs) + rhs;
 }
 
 template <typename... Coords0, typename Coords1>
 [[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator-(const ARIA::tup::detail::Tec<Coords0...> &lhs,
                                                         const Coords1 &rhs) {
-  return lhs - aria::tup::detail::FillCoords<std::conditional_t<true, Coords1, Coords0>...>(rhs);
+  return lhs - aria::tup::detail::FillTec<std::conditional_t<true, Coords1, Coords0>...>(rhs);
 }
 
 template <typename... Coords0, typename Coords1>
 [[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator-(const Coords1 &lhs,
                                                         const ARIA::tup::detail::Tec<Coords0...> &rhs) {
-  return aria::tup::detail::FillCoords<std::conditional_t<true, Coords1, Coords0>...>(lhs) - rhs;
+  return aria::tup::detail::FillTec<std::conditional_t<true, Coords1, Coords0>...>(lhs) - rhs;
 }
 
 template <typename... Coords0, typename Coords1>
 [[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator*(const ARIA::tup::detail::Tec<Coords0...> &lhs,
                                                         const Coords1 &rhs) {
-  return lhs * aria::tup::detail::FillCoords<std::conditional_t<true, Coords1, Coords0>...>(rhs);
+  return lhs * aria::tup::detail::FillTec<std::conditional_t<true, Coords1, Coords0>...>(rhs);
 }
 
 template <typename... Coords0, typename Coords1>
 [[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator*(const Coords1 &lhs,
                                                         const ARIA::tup::detail::Tec<Coords0...> &rhs) {
-  return aria::tup::detail::FillCoords<std::conditional_t<true, Coords1, Coords0>...>(lhs) * rhs;
+  return aria::tup::detail::FillTec<std::conditional_t<true, Coords1, Coords0>...>(lhs) * rhs;
 }
 
 } // namespace cute
