@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <queue>
-
 namespace ARIA {
 
 namespace {
@@ -13,21 +11,6 @@ using cute::_1;
 using cute::_2;
 using cute::_3;
 using cute::_4;
-
-std::queue<uint> q;
-
-void CheckQ() {
-  // clang-format off
-  EXPECT_EQ(q.front(), 0); q.pop(); EXPECT_EQ(q.front(), 0); q.pop();
-  EXPECT_EQ(q.front(), 1); q.pop(); EXPECT_EQ(q.front(), 0); q.pop();
-  EXPECT_EQ(q.front(), 0); q.pop(); EXPECT_EQ(q.front(), 1); q.pop();
-  EXPECT_EQ(q.front(), 1); q.pop(); EXPECT_EQ(q.front(), 1); q.pop();
-  EXPECT_EQ(q.front(), 0); q.pop(); EXPECT_EQ(q.front(), 2); q.pop();
-  EXPECT_EQ(q.front(), 1); q.pop(); EXPECT_EQ(q.front(), 2); q.pop();
-  EXPECT_EQ(q.front(), 0); q.pop(); EXPECT_EQ(q.front(), 3); q.pop();
-  EXPECT_EQ(q.front(), 1); q.pop(); EXPECT_EQ(q.front(), 3); q.pop();
-  // clang-format on
-};
 
 } // namespace
 
