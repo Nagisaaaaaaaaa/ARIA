@@ -3,6 +3,7 @@
 /// \file
 /// \brief A layout abstraction based on NVIDIA CuTe.
 /// See https://github.com/NVIDIA/cutlass/blob/main/media/docs/cute/00_quickstart.md.
+/// Please read the comments in `Tup.h` before continue.
 ///
 /// CuTe is a collection of C++ CUDA template abstractions for
 /// defining and operating on hierarchically multidimensional layouts of threads and data.
