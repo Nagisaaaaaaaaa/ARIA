@@ -19,6 +19,7 @@ endif ()
 
 set(core_math_headers
     ARIA/BezierCurve.h
+    ARIA/BoltzmannDistribution.h
     ARIA/Mat.h
     ARIA/Math.h
     ARIA/MortonCode.h

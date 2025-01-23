@@ -2,6 +2,7 @@ if (ARIA_BUILD_TESTS)
   aria_add_tests(Tests.ARIA.Core.Math
       SOURCES
       BezierCurve.cu
+      BoltzmannDistribution.cpp
       Mat.cpp
       Math.cpp
       MortonCode.cpp
