@@ -18,6 +18,11 @@ public:
 
     static_assert(is_static_v<TOrder>, "The order type should be static");
     static_assert(is_static_v<TDomain>, "The domain type should be static");
+
+    constexpr uint order = get<0>(TOrder{});
+    constexpr int domain = get<0>(TDomain{});
+
+    static_assert(domain == -1 || domain == 0 || domain == 1, "Domain should only be -1, 0, or 1");
   }
 };
 
