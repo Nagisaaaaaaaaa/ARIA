@@ -45,6 +45,16 @@ consteval auto PopBack(Tec<Ts...>) {
 template <typename TTec>
 using PopBack_t = decltype(PopBack(TTec{}));
 
+template <typename... Ts>
+consteval auto Tail(Tec<Ts...>) {
+  using TArray = MakeTypeArray<Ts...>;
+  using TArrayTail = TArray::Slice<TArray::size - 1, TArray::size, 1>;
+  return ToTec(TArrayTail{});
+}
+
+template <typename TTec>
+using Tail_t = decltype(Tail(TTec{}));
+
 } // namespace boltzmann_distribution::detail
 
 //
