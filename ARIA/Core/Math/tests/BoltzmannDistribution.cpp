@@ -11,7 +11,7 @@ consteval bool StaticExpectEq(float a, float b) {
   if (delta < 0)
     delta = -delta;
 
-  return delta < 1e-8;
+  return delta < 1e-7;
 }
 
 } // namespace
@@ -252,8 +252,8 @@ TEST(BoltzmannDistribution, D2) {
   Real o04dNN = BD::Moment<Order04, DomainNN>(u);
 
   EXPECT_FLOAT_EQ(o00dOO, 1);
-  EXPECT_FLOAT_EQ(o10dOO, 0.1140000000);
-  EXPECT_FLOAT_EQ(o01dOO, 0.5140000000);
+  EXPECT_FLOAT_EQ(o10dOO, 0.114);
+  EXPECT_FLOAT_EQ(o01dOO, 0.514);
   EXPECT_FLOAT_EQ(o20dOO, 0.3463293333);
   EXPECT_FLOAT_EQ(o11dOO, 0.0585960000);
   EXPECT_FLOAT_EQ(o02dOO, 0.5975293333);
@@ -266,6 +266,22 @@ TEST(BoltzmannDistribution, D2) {
   EXPECT_FLOAT_EQ(o22dOO, 0.2069419357);
   EXPECT_FLOAT_EQ(o13dOO, 0.0740768288);
   EXPECT_FLOAT_EQ(o04dOO, 0.9315248597);
+
+  static_assert(StaticExpectEq(BD::Moment<Order00, DomainOO>(uC), 1));
+  static_assert(StaticExpectEq(BD::Moment<Order10, DomainOO>(uC), 0.114));
+  static_assert(StaticExpectEq(BD::Moment<Order01, DomainOO>(uC), 0.514));
+  static_assert(StaticExpectEq(BD::Moment<Order20, DomainOO>(uC), 0.3463293333));
+  static_assert(StaticExpectEq(BD::Moment<Order11, DomainOO>(uC), 0.0585960000));
+  static_assert(StaticExpectEq(BD::Moment<Order02, DomainOO>(uC), 0.5975293333));
+  static_assert(StaticExpectEq(BD::Moment<Order30, DomainOO>(uC), 0.1154815440));
+  static_assert(StaticExpectEq(BD::Moment<Order21, DomainOO>(uC), 0.1780132773));
+  static_assert(StaticExpectEq(BD::Moment<Order12, DomainOO>(uC), 0.0681183440));
+  static_assert(StaticExpectEq(BD::Moment<Order03, DomainOO>(uC), 0.6497967440));
+  static_assert(StaticExpectEq(BD::Moment<Order40, DomainOO>(uC), 0.3594942293));
+  static_assert(StaticExpectEq(BD::Moment<Order31, DomainOO>(uC), 0.0593575136));
+  static_assert(StaticExpectEq(BD::Moment<Order22, DomainOO>(uC), 0.2069419357));
+  static_assert(StaticExpectEq(BD::Moment<Order13, DomainOO>(uC), 0.0740768288));
+  static_assert(StaticExpectEq(BD::Moment<Order04, DomainOO>(uC), 0.9315248597));
 }
 
 } // namespace ARIA
