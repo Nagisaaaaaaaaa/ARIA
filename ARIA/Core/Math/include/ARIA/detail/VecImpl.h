@@ -87,9 +87,9 @@ template <typename T, auto n>
 // Cast `Tec` to `Vec`.
 template <typename T, typename... Ts>
 [[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToVec(const Tec<T, Ts...> &tec) {
-  static_assert(tup::detail::is_same_arithmetic_domain_v<T, Ts...>,
-                "Element types of `Tec` should be \"as similar as possible\"");
   using value_type = tup::detail::arithmetic_domain_t<T>;
+  static_assert(tup::detail::is_tec_t_v<Tec<T, Ts...>, value_type>,
+                "Element types of `Tec` should be \"as similar as possible\"");
 
   constexpr uint rank = rank_v<Tec<T, Ts...>>;
 
