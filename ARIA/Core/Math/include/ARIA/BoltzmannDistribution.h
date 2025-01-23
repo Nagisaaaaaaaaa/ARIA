@@ -27,7 +27,7 @@ public:
 
     static_assert(domain == -1 || domain == 0 || domain == 1, "Domain should only be -1, 0, or 1");
 
-    Real u0 = u[0];
+    Real u0 = get<0>(u);
 
     if constexpr (order == 0) {
       if constexpr (domain == 0)
