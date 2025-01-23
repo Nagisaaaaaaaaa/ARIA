@@ -1,17 +1,20 @@
 #pragma once
 
+#include "ARIA/Math.h"
 #include "ARIA/Tup.h"
 
 namespace ARIA {
 
-template <uint dim>
+template <uint dim, Real lambda>
 class BoltzmannDistribution;
 
-template <>
-class BoltzmannDistribution<1> {
+template <Real lambda>
+class BoltzmannDistribution<1, lambda> {
 public:
   template <typename TOrder, typename TDomain, typename TU>
   [[nodiscard]] ARIA_HOST_DEVICE static constexpr Real Moment(const TU &u) {
+    constexpr Real cs2 = 1.0 / (2.0 * lambda);
+
     static_assert(tup::detail::is_tec_tr_v<TOrder, uint, 1>, "The order type should be `Tec1u`");
     static_assert(tup::detail::is_tec_tr_v<TDomain, int, 1>, "The domain type should be `Tec1i`");
     static_assert(tup::detail::is_tec_tr_v<TU, Real, 1>, "The velocity type should be `Tec1r`");
