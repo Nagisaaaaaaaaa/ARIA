@@ -75,4 +75,37 @@ TEST(BoltzmannDistribution, D1) {
   static_assert(StaticExpectEq(BD::Moment<Order4, DomainO>(uC), 0.3594942293));
 }
 
+TEST(BoltzmannDistribution, D2) {
+  using BD = BoltzmannDistribution<2, 1.5>;
+
+  using Order00 = Tec<UInt<0>, UInt<0>>;
+  using Order10 = Tec<UInt<1>, UInt<0>>;
+  using Order01 = Tec<UInt<0>, UInt<1>>;
+  using Order20 = Tec<UInt<2>, UInt<0>>;
+  using Order11 = Tec<UInt<1>, UInt<1>>;
+  using Order02 = Tec<UInt<0>, UInt<2>>;
+  using Order30 = Tec<UInt<3>, UInt<0>>;
+  using Order21 = Tec<UInt<2>, UInt<1>>;
+  using Order12 = Tec<UInt<1>, UInt<2>>;
+  using Order03 = Tec<UInt<0>, UInt<3>>;
+  using Order40 = Tec<UInt<4>, UInt<0>>;
+  using Order31 = Tec<UInt<3>, UInt<1>>;
+  using Order22 = Tec<UInt<2>, UInt<2>>;
+  using Order13 = Tec<UInt<1>, UInt<3>>;
+  using Order04 = Tec<UInt<0>, UInt<4>>;
+
+  using DomainPP = Tec<Int<1>, Int<1>>;
+  using DomainOP = Tec<Int<0>, Int<1>>;
+  using DomainNP = Tec<Int<-1>, Int<1>>;
+  using DomainPO = Tec<Int<1>, Int<0>>;
+  using DomainOO = Tec<Int<0>, Int<0>>;
+  using DomainNO = Tec<Int<-1>, Int<0>>;
+  using DomainPN = Tec<Int<1>, Int<-1>>;
+  using DomainON = Tec<Int<0>, Int<-1>>;
+  using DomainNN = Tec<Int<-1>, Int<-1>>;
+
+  Tec2r u{0.114_R, 0.514_R};
+  constexpr Tec2r uC{C<0.114_R>{}, C<0.514_R>{}};
+}
+
 } // namespace ARIA
