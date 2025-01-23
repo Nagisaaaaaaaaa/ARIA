@@ -23,6 +23,29 @@ public:
     constexpr int domain = get<0>(TDomain{});
 
     static_assert(domain == -1 || domain == 0 || domain == 1, "Domain should only be -1, 0, or 1");
+
+    Real u0 = u[0];
+
+    if constexpr (order == 0) {
+      if constexpr (domain == 0)
+        return 1_R;
+      else if constexpr (domain == 1)
+        return std::erfc(-std::sqrt(lambda) * u0) / 2_R;
+      else if constexpr (domain == -1)
+        return std::erfc(std::sqrt(lambda) * u0) / 2_R;
+    } else if constexpr (order == 1) {
+      if constexpr (domain == 0)
+        return u0;
+      else if constexpr (domain == 1)
+        return u0 * Moment<Tec<UInt<0>>, TDomain>(u) +
+               std::exp(-lambda * (u0 * u0)) / (std::sqrt(pi<Real> * lambda) * 2_R);
+      else if constexpr (domain == -1)
+        return u0 * Moment<Tec<UInt<0>>, TDomain>(u) -
+               std::exp(-lambda * (u0 * u0)) / (std::sqrt(pi<Real> * lambda) * 2_R);
+    } else {
+      return u0 * Moment<decltype(TOrder{} - Tec<UInt<1>>{}), TDomain>(u) +
+             ((order - 1) * cs2) * Moment<decltype(TOrder{} - Tec<UInt<2>>{}), TDomain>(u);
+    }
   }
 };
 
