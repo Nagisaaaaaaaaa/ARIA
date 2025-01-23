@@ -123,7 +123,7 @@ struct is_layout_const_cosize_unsafe<TLayout> {
 template <LayoutType TLayout>
 constexpr bool is_layout_const_cosize_unsafe_v = is_layout_const_cosize_unsafe<TLayout>::value;
 
-//! `is_layout_const_cosize` is implemented below.
+//! `is_layout_const_cosize_safe` is implemented below.
 
 //
 //
