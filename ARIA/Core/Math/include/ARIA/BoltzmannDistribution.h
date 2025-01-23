@@ -12,9 +12,12 @@ class BoltzmannDistribution<1> {
 public:
   template <typename TOrder, typename TDomain, typename TU>
   [[nodiscard]] ARIA_HOST_DEVICE static constexpr Real Moment(const TU &u) {
-    static_assert(tup::detail::is_tec_tr_v<TOrder, uint, 1>, "The given order type should be `Tec1u`");
-    static_assert(tup::detail::is_tec_tr_v<TDomain, int, 1>, "The given domain type should be `Tec1i`");
-    static_assert(tup::detail::is_tec_tr_v<TU, Real, 1>, "The given velocity type should be `Tec1r`");
+    static_assert(tup::detail::is_tec_tr_v<TOrder, uint, 1>, "The order type should be `Tec1u`");
+    static_assert(tup::detail::is_tec_tr_v<TDomain, int, 1>, "The domain type should be `Tec1i`");
+    static_assert(tup::detail::is_tec_tr_v<TU, Real, 1>, "The velocity type should be `Tec1r`");
+
+    static_assert(is_static_v<TOrder>, "The order type should be static");
+    static_assert(is_static_v<TDomain>, "The domain type should be static");
   }
 };
 
