@@ -66,19 +66,6 @@ constexpr bool is_same_arithmetic_domain_v =
 //
 //
 //
-//
-//
-// Fetch implementations from CuTe.
-
-using cute::rank;
-using cute::rank_t;
-using cute::rank_v;
-
-using cute::get;
-
-//
-//
-//
 template <typename... Ts>
 using Tup = cute::tuple<Ts...>;
 
@@ -280,6 +267,15 @@ constexpr bool is_tec_tr_v = is_tec_tr<TTec, T, r>::value;
 
 //
 //
+//
+//
+//
+using cute::rank;
+using cute::rank_t;
+using cute::rank_v;
+
+using cute::get;
+
 //
 //
 //
