@@ -9,7 +9,7 @@ namespace ARIA {
 namespace boltzmann_distribution::detail {
 
 template <uint dim, typename TOrder, typename TDomain, typename TU>
-void StaticTestMoment() {
+constexpr void StaticTestMoment() {
   static_assert(tup::detail::is_tec_tr_v<TOrder, uint, dim>, "The order type should be `Tecu`");
   static_assert(tup::detail::is_tec_tr_v<TDomain, int, dim>, "The domain type should be `Teci`");
   static_assert(tup::detail::is_tec_tr_v<TU, Real, dim>, "The velocity type should be `Tecr`");

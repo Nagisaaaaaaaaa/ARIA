@@ -4,7 +4,19 @@
 
 namespace ARIA {
 
-TEST(BoltzmannDistribution, D1Runtime) {
+namespace {
+
+consteval bool StaticExpectEq(float a, float b) {
+  float delta = a - b;
+  if (delta < 0)
+    delta = -delta;
+
+  return delta < 1e-8;
+}
+
+} // namespace
+
+TEST(BoltzmannDistribution, D1) {
   using BD = BoltzmannDistribution<1, 1.5>;
 
   using Order0 = Tec<UInt<0>>;
@@ -18,6 +30,7 @@ TEST(BoltzmannDistribution, D1Runtime) {
   using DomainN = Tec<Int<-1>>;
 
   Tec1r u{0.114_R};
+  constexpr Tec1r uC{C<0.114_R>{}};
 
   Real o0dP = BD::Moment<Order0, DomainP>(u);
   Real o1dP = BD::Moment<Order1, DomainP>(u);
@@ -54,6 +67,12 @@ TEST(BoltzmannDistribution, D1Runtime) {
   EXPECT_FLOAT_EQ(o2dP, 0.2260203572);
   EXPECT_FLOAT_EQ(o3dP, 0.2203029497);
   EXPECT_FLOAT_EQ(o4dP, 0.2511348935);
+
+  static_assert(StaticExpectEq(BD::Moment<Order0, DomainO>(uC), 1));
+  static_assert(StaticExpectEq(BD::Moment<Order1, DomainO>(uC), 0.114));
+  static_assert(StaticExpectEq(BD::Moment<Order2, DomainO>(uC), 0.3463293333));
+  static_assert(StaticExpectEq(BD::Moment<Order3, DomainO>(uC), 0.1154815440));
+  static_assert(StaticExpectEq(BD::Moment<Order4, DomainO>(uC), 0.3594942293));
 }
 
 } // namespace ARIA
