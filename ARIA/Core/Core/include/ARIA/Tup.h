@@ -74,6 +74,13 @@ using tup::detail::Tec4u;
 //
 //
 //
+using tup::detail::tup_size_v;
+
+using tup::detail::tup_elem_t;
+
+//
+//
+//
 using tup::detail::rank;
 
 using tup::detail::rank_t;

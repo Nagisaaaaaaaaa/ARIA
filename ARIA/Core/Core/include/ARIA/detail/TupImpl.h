@@ -270,6 +270,15 @@ constexpr bool is_tec_tr_v = is_tec_tr<TTec, T, r>::value;
 //
 //
 //
+template <typename T>
+constexpr auto tup_size_v = cute::tuple_size_v<T>;
+
+template <auto I, typename T>
+using tup_elem_t = cute::tuple_element_t<I, T>;
+
+//
+//
+//
 using cute::rank;
 using cute::rank_t;
 using cute::rank_v;
