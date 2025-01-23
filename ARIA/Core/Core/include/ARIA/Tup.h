@@ -20,6 +20,10 @@
 /// Layouts can also be combined and manipulated via functional composition, on which
 /// we build a large set of common operations such as tiling and partitioning.
 ///
+/// This file introduces `Tup` (tuple) and `Tec` (tuple + vec), where
+/// `Tec` is a vec type which can be fully or even partially determined at compile time.
+/// `Tup` and `Tec` are extensively used in ARIA metaprogramming.
+///
 /// \note This file is not fully documented, since we assume that the users have basic knowledge about CuTe.
 /// If you are not familiar with CuTe, please read the tutorials of NVIDIA CuTe before continue:
 /// 0. https://github.com/NVIDIA/cutlass/blob/main/media/docs/cute/00_quickstart.md.
