@@ -1,10 +1,8 @@
 #pragma once
 
-#include "ARIA/ForEach.h"
+#include "ARIA/Tup.h"
 
 #include <cute/layout.hpp>
-
-#include <array>
 
 namespace ARIA {
 
