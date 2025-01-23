@@ -32,8 +32,12 @@ using tup::detail::Tup;
 ///
 /// \warning `Tec` has the same type as `cute::tuple` but with restrictions, where
 /// the elements are required to be "arithmetic" types.
+/// Here, "arithmetic" means `std::is_arithmetic` or `ConstantArithmetic`.
 using tup::detail::Tec;
 
+//
+//
+//
 using tup::detail::Tec1;
 using tup::detail::Tec2;
 using tup::detail::Tec3;
