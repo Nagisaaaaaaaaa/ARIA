@@ -5,6 +5,29 @@
 
 namespace ARIA {
 
+namespace boltzmann_distribution::detail {
+
+template <uint dim, typename TOrder, typename TDomain, typename TU>
+void StaticTestMoment() {
+  static_assert(tup::detail::is_tec_tr_v<TOrder, uint, dim>, "The order type should be `Tecu`");
+  static_assert(tup::detail::is_tec_tr_v<TDomain, int, dim>, "The domain type should be `Teci`");
+  static_assert(tup::detail::is_tec_tr_v<TU, Real, dim>, "The velocity type should be `Tecr`");
+
+  static_assert(is_static_v<TOrder>, "The order type should be static");
+  static_assert(is_static_v<TDomain>, "The domain type should be static");
+
+  ForEach<dim>([]<auto i>() {
+    using TDomainI = tup_elem_t<i, TDomain>;
+    constexpr int domainI = TDomainI{};
+    static_assert(domainI == -1 || domainI == 0 || domainI == 1, "Domain should only be -1, 0, or 1");
+  });
+}
+
+} // namespace boltzmann_distribution::detail
+
+//
+//
+//
 template <uint dim, Real lambda>
 class BoltzmannDistribution;
 
@@ -16,19 +39,12 @@ class BoltzmannDistribution<1, lambda> {
 public:
   template <typename TOrder, typename TDomain, typename TU>
   [[nodiscard]] ARIA_HOST_DEVICE static constexpr Real Moment(const TU &u) {
+    boltzmann_distribution::detail::StaticTestMoment<1, TOrder, TDomain, TU>();
+
     constexpr Real cs2 = 1.0 / (2.0 * lambda);
-
-    static_assert(tup::detail::is_tec_tr_v<TOrder, uint, 1>, "The order type should be `Tec1u`");
-    static_assert(tup::detail::is_tec_tr_v<TDomain, int, 1>, "The domain type should be `Tec1i`");
-    static_assert(tup::detail::is_tec_tr_v<TU, Real, 1>, "The velocity type should be `Tec1r`");
-
-    static_assert(is_static_v<TOrder>, "The order type should be static");
-    static_assert(is_static_v<TDomain>, "The domain type should be static");
 
     constexpr uint order = get<0>(TOrder{});
     constexpr int domain = get<0>(TDomain{});
-
-    static_assert(domain == -1 || domain == 0 || domain == 1, "Domain should only be -1, 0, or 1");
 
     Real u0 = get<0>(u);
 
@@ -63,7 +79,9 @@ template <uint dim, Real lambda>
 class BoltzmannDistribution<dim, lambda> {
 public:
   template <typename TOrder, typename TDomain, typename TU>
-  [[nodiscard]] ARIA_HOST_DEVICE static constexpr Real Moment(const TU &u) {}
+  [[nodiscard]] ARIA_HOST_DEVICE static constexpr Real Moment(const TU &u) {
+    boltzmann_distribution::detail::StaticTestMoment<dim, TOrder, TDomain, TU>();
+  }
 };
 
 } // namespace ARIA
