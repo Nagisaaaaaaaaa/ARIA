@@ -12,17 +12,6 @@
 
 namespace ARIA {
 
-using tup::detail::rank;
-
-using tup::detail::rank_t;
-
-using tup::detail::rank_v;
-
-using tup::detail::get;
-
-//
-//
-//
 /// \brief `Tup` (tuple) is a fixed-size collection of heterogeneous values.
 ///
 /// \example ```cpp
@@ -79,6 +68,19 @@ using tup::detail::Tec4f;
 using tup::detail::Tec4i;
 using tup::detail::Tec4r;
 using tup::detail::Tec4u;
+
+//
+//
+//
+//
+//
+using tup::detail::rank;
+
+using tup::detail::rank_t;
+
+using tup::detail::rank_v;
+
+using tup::detail::get;
 
 //
 //
