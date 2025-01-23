@@ -5,11 +5,15 @@
 
 namespace ARIA {
 
+namespace {
+
 using cute::_0;
 using cute::_1;
 using cute::_2;
 using cute::_3;
 using cute::_4;
+
+} // namespace
 
 TEST(Layout, Base) {
   // Make shape.
