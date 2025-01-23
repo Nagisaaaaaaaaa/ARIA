@@ -3,6 +3,7 @@
 /// \file
 /// \brief A multidimensional vector implementation based on NVIDIA CuTe.
 /// See https://github.com/NVIDIA/cutlass/blob/main/media/docs/cute/03_tensor.md.
+/// Please read the comments in `Layout.h` before continue.
 ///
 /// CuTe's `Tensor` class represents a multidimensional vector.
 /// The vector's elements can live in any kind of memory, including

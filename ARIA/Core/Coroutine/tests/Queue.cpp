@@ -6,8 +6,6 @@
 #include <cppcoro/when_all.hpp>
 #include <gtest/gtest.h>
 
-#include <queue>
-
 namespace ARIA {
 
 namespace {

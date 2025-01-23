@@ -92,6 +92,7 @@ set(core_core_headers
     ARIA/Registry.h
     ARIA/SmallVector.h
     ARIA/TensorVector.h
+    ARIA/Tup.h
     ARIA/TypeArray.h
 )
 

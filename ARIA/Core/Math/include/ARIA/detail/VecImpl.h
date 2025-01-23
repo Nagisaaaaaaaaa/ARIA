@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ARIA/Layout.h"
+#include "ARIA/Tup.h"
 #include "ARIA/detail/MatImpl.h"
 
 namespace ARIA {
@@ -14,7 +14,7 @@ using Vec = Eigen::Vector<T, size>;
 //
 //
 //
-// Whether the given type is `Vec<T, ...>`.
+// Whether the given type is `Vec<...>`.
 template <typename T>
 struct is_vec : std::false_type {};
 
@@ -27,7 +27,7 @@ static constexpr bool is_vec_v = is_vec<T>::value;
 //
 //
 //
-// Whether the given type is `Vec<T, s>`.
+// Whether the given type is `Vec<..., s>`.
 template <typename T, auto s>
 struct is_vec_s : std::false_type {};
 
@@ -87,9 +87,9 @@ template <typename T, auto n>
 // Cast `Tec` to `Vec`.
 template <typename T, typename... Ts>
 [[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToVec(const Tec<T, Ts...> &tec) {
-  static_assert(layout::detail::is_same_arithmetic_domain_v<T, Ts...>,
+  using value_type = tup::detail::arithmetic_domain_t<T>;
+  static_assert(tup::detail::is_tec_t_v<Tec<T, Ts...>, value_type>,
                 "Element types of `Tec` should be \"as similar as possible\"");
-  using value_type = layout::detail::arithmetic_domain_t<T>;
 
   constexpr uint rank = rank_v<Tec<T, Ts...>>;
 

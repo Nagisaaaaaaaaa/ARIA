@@ -1,26 +1,11 @@
 #pragma once
 
 /// \file
-/// \brief A Layout abstraction based on NVIDIA CuTe.
+/// \brief A layout abstraction based on NVIDIA CuTe.
 /// See https://github.com/NVIDIA/cutlass/blob/main/media/docs/cute/00_quickstart.md.
+/// Please read the comments in `Tup.h` before continue.
 ///
-/// CuTe is a collection of C++ CUDA template abstractions for
-/// defining and operating on hierarchically multidimensional layouts of threads and data.
-/// CuTe provides `Layout` and `Tensor` objects that
-/// compactly packages the type, shape, memory space, and layout of data, while
-/// performing the complicated indexing for the user.
-/// This lets programmers focus on the logical descriptions of their algorithms while
-/// CuTe does the mechanical bookkeeping for them.
-/// With these tools, we can quickly design, implement, and modify all dense linear algebra operations.
-///
-/// The core abstraction of CuTe are the hierarchically multidimensional layouts which
-/// can be composed with data arrays to represent tensors.
-/// The representation of layouts is powerful enough to represent nearly everything
-/// we need to implement efficient dense linear algebra.
-/// Layouts can also be combined and manipulated via functional composition, on which
-/// we build a large set of common operations such as tiling and partitioning.
-///
-/// \note This file is not fully documented, since we assume that the users have basic knowledge about CuTe.
+/// \note We assume users have basic knowledge about CuTe.
 /// If you are not familiar with CuTe, please read the tutorials of NVIDIA CuTe before continue:
 /// 0. https://github.com/NVIDIA/cutlass/blob/main/media/docs/cute/00_quickstart.md.
 /// 1. https://github.com/NVIDIA/cutlass/blob/main/media/docs/cute/01_layout.md.
@@ -35,84 +20,6 @@
 
 namespace ARIA {
 
-using layout::detail::rank;
-
-using layout::detail::rank_t;
-
-using layout::detail::rank_v;
-
-using layout::detail::get;
-
-//
-//
-//
-/// \brief `Tup` (tuple) is a fixed-size collection of heterogeneous values.
-///
-/// \example ```cpp
-/// Tup tup{1, C<2U>{}, Tup{3.0F, std::string{"4"}}};
-/// ```
-///
-/// \warning `Tup` has the same type as `cute::tuple`.
-using layout::detail::Tup;
-
-/// \brief `Tec` (tuple + vec) is a fixed-size collection of heterogeneous "arithmetic" values.
-///
-/// \example ```cpp
-/// Tec tec{1, C<2U>{}, 3.0F, C<4.0>{}};
-/// Tec3 tec3{1, C<2U>{}, 3.0F};
-/// Teci teci{1, C<2>{}, 3, C<4>{}};
-/// Tec3i tec3i{1, C<2>{}, 3};
-/// ```
-///
-/// \warning `Tec` has the same type as `cute::tuple` but with restrictions, where
-/// the elements are required to be "arithmetic" types.
-using layout::detail::Tec;
-
-using layout::detail::Tec1;
-using layout::detail::Tec2;
-using layout::detail::Tec3;
-using layout::detail::Tec4;
-
-using layout::detail::Tecd;
-using layout::detail::Tecf;
-using layout::detail::Teci;
-using layout::detail::Tecr;
-using layout::detail::Tecu;
-
-using layout::detail::Tec1d;
-using layout::detail::Tec1f;
-using layout::detail::Tec1i;
-using layout::detail::Tec1r;
-using layout::detail::Tec1u;
-
-using layout::detail::Tec2d;
-using layout::detail::Tec2f;
-using layout::detail::Tec2i;
-using layout::detail::Tec2r;
-using layout::detail::Tec2u;
-
-using layout::detail::Tec3d;
-using layout::detail::Tec3f;
-using layout::detail::Tec3i;
-using layout::detail::Tec3r;
-using layout::detail::Tec3u;
-
-using layout::detail::Tec4d;
-using layout::detail::Tec4f;
-using layout::detail::Tec4i;
-using layout::detail::Tec4r;
-using layout::detail::Tec4u;
-
-//
-//
-//
-using layout::detail::is_static;
-
-using layout::detail::is_static_v;
-
-//
-//
-//
 using layout::detail::Shape;
 
 using layout::detail::Stride;
@@ -257,19 +164,5 @@ using layout::detail::is_co_layout_v;
 /// ...
 /// ```
 using layout::detail::CoLayout;
-
-//
-//
-//
-//
-//
-/// \brief Cast `Tec` to `std::array`.
-///
-/// \example ```cpp
-/// std::array<int, 2> array0 = ToArray(Tec{5, 6});
-/// std::array<int, 2> array1 = ToArray(Tec{5_I, 6});
-/// std::array<int, 2> array2 = ToArray(Tec{5_I, 6_I});
-/// ```
-using layout::detail::ToArray;
 
 } // namespace ARIA

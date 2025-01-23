@@ -21,6 +21,7 @@ if (ARIA_BUILD_TESTS)
       Python.cpp
       Registry.cpp
       TensorVector.cu
+      Tup.cpp
       TypeArray.cpp
       HARD_DEPENDENCIES
       ARIA::Core::Core
