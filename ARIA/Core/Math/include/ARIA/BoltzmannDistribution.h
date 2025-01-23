@@ -2,6 +2,7 @@
 
 #include "ARIA/Math.h"
 #include "ARIA/Tup.h"
+#include "ARIA/TypeArray.h"
 
 namespace ARIA {
 
@@ -23,8 +24,31 @@ void StaticTestMoment() {
   });
 }
 
+//
+//
+//
+template <typename... Ts>
+consteval auto ToTec(TypeArray<Ts...>) {
+  return Tec<Ts...>{};
+}
+
+template <typename TArray>
+using ToTec_t = decltype(ToTec(TArray{}));
+
+template <typename... Ts>
+consteval auto PopBack(Tec<Ts...>) {
+  using TArray = MakeTypeArray<Ts...>;
+  using TArrayBackPopped = TArray::Slice<0, TArray::size - 1, 1>;
+  return ToTec(TArrayBackPopped{});
+}
+
+template <typename TTec>
+using PopBack_t = decltype(PopBack(TTec{}));
+
 } // namespace boltzmann_distribution::detail
 
+//
+//
 //
 //
 //
