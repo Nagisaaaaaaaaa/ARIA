@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ARIA/Layout.h"
+#include "ARIA/Tup.h"
 #include "ARIA/detail/MatImpl.h"
 
 namespace ARIA {
@@ -87,9 +87,9 @@ template <typename T, auto n>
 // Cast `Tec` to `Vec`.
 template <typename T, typename... Ts>
 [[nodiscard]] ARIA_HOST_DEVICE static constexpr auto ToVec(const Tec<T, Ts...> &tec) {
-  static_assert(layout::detail::is_same_arithmetic_domain_v<T, Ts...>,
+  static_assert(tup::detail::is_same_arithmetic_domain_v<T, Ts...>,
                 "Element types of `Tec` should be \"as similar as possible\"");
-  using value_type = layout::detail::arithmetic_domain_t<T>;
+  using value_type = tup::detail::arithmetic_domain_t<T>;
 
   constexpr uint rank = rank_v<Tec<T, Ts...>>;
 
