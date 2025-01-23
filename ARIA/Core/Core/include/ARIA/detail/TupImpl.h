@@ -333,6 +333,9 @@ FillCoords(const std::decay_t<decltype(get<0>(std::declval<ARIA::tup::detail::Te
 
 } // namespace aria::tup::detail
 
+//
+//
+//
 template <typename... Coords0, typename... Coords1>
 [[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator+(const ARIA::tup::detail::Tec<Coords0...> &lhs,
                                                         const ARIA::tup::detail::Tec<Coords1...> &rhs) {
