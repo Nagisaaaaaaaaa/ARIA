@@ -95,14 +95,10 @@ TEST(BoltzmannDistribution, D2) {
   using Order04 = Tec<UInt<0>, UInt<4>>;
 
   using DomainPP = Tec<Int<1>, Int<1>>;
-  using DomainOP = Tec<Int<0>, Int<1>>;
-  using DomainNP = Tec<Int<-1>, Int<1>>;
   using DomainPO = Tec<Int<1>, Int<0>>;
   using DomainOO = Tec<Int<0>, Int<0>>;
   using DomainNO = Tec<Int<-1>, Int<0>>;
   using DomainPN = Tec<Int<1>, Int<-1>>;
-  using DomainON = Tec<Int<0>, Int<-1>>;
-  using DomainNN = Tec<Int<-1>, Int<-1>>;
 
   Tec2r u{0.114_R, 0.514_R};
   constexpr Tec2r uC{C<0.114_R>{}, C<0.514_R>{}};
@@ -282,6 +278,31 @@ TEST(BoltzmannDistribution, D2) {
   static_assert(StaticExpectEq(BD::Moment<Order22, DomainOO>(uC), 0.2069419357));
   static_assert(StaticExpectEq(BD::Moment<Order13, DomainOO>(uC), 0.0740768288));
   static_assert(StaticExpectEq(BD::Moment<Order04, DomainOO>(uC), 0.9315248597));
+}
+
+TEST(BoltzmannDistribution, D3) {
+  using BD = BoltzmannDistribution<3, 1.5>;
+
+  using Order000 = Tec<UInt<0>, UInt<0>, UInt<0>>;
+  using Order100 = Tec<UInt<1>, UInt<0>, UInt<0>>;
+  using Order010 = Tec<UInt<0>, UInt<1>, UInt<0>>;
+  using Order001 = Tec<UInt<0>, UInt<0>, UInt<1>>;
+  using Order200 = Tec<UInt<2>, UInt<0>, UInt<0>>;
+  using Order110 = Tec<UInt<1>, UInt<1>, UInt<0>>;
+  using Order020 = Tec<UInt<0>, UInt<2>, UInt<0>>;
+  using Order101 = Tec<UInt<1>, UInt<0>, UInt<1>>;
+  using Order011 = Tec<UInt<0>, UInt<1>, UInt<1>>;
+  using Order002 = Tec<UInt<0>, UInt<0>, UInt<2>>;
+  using Order300 = Tec<UInt<3>, UInt<0>, UInt<0>>;
+  using Order210 = Tec<UInt<2>, UInt<1>, UInt<0>>;
+  using Order120 = Tec<UInt<1>, UInt<2>, UInt<0>>;
+  using Order030 = Tec<UInt<0>, UInt<3>, UInt<0>>;
+  using Order201 = Tec<UInt<2>, UInt<0>, UInt<1>>;
+  using Order111 = Tec<UInt<1>, UInt<1>, UInt<1>>;
+  using Order021 = Tec<UInt<0>, UInt<2>, UInt<1>>;
+  using Order102 = Tec<UInt<1>, UInt<0>, UInt<2>>;
+  using Order012 = Tec<UInt<0>, UInt<1>, UInt<2>>;
+  using Order003 = Tec<UInt<0>, UInt<0>, UInt<3>>;
 }
 
 } // namespace ARIA
