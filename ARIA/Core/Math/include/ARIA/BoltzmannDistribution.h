@@ -26,33 +26,27 @@ constexpr void StaticTestMoment() {
 //
 //
 //
-template <typename... Ts>
-consteval auto ToTec(TypeArray<Ts...>) {
-  return Tec<Ts...>{};
-}
+template <typename TTup>
+struct except_tail {
+  using TArray = to_type_array_t<TTup>;
+  using TArrayExceptTail = TArray::template Slice<0, TArray::size - 1, 1>;
+  using TTupExceptTail = to_tup_t<TArrayExceptTail>;
+  using type = TTupExceptTail;
+};
 
-template <typename TArray>
-using ToTec_t = decltype(ToTec(TArray{}));
+template <typename TTup>
+using except_tail_t = typename except_tail<TTup>::type;
 
-template <typename... Ts>
-consteval auto PopBack(Tec<Ts...>) {
-  using TArray = MakeTypeArray<Ts...>;
-  using TArrayBackPopped = TArray::template Slice<0, TArray::size - 1, 1>;
-  return ToTec(TArrayBackPopped{});
-}
-
-template <typename TTec>
-using PopBack_t = decltype(PopBack(TTec{}));
-
-template <typename... Ts>
-consteval auto Tail(Tec<Ts...>) {
-  using TArray = MakeTypeArray<Ts...>;
+template <typename TTup>
+struct tail {
+  using TArray = to_type_array_t<TTup>;
   using TArrayTail = TArray::template Slice<TArray::size - 1, TArray::size, 1>;
-  return ToTec(TArrayTail{});
-}
+  using TTupTail = to_tup_t<TArrayTail>;
+  using type = TTupTail;
+};
 
-template <typename TTec>
-using Tail_t = decltype(Tail(TTec{}));
+template <typename TTup>
+using tail_t = typename tail<TTup>::type;
 
 } // namespace boltzmann_distribution::detail
 
@@ -115,12 +109,12 @@ public:
   [[nodiscard]] ARIA_HOST_DEVICE static constexpr Real Moment(const TU &u) {
     boltzmann_distribution::detail::StaticTestMoment<dim, TOrder, TDomain, TU>();
 
-    using TOrderL = boltzmann_distribution::detail::PopBack_t<TOrder>;
-    using TOrderR = boltzmann_distribution::detail::Tail_t<TOrder>;
-    using TDomainL = boltzmann_distribution::detail::PopBack_t<TDomain>;
-    using TDomainR = boltzmann_distribution::detail::Tail_t<TDomain>;
-    using TUL = boltzmann_distribution::detail::PopBack_t<TU>;
-    using TUR = boltzmann_distribution::detail::Tail_t<TU>;
+    using TOrderL = boltzmann_distribution::detail::except_tail_t<TOrder>;
+    using TOrderR = boltzmann_distribution::detail::tail_t<TOrder>;
+    using TDomainL = boltzmann_distribution::detail::except_tail_t<TDomain>;
+    using TDomainR = boltzmann_distribution::detail::tail_t<TDomain>;
+    using TUL = boltzmann_distribution::detail::except_tail_t<TU>;
+    using TUR = boltzmann_distribution::detail::tail_t<TU>;
 
     TUL uL;
     ForEach<dim - 1>([&]<auto i>() { get<i>(uL) = get<i>(u); });
