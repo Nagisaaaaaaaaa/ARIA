@@ -4,14 +4,15 @@ namespace ARIA {
 
 namespace boltzmann_distribution::detail {
 
+// Statically test the template parameters for `Moment`.
 template <uint dim, typename TOrder, typename TDomain, typename TU>
 constexpr void StaticTestMoment() {
+  static_assert(is_static_v<TOrder>, "The order type should be static");
+  static_assert(is_static_v<TDomain>, "The domain type should be static");
+
   static_assert(tup::detail::is_tec_tr_v<TOrder, uint, dim>, "The order type should be `Tecu`");
   static_assert(tup::detail::is_tec_tr_v<TDomain, int, dim>, "The domain type should be `Teci`");
   static_assert(tup::detail::is_tec_tr_v<TU, Real, dim>, "The velocity type should be `Tecr`");
-
-  static_assert(is_static_v<TOrder>, "The order type should be static");
-  static_assert(is_static_v<TDomain>, "The domain type should be static");
 
   ForEach<dim>([]<auto i>() {
     using TDomainI = tup_elem_t<i, TDomain>;
