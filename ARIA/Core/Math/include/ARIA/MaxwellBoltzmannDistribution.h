@@ -18,10 +18,10 @@ namespace ARIA {
 ///
 /// The distribution looks like
 /// f(ξ, u) = (λ / π)^(d / 2) exp(-λ(ξ - u)^2), where
-/// ξ is the microscopic particle velocity,
-/// u is the macroscopic velocity,
-/// λ = 1 / (2 RT), R is the gas constant, T is the temperature,
-/// d is the dimension of the system.
+///   ξ is the microscopic particle velocity,
+///   u is the macroscopic velocity,
+///   λ = 1 / (2 RT), R is the gas constant, T is the temperature,
+///   d is the dimension of the system.
 ///
 /// Before continue, define an operator:
 ///       +∞
@@ -29,6 +29,11 @@ namespace ARIA {
 ///       -∞
 ///
 /// Moments of the distribution is defined as:
+///   The 0^th order moment   : ⟨x⟩ = 1.
+///   The 1^th order moment(s): ⟨ξx⟩ = u.
+///   The 2^th order moment(s): ⟨ξξx⟩ = ...
+///   The 3^th order moment(s): ⟨ξξξx⟩ = ...
+///   ...
 template <uint dim, Real lambda>
 class MaxwellBoltzmannDistribution;
 
