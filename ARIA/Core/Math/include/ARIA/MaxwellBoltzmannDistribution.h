@@ -23,7 +23,9 @@ namespace ARIA {
 ///   λ = 1 / (2 RT), R is the gas constant, T is the temperature,
 ///   d is the dimension of the system.
 ///
-/// For simplicity, we firstly consider 1D systems.
+/// For simplicity, we firstly consider 1D systems, where
+/// ξ and u are both scalars.
+///
 /// Before continue, define an operator:
 ///       +∞
 /// ⟨x⟩ = ∫ x dξ.
