@@ -24,6 +24,7 @@ static consteval void StaticTestMoment() {
 //
 //
 //
+// Get type of the sub-`Tup` with elements except the tail.
 template <typename TTup>
 struct except_tail {
   using TArray = to_type_array_t<TTup>;
@@ -35,6 +36,7 @@ struct except_tail {
 template <typename TTup>
 using except_tail_t = typename except_tail<TTup>::type;
 
+// Get type of the sub-`Tup` with only the tail element.
 template <typename TTup>
 struct tail {
   using TArray = to_type_array_t<TTup>;
