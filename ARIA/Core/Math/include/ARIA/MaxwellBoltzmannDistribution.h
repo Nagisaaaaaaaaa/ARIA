@@ -44,7 +44,7 @@ namespace ARIA {
 ///
 /// Then, we move to 2D systems.
 /// ξ = (ξ0, ξ1)^T and u = (u0, u1)^T are now vectors instead of scalars.
-/// ⟨·⟩ should also be upgraded to
+/// ⟨x⟩ should also be upgraded to
 ///         +∞
 /// ⟨⟨x⟩⟩ = ∫∫ x dξ0 dξ1.
 ///         -∞
@@ -54,13 +54,13 @@ namespace ARIA {
 ///   THREE 2^nd order moments, ⟨⟨ξξf⟩⟩ = ...
 ///   ...
 /// We can also define moments with ⟨⟨x]⟩, ⟨⟨x]], ...
-///
 /// All things can be similarly extended to 3D, 4D, ...
 ///
 /// An important fact about high dimensional moments is that
 /// ⟨⟨ξ0^a ξ1^b ξ2^c f⟩⟩ = ⟨ξ0^a f⟩⟨ξ1^b f⟩⟨ξ2^c f⟩.
-/// This also works for other operators, which
-/// means that n-D moments can always be computed based on 1D moments.
+/// This also works for other operators such as ⟨⟨⟨x]⟩⟩, which
+/// means that complex n-D moments can always be computed as
+/// multiplication of simple 1D moments.
 ///
 /// \tparam dim Dimension of the system.
 /// \tparam lambda λ = 1 / (2 RT).
