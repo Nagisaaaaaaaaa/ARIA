@@ -307,6 +307,25 @@ template <typename T, typename... Ts>
 
 } // namespace tup::detail
 
+//
+//
+//
+//
+//
+//
+//
+//
+//
+namespace tup {
+
+template <typename T>
+constexpr auto size_v = cute::tuple_size_v<T>;
+
+template <auto I, typename T>
+using elem_t = cute::tuple_element_t<I, T>;
+
+} // namespace tup
+
 } // namespace ARIA
 
 //
