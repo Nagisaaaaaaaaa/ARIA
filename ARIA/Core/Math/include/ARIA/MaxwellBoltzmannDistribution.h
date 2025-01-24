@@ -90,8 +90,8 @@ namespace ARIA {
 ///
 /// using Order00 = Tec<UInt<0>, UInt<0>>;
 /// using Order10 = Tec<UInt<1>, UInt<0>>;
-/// using Order20 = Tec<UInt<2>, UInt<0>>;
 /// using Order11 = Tec<UInt<1>, UInt<1>>;
+/// using Order02 = Tec<UInt<0>, UInt<2>>;
 ///
 /// using DomainNO = Tec<Int<-1>, Int<0>>;
 /// using DomainOO = Tec<Int<0>, Int<0>>;
@@ -100,10 +100,10 @@ namespace ARIA {
 ///
 /// Vec2r u{0.123_R, 0.456_R}; // You can also use `Tec2r`.
 ///
-/// Real o00dNO = MBD::Moment<Order00, DomainNO>(u); // ⟨⟨f]⟩ = ⟨f]⟨f⟩
-/// Real o10dOO = MBD::Moment<Order10, DomainOO>(u); // ⟨⟨ξ0f⟩⟩ = ⟨ξ0f⟩⟨f⟩
+/// Real o00dNO = MBD::Moment<Order00, DomainNO>(u); // ⟨⟨f]⟩     = ⟨f]  ⟨f⟩
+/// Real o10dOO = MBD::Moment<Order10, DomainOO>(u); // ⟨⟨ξ0f⟩⟩   = ⟨ξ0f⟩⟨f⟩
 /// Real o11dPO = MBD::Moment<Order11, DomainPO>(u); // ⟨[ξ0ξ1f⟩⟩ = [ξ0f⟩⟨ξ1f⟩
-/// Real o02dPP = MBD::Moment<Order02, DomainPP>(u); // [[ξ1ξ1f⟩⟩ = [f⟩[ξ1ξ1f⟩
+/// Real o02dPP = MBD::Moment<Order02, DomainPP>(u); // [[ξ1ξ1f⟩⟩ = [f⟩  [ξ1ξ1f⟩
 /// ```
 template <uint dim, Real lambda>
 class MaxwellBoltzmannDistribution;
