@@ -52,7 +52,7 @@ namespace ARIA {
 /// We can also define moments with ⟨⟨x]⟩, ⟨⟨x]], ...
 ///
 /// An important fact about high dimensional moments is that
-/// ⟨⟨ ξ0^m ξ1^n f⟩⟩ = ⟨ξ0^m f⟩ ⟨ξ1^n f⟩.
+/// ⟨⟨ξ0^a ξ1^b ξ2^c f⟩⟩ = ⟨ξ0^a f⟩⟨ξ1^b f⟩⟨ξ2^c f⟩.
 /// This also works for other operators, which
 /// means that n-D moments can always be computed based on 1D moments.
 ///
