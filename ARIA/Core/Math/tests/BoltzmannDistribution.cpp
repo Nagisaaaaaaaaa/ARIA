@@ -303,6 +303,76 @@ TEST(BoltzmannDistribution, D3) {
   using Order102 = Tec<UInt<1>, UInt<0>, UInt<2>>;
   using Order012 = Tec<UInt<0>, UInt<1>, UInt<2>>;
   using Order003 = Tec<UInt<0>, UInt<0>, UInt<3>>;
+
+  using DomainPOO = Tec<Int<1>, Int<0>, Int<0>>;
+  using DomainOOO = Tec<Int<0>, Int<0>, Int<0>>;
+  using DomainNOO = Tec<Int<-1>, Int<0>, Int<0>>;
+
+  Tec3r u{0.114_R, 0.514_R, 0.1919810_R};
+  constexpr Tec2r uC{C<0.114_R>{}, C<0.514_R>{}, C<0.1919810_R>{}};
+
+  Real o000dPOO = BD::Moment<Order000, DomainPOO>(u);
+  Real o100dPOO = BD::Moment<Order100, DomainPOO>(u);
+  Real o010dPOO = BD::Moment<Order010, DomainPOO>(u);
+  Real o001dPOO = BD::Moment<Order001, DomainPOO>(u);
+  Real o200dPOO = BD::Moment<Order200, DomainPOO>(u);
+  Real o110dPOO = BD::Moment<Order110, DomainPOO>(u);
+  Real o020dPOO = BD::Moment<Order020, DomainPOO>(u);
+  Real o101dPOO = BD::Moment<Order101, DomainPOO>(u);
+  Real o011dPOO = BD::Moment<Order011, DomainPOO>(u);
+  Real o002dPOO = BD::Moment<Order002, DomainPOO>(u);
+  Real o300dPOO = BD::Moment<Order300, DomainPOO>(u);
+  Real o210dPOO = BD::Moment<Order210, DomainPOO>(u);
+  Real o120dPOO = BD::Moment<Order120, DomainPOO>(u);
+  Real o030dPOO = BD::Moment<Order030, DomainPOO>(u);
+  Real o201dPOO = BD::Moment<Order201, DomainPOO>(u);
+  Real o111dPOO = BD::Moment<Order111, DomainPOO>(u);
+  Real o021dPOO = BD::Moment<Order021, DomainPOO>(u);
+  Real o102dPOO = BD::Moment<Order102, DomainPOO>(u);
+  Real o012dPOO = BD::Moment<Order012, DomainPOO>(u);
+  Real o003dPOO = BD::Moment<Order003, DomainPOO>(u);
+
+  Real o000dOOO = BD::Moment<Order000, DomainOOO>(u);
+  Real o100dOOO = BD::Moment<Order100, DomainOOO>(u);
+  Real o010dOOO = BD::Moment<Order010, DomainOOO>(u);
+  Real o001dOOO = BD::Moment<Order001, DomainOOO>(u);
+  Real o200dOOO = BD::Moment<Order200, DomainOOO>(u);
+  Real o110dOOO = BD::Moment<Order110, DomainOOO>(u);
+  Real o020dOOO = BD::Moment<Order020, DomainOOO>(u);
+  Real o101dOOO = BD::Moment<Order101, DomainOOO>(u);
+  Real o011dOOO = BD::Moment<Order011, DomainOOO>(u);
+  Real o002dOOO = BD::Moment<Order002, DomainOOO>(u);
+  Real o300dOOO = BD::Moment<Order300, DomainOOO>(u);
+  Real o210dOOO = BD::Moment<Order210, DomainOOO>(u);
+  Real o120dOOO = BD::Moment<Order120, DomainOOO>(u);
+  Real o030dOOO = BD::Moment<Order030, DomainOOO>(u);
+  Real o201dOOO = BD::Moment<Order201, DomainOOO>(u);
+  Real o111dOOO = BD::Moment<Order111, DomainOOO>(u);
+  Real o021dOOO = BD::Moment<Order021, DomainOOO>(u);
+  Real o102dOOO = BD::Moment<Order102, DomainOOO>(u);
+  Real o012dOOO = BD::Moment<Order012, DomainOOO>(u);
+  Real o003dOOO = BD::Moment<Order003, DomainOOO>(u);
+
+  Real o000dNOO = BD::Moment<Order000, DomainNOO>(u);
+  Real o100dNOO = BD::Moment<Order100, DomainNOO>(u);
+  Real o010dNOO = BD::Moment<Order010, DomainNOO>(u);
+  Real o001dNOO = BD::Moment<Order001, DomainNOO>(u);
+  Real o200dNOO = BD::Moment<Order200, DomainNOO>(u);
+  Real o110dNOO = BD::Moment<Order110, DomainNOO>(u);
+  Real o020dNOO = BD::Moment<Order020, DomainNOO>(u);
+  Real o101dNOO = BD::Moment<Order101, DomainNOO>(u);
+  Real o011dNOO = BD::Moment<Order011, DomainNOO>(u);
+  Real o002dNOO = BD::Moment<Order002, DomainNOO>(u);
+  Real o300dNOO = BD::Moment<Order300, DomainNOO>(u);
+  Real o210dNOO = BD::Moment<Order210, DomainNOO>(u);
+  Real o120dNOO = BD::Moment<Order120, DomainNOO>(u);
+  Real o030dNOO = BD::Moment<Order030, DomainNOO>(u);
+  Real o201dNOO = BD::Moment<Order201, DomainNOO>(u);
+  Real o111dNOO = BD::Moment<Order111, DomainNOO>(u);
+  Real o021dNOO = BD::Moment<Order021, DomainNOO>(u);
+  Real o102dNOO = BD::Moment<Order102, DomainNOO>(u);
+  Real o012dNOO = BD::Moment<Order012, DomainNOO>(u);
+  Real o003dNOO = BD::Moment<Order003, DomainNOO>(u);
 }
 
 } // namespace ARIA
