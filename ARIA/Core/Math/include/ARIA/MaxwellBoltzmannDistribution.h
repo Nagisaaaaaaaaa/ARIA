@@ -23,6 +23,7 @@ namespace ARIA {
 ///   λ = 1 / (2 RT), R is the gas constant, T is the temperature,
 ///   d is the dimension of the system.
 ///
+/// For simplicity, we firstly consider 1D systems.
 /// Before continue, define an operator:
 ///       +∞
 /// ⟨x⟩ = ∫ x dξ.
@@ -32,12 +33,14 @@ namespace ARIA {
 /// [x⟩ = ∫(0, +∞) x dξ
 ///
 /// Moments of the distribution are defined as:
-///   The 0^th order moment   : ⟨f⟩ = 1.
-///   The 1^st order moment(s): ⟨ξf⟩ = u.
-///   The 2^nd order moment(s): ⟨ξξf⟩ = ...
-///   The 3^rd order moment(s): ⟨ξξξf⟩ = ...
+///   The 0^th order moment: ⟨f⟩ = 1.
+///   The 1^st order moment: ⟨ξf⟩ = u.
+///   The 2^nd order moment: ⟨ξξf⟩ = ...
+///   The 3^rd order moment: ⟨ξξξf⟩ = ...
 ///   ...
 /// We can also define moments with ⟨x] or [x⟩.
+///
+/// Now, we move to systems with dimensions larger than 1.
 ///
 /// \tparam dim Dimension of the system.
 /// \tparam lambda λ = 1 / (2 RT).
