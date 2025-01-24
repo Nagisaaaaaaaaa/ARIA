@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ARIA/Math.h"
-#include "ARIA/Tup.h"
+#include "ARIA/Vec.h"
 
 namespace ARIA {
 
