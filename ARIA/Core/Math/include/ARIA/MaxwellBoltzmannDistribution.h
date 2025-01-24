@@ -27,8 +27,7 @@ namespace ARIA {
 ///       +∞
 /// ⟨x⟩ = ∫ x dξ.
 ///       -∞
-///
-/// We sometimes also want such kinds of integral domains:
+/// We also want other kinds of integral domains:
 /// ⟨x] = ∫(-∞, 0) x dξ
 /// [x⟩ = ∫(0, +∞) x dξ
 ///
@@ -38,7 +37,6 @@ namespace ARIA {
 ///   The 2^th order moment(s): ⟨ξξf⟩ = ...
 ///   The 3^th order moment(s): ⟨ξξξf⟩ = ...
 ///   ...
-///
 /// We can also define moments with ⟨x] or [x⟩.
 ///
 /// \tparam dim Dimension of the system.
