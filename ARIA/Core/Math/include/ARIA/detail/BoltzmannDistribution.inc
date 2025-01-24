@@ -6,7 +6,7 @@ namespace boltzmann_distribution::detail {
 
 // Statically test the template parameters for `Moment`.
 template <uint dim, typename TOrder, typename TDomain, typename TU>
-constexpr void StaticTestMoment() {
+static consteval void StaticTestMoment() {
   static_assert(is_static_v<TOrder>, "The order type should be static");
   static_assert(is_static_v<TDomain>, "The domain type should be static");
 
