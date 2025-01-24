@@ -394,6 +394,27 @@ TEST(BoltzmannDistribution, D3) {
   EXPECT_FLOAT_EQ(o102dOOO, 0.0422016643);
   EXPECT_FLOAT_EQ(o012dOOO, 0.1902776794);
   EXPECT_FLOAT_EQ(o003dOOO, 0.1990567870);
+
+  static_assert(StaticExpectEq(BD::Moment<Order000, DomainOOO>(uC), 1));
+  static_assert(StaticExpectEq(BD::Moment<Order100, DomainOOO>(uC), 0.114));
+  static_assert(StaticExpectEq(BD::Moment<Order010, DomainOOO>(uC), 0.514));
+  static_assert(StaticExpectEq(BD::Moment<Order001, DomainOOO>(uC), 0.1919810));
+  static_assert(StaticExpectEq(BD::Moment<Order200, DomainOOO>(uC), 0.3463293333));
+  static_assert(StaticExpectEq(BD::Moment<Order110, DomainOOO>(uC), 0.0585960000));
+  static_assert(StaticExpectEq(BD::Moment<Order020, DomainOOO>(uC), 0.5975293333));
+  static_assert(StaticExpectEq(BD::Moment<Order101, DomainOOO>(uC), 0.0218858340));
+  static_assert(StaticExpectEq(BD::Moment<Order011, DomainOOO>(uC), 0.0986782340));
+  static_assert(StaticExpectEq(BD::Moment<Order002, DomainOOO>(uC), 0.3701900377));
+  static_assert(StaticExpectEq(BD::Moment<Order300, DomainOOO>(uC), 0.1154815440));
+  static_assert(StaticExpectEq(BD::Moment<Order210, DomainOOO>(uC), 0.1780132773));
+  static_assert(StaticExpectEq(BD::Moment<Order120, DomainOOO>(uC), 0.0681183440));
+  static_assert(StaticExpectEq(BD::Moment<Order030, DomainOOO>(uC), 0.6497967440));
+  static_assert(StaticExpectEq(BD::Moment<Order201, DomainOOO>(uC), 0.0664886517));
+  static_assert(StaticExpectEq(BD::Moment<Order111, DomainOOO>(uC), 0.0112493187));
+  static_assert(StaticExpectEq(BD::Moment<Order021, DomainOOO>(uC), 0.1147142789));
+  static_assert(StaticExpectEq(BD::Moment<Order102, DomainOOO>(uC), 0.0422016643));
+  static_assert(StaticExpectEq(BD::Moment<Order012, DomainOOO>(uC), 0.1902776794));
+  static_assert(StaticExpectEq(BD::Moment<Order003, DomainOOO>(uC), 0.1990567870));
 }
 
 } // namespace ARIA
