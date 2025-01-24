@@ -145,8 +145,16 @@ using tup::detail::is_static_v;
 using tup::detail::to_type_array_t;
 
 /// \brief Cast `TypeArray` to `Tup`.
+///
+/// \example ```cpp
+/// using Ts = MakeTypeArray<int, C<2U>, Tup<float, std::string>>;
+/// using TTup = to_tup_t<Ts>; // Tup<int, C<2U>, Tup<float, std::string>>
+/// ```
 using tup::detail::to_tup_t;
 
+//
+//
+//
 /// \brief Cast `Tec` to `std::array`.
 ///
 /// \example ```cpp
