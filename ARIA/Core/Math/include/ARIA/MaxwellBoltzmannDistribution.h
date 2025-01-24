@@ -31,8 +31,8 @@ namespace ARIA {
 /// ⟨x⟩ = ∫ x dξ.
 ///       -∞
 /// We also want other kinds of integral domains:
-/// ⟨x] = ∫(-∞, 0) x dξ
-/// [x⟩ = ∫(0, +∞) x dξ
+/// ⟨x] = ∫(-∞, 0] x dξ
+/// [x⟩ = ∫[0, +∞) x dξ
 ///
 /// Moments of the distribution are defined as:
 ///   The 0^th order moment: ⟨f⟩ = 1.
