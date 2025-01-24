@@ -55,6 +55,9 @@ using tail_t = typename tail<TTup>::type;
 //
 //
 //
+//! Mathematically, the n-D Boltzmann distribution has
+//! good relationships with the 1D case, especially for moments computation.
+//! So, template specialization will be used below.
 template <Real lambda>
 class BoltzmannDistribution<1, lambda> {
 public:
