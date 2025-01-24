@@ -10,9 +10,9 @@ constexpr void StaticTestMoment() {
   static_assert(is_static_v<TOrder>, "The order type should be static");
   static_assert(is_static_v<TDomain>, "The domain type should be static");
 
-  static_assert(tup::detail::is_tec_tr_v<TOrder, uint, dim>, "The order type should be `Tecu`");
-  static_assert(tup::detail::is_tec_tr_v<TDomain, int, dim>, "The domain type should be `Teci`");
-  static_assert(tup::detail::is_tec_tr_v<TU, Real, dim>, "The velocity type should be `Tecr`");
+  static_assert(tup::detail::is_tec_tr_v<TOrder, uint, dim>, "The order type should be `Tecu` and is `dim`-rank");
+  static_assert(tup::detail::is_tec_tr_v<TDomain, int, dim>, "The domain type should be `Teci` and is `dim`-rank");
+  static_assert(tup::detail::is_tec_tr_v<TU, Real, dim>, "The velocity type should be `Tecr` and is `dim`-rank");
 
   ForEach<dim>([]<auto i>() {
     using TDomainI = tup_elem_t<i, TDomain>;
