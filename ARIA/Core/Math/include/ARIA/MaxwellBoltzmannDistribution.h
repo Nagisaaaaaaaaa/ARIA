@@ -51,6 +51,11 @@ namespace ARIA {
 /// THREE 2^nd order moments, ⟨⟨ξξf⟩⟩ = ....
 /// We can also define moments with ⟨⟨x]⟩, ⟨⟨x]], ...
 ///
+/// An important fact about high dimensional moments is that
+/// ⟨⟨ ξ0^m ξ1^n f⟩⟩ = ⟨ξ0^m f⟩ ⟨ξ1^n f⟩.
+/// This also works for other operators, which
+/// means that n-D moments can always be computed based on 1D moments.
+///
 /// \tparam dim Dimension of the system.
 /// \tparam lambda λ = 1 / (2 RT).
 ///
