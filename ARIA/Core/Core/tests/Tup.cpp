@@ -36,25 +36,17 @@ TEST(Tup, Base) {
 
     static_assert(tup_size_v<decltype(v)> == 3);
     static_assert(tup_size_v<decltype(vSub)> == 2);
-    static_assert(tup::size_v<decltype(v)> == 3);
-    static_assert(tup::size_v<decltype(vSub)> == 2);
 
     static_assert(std::is_same_v<tup_elem_t<0, decltype(v)>, int>);
     static_assert(std::is_same_v<tup_elem_t<1, decltype(v)>, float>);
     static_assert(std::is_same_v<tup_elem_t<2, decltype(v)>, Tup<double, std::string>>);
     static_assert(std::is_same_v<tup_elem_t<0, decltype(vSub)>, double>);
     static_assert(std::is_same_v<tup_elem_t<1, decltype(vSub)>, std::string>);
-    static_assert(std::is_same_v<tup::elem_t<0, decltype(v)>, int>);
-    static_assert(std::is_same_v<tup::elem_t<1, decltype(v)>, float>);
-    static_assert(std::is_same_v<tup::elem_t<2, decltype(v)>, Tup<double, std::string>>);
-    static_assert(std::is_same_v<tup::elem_t<0, decltype(vSub)>, double>);
-    static_assert(std::is_same_v<tup::elem_t<1, decltype(vSub)>, std::string>);
 
-    static_assert(
-        std::is_same_v<tup::to_type_array_t<decltype(v)>, MakeTypeArray<int, float, Tup<double, std::string>>>);
-    static_assert(std::is_same_v<tup::to_type_array_t<decltype(vSub)>, MakeTypeArray<double, std::string>>);
-    static_assert(std::is_same_v<tup::to_tup_t<MakeTypeArray<int, float, Tup<double, std::string>>>, decltype(v)>);
-    static_assert(std::is_same_v<tup::to_tup_t<MakeTypeArray<double, std::string>>, decltype(vSub)>);
+    static_assert(std::is_same_v<to_type_array_t<decltype(v)>, MakeTypeArray<int, float, Tup<double, std::string>>>);
+    static_assert(std::is_same_v<to_type_array_t<decltype(vSub)>, MakeTypeArray<double, std::string>>);
+    static_assert(std::is_same_v<to_tup_t<MakeTypeArray<int, float, Tup<double, std::string>>>, decltype(v)>);
+    static_assert(std::is_same_v<to_tup_t<MakeTypeArray<double, std::string>>, decltype(vSub)>);
   }
 
   // Make tec.
@@ -68,19 +60,14 @@ TEST(Tup, Base) {
     static_assert(tup::detail::is_tec_v<decltype(v)>);
 
     static_assert(tup_size_v<decltype(v)> == 4);
-    static_assert(tup::size_v<decltype(v)> == 4);
 
     static_assert(std::is_same_v<tup_elem_t<0, decltype(v)>, int>);
     static_assert(std::is_same_v<tup_elem_t<1, decltype(v)>, float>);
     static_assert(std::is_same_v<tup_elem_t<2, decltype(v)>, C<3U>>);
     static_assert(std::is_same_v<tup_elem_t<3, decltype(v)>, C<4.0>>);
-    static_assert(std::is_same_v<tup::elem_t<0, decltype(v)>, int>);
-    static_assert(std::is_same_v<tup::elem_t<1, decltype(v)>, float>);
-    static_assert(std::is_same_v<tup::elem_t<2, decltype(v)>, C<3U>>);
-    static_assert(std::is_same_v<tup::elem_t<3, decltype(v)>, C<4.0>>);
 
-    static_assert(std::is_same_v<tup::to_type_array_t<decltype(v)>, MakeTypeArray<int, float, C<3U>, C<4.0>>>);
-    static_assert(std::is_same_v<tup::to_tup_t<MakeTypeArray<int, float, C<3U>, C<4.0>>>, decltype(v)>);
+    static_assert(std::is_same_v<to_type_array_t<decltype(v)>, MakeTypeArray<int, float, C<3U>, C<4.0>>>);
+    static_assert(std::is_same_v<to_tup_t<MakeTypeArray<int, float, C<3U>, C<4.0>>>, decltype(v)>);
   }
 
   {
