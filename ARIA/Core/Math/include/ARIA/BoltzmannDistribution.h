@@ -1,5 +1,12 @@
 #pragma once
 
+/// \file
+/// \brief A policy-based Maxwell-Boltzmann distribution implementation.
+//
+//
+//
+//
+//
 #include "ARIA/Math.h"
 #include "ARIA/Vec.h"
 
