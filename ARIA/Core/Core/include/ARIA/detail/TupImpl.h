@@ -324,6 +324,22 @@ constexpr auto size_v = cute::tuple_size_v<T>;
 template <auto I, typename T>
 using elem_t = cute::tuple_element_t<I, T>;
 
+//
+//
+//
+namespace detail {
+
+template <typename... Ts>
+consteval auto ToTypeArray(const Tup<Ts...> &) {
+  return MakeTypeArray<Ts...>{};
+}
+
+} // namespace detail
+
+/// \brief Get template parameters of a `Tup`.
+template <typename TTup>
+using type_array_t = decltype(detail::ToTypeArray(std::declval<TTup>()));
+
 } // namespace tup
 
 } // namespace ARIA
