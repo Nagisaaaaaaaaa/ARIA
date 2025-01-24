@@ -3,6 +3,9 @@
 /// \file
 /// \brief A policy-based Maxwell-Boltzmann distribution implementation.
 /// See https://en.wikipedia.org/wiki/Maxwell-Boltzmann_distribution.
+///
+/// The Maxwell-Boltzmann distribution is commonly used in
+/// physically-based simulation and computer graphics.
 //
 //
 //
