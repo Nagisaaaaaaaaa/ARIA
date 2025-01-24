@@ -16,11 +16,19 @@ namespace ARIA {
 /// \brief A policy-based Maxwell-Boltzmann distribution implementation.
 /// See https://en.wikipedia.org/wiki/Maxwell-Boltzmann_distribution.
 ///
-/// The distribution looks like f(ξ, u) = (λ / π)^(d / 2) exp(-λ(ξ - u)^2), where
+/// The distribution looks like
+/// f(ξ, u) = (λ / π)^(d / 2) exp(-λ(ξ - u)^2), where
 /// ξ is the microscopic particle velocity,
 /// u is the macroscopic velocity,
 /// λ = 1 / (2 RT), R is the gas constant, T is the temperature,
 /// d is the dimension of the system.
+///
+/// Before continue, define an operator:
+///       +∞
+/// ⟨x⟩ = ∫ x dξ.
+///       -∞
+///
+/// Moments of the distribution is defined as:
 template <uint dim, Real lambda>
 class MaxwellBoltzmannDistribution;
 
