@@ -93,6 +93,11 @@ public:
              ((order - 1) * rt) * Moment<decltype(TOrder{} - Tec<UInt<2>>{}), TDomain>(u);
     }
   }
+
+  template <typename TOrder, typename TDomain>
+  [[nodiscard]] ARIA_HOST_DEVICE static constexpr Real Moment(const Vec1r &u) {
+    return Moment<TOrder, TDomain>(ToTec(u));
+  }
 };
 
 //
@@ -120,6 +125,11 @@ public:
 
     return BoltzmannDistribution<dim - 1, lambda>::template Moment<TOrderL, TDomainL, TUL>(uL) *
            BoltzmannDistribution<1, lambda>::template Moment<TOrderR, TDomainR, TUR>(uR);
+  }
+
+  template <typename TOrder, typename TDomain>
+  [[nodiscard]] ARIA_HOST_DEVICE static constexpr Real Moment(const Vec<Real, dim> &u) {
+    return Moment<TOrder, TDomain>(ToTec(u));
   }
 };
 
