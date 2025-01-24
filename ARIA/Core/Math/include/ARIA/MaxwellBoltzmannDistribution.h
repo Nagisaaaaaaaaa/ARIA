@@ -33,13 +33,57 @@ namespace ARIA {
 /// [x⟩ = ∫(0, +∞) x dξ
 ///
 /// Moments of the distribution is defined as:
-///   The 0^th order moment   : ⟨x⟩ = 1.
-///   The 1^th order moment(s): ⟨ξx⟩ = u.
-///   The 2^th order moment(s): ⟨ξξx⟩ = ...
-///   The 3^th order moment(s): ⟨ξξξx⟩ = ...
+///   The 0^th order moment   : ⟨f⟩ = 1.
+///   The 1^th order moment(s): ⟨ξf⟩ = u.
+///   The 2^th order moment(s): ⟨ξξf⟩ = ...
+///   The 3^th order moment(s): ⟨ξξξf⟩ = ...
 ///   ...
 ///
 /// We can also define moments with ⟨x] or [x⟩.
+///
+/// \tparam dim Dimension of the system.
+/// \tparam lambda λ = 1 / (2 RT).
+///
+/// \example ```cpp
+/// // 1D example.
+/// using MBD = MaxwellBoltzmannDistribution<1, 1.5>;
+///
+/// using Order0 = Tec<UInt<0>>;
+/// using Order1 = Tec<UInt<1>>;
+/// using Order2 = Tec<UInt<2>>;
+///
+/// using DomainN = Tec<Int<-1>>;
+/// using DomainO = Tec<Int<0>>;
+/// using DomainP = Tec<Int<1>>;
+///
+/// Vec1r u{0.123_R}; // You can also use `Tec1r`.
+///
+/// Real o0dN = MBD::Moment<Order0, DomainN>(u); // ⟨f]
+/// Real o1dO = MBD::Moment<Order1, DomainO>(u); // ⟨ξf⟩ = u
+/// Real o2dP = MBD::Moment<Order2, DomainP>(u); // [ξξf⟩
+/// ```
+///
+/// \example ```cpp
+/// // 2D example.
+/// using MBD = MaxwellBoltzmannDistribution<2, 1.5>;
+///
+/// using Order00 = Tec<UInt<0>, UInt<0>>;
+/// using Order10 = Tec<UInt<1>, UInt<0>>;
+/// using Order20 = Tec<UInt<2>, UInt<0>>;
+/// using Order11 = Tec<UInt<1>, UInt<1>>;
+///
+/// using DomainNO = Tec<Int<-1>, Int<0>>;
+/// using DomainOO = Tec<Int<0>, Int<0>>;
+/// using DomainPO = Tec<Int<1>, Int<0>>;
+/// using DomainPP = Tec<Int<1>, Int<1>>;
+///
+/// Vec2r u{0.123_R, 0.456_R}; // You can also use `Tec2r`.
+///
+/// Real o00dNO = MBD::Moment<Order00, DomainNO>(u); // ⟨⟨f]⟩ = ⟨f]⟨f⟩
+/// Real o10dOO = MBD::Moment<Order10, DomainOO>(u); // ⟨⟨ξ0f⟩⟩ = ⟨ξ0f⟩⟨f⟩
+/// Real o11dPO = MBD::Moment<Order11, DomainPO>(u); // ⟨[ξ0ξ1f⟩⟩ = [ξ0f⟩⟨ξ1f⟩
+/// Real o02dPP = MBD::Moment<Order02, DomainPP>(u); // [[ξ1ξ1f⟩⟩ = [f⟩[ξ1ξ1f⟩
+/// ```
 template <uint dim, Real lambda>
 class MaxwellBoltzmannDistribution;
 
