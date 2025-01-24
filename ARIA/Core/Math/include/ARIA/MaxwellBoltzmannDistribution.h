@@ -19,23 +19,20 @@ namespace ARIA {
 /// \brief A policy-based Maxwell-Boltzmann distribution implementation.
 /// See https://en.wikipedia.org/wiki/Maxwell-Boltzmann_distribution.
 ///
-/// The distribution looks like
-/// f(ξ, u) = (λ / π)^(d / 2) exp(-λ(ξ - u)^2), where
-///   ξ is the microscopic particle velocity,
-///   u is the macroscopic velocity,
-///   λ = 1 / (2 RT), R is the gas constant, T is the temperature,
-///   d is the dimension of the system.
+/// The Maxwell-Boltzmann distribution looks like
+///   f(ξ, u) = (λ / π)^(d / 2) exp(-λ(ξ - u)^2), where
+///     ξ is the microscopic particle velocity,
+///     u is the macroscopic velocity,
+///     λ = 1 / (2 RT), R is the gas constant, T is the temperature,
+///     d is the dimension of the system.
 ///
 /// For simplicity, we firstly consider 1D systems, where
 /// ξ and u are both scalars.
 ///
-/// Before continue, define an operator:
-///       +∞
-/// ⟨x⟩ = ∫ x dξ.
-///       -∞
-/// We also want other kinds of integral domains:
-/// ⟨x] = ∫(-∞, 0] x dξ
-/// [x⟩ = ∫[0, +∞) x dξ
+/// Before continue, several operators should be defined:
+///   ⟨x⟩ = ∫(-∞, +∞) x dξ,
+///   ⟨x] = ∫(-∞, 0] x dξ,
+///   [x⟩ = ∫[0, +∞) x dξ.
 ///
 /// Moments of the distribution are defined as:
 ///   The 0^th order moment: ⟨f⟩ = 1.
@@ -48,10 +45,8 @@ namespace ARIA {
 /// Then, we move to 2D systems.
 /// ξ = (ξ0, ξ1)^T and u = (u0, u1)^T are now vectors instead of scalars.
 /// ⟨x⟩ should also be upgraded to
-///         +∞
-/// ⟨⟨x⟩⟩ = ∫∫ x dξ0 dξ1.
-///         -∞
-/// We can also define ⟨⟨x]⟩, ⟨⟨x]], ..., with different integral domains.
+///   ⟨⟨x⟩⟩ = ∫∫(-∞, +∞) x dξ0 dξ1.
+/// Other operators ⟨⟨x]⟩, ⟨⟨x]], ... are similarly defined.
 /// Note that for 2D systems, there are:
 ///   TWO   1^st order moments, ⟨⟨ξf⟩⟩ = u.
 ///   THREE 2^nd order moments, ⟨⟨ξξf⟩⟩ = ...
@@ -60,7 +55,7 @@ namespace ARIA {
 /// All things can be similarly extended to 3D, 4D, ...
 ///
 /// An important fact about high dimensional moments is that
-/// ⟨⟨ξ0^a ξ1^b ξ2^c f⟩⟩ = ⟨ξ0^a f⟩⟨ξ1^b f⟩⟨ξ2^c f⟩.
+///   ⟨⟨ξ0^a ξ1^b ξ2^c f⟩⟩ = ⟨ξ0^a f⟩⟨ξ1^b f⟩⟨ξ2^c f⟩.
 /// This also works for other operators such as ⟨⟨⟨x]⟩⟩, which
 /// means that complex n-D moments can always be computed as
 /// multiplication of simple 1D moments.
@@ -103,10 +98,10 @@ namespace ARIA {
 ///
 /// Vec2r u{0.123_R, 0.456_R}; // You can also use `Tec2r`.
 ///
-/// Real o00dNO = MBD::Moment<Order00, DomainNO>(u); // ⟨⟨f]⟩     = ⟨f]  ⟨f⟩
-/// Real o10dOO = MBD::Moment<Order10, DomainOO>(u); // ⟨⟨ξ0f⟩⟩   = ⟨ξ0f⟩⟨f⟩
+/// Real o00dNO = MBD::Moment<Order00, DomainNO>(u); // ⟨⟨f]⟩ = ⟨f]⟨f⟩
+/// Real o10dOO = MBD::Moment<Order10, DomainOO>(u); // ⟨⟨ξ0f⟩⟩ = ⟨ξ0f⟩⟨f⟩
 /// Real o11dPO = MBD::Moment<Order11, DomainPO>(u); // ⟨[ξ0ξ1f⟩⟩ = [ξ0f⟩⟨ξ1f⟩
-/// Real o02dPP = MBD::Moment<Order02, DomainPP>(u); // [[ξ1ξ1f⟩⟩ = [f⟩  [ξ1ξ1f⟩
+/// Real o02dPP = MBD::Moment<Order02, DomainPP>(u); // [[ξ1ξ1f⟩⟩ = [f⟩[ξ1ξ1f⟩
 /// ```
 template <uint dim, Real lambda>
 class MaxwellBoltzmannDistribution;
