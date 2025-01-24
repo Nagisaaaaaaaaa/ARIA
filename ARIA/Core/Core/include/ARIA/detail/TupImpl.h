@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ARIA/ForEach.h"
+#include "ARIA/TypeArray.h"
 
 #include <cute/int_tuple.hpp>
 
@@ -289,6 +289,27 @@ using cute::is_static_v;
 
 //
 //
+//
+//
+//
+// Cast `Tup` to `TypeArray`.
+template <typename... Ts>
+consteval auto ToTypeArray(const Tup<Ts...> &) {
+  return MakeTypeArray<Ts...>{};
+}
+
+template <typename TTup>
+using to_type_array_t = decltype(detail::ToTypeArray(std::declval<TTup>()));
+
+// Cast `TypeArray` to `Tup`.
+template <typename... Ts>
+consteval auto ToTup(const TypeArray<Ts...> &) {
+  return Tup<Ts...>{};
+}
+
+template <typename TArray>
+using to_tup_t = decltype(detail::ToTup(std::declval<TArray>()));
+
 //
 //
 //

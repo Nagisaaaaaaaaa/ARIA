@@ -21,6 +21,7 @@ set(core_math_headers
     ARIA/BezierCurve.h
     ARIA/Mat.h
     ARIA/Math.h
+    ARIA/MaxwellBoltzmannDistribution.h
     ARIA/MortonCode.h
     ARIA/MovingPoint.h
     ARIA/Quat.h

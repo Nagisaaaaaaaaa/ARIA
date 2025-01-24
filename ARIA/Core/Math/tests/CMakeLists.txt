@@ -4,6 +4,7 @@ if (ARIA_BUILD_TESTS)
       BezierCurve.cu
       Mat.cpp
       Math.cpp
+      MaxwellBoltzmannDistribution.cpp
       MortonCode.cpp
       MovingPoint.cpp
       Quat.cpp
