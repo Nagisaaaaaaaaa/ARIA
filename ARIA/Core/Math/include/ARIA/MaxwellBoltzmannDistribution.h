@@ -66,7 +66,7 @@ namespace ARIA {
 /// \tparam lambda λ = 1 / (2 RT).
 ///
 /// \example ```cpp
-/// // 1D example.
+/// // For 1D systems.
 /// using MBD = MaxwellBoltzmannDistribution<1, 1.5>;
 ///
 /// using Order0 = Tec<UInt<0>>;
@@ -82,10 +82,10 @@ namespace ARIA {
 /// Real o0dN = MBD::Moment<Order0, DomainN>(u); // ⟨f]
 /// Real o1dO = MBD::Moment<Order1, DomainO>(u); // ⟨ξf⟩ = u
 /// Real o2dP = MBD::Moment<Order2, DomainP>(u); // [ξξf⟩
-/// ```
 ///
-/// \example ```cpp
-/// // 2D example.
+///
+///
+/// // For 2D systems.
 /// using MBD = MaxwellBoltzmannDistribution<2, 1.5>;
 ///
 /// using Order00 = Tec<UInt<0>, UInt<0>>;
