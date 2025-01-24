@@ -5,6 +5,14 @@
 
 namespace ARIA {
 
+template <uint dim, Real lambda>
+class BoltzmannDistribution;
+
+//
+//
+//
+//
+//
 namespace boltzmann_distribution::detail {
 
 template <uint dim, typename TOrder, typename TDomain, typename TU>
@@ -49,14 +57,6 @@ template <typename TTup>
 using tail_t = typename tail<TTup>::type;
 
 } // namespace boltzmann_distribution::detail
-
-//
-//
-//
-//
-//
-template <uint dim, Real lambda>
-class BoltzmannDistribution;
 
 //
 //
