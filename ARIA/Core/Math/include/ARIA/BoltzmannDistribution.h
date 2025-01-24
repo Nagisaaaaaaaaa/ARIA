@@ -75,7 +75,7 @@ public:
   [[nodiscard]] ARIA_HOST_DEVICE static constexpr Real Moment(const TU &u) {
     boltzmann_distribution::detail::StaticTestMoment<1, TOrder, TDomain, TU>();
 
-    constexpr Real cs2 = 1.0 / (2.0 * lambda);
+    constexpr Real rt = 1.0 / (2.0 * lambda);
 
     constexpr uint order = get<0>(TOrder{});
     constexpr int domain = get<0>(TDomain{});
@@ -100,7 +100,7 @@ public:
                std::exp(-lambda * (u0 * u0)) / (std::sqrt(pi<Real> * lambda) * 2_R);
     } else {
       return u0 * Moment<decltype(TOrder{} - Tec<UInt<1>>{}), TDomain>(u) +
-             ((order - 1) * cs2) * Moment<decltype(TOrder{} - Tec<UInt<2>>{}), TDomain>(u);
+             ((order - 1) * rt) * Moment<decltype(TOrder{} - Tec<UInt<2>>{}), TDomain>(u);
     }
   }
 };
