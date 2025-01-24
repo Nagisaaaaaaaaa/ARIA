@@ -40,7 +40,16 @@ namespace ARIA {
 ///   ...
 /// We can also define moments with ⟨x] or [x⟩.
 ///
-/// Now, we move to systems with dimensions larger than 1.
+/// Now, we move to 2D systems.
+/// ξ = (ξ0, ξ1)^T and u = (u0, u1)^T are now vectors instead of scalars.
+/// ⟨·⟩ should also be upgraded to
+///         +∞+∞
+/// ⟨⟨x⟩⟩ = ∫ ∫ x dξ0 dξ1.
+///         -∞-∞
+/// We can also define ⟨⟨x]⟩, ⟨⟨x]], ...
+/// Note that there are now TWO 1^st order moments, ⟨⟨ξf⟩⟩ = u, and
+/// THREE 2^nd order moments, ⟨⟨ξξf⟩⟩ = ....
+/// We can also define moments with ⟨⟨x]⟩, ⟨⟨x]], ...
 ///
 /// \tparam dim Dimension of the system.
 /// \tparam lambda λ = 1 / (2 RT).
