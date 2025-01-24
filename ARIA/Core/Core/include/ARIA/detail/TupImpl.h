@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ARIA/ForEach.h"
+#include "ARIA/TypeArray.h"
 
 #include <cute/int_tuple.hpp>
 

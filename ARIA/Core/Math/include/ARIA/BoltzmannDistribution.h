@@ -2,7 +2,6 @@
 
 #include "ARIA/Math.h"
 #include "ARIA/Tup.h"
-#include "ARIA/TypeArray.h"
 
 namespace ARIA {
 
