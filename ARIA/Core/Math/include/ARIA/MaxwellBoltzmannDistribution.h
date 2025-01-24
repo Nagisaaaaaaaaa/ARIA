@@ -28,12 +28,18 @@ namespace ARIA {
 /// ⟨x⟩ = ∫ x dξ.
 ///       -∞
 ///
+/// We sometimes also want such kinds of integral domains:
+/// ⟨x] = ∫(-∞, 0) x dξ
+/// [x⟩ = ∫(0, +∞) x dξ
+///
 /// Moments of the distribution is defined as:
 ///   The 0^th order moment   : ⟨x⟩ = 1.
 ///   The 1^th order moment(s): ⟨ξx⟩ = u.
 ///   The 2^th order moment(s): ⟨ξξx⟩ = ...
 ///   The 3^th order moment(s): ⟨ξξξx⟩ = ...
 ///   ...
+///
+/// We can also define moments with ⟨x] or [x⟩.
 template <uint dim, Real lambda>
 class MaxwellBoltzmannDistribution;
 
