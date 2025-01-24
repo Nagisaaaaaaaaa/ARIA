@@ -334,11 +334,20 @@ consteval auto ToTypeArray(const Tup<Ts...> &) {
   return MakeTypeArray<Ts...>{};
 }
 
+template <typename... Ts>
+consteval auto ToTup(const TypeArray<Ts...> &) {
+  return Tup<Ts...>{};
+}
+
 } // namespace detail
 
-/// \brief Get template parameters of a `Tup`.
+/// \brief Cast `Tup` to `TypeArray`.
 template <typename TTup>
-using type_array_t = decltype(detail::ToTypeArray(std::declval<TTup>()));
+using to_type_array_t = decltype(detail::ToTypeArray(std::declval<TTup>()));
+
+/// \brief Cast `TypeArray` to `Tup`.
+template <typename TArray>
+using to_tup_t = decltype(detail::ToTup(std::declval<TArray>()));
 
 } // namespace tup
 
