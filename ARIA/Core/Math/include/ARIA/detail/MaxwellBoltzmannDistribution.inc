@@ -2,7 +2,7 @@
 
 namespace ARIA {
 
-namespace boltzmann_distribution::detail {
+namespace maxwell_boltzmann_distribution::detail {
 
 // Statically test the template parameters for `Moment`.
 template <uint dim, typename TOrder, typename TDomain, typename TU>
@@ -48,22 +48,22 @@ struct tail {
 template <typename TTup>
 using tail_t = typename tail<TTup>::type;
 
-} // namespace boltzmann_distribution::detail
+} // namespace maxwell_boltzmann_distribution::detail
 
 //
 //
 //
 //
 //
-//! Mathematically, the n-D Boltzmann distribution has
+//! Mathematically, the n-D Maxwell-Boltzmann distribution has
 //! good relationships with the 1D case, especially for moments computation.
 //! So, template specialization will be used below.
 template <Real lambda>
-class BoltzmannDistribution<1, lambda> {
+class MaxwellBoltzmannDistribution<1, lambda> {
 public:
   template <typename TOrder, typename TDomain, typename TU>
   [[nodiscard]] ARIA_HOST_DEVICE static constexpr Real Moment(const TU &u) {
-    boltzmann_distribution::detail::StaticTestMoment<1, TOrder, TDomain, TU>();
+    maxwell_boltzmann_distribution::detail::StaticTestMoment<1, TOrder, TDomain, TU>();
 
     constexpr Real rt = 1.0 / (2.0 * lambda);
 
@@ -105,26 +105,26 @@ public:
 //
 template <uint dim, Real lambda>
   requires(dim > 1)
-class BoltzmannDistribution<dim, lambda> {
+class MaxwellBoltzmannDistribution<dim, lambda> {
 public:
   template <typename TOrder, typename TDomain, typename TU>
   [[nodiscard]] ARIA_HOST_DEVICE static constexpr Real Moment(const TU &u) {
-    boltzmann_distribution::detail::StaticTestMoment<dim, TOrder, TDomain, TU>();
+    maxwell_boltzmann_distribution::detail::StaticTestMoment<dim, TOrder, TDomain, TU>();
 
-    using TOrderL = boltzmann_distribution::detail::except_tail_t<TOrder>;
-    using TOrderR = boltzmann_distribution::detail::tail_t<TOrder>;
-    using TDomainL = boltzmann_distribution::detail::except_tail_t<TDomain>;
-    using TDomainR = boltzmann_distribution::detail::tail_t<TDomain>;
-    using TUL = boltzmann_distribution::detail::except_tail_t<TU>;
-    using TUR = boltzmann_distribution::detail::tail_t<TU>;
+    using TOrderL = maxwell_boltzmann_distribution::detail::except_tail_t<TOrder>;
+    using TOrderR = maxwell_boltzmann_distribution::detail::tail_t<TOrder>;
+    using TDomainL = maxwell_boltzmann_distribution::detail::except_tail_t<TDomain>;
+    using TDomainR = maxwell_boltzmann_distribution::detail::tail_t<TDomain>;
+    using TUL = maxwell_boltzmann_distribution::detail::except_tail_t<TU>;
+    using TUR = maxwell_boltzmann_distribution::detail::tail_t<TU>;
 
     TUL uL;
     ForEach<dim - 1>([&]<auto i>() { get<i>(uL) = get<i>(u); });
     TUR uR;
     get<0>(uR) = get<dim - 1>(u);
 
-    return BoltzmannDistribution<dim - 1, lambda>::template Moment<TOrderL, TDomainL, TUL>(uL) *
-           BoltzmannDistribution<1, lambda>::template Moment<TOrderR, TDomainR, TUR>(uR);
+    return MaxwellBoltzmannDistribution<dim - 1, lambda>::template Moment<TOrderL, TDomainL, TUL>(uL) *
+           MaxwellBoltzmannDistribution<1, lambda>::template Moment<TOrderR, TDomainR, TUR>(uR);
   }
 
   template <typename TOrder, typename TDomain>

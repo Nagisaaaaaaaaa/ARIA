@@ -1,4 +1,4 @@
-#include "ARIA/BoltzmannDistribution.h"
+#include "ARIA/MaxwellBoltzmannDistribution.h"
 
 #include <gtest/gtest.h>
 
@@ -16,8 +16,8 @@ consteval bool StaticExpectEq(float a, float b) {
 
 } // namespace
 
-TEST(BoltzmannDistribution, D1) {
-  using BD = BoltzmannDistribution<1, 1.5>;
+TEST(MaxwellBoltzmannDistribution, D1) {
+  using BD = MaxwellBoltzmannDistribution<1, 1.5>;
 
   using Order0 = Tec<UInt<0>>;
   using Order1 = Tec<UInt<1>>;
@@ -81,8 +81,8 @@ TEST(BoltzmannDistribution, D1) {
   static_assert(StaticExpectEq(BD::Moment<Order4, DomainO>(uC), 0.3594942293));
 }
 
-TEST(BoltzmannDistribution, D2) {
-  using BD = BoltzmannDistribution<2, 1.5>;
+TEST(MaxwellBoltzmannDistribution, D2) {
+  using BD = MaxwellBoltzmannDistribution<2, 1.5>;
 
   using Order00 = Tec<UInt<0>, UInt<0>>;
   using Order10 = Tec<UInt<1>, UInt<0>>;
@@ -292,8 +292,8 @@ TEST(BoltzmannDistribution, D2) {
   static_assert(StaticExpectEq(BD::Moment<Order04, DomainOO>(uC), 0.9315248597));
 }
 
-TEST(BoltzmannDistribution, D3) {
-  using BD = BoltzmannDistribution<3, 1.5>;
+TEST(MaxwellBoltzmannDistribution, D3) {
+  using BD = MaxwellBoltzmannDistribution<3, 1.5>;
 
   using Order000 = Tec<UInt<0>, UInt<0>, UInt<0>>;
   using Order100 = Tec<UInt<1>, UInt<0>, UInt<0>>;

@@ -13,7 +13,7 @@
 namespace ARIA {
 
 template <uint dim, Real lambda>
-class BoltzmannDistribution;
+class MaxwellBoltzmannDistribution;
 
 } // namespace ARIA
 
@@ -22,4 +22,4 @@ class BoltzmannDistribution;
 //
 //
 //
-#include "ARIA/detail/BoltzmannDistribution.inc"
+#include "ARIA/detail/MaxwellBoltzmannDistribution.inc"
