@@ -47,7 +47,7 @@ public:
   using Get = GetNoCheck<i>;
 
   template <typename T>
-    requires(std::is_same_v<T, Get<find_no_check<T>>>)
+    requires(std::is_same_v<T, GetNoCheck<find_no_check<T>>>)
   static constexpr size_t find = find_no_check<T>;
 };
 
