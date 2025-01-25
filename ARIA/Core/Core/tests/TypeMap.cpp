@@ -26,7 +26,7 @@ TEST(TypeMap, Base) {
   static_assert(tm::find<uint64 &&> == 7);
 }
 
-TEST(TypeMap, LargeMap) {
+TEST(TypeMap, LargeScale) {
   using tm = TypeMap<C<0>, C<1>, C<2>, C<3>, C<4>, C<5>, C<6>, C<7>, C<8>, C<9>,                      //
                                                                                                       //
                      C<10>, C<11>, C<12>, C<13>, C<14>, C<15>, C<16>, C<17>, C<18>, C<19>,            //
