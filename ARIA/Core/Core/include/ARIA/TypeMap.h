@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ARIA/TypeArray.h"
+#include "ARIA/Tup.h"
 
 namespace ARIA {
 
@@ -12,7 +12,7 @@ struct FindImpl;
 template <size_t i, typename T>
 struct FindImpl<i, T> {
   static consteval C<i> value(T);
-  static consteval T type(C<i>);
+  static consteval Tup<T> type(C<i>);
 };
 
 template <size_t i, typename T, typename... Ts>
@@ -21,7 +21,7 @@ struct FindImpl<i, T, Ts...> : FindImpl<i + 1, Ts...> {
   using FindImpl<i + 1, Ts...>::type;
 
   static consteval C<i> value(T);
-  static consteval T type(C<i>);
+  static consteval Tup<T> type(C<i>);
 };
 
 } // namespace type_map::detail
@@ -39,7 +39,7 @@ private:
   static constexpr size_t find_no_check = decltype(TFind::value(std::declval<T>())){};
 
   template <size_t i>
-  using GetNoCheck = decltype(TFind::type(C<i>{}));
+  using GetNoCheck = tup_elem_t<0, decltype(TFind::type(C<i>{}))>;
 
 public:
   template <size_t i>
