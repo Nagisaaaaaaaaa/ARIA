@@ -1,5 +1,13 @@
 #pragma once
 
+/// \file
+/// \brief TODO: Document this: EXTREMELY fast compile-time type map.
+
+//
+//
+//
+//
+//
 #include "ARIA/Tup.h"
 
 namespace ARIA {
@@ -7,18 +15,18 @@ namespace ARIA {
 namespace type_map::detail {
 
 template <size_t i, typename... Ts>
-struct FindImpl;
+struct Impl;
 
 template <size_t i, typename T>
-struct FindImpl<i, T> {
+struct Impl<i, T> {
   static consteval C<i> value(T);
   static consteval Tup<T> type(C<i>);
 };
 
 template <size_t i, typename T, typename... Ts>
-struct FindImpl<i, T, Ts...> : FindImpl<i + 1, Ts...> {
-  using FindImpl<i + 1, Ts...>::value;
-  using FindImpl<i + 1, Ts...>::type;
+struct Impl<i, T, Ts...> : Impl<i + 1, Ts...> {
+  using Impl<i + 1, Ts...>::value;
+  using Impl<i + 1, Ts...>::type;
 
   static consteval C<i> value(T);
   static consteval Tup<T> type(C<i>);
@@ -32,14 +40,13 @@ struct FindImpl<i, T, Ts...> : FindImpl<i + 1, Ts...> {
 template <typename... Ts>
 class TypeMap {
 private:
-  using TArray = MakeTypeArray<Ts...>;
-  using TFind = type_map::detail::FindImpl<0, Ts...>;
+  using TImpl = type_map::detail::Impl<0, Ts...>;
 
   template <typename T>
-  static constexpr size_t find_no_check = decltype(TFind::value(std::declval<T>())){};
+  static constexpr size_t find_no_check = decltype(TImpl::value(std::declval<T>())){};
 
   template <size_t i>
-  using GetNoCheck = tup_elem_t<0, decltype(TFind::type(C<i>{}))>;
+  using GetNoCheck = tup_elem_t<0, decltype(TImpl::type(C<i>{}))>;
 
 public:
   template <size_t i>
