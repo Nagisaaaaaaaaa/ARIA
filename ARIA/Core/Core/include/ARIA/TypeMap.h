@@ -1,7 +1,7 @@
 #pragma once
 
 /// \file
-/// \brief TODO: Document this: EXTREMELY fast compile-time type map.
+/// \brief TODO: Document this: SUPER CRAZY FAST compile-time type map.
 
 //
 //
