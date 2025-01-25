@@ -5,25 +5,43 @@
 namespace ARIA {
 
 TEST(TypeMap, Base) {
-  using tm = TypeMap<int8, int16, int, int64, const uint8, uint16 &, const uint &, uint64 &&>;
+  {
+    using tm = TypeMap<int8, int16, int, int64, const uint8, uint16 &, const uint &, uint64 &&>;
 
-  static_assert(std::is_same_v<tm::Get<0>, int8>);
-  static_assert(std::is_same_v<tm::Get<1>, int16>);
-  static_assert(std::is_same_v<tm::Get<2>, int>);
-  static_assert(std::is_same_v<tm::Get<3>, int64>);
-  static_assert(std::is_same_v<tm::Get<4>, const uint8>);
-  static_assert(std::is_same_v<tm::Get<5>, uint16 &>);
-  static_assert(std::is_same_v<tm::Get<6>, const uint &>);
-  static_assert(std::is_same_v<tm::Get<7>, uint64 &&>);
+    static_assert(std::is_same_v<tm::Get<0>, int8>);
+    static_assert(std::is_same_v<tm::Get<1>, int16>);
+    static_assert(std::is_same_v<tm::Get<2>, int>);
+    static_assert(std::is_same_v<tm::Get<3>, int64>);
+    static_assert(std::is_same_v<tm::Get<4>, const uint8>);
+    static_assert(std::is_same_v<tm::Get<5>, uint16 &>);
+    static_assert(std::is_same_v<tm::Get<6>, const uint &>);
+    static_assert(std::is_same_v<tm::Get<7>, uint64 &&>);
 
-  static_assert(tm::find<int8> == 0);
-  static_assert(tm::find<int16> == 1);
-  static_assert(tm::find<int> == 2);
-  static_assert(tm::find<int64> == 3);
-  static_assert(tm::find<const uint8> == 4);
-  static_assert(tm::find<uint16 &> == 5);
-  static_assert(tm::find<const uint &> == 6);
-  static_assert(tm::find<uint64 &&> == 7);
+    static_assert(tm::find<int8> == 0);
+    static_assert(tm::find<int16> == 1);
+    static_assert(tm::find<int> == 2);
+    static_assert(tm::find<int64> == 3);
+    static_assert(tm::find<const uint8> == 4);
+    static_assert(tm::find<uint16 &> == 5);
+    static_assert(tm::find<const uint &> == 6);
+    static_assert(tm::find<uint64 &&> == 7);
+  }
+
+  {
+    using tm = TypeMap<float, int, int, int, double>;
+
+    static_assert(std::is_same_v<tm::Get<0>, float>);
+    static_assert(std::is_same_v<tm::Get<1>, int>);
+    // static_assert(std::is_same_v<tm::Get<2>, int>);
+    // static_assert(std::is_same_v<tm::Get<3>, int>);
+    static_assert(std::is_same_v<tm::Get<4>, double>);
+
+    static_assert(tm::find<float> == 0);
+    static_assert(tm::find<int> == 1);
+    // static_assert(tm::find<int> == 2);
+    // static_assert(tm::find<int> == 3);
+    static_assert(tm::find<double> == 4);
+  }
 }
 
 TEST(TypeMap, LargeScale) {
