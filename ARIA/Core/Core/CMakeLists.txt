@@ -95,6 +95,7 @@ set(core_core_headers
     ARIA/TensorVector.h
     ARIA/Tup.h
     ARIA/TypeArray.h
+    ARIA/TypeMap.h
 )
 
 # Add the module sources (if any).
