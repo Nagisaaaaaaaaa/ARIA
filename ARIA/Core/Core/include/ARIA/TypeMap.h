@@ -11,14 +11,17 @@ struct FindImpl;
 
 template <size_t i, typename T>
 struct FindImpl<i, T> {
-  static consteval auto value(T) { return C<i>{}; }
+  static consteval C<i> value(T);
+  static consteval T type(C<i>);
 };
 
 template <size_t i, typename T, typename... Ts>
 struct FindImpl<i, T, Ts...> : FindImpl<i + 1, Ts...> {
   using FindImpl<i + 1, Ts...>::value;
+  using FindImpl<i + 1, Ts...>::type;
 
-  static consteval auto value(T) { return C<i>{}; }
+  static consteval C<i> value(T);
+  static consteval T type(C<i>);
 };
 
 } // namespace type_map::detail
@@ -32,15 +35,20 @@ private:
   using TArray = MakeTypeArray<Ts...>;
   using TFind = type_map::detail::FindImpl<0, Ts...>;
 
+  template <typename T>
+  static constexpr size_t find_no_check = decltype(TFind::value(std::declval<T>())){};
+
+  template <size_t i>
+  using GetNoCheck = decltype(TFind::type(C<i>{}));
+
 public:
   template <size_t i>
-  using Get = TArray::template Get<i>;
+    requires(i == find_no_check<GetNoCheck<i>>)
+  using Get = GetNoCheck<i>;
 
   template <typename T>
-  static constexpr size_t find_unsafe = decltype(TFind::value(std::declval<T>())){};
-
-  template <typename T>
-  static constexpr size_t find = TArray::template firstIdx<T>;
+    requires(std::is_same_v<T, Get<find_no_check<T>>>)
+  static constexpr size_t find = find_no_check<T>;
 };
 
 } // namespace ARIA
