@@ -82,17 +82,8 @@ TEST(TypeMap, LargeMap) {
                      C<470>, C<471>, C<472>, C<473>, C<474>, C<475>, C<476>, C<477>, C<478>, C<479>,  //
                      C<480>, C<481>, C<482>, C<483>, C<484>, C<485>, C<486>, C<487>, C<488>, C<489>>; //
 
-  ForEach<490>([]<auto i>() {
-    using tc = C<i>;
-    static_assert(tm::find_unsafe<tc> == i);
-  });
-
-#if 0
-  ForEach<490>([]<auto i>() {
-    using t = tm::Get<i>;
-    static_assert(std::is_same_v<t, C<i>>);
-  });
-#endif
+  ForEach<490>([]<auto i>() { static_assert(tm::find<C<i>> == i); });
+  ForEach<490>([]<auto i>() { static_assert(std::is_same_v<tm::Get<i>, C<i>>); });
 }
 
 } // namespace ARIA
