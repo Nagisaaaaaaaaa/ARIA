@@ -17,7 +17,7 @@
 //
 //
 //
-#include "ARIA/Tup.h"
+#include "ARIA/ForEach.h"
 
 namespace ARIA {
 
@@ -30,22 +30,30 @@ struct TypeSetNonAmbiguous {};
 //
 namespace type_set::detail {
 
+template <typename T>
+struct Wrap {
+  using type = T;
+};
+
+//
+//
+//
 template <size_t i, typename... Ts>
 struct OverloadingNA;
 
 template <size_t i, typename T>
 struct OverloadingNA<i, T> {
-  static consteval Tup<T> type(C<i>);
-  static consteval C<i> value(T);
+  static consteval Wrap<T> type(C<i>);
+  static consteval C<i> value(Wrap<T>);
 };
 
 template <size_t i, typename T, typename... Ts>
 struct OverloadingNA<i, T, Ts...> : OverloadingNA<i + 1, Ts...> {
-  using OverloadingNA<i + 1, Ts...>::value;
   using OverloadingNA<i + 1, Ts...>::type;
+  using OverloadingNA<i + 1, Ts...>::value;
 
-  static consteval Tup<T> type(C<i>);
-  static consteval C<i> value(T);
+  static consteval Wrap<T> type(C<i>);
+  static consteval C<i> value(Wrap<T>);
 };
 
 //
@@ -57,10 +65,10 @@ private:
   using TOverloading = OverloadingNA<0, Ts...>;
 
   template <size_t i>
-  using GetNoCheck = tup_elem_t<0, decltype(TOverloading::type(C<i>{}))>;
+  using GetNoCheck = typename decltype(TOverloading::type(C<i>{}))::type;
 
   template <typename T>
-  static constexpr size_t idx_no_check = decltype(TOverloading::value(std::declval<T>())){};
+  static constexpr size_t idx_no_check = decltype(TOverloading::value(std::declval<Wrap<T>>())){};
 
 public:
   template <size_t i>
