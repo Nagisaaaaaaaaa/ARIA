@@ -17,17 +17,10 @@
 //
 //
 //
-#include "ARIA/ForEach.h"
+#include "ARIA/Constant.h"
 
 namespace ARIA {
 
-struct TypeSetNonSame {};
-
-struct TypeSetNonAmbiguous {};
-
-//
-//
-//
 namespace type_set::detail {
 
 template <typename T>
@@ -39,58 +32,22 @@ struct Wrap {
 //
 //
 template <size_t i, typename... Ts>
-struct OverloadingNA;
+struct Overloading;
 
 template <size_t i, typename T>
-struct OverloadingNA<i, T> {
+struct Overloading<i, T> {
   static consteval Wrap<T> type(C<i>);
   static consteval C<i> value(Wrap<T>);
 };
 
 template <size_t i, typename T, typename... Ts>
-struct OverloadingNA<i, T, Ts...> : OverloadingNA<i + 1, Ts...> {
-  using OverloadingNA<i + 1, Ts...>::type;
-  using OverloadingNA<i + 1, Ts...>::value;
+struct Overloading<i, T, Ts...> : Overloading<i + 1, Ts...> {
+  using Overloading<i + 1, Ts...>::type;
+  using Overloading<i + 1, Ts...>::value;
 
   static consteval Wrap<T> type(C<i>);
   static consteval C<i> value(Wrap<T>);
 };
-
-//
-//
-//
-template <typename... Ts>
-class ImplNA {
-private:
-  using TOverloading = OverloadingNA<0, Ts...>;
-
-  template <size_t i>
-  using GetNoCheck = typename decltype(TOverloading::type(C<i>{}))::type;
-
-  template <typename T>
-  static constexpr size_t idx_no_check = decltype(TOverloading::value(std::declval<Wrap<T>>())){};
-
-public:
-  template <size_t i>
-    requires(i == idx_no_check<GetNoCheck<i>>)
-  using Get = GetNoCheck<i>;
-
-  template <typename T>
-    requires(std::is_same_v<T, GetNoCheck<idx_no_check<T>>>)
-  static constexpr size_t idx = idx_no_check<T>;
-};
-
-//
-//
-//
-template <typename... Ts>
-struct ValidTypeSetImpl {
-  using TImpl = ImplNA<Ts...>;
-  static constexpr bool value = (std::is_same_v<Ts, TImpl::template Get<TImpl::template idx<Ts>>> && ...);
-};
-
-template <typename... Ts>
-concept ValidTypeSet = ValidTypeSetImpl<Ts...>::value;
 
 } // namespace type_set::detail
 
@@ -98,17 +55,16 @@ concept ValidTypeSet = ValidTypeSetImpl<Ts...>::value;
 //
 //
 template <typename... Ts>
-  requires type_set::detail::ValidTypeSet<Ts...>
 class TypeSet {
 private:
-  using TImpl = type_set::detail::ImplNA<Ts...>;
+  using TOverloading = type_set::detail::Overloading<0, Ts...>;
 
 public:
   template <size_t i>
-  using Get = TImpl::template Get<i>;
+  using Get = typename decltype(TOverloading::type(C<i>{}))::type;
 
   template <typename T>
-  static constexpr size_t idx = TImpl::template idx<T>;
+  static constexpr size_t idx = decltype(TOverloading::value(std::declval<type_set::detail::Wrap<T>>())){};
 };
 
 } // namespace ARIA
