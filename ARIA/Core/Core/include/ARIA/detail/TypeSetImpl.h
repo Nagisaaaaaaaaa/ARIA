@@ -42,6 +42,17 @@ namespace type_set::detail {
 //!
 //! Now, we've got the basic idea.
 
+//
+//
+//
+//! C++ is something like a "weak typing" language.
+//! For example, even though `int` and `const int` are different types,
+//! both `void Func(int)` and `void Func(const int)` accept `int` and `const int`.
+//!
+//! To avoid such ambiguity, we have to "Wrap" our types with
+//! `void Func(Wrap<int>)` and `void Func(Wrap<const int>)`.
+//! Note that `Wrap<int>` and `Wrap<const int>` can not be cast between each other.
+//! Now, we successfully define a "strong typing" function `Func`.
 template <typename T>
 struct Wrap {
   using type = T;
