@@ -55,7 +55,7 @@ TEST(TypeSet, Base) {
   }
 
   {
-    // Unable to compile.
+    //! Unable to compile.
     // using ts = MakeTypeSet<float, int, int, double>;
   }
 }
