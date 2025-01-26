@@ -21,6 +21,13 @@
 
 namespace ARIA {
 
+struct TypeSetNonSame {};
+
+struct TypeSetNonAmbiguous {};
+
+//
+//
+//
 namespace type_set::detail {
 
 template <size_t i, typename... Ts>
@@ -41,15 +48,13 @@ struct Impl<i, T, Ts...> : Impl<i + 1, Ts...> {
   static consteval Tup<T> type(C<i>);
 };
 
-} // namespace type_set::detail
-
 //
 //
 //
 template <typename... Ts>
-class TypeSet {
+class TypeSetNoCheck {
 private:
-  using TImpl = type_set::detail::Impl<0, Ts...>;
+  using TImpl = Impl<0, Ts...>;
 
   template <typename T>
   static constexpr size_t idx_no_check = decltype(TImpl::value(std::declval<T>())){};
@@ -65,6 +70,38 @@ public:
   template <typename T>
     requires(std::is_same_v<T, GetNoCheck<idx_no_check<T>>>)
   static constexpr size_t idx = idx_no_check<T>;
+};
+
+//
+//
+//
+template <typename... Ts>
+struct ValidTypeSetImpl {
+  using TTypeSetNoCheck = TypeSetNoCheck<Ts...>;
+  static constexpr bool value =
+      (std::is_same_v<Ts, TTypeSetNoCheck::template Get<TTypeSetNoCheck::template idx<Ts>>> && ...);
+};
+
+template <typename... Ts>
+concept ValidTypeSet = ValidTypeSetImpl<Ts...>::value;
+
+} // namespace type_set::detail
+
+//
+//
+//
+template <typename... Ts>
+  requires type_set::detail::ValidTypeSet<Ts...>
+class TypeSet {
+private:
+  using TTypeSetNoCheck = type_set::detail::TypeSetNoCheck<Ts...>;
+
+public:
+  template <size_t i>
+  using Get = TTypeSetNoCheck::template Get<i>;
+
+  template <typename T>
+  static constexpr size_t idx = TTypeSetNoCheck::template idx<T>;
 };
 
 } // namespace ARIA

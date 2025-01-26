@@ -42,6 +42,12 @@ TEST(TypeSet, Base) {
     // static_assert(ts::idx<int> == 3);
     static_assert(ts::idx<double> == 4);
   }
+
+  {
+    // using ts = TypeSet<int, const int, volatile int,       //
+    //                    int &, const int &, volatile int &, //
+    //                    int &&, const int &&, volatile int &&>;
+  }
 }
 
 TEST(TypeSet, LargeScale) {
