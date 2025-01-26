@@ -66,6 +66,11 @@ struct Wrapper {
 // There are two overloaded functions here:
 // 1. `Get`: Given the index in `[0, n - 1]`, returns the type in `Ts...`.
 // 2. `idx`: Given the type in `Ts...`, returns the index in `[0, n - 1]`.
+//
+//! Note that the following `Get` and `idx` are only declared but not implemented, because
+//! we don't have to implement them and, actually, there's no way to implement them.
+//! 1. We only need to call them with `std::declval` and `decltype`.
+//! 2. We are unable to call the constructors of `T` and return a real `Wrapper<T>` instance.
 template <size_t i, typename... Ts>
 struct Overloading;
 
