@@ -112,6 +112,8 @@ struct Overloading<i, T, Ts...> : Overloading<i + 1, Ts...> {
 //
 //
 //
+//
+//
 // The `TypeSet` where duplications of `Ts...` have not been checked (`NoCheck`).
 // Thanks to `Overloading`, the implementation is trivial.
 // We only need to call `Overloading::Get` and `Overloading::idx`, then,
@@ -133,6 +135,8 @@ public:
 //
 //
 // The final step is to check duplications of `Ts...`.
+//! We only need to call `Get` and `idx` with all possible combinations of arguments.
+//! If there exists duplications, the code will be unable to compile.
 template <typename... Ts>
 struct ValidTypeSetArgsImpl {
   using TNoCheck = TypeSetNoCheck<Ts...>;
