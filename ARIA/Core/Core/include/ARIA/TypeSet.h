@@ -39,7 +39,8 @@ struct Overloading<i, T> {
 template <size_t i, typename T, typename... Ts>
 struct Overloading<i, T, Ts...> : Overloading<i + 1, Ts...> {
   static_assert(decltype(Overloading<i + 1, Ts...>::value(std::declval<Wrap<T>>())){} ==
-                std::numeric_limits<size_t>::max());
+                    std::numeric_limits<size_t>::max(),
+                "Duplicated types are not allowed for `TypeSet`");
 
   using Overloading<i + 1, Ts...>::type;
   using Overloading<i + 1, Ts...>::value;
