@@ -31,36 +31,36 @@ struct TypeSetNonAmbiguous {};
 namespace type_set::detail {
 
 template <size_t i, typename... Ts>
-struct Impl;
+struct OverloadingNA;
 
 template <size_t i, typename T>
-struct Impl<i, T> {
-  static consteval C<i> value(T);
+struct OverloadingNA<i, T> {
   static consteval Tup<T> type(C<i>);
+  static consteval C<i> value(T);
 };
 
 template <size_t i, typename T, typename... Ts>
-struct Impl<i, T, Ts...> : Impl<i + 1, Ts...> {
-  using Impl<i + 1, Ts...>::value;
-  using Impl<i + 1, Ts...>::type;
+struct OverloadingNA<i, T, Ts...> : OverloadingNA<i + 1, Ts...> {
+  using OverloadingNA<i + 1, Ts...>::value;
+  using OverloadingNA<i + 1, Ts...>::type;
 
-  static consteval C<i> value(T);
   static consteval Tup<T> type(C<i>);
+  static consteval C<i> value(T);
 };
 
 //
 //
 //
 template <typename... Ts>
-class TypeSetNoCheck {
+class ImplNA {
 private:
-  using TImpl = Impl<0, Ts...>;
-
-  template <typename T>
-  static constexpr size_t idx_no_check = decltype(TImpl::value(std::declval<T>())){};
+  using TOverloading = OverloadingNA<0, Ts...>;
 
   template <size_t i>
-  using GetNoCheck = tup_elem_t<0, decltype(TImpl::type(C<i>{}))>;
+  using GetNoCheck = tup_elem_t<0, decltype(TOverloading::type(C<i>{}))>;
+
+  template <typename T>
+  static constexpr size_t idx_no_check = decltype(TOverloading::value(std::declval<T>())){};
 
 public:
   template <size_t i>
@@ -77,9 +77,8 @@ public:
 //
 template <typename... Ts>
 struct ValidTypeSetImpl {
-  using TTypeSetNoCheck = TypeSetNoCheck<Ts...>;
-  static constexpr bool value =
-      (std::is_same_v<Ts, TTypeSetNoCheck::template Get<TTypeSetNoCheck::template idx<Ts>>> && ...);
+  using TImpl = ImplNA<Ts...>;
+  static constexpr bool value = (std::is_same_v<Ts, TImpl::template Get<TImpl::template idx<Ts>>> && ...);
 };
 
 template <typename... Ts>
@@ -94,14 +93,14 @@ template <typename... Ts>
   requires type_set::detail::ValidTypeSet<Ts...>
 class TypeSet {
 private:
-  using TTypeSetNoCheck = type_set::detail::TypeSetNoCheck<Ts...>;
+  using TImpl = type_set::detail::ImplNA<Ts...>;
 
 public:
   template <size_t i>
-  using Get = TTypeSetNoCheck::template Get<i>;
+  using Get = TImpl::template Get<i>;
 
   template <typename T>
-  static constexpr size_t idx = TTypeSetNoCheck::template idx<T>;
+  static constexpr size_t idx = TImpl::template idx<T>;
 };
 
 } // namespace ARIA
