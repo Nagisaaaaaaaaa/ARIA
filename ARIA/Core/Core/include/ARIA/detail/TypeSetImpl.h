@@ -84,18 +84,20 @@ struct Overloading<i, T> {
 // Recursive inheritance.
 template <size_t i, typename T, typename... Ts>
 struct Overloading<i, T, Ts...> : Overloading<i + 1, Ts...> {
+  using Base = Overloading<i + 1, Ts...>;
+
   //! Call the parent's `idx` with the current type `T`.
   //! 1. If the magic code is returned, the most generic `idx` is called, which
   //!    means that `C<i> idx(Wrapper<T>)` has not been defined for the current `T`.
   //!    That is, `T` is not duplicated.
   //! 2. If the magic code is not returned, perform a similar analysis,
   //!    we can know that `T` must be duplicated.
-  static_assert(decltype(Overloading<i + 1, Ts...>::idx(std::declval<Wrapper<T>>())){} ==
-                    std::numeric_limits<size_t>::max(),
+  static_assert(decltype(Base::idx(std::declval<Wrapper<T>>())){} == std::numeric_limits<size_t>::max(),
                 "Duplicated types are not allowed for `TypeSet`");
 
-  using Overloading<i + 1, Ts...>::Get;
-  using Overloading<i + 1, Ts...>::idx;
+  //! Recursively using the parent's `Get` and `idx`.
+  using Base::Get;
+  using Base::idx;
 
   static consteval Wrapper<T> Get(C<i>);
   static consteval C<i> idx(Wrapper<T>);
