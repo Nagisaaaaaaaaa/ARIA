@@ -96,6 +96,7 @@ struct Overloading<i, T, Ts...> : Overloading<i + 1, Ts...> {
                 "Duplicated types are not allowed for `TypeSet`");
 
   //! Recursively using the parent's `Get` and `idx`.
+  //! That's how function overloading is generated.
   using Base::Get;
   using Base::idx;
 
