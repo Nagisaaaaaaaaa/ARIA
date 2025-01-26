@@ -56,7 +56,7 @@ TEST(TypeSet, Base) {
 
   {
     // Unable to compile.
-    // using ts = TypeSet<float, int, int, int, double>;
+    // using ts = TypeSet<float, int, int, double>;
   }
 }
 
