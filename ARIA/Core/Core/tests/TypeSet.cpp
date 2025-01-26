@@ -1,51 +1,51 @@
-#include "ARIA/TypeMap.h"
+#include "ARIA/TypeSet.h"
 
 #include <gtest/gtest.h>
 
 namespace ARIA {
 
-TEST(TypeMap, Base) {
+TEST(TypeSet, Base) {
   {
-    using tm = TypeMap<int8, int16, int, int64, const uint8, uint16 &, const uint &, uint64 &&>;
+    using ts = TypeSet<int8, int16, int, int64, const uint8, uint16 &, const uint &, uint64 &&>;
 
-    static_assert(std::is_same_v<tm::Get<0>, int8>);
-    static_assert(std::is_same_v<tm::Get<1>, int16>);
-    static_assert(std::is_same_v<tm::Get<2>, int>);
-    static_assert(std::is_same_v<tm::Get<3>, int64>);
-    static_assert(std::is_same_v<tm::Get<4>, const uint8>);
-    static_assert(std::is_same_v<tm::Get<5>, uint16 &>);
-    static_assert(std::is_same_v<tm::Get<6>, const uint &>);
-    static_assert(std::is_same_v<tm::Get<7>, uint64 &&>);
+    static_assert(std::is_same_v<ts::Get<0>, int8>);
+    static_assert(std::is_same_v<ts::Get<1>, int16>);
+    static_assert(std::is_same_v<ts::Get<2>, int>);
+    static_assert(std::is_same_v<ts::Get<3>, int64>);
+    static_assert(std::is_same_v<ts::Get<4>, const uint8>);
+    static_assert(std::is_same_v<ts::Get<5>, uint16 &>);
+    static_assert(std::is_same_v<ts::Get<6>, const uint &>);
+    static_assert(std::is_same_v<ts::Get<7>, uint64 &&>);
 
-    static_assert(tm::find<int8> == 0);
-    static_assert(tm::find<int16> == 1);
-    static_assert(tm::find<int> == 2);
-    static_assert(tm::find<int64> == 3);
-    static_assert(tm::find<const uint8> == 4);
-    static_assert(tm::find<uint16 &> == 5);
-    static_assert(tm::find<const uint &> == 6);
-    static_assert(tm::find<uint64 &&> == 7);
+    static_assert(ts::find<int8> == 0);
+    static_assert(ts::find<int16> == 1);
+    static_assert(ts::find<int> == 2);
+    static_assert(ts::find<int64> == 3);
+    static_assert(ts::find<const uint8> == 4);
+    static_assert(ts::find<uint16 &> == 5);
+    static_assert(ts::find<const uint &> == 6);
+    static_assert(ts::find<uint64 &&> == 7);
   }
 
   {
-    using tm = TypeMap<float, int, int, int, double>;
+    using ts = TypeSet<float, int, int, int, double>;
 
-    static_assert(std::is_same_v<tm::Get<0>, float>);
-    static_assert(std::is_same_v<tm::Get<1>, int>);
-    // static_assert(std::is_same_v<tm::Get<2>, int>);
-    // static_assert(std::is_same_v<tm::Get<3>, int>);
-    static_assert(std::is_same_v<tm::Get<4>, double>);
+    static_assert(std::is_same_v<ts::Get<0>, float>);
+    static_assert(std::is_same_v<ts::Get<1>, int>);
+    // static_assert(std::is_same_v<ts::Get<2>, int>);
+    // static_assert(std::is_same_v<ts::Get<3>, int>);
+    static_assert(std::is_same_v<ts::Get<4>, double>);
 
-    static_assert(tm::find<float> == 0);
-    static_assert(tm::find<int> == 1);
-    // static_assert(tm::find<int> == 2);
-    // static_assert(tm::find<int> == 3);
-    static_assert(tm::find<double> == 4);
+    static_assert(ts::find<float> == 0);
+    static_assert(ts::find<int> == 1);
+    // static_assert(ts::find<int> == 2);
+    // static_assert(ts::find<int> == 3);
+    static_assert(ts::find<double> == 4);
   }
 }
 
-TEST(TypeMap, LargeScale) {
-  using tm = TypeMap<C<0>, C<1>, C<2>, C<3>, C<4>, C<5>, C<6>, C<7>, C<8>, C<9>,                      //
+TEST(TypeSet, LargeScale) {
+  using ts = TypeSet<C<0>, C<1>, C<2>, C<3>, C<4>, C<5>, C<6>, C<7>, C<8>, C<9>,                      //
                                                                                                       //
                      C<10>, C<11>, C<12>, C<13>, C<14>, C<15>, C<16>, C<17>, C<18>, C<19>,            //
                      C<20>, C<21>, C<22>, C<23>, C<24>, C<25>, C<26>, C<27>, C<28>, C<29>,            //
@@ -100,8 +100,8 @@ TEST(TypeMap, LargeScale) {
                      C<470>, C<471>, C<472>, C<473>, C<474>, C<475>, C<476>, C<477>, C<478>, C<479>,  //
                      C<480>, C<481>, C<482>, C<483>, C<484>, C<485>, C<486>, C<487>, C<488>, C<489>>; //
 
-  ForEach<490>([]<auto i>() { static_assert(tm::find<C<i>> == i); });
-  ForEach<490>([]<auto i>() { static_assert(std::is_same_v<tm::Get<i>, C<i>>); });
+  ForEach<490>([]<auto i>() { static_assert(ts::find<C<i>> == i); });
+  ForEach<490>([]<auto i>() { static_assert(std::is_same_v<ts::Get<i>, C<i>>); });
 }
 
 } // namespace ARIA

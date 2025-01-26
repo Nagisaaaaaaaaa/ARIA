@@ -2,7 +2,7 @@
 
 /// \file
 /// \brief TODO: Document this:
-///              1. SUPER CRAZY FAST compile-time type map.
+///              1. SUPER CRAZY FAST compile-time type set.
 ///              2. Since the implementation is based on function overloading,
 ///                 any combinations of types which can potentially result in ambiguity is not allowed
 ///                 The rule is the same as function overloading:
@@ -21,7 +21,7 @@
 
 namespace ARIA {
 
-namespace type_map::detail {
+namespace type_set::detail {
 
 template <size_t i, typename... Ts>
 struct Impl;
@@ -41,15 +41,15 @@ struct Impl<i, T, Ts...> : Impl<i + 1, Ts...> {
   static consteval Tup<T> type(C<i>);
 };
 
-} // namespace type_map::detail
+} // namespace type_set::detail
 
 //
 //
 //
 template <typename... Ts>
-class TypeMap {
+class TypeSet {
 private:
-  using TImpl = type_map::detail::Impl<0, Ts...>;
+  using TImpl = type_set::detail::Impl<0, Ts...>;
 
   template <typename T>
   static constexpr size_t find_no_check = decltype(TImpl::value(std::declval<T>())){};
