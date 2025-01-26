@@ -3,14 +3,7 @@
 /// \file
 /// \brief TODO: Document this:
 ///              1. SUPER CRAZY FAST compile-time type set.
-///              2. Since the implementation is based on function overloading,
-///                 any combinations of types which can potentially result in ambiguity is not allowed
-///                 The rule is the same as function overloading:
-///                   consteval size_t deduce(T0) { return 0; }
-///                   consteval size_t deduce(T1) { return 0; }
-///                 For example, duplications such as <int, int>, ambiguity such as <int, const int>.
-///                 All these dangerous cases are checked by ARIA at compile-time, but
-///                 you still need to pay much attensions.
+///              2. SUPER CRAZY STABLE!
 
 //
 //
@@ -36,12 +29,18 @@ struct Overloading;
 
 template <size_t i, typename T>
 struct Overloading<i, T> {
+  template <typename U>
+  static consteval C<std::numeric_limits<size_t>::max()> value(U);
+
   static consteval Wrap<T> type(C<i>);
   static consteval C<i> value(Wrap<T>);
 };
 
 template <size_t i, typename T, typename... Ts>
 struct Overloading<i, T, Ts...> : Overloading<i + 1, Ts...> {
+  static_assert(decltype(Overloading<i + 1, Ts...>::value(std::declval<Wrap<T>>())){} ==
+                std::numeric_limits<size_t>::max());
+
   using Overloading<i + 1, Ts...>::type;
   using Overloading<i + 1, Ts...>::value;
 
