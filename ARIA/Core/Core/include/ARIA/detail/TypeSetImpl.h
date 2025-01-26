@@ -49,12 +49,12 @@ namespace type_set::detail {
 //! For example, even though `int` and `const int` are different types,
 //! both `void Func(int)` and `void Func(const int)` accept `int` and `const int`.
 //!
-//! To avoid such ambiguity, we have to "Wrap" our types with
-//! `void Func(Wrap<int>)` and `void Func(Wrap<const int>)`.
-//! Note that `Wrap<int>` and `Wrap<const int>` can not be cast between each other.
+//! To avoid such ambiguity, we have to "wrap" our types with
+//! `void Func(Wrapper<int>)` and `void Func(Wrapper<const int>)`.
+//! Note that `Wrapper<int>` and `Wrapper<const int>` can not be cast between each other.
 //! Now, we successfully define a "strong typing" function `Func`.
 template <typename T>
-struct Wrap {
+struct Wrapper {
   using type = T;
 };
 
@@ -69,21 +69,21 @@ struct Overloading<i, T> {
   template <typename U>
   static consteval C<std::numeric_limits<size_t>::max()> value(U);
 
-  static consteval Wrap<T> type(C<i>);
-  static consteval C<i> value(Wrap<T>);
+  static consteval Wrapper<T> type(C<i>);
+  static consteval C<i> value(Wrapper<T>);
 };
 
 template <size_t i, typename T, typename... Ts>
 struct Overloading<i, T, Ts...> : Overloading<i + 1, Ts...> {
-  static_assert(decltype(Overloading<i + 1, Ts...>::value(std::declval<Wrap<T>>())){} ==
+  static_assert(decltype(Overloading<i + 1, Ts...>::value(std::declval<Wrapper<T>>())){} ==
                     std::numeric_limits<size_t>::max(),
                 "Duplicated types are not allowed for `TypeSet`");
 
   using Overloading<i + 1, Ts...>::type;
   using Overloading<i + 1, Ts...>::value;
 
-  static consteval Wrap<T> type(C<i>);
-  static consteval C<i> value(Wrap<T>);
+  static consteval Wrapper<T> type(C<i>);
+  static consteval C<i> value(Wrapper<T>);
 };
 
 //
@@ -99,7 +99,7 @@ public:
   using Get = typename decltype(TOverloading::type(C<i>{}))::type;
 
   template <typename T>
-  static constexpr size_t idx = decltype(TOverloading::value(std::declval<Wrap<T>>())){};
+  static constexpr size_t idx = decltype(TOverloading::value(std::declval<Wrapper<T>>())){};
 };
 
 //
