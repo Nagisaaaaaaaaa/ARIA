@@ -62,6 +62,10 @@ struct Wrapper {
 //
 //
 // Now we are ready to introduce the overloading magic.
+//
+// There are two overloaded functions here:
+// 1. `Get`: Given the index in `[0, n - 1]`, returns the type in `Ts...`.
+// 2. `idx`: Given the type in `Ts...`, returns the index in `[0, n - 1]`.
 template <size_t i, typename... Ts>
 struct Overloading;
 
