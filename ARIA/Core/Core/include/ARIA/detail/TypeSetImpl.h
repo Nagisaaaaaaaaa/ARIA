@@ -112,6 +112,10 @@ struct Overloading<i, T, Ts...> : Overloading<i + 1, Ts...> {
 //
 //
 //
+// The `TypeSet` where duplications of `Ts...` have not been checked (`NoCheck`).
+// Thanks to `Overloading`, the implementation is trivial.
+// We only need to call `Overloading::Get` and `Overloading::idx`, then,
+// the correct ones will be automatically chosen according to the function overloading rules.
 template <typename... Ts>
 class TypeSetNoCheck {
 private:
