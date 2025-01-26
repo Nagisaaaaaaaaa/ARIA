@@ -17,14 +17,14 @@ TEST(TypeSet, Base) {
     static_assert(std::is_same_v<ts::Get<6>, const uint &>);
     static_assert(std::is_same_v<ts::Get<7>, uint64 &&>);
 
-    static_assert(ts::find<int8> == 0);
-    static_assert(ts::find<int16> == 1);
-    static_assert(ts::find<int> == 2);
-    static_assert(ts::find<int64> == 3);
-    static_assert(ts::find<const uint8> == 4);
-    static_assert(ts::find<uint16 &> == 5);
-    static_assert(ts::find<const uint &> == 6);
-    static_assert(ts::find<uint64 &&> == 7);
+    static_assert(ts::idx<int8> == 0);
+    static_assert(ts::idx<int16> == 1);
+    static_assert(ts::idx<int> == 2);
+    static_assert(ts::idx<int64> == 3);
+    static_assert(ts::idx<const uint8> == 4);
+    static_assert(ts::idx<uint16 &> == 5);
+    static_assert(ts::idx<const uint &> == 6);
+    static_assert(ts::idx<uint64 &&> == 7);
   }
 
   {
@@ -36,11 +36,11 @@ TEST(TypeSet, Base) {
     // static_assert(std::is_same_v<ts::Get<3>, int>);
     static_assert(std::is_same_v<ts::Get<4>, double>);
 
-    static_assert(ts::find<float> == 0);
-    static_assert(ts::find<int> == 1);
-    // static_assert(ts::find<int> == 2);
-    // static_assert(ts::find<int> == 3);
-    static_assert(ts::find<double> == 4);
+    static_assert(ts::idx<float> == 0);
+    static_assert(ts::idx<int> == 1);
+    // static_assert(ts::idx<int> == 2);
+    // static_assert(ts::idx<int> == 3);
+    static_assert(ts::idx<double> == 4);
   }
 }
 
@@ -100,7 +100,7 @@ TEST(TypeSet, LargeScale) {
                      C<470>, C<471>, C<472>, C<473>, C<474>, C<475>, C<476>, C<477>, C<478>, C<479>,  //
                      C<480>, C<481>, C<482>, C<483>, C<484>, C<485>, C<486>, C<487>, C<488>, C<489>>; //
 
-  ForEach<490>([]<auto i>() { static_assert(ts::find<C<i>> == i); });
+  ForEach<490>([]<auto i>() { static_assert(ts::idx<C<i>> == i); });
   ForEach<490>([]<auto i>() { static_assert(std::is_same_v<ts::Get<i>, C<i>>); });
 }
 

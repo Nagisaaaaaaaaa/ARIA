@@ -52,19 +52,19 @@ private:
   using TImpl = type_set::detail::Impl<0, Ts...>;
 
   template <typename T>
-  static constexpr size_t find_no_check = decltype(TImpl::value(std::declval<T>())){};
+  static constexpr size_t idx_no_check = decltype(TImpl::value(std::declval<T>())){};
 
   template <size_t i>
   using GetNoCheck = tup_elem_t<0, decltype(TImpl::type(C<i>{}))>;
 
 public:
   template <size_t i>
-    requires(i == find_no_check<GetNoCheck<i>>)
+    requires(i == idx_no_check<GetNoCheck<i>>)
   using Get = GetNoCheck<i>;
 
   template <typename T>
-    requires(std::is_same_v<T, GetNoCheck<find_no_check<T>>>)
-  static constexpr size_t find = find_no_check<T>;
+    requires(std::is_same_v<T, GetNoCheck<idx_no_check<T>>>)
+  static constexpr size_t idx = idx_no_check<T>;
 };
 
 } // namespace ARIA
