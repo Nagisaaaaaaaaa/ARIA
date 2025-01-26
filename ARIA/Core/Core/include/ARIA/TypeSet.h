@@ -48,22 +48,51 @@ struct Overloading<i, T, Ts...> : Overloading<i + 1, Ts...> {
   static consteval C<i> value(Wrap<T>);
 };
 
-} // namespace type_set::detail
-
 //
 //
 //
 template <typename... Ts>
-class TypeSet {
+class TypeSetNoCheck {
 private:
-  using TOverloading = type_set::detail::Overloading<0, Ts...>;
+  using TOverloading = Overloading<0, Ts...>;
 
 public:
   template <size_t i>
   using Get = typename decltype(TOverloading::type(C<i>{}))::type;
 
   template <typename T>
-  static constexpr size_t idx = decltype(TOverloading::value(std::declval<type_set::detail::Wrap<T>>())){};
+  static constexpr size_t idx = decltype(TOverloading::value(std::declval<Wrap<T>>())){};
+};
+
+//
+//
+//
+template <typename... Ts>
+struct ValidTypeSetImpl {
+  using TNoCheck = TypeSetNoCheck<Ts...>;
+  static constexpr bool value = (std::is_same_v<Ts, TNoCheck::template Get<TNoCheck::template idx<Ts>>> && ...);
+};
+
+template <typename... Ts>
+concept ValidTypeSet = ValidTypeSetImpl<Ts...>::value;
+
+} // namespace type_set::detail
+
+//
+//
+//
+template <typename... Ts>
+  requires(type_set::detail::ValidTypeSet<Ts...>)
+class TypeSet {
+private:
+  using TNoCheck = type_set::detail::TypeSetNoCheck<Ts...>;
+
+public:
+  template <size_t i>
+  using Get = TNoCheck::template Get<i>;
+
+  template <typename T>
+  static constexpr size_t idx = TNoCheck::template idx<T>;
 };
 
 } // namespace ARIA

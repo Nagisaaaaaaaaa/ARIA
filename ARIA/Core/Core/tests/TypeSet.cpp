@@ -29,22 +29,6 @@ TEST(TypeSet, Base) {
   }
 
   {
-    using ts = TypeSet<float, int, int, int, double>;
-
-    static_assert(std::is_same_v<ts::Get<0>, float>);
-    static_assert(std::is_same_v<ts::Get<1>, int>);
-    // static_assert(std::is_same_v<ts::Get<2>, int>);
-    // static_assert(std::is_same_v<ts::Get<3>, int>);
-    static_assert(std::is_same_v<ts::Get<4>, double>);
-
-    static_assert(ts::idx<float> == 0);
-    static_assert(ts::idx<int> == 1);
-    // static_assert(ts::idx<int> == 2);
-    // static_assert(ts::idx<int> == 3);
-    static_assert(ts::idx<double> == 4);
-  }
-
-  {
     using ts = TypeSet<int, const int, volatile int,       //
                        int &, const int &, volatile int &, //
                        int &&, const int &&, volatile int &&>;
@@ -68,6 +52,11 @@ TEST(TypeSet, Base) {
     static_assert(ts::idx<int &&> == 6);
     static_assert(ts::idx<const int &&> == 7);
     static_assert(ts::idx<volatile int &&> == 8);
+  }
+
+  {
+    // Unable to compile.
+    // using ts = TypeSet<float, int, int, int, double>;
   }
 }
 
