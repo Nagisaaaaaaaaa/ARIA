@@ -132,14 +132,15 @@ public:
 //
 //
 //
+// The final step is to check duplications of `Ts...`.
 template <typename... Ts>
-struct ValidTypeSetImpl {
+struct ValidTypeSetArgsImpl {
   using TNoCheck = TypeSetNoCheck<Ts...>;
   static constexpr bool idx = (std::is_same_v<Ts, TNoCheck::template Get<TNoCheck::template idx<Ts>>> && ...);
 };
 
 template <typename... Ts>
-concept ValidTypeSet = ValidTypeSetImpl<Ts...>::idx;
+concept ValidTypeSetArgs = ValidTypeSetArgsImpl<Ts...>::idx;
 
 } // namespace type_set::detail
 

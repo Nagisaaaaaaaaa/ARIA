@@ -15,7 +15,7 @@
 namespace ARIA {
 
 template <typename... Ts>
-  requires(type_set::detail::ValidTypeSet<Ts...>)
+  requires(type_set::detail::ValidTypeSetArgs<Ts...>)
 class TypeSet {
 private:
   using TNoCheck = type_set::detail::TypeSetNoCheck<Ts...>;
