@@ -24,7 +24,7 @@ if (ARIA_BUILD_TESTS)
       TensorVector.cu
       Tup.cpp
       TypeArray.cpp
-      TypeMap.cpp
+      TypeSet.cpp
       HARD_DEPENDENCIES
       ARIA::Core::Core
   )
