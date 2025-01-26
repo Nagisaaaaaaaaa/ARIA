@@ -61,29 +61,30 @@ struct Wrapper {
 //
 //
 //
+// Now we are ready to introduce the overloading magic.
 template <size_t i, typename... Ts>
 struct Overloading;
 
 template <size_t i, typename T>
 struct Overloading<i, T> {
   template <typename U>
-  static consteval C<std::numeric_limits<size_t>::max()> value(U);
+  static consteval C<std::numeric_limits<size_t>::max()> idx(U);
 
-  static consteval Wrapper<T> type(C<i>);
-  static consteval C<i> value(Wrapper<T>);
+  static consteval Wrapper<T> Get(C<i>);
+  static consteval C<i> idx(Wrapper<T>);
 };
 
 template <size_t i, typename T, typename... Ts>
 struct Overloading<i, T, Ts...> : Overloading<i + 1, Ts...> {
-  static_assert(decltype(Overloading<i + 1, Ts...>::value(std::declval<Wrapper<T>>())){} ==
+  static_assert(decltype(Overloading<i + 1, Ts...>::idx(std::declval<Wrapper<T>>())){} ==
                     std::numeric_limits<size_t>::max(),
                 "Duplicated types are not allowed for `TypeSet`");
 
-  using Overloading<i + 1, Ts...>::type;
-  using Overloading<i + 1, Ts...>::value;
+  using Overloading<i + 1, Ts...>::Get;
+  using Overloading<i + 1, Ts...>::idx;
 
-  static consteval Wrapper<T> type(C<i>);
-  static consteval C<i> value(Wrapper<T>);
+  static consteval Wrapper<T> Get(C<i>);
+  static consteval C<i> idx(Wrapper<T>);
 };
 
 //
@@ -96,10 +97,10 @@ private:
 
 public:
   template <size_t i>
-  using Get = typename decltype(TOverloading::type(C<i>{}))::type;
+  using Get = typename decltype(TOverloading::Get(C<i>{}))::type;
 
   template <typename T>
-  static constexpr size_t idx = decltype(TOverloading::value(std::declval<Wrapper<T>>())){};
+  static constexpr size_t idx = decltype(TOverloading::idx(std::declval<Wrapper<T>>())){};
 };
 
 //
@@ -108,11 +109,11 @@ public:
 template <typename... Ts>
 struct ValidTypeSetImpl {
   using TNoCheck = TypeSetNoCheck<Ts...>;
-  static constexpr bool value = (std::is_same_v<Ts, TNoCheck::template Get<TNoCheck::template idx<Ts>>> && ...);
+  static constexpr bool idx = (std::is_same_v<Ts, TNoCheck::template Get<TNoCheck::template idx<Ts>>> && ...);
 };
 
 template <typename... Ts>
-concept ValidTypeSet = ValidTypeSetImpl<Ts...>::value;
+concept ValidTypeSet = ValidTypeSetImpl<Ts...>::idx;
 
 } // namespace type_set::detail
 
