@@ -69,8 +69,11 @@ struct Wrapper {
 template <size_t i, typename... Ts>
 struct Overloading;
 
+// The grand class.
 template <size_t i, typename T>
 struct Overloading<i, T> {
+  //! For the grand class, define the most generic `idx` which can accept all types.
+  //! It returns a magic code which will be used to check duplications later.
   template <typename U>
   static consteval C<std::numeric_limits<size_t>::max()> idx(U);
 
@@ -78,8 +81,15 @@ struct Overloading<i, T> {
   static consteval C<i> idx(Wrapper<T>);
 };
 
+// Recursive inheritance.
 template <size_t i, typename T, typename... Ts>
 struct Overloading<i, T, Ts...> : Overloading<i + 1, Ts...> {
+  //! Call the parent's `idx` with the current type `T`.
+  //! 1. If the magic code is returned, the most generic `idx` is called, which
+  //!    means that `C<i> idx(Wrapper<T>)` has not been defined for the current `T`.
+  //!    That is, `T` is not duplicated.
+  //! 2. If the magic code is not returned, perform a similar analysis,
+  //!    we can know that `T` must be duplicated.
   static_assert(decltype(Overloading<i + 1, Ts...>::idx(std::declval<Wrapper<T>>())){} ==
                     std::numeric_limits<size_t>::max(),
                 "Duplicated types are not allowed for `TypeSet`");
