@@ -150,4 +150,36 @@ concept ValidTypeSetArgs = ValidTypeSetArgsImpl<Ts...>::idx;
 
 } // namespace type_set::detail
 
+//
+//
+//
+//
+//
+// fwd
+template <type_array::detail::NonArrayType... Ts>
+  requires(type_set::detail::ValidTypeSetArgs<Ts...>)
+struct TypeSet;
+
+//
+//
+//
+namespace type_set::detail {
+
+// Cast `TypeArray` to `TypeSet`.
+template <typename... Ts>
+consteval TypeSet<Ts...> ToTypeSetImpl(TypeArray<Ts...>) {
+  return {};
+}
+
+template <typename T>
+using to_type_set_t = decltype(ToTypeSetImpl(std::declval<T>()));
+
+} // namespace type_set::detail
+
+//
+//
+//
+template <typename... Ts>
+using MakeTypeSet = type_set::detail::to_type_set_t<MakeTypeArray<Ts...>>;
+
 } // namespace ARIA
