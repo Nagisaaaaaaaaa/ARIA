@@ -75,15 +75,17 @@ template <size_t i, typename... Ts>
 struct Overloading;
 
 // The grand class.
-template <size_t i, typename T>
-struct Overloading<i, T> {
-  //! For the grand class, define the most generic `idx` which can accept all types.
+template <size_t i>
+struct Overloading<i> {
+  //! For the grand class, define the most generic `Get` which can accept all `C<...>`s.
+  //! This is essential for defining empty `TypeSet`s.
+  template <auto k>
+  static consteval Wrapper<void> Get(C<k>);
+
+  //! Also, the most generic `idx` is defined to accept all types.
   //! It returns a magic code which will be used to check duplications later.
   template <typename U>
   static consteval C<std::numeric_limits<size_t>::max()> idx(U);
-
-  static consteval Wrapper<T> Get(C<i>);
-  static consteval C<i> idx(Wrapper<T>);
 };
 
 // Recursive inheritance.
