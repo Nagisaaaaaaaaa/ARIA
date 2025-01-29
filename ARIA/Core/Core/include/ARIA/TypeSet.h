@@ -25,6 +25,9 @@ private:
 public:
   static constexpr size_t size = TArray::size;
 
+  template <type_array::detail::NonArrayType T>
+  static constexpr bool has = TNoCheck::template has<T>;
+
   template <size_t i>
   using Get = TNoCheck::template Get<i>;
 

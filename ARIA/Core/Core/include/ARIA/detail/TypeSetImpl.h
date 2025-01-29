@@ -125,12 +125,19 @@ class TypeSetNoCheck {
 private:
   using TOverloading = Overloading<0, Ts...>;
 
+  template <typename T>
+  static constexpr size_t idx_no_check = decltype(TOverloading::idx(std::declval<Wrapper<T>>())){};
+
 public:
   template <size_t i>
   using Get = typename decltype(TOverloading::Get(C<i>{}))::type;
 
   template <typename T>
-  static constexpr size_t idx = decltype(TOverloading::idx(std::declval<Wrapper<T>>())){};
+  static constexpr bool has = idx_no_check<T> != std::numeric_limits<size_t>::max();
+
+  template <typename T>
+    requires(has<T>)
+  static constexpr size_t idx = idx_no_check<T>;
 };
 
 //

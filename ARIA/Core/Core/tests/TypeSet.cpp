@@ -23,6 +23,15 @@ TEST(TypeSet, Base) {
     static_assert(MakeTypeSet<>::size == 0);
     static_assert(MakeTypeSet<void>::size == 1);
     static_assert(MakeTypeSet<int, float, double>::size == 3);
+
+    // `has`.
+    static_assert(!MakeTypeSet<>::has<void>);
+    static_assert(MakeTypeSet<void>::has<void>);
+    static_assert(!MakeTypeSet<void>::has<int>);
+    static_assert(MakeTypeSet<int, float, double>::has<int>);
+    static_assert(MakeTypeSet<int, float, double>::has<float>);
+    static_assert(MakeTypeSet<int, float, double>::has<double>);
+    static_assert(!MakeTypeSet<int, float, double>::has<void>);
   }
 
   {
