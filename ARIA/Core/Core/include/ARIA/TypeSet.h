@@ -16,22 +16,20 @@ namespace ARIA {
 
 template <type_array::detail::NonArrayType... Ts>
   requires(type_set::detail::ValidTypeSetArgs<Ts...>)
-class TypeSet final : public type_array::detail::TypeArrayBase {
+struct TypeSet final : public type_array::detail::TypeArrayBase {
 private:
+  using Idx = type_array::detail::Idx;
+  using TArray = MakeTypeArray<Ts...>;
   using TNoCheck = type_set::detail::TypeSetNoCheck<Ts...>;
 
 public:
+  static constexpr size_t size = TArray::size;
+
   template <size_t i>
   using Get = TNoCheck::template Get<i>;
 
   template <typename T>
   static constexpr size_t idx = TNoCheck::template idx<T>;
 };
-
-//
-//
-//
-template <typename... Ts>
-using MakeTypeSet = TypeSet<Ts...>;
 
 } // namespace ARIA
