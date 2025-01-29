@@ -7,6 +7,25 @@ namespace ARIA {
 
 TEST(TypeSet, Base) {
   {
+    // `ArrayType`.
+    static_assert(type_array::detail::ArrayType<MakeTypeSet<>>);
+    static_assert(type_array::detail::ArrayType<MakeTypeSet<void>>);
+    static_assert(type_array::detail::ArrayType<MakeTypeSet<int, float, double>>);
+    // static_assert(type_array::detail::ArrayType<MakeTypeSet<int, float, float>>);
+
+    // `MakeTypeSet`.
+    static_assert(std::is_same_v<MakeTypeSet<MakeTypeArray<>>, TypeSet<>>);
+    static_assert(std::is_same_v<MakeTypeSet<MakeTypeArray<void>>, TypeSet<void>>);
+    static_assert(std::is_same_v<MakeTypeSet<MakeTypeArray<int, float, double>>, TypeSet<int, float, double>>);
+    static_assert(std::is_same_v<MakeTypeSet<MakeTypeArray<int, float>, double>, TypeSet<int, float, double>>);
+
+    // `size`.
+    static_assert(MakeTypeSet<>::size == 0);
+    static_assert(MakeTypeSet<void>::size == 1);
+    static_assert(MakeTypeSet<int, float, double>::size == 3);
+  }
+
+  {
     using ts = MakeTypeSet<int8, int16, int, int64, const uint8, uint16 &, const uint &, uint64 &&>;
 
     static_assert(std::is_same_v<ts::Get<0>, int8>);
@@ -52,11 +71,6 @@ TEST(TypeSet, Base) {
     static_assert(ts::idx<int &&> == 6);
     static_assert(ts::idx<const int &&> == 7);
     static_assert(ts::idx<volatile int &&> == 8);
-  }
-
-  {
-    //! Unable to compile.
-    // using ts = MakeTypeSet<float, int, int, double>;
   }
 }
 
