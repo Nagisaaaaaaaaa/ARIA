@@ -125,15 +125,17 @@ class TypeSetNoCheck {
 private:
   using TOverloading = Overloading<0, Ts...>;
 
+  // Here, `no_check` means `T` may not be contained in `Ts...`.
   template <typename T>
   static constexpr size_t idx_no_check = decltype(TOverloading::idx(std::declval<Wrapper<T>>())){};
 
 public:
-  template <size_t i>
-  using Get = typename decltype(TOverloading::Get(C<i>{}))::type;
-
+  //! The magic code can also be used to implement `has`.
   template <typename T>
   static constexpr bool has = idx_no_check<T> != std::numeric_limits<size_t>::max();
+
+  template <size_t i>
+  using Get = typename decltype(TOverloading::Get(C<i>{}))::type;
 
   template <typename T>
     requires(has<T>)
