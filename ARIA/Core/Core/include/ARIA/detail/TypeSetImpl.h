@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ARIA/Constant.h"
+#include "ARIA/TypeArray.h"
 
 namespace ARIA {
 

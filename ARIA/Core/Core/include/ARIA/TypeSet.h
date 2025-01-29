@@ -1,9 +1,9 @@
 #pragma once
 
 /// \file
-/// \brief TODO: Document this:
-///              1. SUPER CRAZY FAST compile-time type set.
-///              2. SUPER CRAZY STABLE!
+/// \brief Type set is a compile-time set containing unique types.
+/// It has much higher perform than `TypeArray`.
+/// TODO: Document this.
 
 //
 //
@@ -14,9 +14,9 @@
 
 namespace ARIA {
 
-template <typename... Ts>
+template <type_array::detail::NonArrayType... Ts>
   requires(type_set::detail::ValidTypeSetArgs<Ts...>)
-class TypeSet {
+class TypeSet final : public type_array::detail::TypeArrayBase {
 private:
   using TNoCheck = type_set::detail::TypeSetNoCheck<Ts...>;
 
