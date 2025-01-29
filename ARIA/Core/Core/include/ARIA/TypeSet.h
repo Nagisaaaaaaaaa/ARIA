@@ -34,7 +34,7 @@ public:
   template <size_t i>
   using Get = TNoCheck::template Get<i>;
 
-  template <typename T>
+  template <type_array::detail::NonArrayType T>
   static constexpr size_t idx = TNoCheck::template idx<T>;
 };
 

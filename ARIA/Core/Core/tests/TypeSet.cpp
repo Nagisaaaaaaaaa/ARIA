@@ -43,6 +43,7 @@ TEST(TypeSet, Base) {
     static_assert(!MakeTypeSet<int, float, double>::has<void>);
   }
 
+  // `Get`, `idx`.
   {
     using ts = MakeTypeSet<int8, int16, int, int64, const uint8, uint16 &, const uint &, uint64 &&>;
 
