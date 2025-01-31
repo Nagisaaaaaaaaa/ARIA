@@ -11,6 +11,9 @@
 /// implemented with hacks such as recursive inheritance and function overloading.
 ///
 /// So, it is always recommended to use `TypeSet` instead of `TypeArray` if possible.
+///
+/// \note This file is not fully documented, since all interfaces of `TypeSet` are
+/// exactly the same as that of `TypeArray`.
 
 //
 //
