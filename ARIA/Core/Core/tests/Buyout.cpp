@@ -24,6 +24,16 @@ struct Construct {
   }
 };
 
+struct ConstructNonConstexpr {
+  template <typename T>
+  T operator()() const {
+    if constexpr (std::integral<T>)
+      return T(9);
+    else
+      return T{9};
+  }
+};
+
 } // namespace
 
 TEST(Buyout, Base) {
@@ -85,6 +95,42 @@ TEST(Buyout, Base) {
     static_assert(get<int32_t>(buyout) == 9);
     static_assert(get<int64_t>(buyout) == 9);
     static_assert(get<std::array<int, 1>>(buyout) == std::array{9});
+  }
+
+  {
+    let buyout = make_buyout<int8_t, int16_t, int32_t, int64_t, std::array<int, 1>>(ConstructNonConstexpr{});
+    static_assert(std::is_same_v<decltype(buyout),
+                                 Buyout<ConstructNonConstexpr, int8_t, int16_t, int32_t, int64_t, std::array<int, 1>>>);
+
+    static_assert(std::is_same_v<decltype(buyout.operator()<int8_t>()), const int8_t &>);
+    static_assert(std::is_same_v<decltype(buyout.operator()<int16_t>()), const int16_t &>);
+    static_assert(std::is_same_v<decltype(buyout.operator()<int32_t>()), const int32_t &>);
+    static_assert(std::is_same_v<decltype(buyout.operator()<int64_t>()), const int64_t &>);
+    static_assert(std::is_same_v<decltype(buyout.operator()<std::array<int, 1>>()), const std::array<int, 1> &>);
+
+    static_assert(std::is_same_v<decltype(get<int8_t>(buyout)), const int8_t &>);
+    static_assert(std::is_same_v<decltype(get<int16_t>(buyout)), const int16_t &>);
+    static_assert(std::is_same_v<decltype(get<int32_t>(buyout)), const int32_t &>);
+    static_assert(std::is_same_v<decltype(get<int64_t>(buyout)), const int64_t &>);
+    static_assert(std::is_same_v<decltype(get<std::array<int, 1>>(buyout)), const std::array<int, 1> &>);
+
+    EXPECT_EQ(buyout.operator()<int8_t>(), 9);
+    EXPECT_EQ(buyout.operator()<int16_t>(), 9);
+    EXPECT_EQ(buyout.operator()<int32_t>(), 9);
+    EXPECT_EQ(buyout.operator()<int64_t>(), 9);
+    {
+      let v = buyout.operator()<std::array<int, 1>>();
+      EXPECT_EQ(v, std::array{9});
+    }
+
+    EXPECT_EQ(get<int8_t>(buyout), 9);
+    EXPECT_EQ(get<int16_t>(buyout), 9);
+    EXPECT_EQ(get<int32_t>(buyout), 9);
+    EXPECT_EQ(get<int64_t>(buyout), 9);
+    {
+      let v = get<std::array<int, 1>>(buyout);
+      EXPECT_EQ(v, std::array{9});
+    }
   }
 }
 
