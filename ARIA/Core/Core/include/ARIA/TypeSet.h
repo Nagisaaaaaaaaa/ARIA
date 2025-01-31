@@ -69,6 +69,7 @@ public:
   template <Idx i>
   using Get = TNoCheck::template Get<i>;
 
+  // TODO: Add tailored and optimized implementations of `Slice`, `Reverse`, ... for `TypeSet`.
   template <Idx begin, Idx end, Idx step>
   using Slice = MakeTypeSet<typename TArray::template Slice<begin, end, step>>;
 
