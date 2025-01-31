@@ -334,4 +334,22 @@ TEST(TypeSet, LargeScale) {
   ForEach<490>([]<auto i>() { static_assert(std::is_same_v<ts::Get<i>, C<i>>); });
 }
 
+TEST(TypeSet, ForEach) {
+  std::stringstream ss;
+
+  using ts = MakeTypeSet<const int, volatile float &, void>;
+  ForEach<ts>([&]<typename T> {
+    if constexpr (std::is_same_v<T, const int>)
+      ss << "const int ";
+    else if constexpr (std::is_same_v<T, volatile float &>)
+      ss << "volatile float& ";
+    else if constexpr (std::is_same_v<T, void>)
+      ss << "void ";
+    else
+      ss << "unknown";
+  });
+
+  EXPECT_EQ(ss.str(), "const int volatile float& void ");
+}
+
 } // namespace ARIA
