@@ -139,6 +139,7 @@ TEST(TypeSet, Base) {
     static_assert(ts::nOf<uint16 &> == 1);
     static_assert(ts::nOf<const uint &> == 1);
     static_assert(ts::nOf<uint64 &&> == 1);
+    static_assert(ts::nOf<void> == 0);
 
     static_assert(ts::has<int8>);
     static_assert(ts::has<int16>);
@@ -148,6 +149,7 @@ TEST(TypeSet, Base) {
     static_assert(ts::has<uint16 &>);
     static_assert(ts::has<const uint &>);
     static_assert(ts::has<uint64 &&>);
+    static_assert(!ts::has<void>);
 
     static_assert(ts::firstIdx<int8> == 0);
     static_assert(ts::firstIdx<int16> == 1);
@@ -208,6 +210,7 @@ TEST(TypeSet, Base) {
     static_assert(ts::nOf<int &&> == 1);
     static_assert(ts::nOf<const int &&> == 1);
     static_assert(ts::nOf<volatile int &&> == 1);
+    static_assert(ts::nOf<void> == 0);
 
     static_assert(ts::has<int>);
     static_assert(ts::has<const int>);
@@ -218,6 +221,7 @@ TEST(TypeSet, Base) {
     static_assert(ts::has<int &&>);
     static_assert(ts::has<const int &&>);
     static_assert(ts::has<volatile int &&>);
+    static_assert(!ts::has<void>);
 
     static_assert(ts::firstIdx<int> == 0);
     static_assert(ts::firstIdx<const int> == 1);
