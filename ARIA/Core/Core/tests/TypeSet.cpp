@@ -1,5 +1,4 @@
 #include "ARIA/TypeSet.h"
-#include "ARIA/ForEach.h"
 
 #include <gtest/gtest.h>
 
