@@ -76,6 +76,7 @@ using reduce_buyout_t = typename reduce_buyout<F, Ts...>::type;
 //
 //
 //
+// It's better to use `get<TArg>(buyout)` instead of `operator()`.
 template <typename TArg, typename F, type_array::detail::NonArrayType... TArgs>
 ARIA_HOST_DEVICE static constexpr decltype(auto) get(const BuyoutReduced<F, TArgs...> &buyout) {
   return buyout.template operator()<TArg>();
