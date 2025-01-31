@@ -3,12 +3,14 @@
 /// \file
 /// \brief Type set is a compile-time 1D array containing any combinations of UNIQUE types
 /// which themselves are not type arrays (we call them `NonArrayType`s).
+/// Please read the comments in `TypeArray.h` before continue.
 ///
-/// That is, a type set can contain int, float&, void, etc.
-/// But it cannot recursively contain another type array.
+/// You may argue that `TypeArray`s are sufficient for most cases, but
+/// it takes much longer time to compile `TypeArray`s than `TypeSet`s.
+/// That is because `TypeSet`s contain only UNIQUE types, which means that they can be
+/// implemented with hacks such as recursive inheritance and function overloading.
 ///
-/// Type set may be helpful if you want to perform complex manipulations on many types,
-/// for example, erase, remove, foreach, filter, etc.
+/// So, it is always recommended to use `TypeSet` instead of `TypeArray` if possible.
 
 //
 //
