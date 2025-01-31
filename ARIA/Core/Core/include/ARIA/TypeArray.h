@@ -43,7 +43,7 @@ namespace ARIA {
 ///
 /// \see MakeTypeArray
 template <type_array::detail::NonArrayType... Ts>
-struct TypeArray final : public type_array::detail::TypeArrayBase {
+struct TypeArray final : type_array::detail::TypeArrayBase {
 private:
   /// \brief Type array support Python-like negative indices.
   ///

@@ -16,9 +16,9 @@ namespace ARIA {
 
 template <type_array::detail::NonArrayType... Ts>
   requires(type_set::detail::ValidTypeSetArgs<Ts...>)
-struct TypeSet final : public type_array::detail::TypeArrayBase {
+struct TypeSet final : type_array::detail::TypeArrayBase {
 private:
-  using Idx = type_array::detail::Idx;
+  using Idx = type_set::detail::Idx;
   using TArray = MakeTypeArray<Ts...>;
   using TNoCheck = type_set::detail::TypeSetNoCheck<Ts...>;
 
@@ -31,11 +31,30 @@ public:
   template <type_array::detail::NonArrayType T>
   static constexpr bool has = TNoCheck::template has<T>;
 
-  template <size_t i>
-  using Get = TNoCheck::template Get<i>;
+  template <type_array::detail::NonArrayType T>
+  static constexpr size_t firstIdx = TNoCheck::template idx<T>;
+
+  template <type_array::detail::NonArrayType T>
+  static constexpr size_t lastIdx = TNoCheck::template idx<T>;
 
   template <type_array::detail::NonArrayType T>
   static constexpr size_t idx = TNoCheck::template idx<T>;
+
+  //
+  //
+  //
+  template <Idx i>
+  using Get = TNoCheck::template Get<i>;
+
+  // TODO: Tailored implementations needed for other features.
 };
+
+//
+//
+//
+//
+//
+template <typename... Ts>
+using MakeTypeSet = type_set::detail::to_type_set_t<MakeTypeArray<Ts...>>;
 
 } // namespace ARIA
