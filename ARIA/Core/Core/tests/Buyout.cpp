@@ -6,25 +6,27 @@ namespace ARIA {
 
 namespace {
 
-struct printTypeName {
+struct SizeOf {
   template <typename T>
-  std::string operator()() const {
-    return typeid(T).name();
+  constexpr size_t operator()() const {
+    return sizeof(T);
   }
 };
 
 } // namespace
 
 TEST(Buyout, Base) {
-  Buyout<std::string, printTypeName, int, float, double> buyout{printTypeName{}};
+  constexpr Buyout<SizeOf, int8_t, int16_t, int32_t, int64_t> buyout{SizeOf{}};
 
-  EXPECT_EQ(buyout.operator()<int>(), "int");
-  EXPECT_EQ(buyout.operator()<float>(), "float");
-  EXPECT_EQ(buyout.operator()<double>(), "double");
+  static_assert(buyout.operator()<int8_t>() == 1);
+  static_assert(buyout.operator()<int16_t>() == 2);
+  static_assert(buyout.operator()<int32_t>() == 4);
+  static_assert(buyout.operator()<int64_t>() == 8);
 
-  EXPECT_EQ(get<int>(buyout), "int");
-  EXPECT_EQ(get<float>(buyout), "float");
-  EXPECT_EQ(get<double>(buyout), "double");
+  static_assert(get<int8_t>(buyout) == 1);
+  static_assert(get<int16_t>(buyout) == 2);
+  static_assert(get<int32_t>(buyout) == 4);
+  static_assert(get<int64_t>(buyout) == 8);
 }
 
 } // namespace ARIA
