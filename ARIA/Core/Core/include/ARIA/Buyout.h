@@ -32,8 +32,8 @@ private:
   TValuesTup values_;
 };
 
-template <typename TArg, typename T, typename F, type_array::detail::NonArrayType... TArgs>
-ARIA_HOST_DEVICE static constexpr decltype(auto) get(const Buyout<T, F, TArgs...> &buyout) {
+template <typename TArg, typename F, type_array::detail::NonArrayType... TArgs>
+ARIA_HOST_DEVICE static constexpr decltype(auto) get(const Buyout<F, TArgs...> &buyout) {
   return buyout.template operator()<TArg>();
 }
 
