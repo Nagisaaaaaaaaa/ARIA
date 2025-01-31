@@ -14,6 +14,14 @@
 
 namespace ARIA {
 
+template <typename... Ts>
+using MakeTypeSet = type_set::detail::to_type_set_t<MakeTypeArray<Ts...>>;
+
+//
+//
+//
+//
+//
 template <type_array::detail::NonArrayType... Ts>
   requires(type_set::detail::ValidTypeSetArgs<Ts...>)
 struct TypeSet final : type_array::detail::TypeArrayBase {
@@ -48,13 +56,5 @@ public:
 
   // TODO: Tailored implementations needed for other features.
 };
-
-//
-//
-//
-//
-//
-template <typename... Ts>
-using MakeTypeSet = type_set::detail::to_type_set_t<MakeTypeArray<Ts...>>;
 
 } // namespace ARIA
