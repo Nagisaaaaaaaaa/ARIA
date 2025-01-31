@@ -60,6 +60,71 @@ TEST(TypeSet, Base) {
       static_assert(std::is_same_v<ts1, TypeSet<int>>);
       static_assert(std::is_same_v<ts2, TypeSet<>>);
     }
+
+    // `Insert`.
+    {
+      using ts = MakeTypeSet<float &>;
+      using ts0 = ts::Insert<0, int>;
+      static_assert(std::is_same_v<ts0, TypeSet<int, float &>>);
+    }
+
+    // `PopFront`.
+    {
+      using ts = MakeTypeSet<int, float &>;
+      using ts0 = ts::PopFront<>;
+      static_assert(std::is_same_v<ts0, TypeSet<float &>>);
+    }
+
+    // `PopBack`.
+    {
+      using ts = MakeTypeSet<int, float &>;
+      using ts0 = ts::PopBack<>;
+      static_assert(std::is_same_v<ts0, TypeSet<int>>);
+    }
+
+    // `PushFront`.
+    {
+      using ts = MakeTypeSet<float &>;
+      using ts0 = ts::PushFront<int>;
+      static_assert(std::is_same_v<ts0, TypeSet<int, float &>>);
+    }
+
+    // `PushBack`.
+    {
+      using ts = MakeTypeSet<int>;
+      using ts0 = ts::PushBack<float &>;
+      static_assert(std::is_same_v<ts0, TypeSet<int, float &>>);
+    }
+
+    // `Remove`.
+    {
+      using ts = MakeTypeSet<int, float &>;
+      using ts0 = ts::Remove<int>;
+      using ts1 = ts::Remove<float &>;
+      static_assert(std::is_same_v<ts0, TypeSet<float &>>);
+      static_assert(std::is_same_v<ts1, TypeSet<int>>);
+    }
+
+    // `Replace`.
+    {
+      using ts = MakeTypeSet<int, float &>;
+      using ts0 = ts::Replace<int, const int>;
+      static_assert(std::is_same_v<ts0, TypeSet<const int, float &>>);
+    }
+
+    // `ForEach`.
+    {
+      using ts = MakeTypeSet<int, float &>;
+      using ts0 = ts::ForEach<std::remove_reference_t>;
+      static_assert(std::is_same_v<ts0, TypeSet<int, float>>);
+    }
+
+    // `Filter`.
+    {
+      using ts = MakeTypeSet<int, float &>;
+      using ts0 = ts::Filter<std::is_reference>;
+      static_assert(std::is_same_v<ts0, TypeSet<float &>>);
+    }
   }
 
   // `nOf`, `has`, `firstIdx`, `lastIdx`, `idx`, `Get`.
