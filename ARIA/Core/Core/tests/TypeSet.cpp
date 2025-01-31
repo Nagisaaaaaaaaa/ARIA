@@ -35,6 +35,31 @@ TEST(TypeSet, Base) {
     static_assert(MakeTypeSet<int, float, double>::size == 3);
 
     // `Slice`.
+    {
+      using ts = MakeTypeSet<int, float &, double &&>;
+      using ts0 = ts::Slice<1, ts::size, 1>;
+      using ts1 = ts::Slice<ts::size - 1, 0, -1>;
+      static_assert(std::is_same_v<ts0, TypeSet<float &, double &&>>);
+      static_assert(std::is_same_v<ts1, TypeSet<double &&, float &>>);
+    }
+
+    // `Reverse`.
+    {
+      using ts = MakeTypeSet<int, float &>;
+      using ts0 = ts::Reverse<>;
+      static_assert(std::is_same_v<ts0, TypeSet<float &, int>>);
+    }
+
+    // `Erase`.
+    {
+      using ts = MakeTypeSet<int, float &>;
+      using ts0 = ts::Erase<0>;
+      using ts1 = ts::Erase<-1>;
+      using ts2 = ts::Erase<0>::Erase<0>;
+      static_assert(std::is_same_v<ts0, TypeSet<float &>>);
+      static_assert(std::is_same_v<ts1, TypeSet<int>>);
+      static_assert(std::is_same_v<ts2, TypeSet<>>);
+    }
   }
 
   // `nOf`, `has`, `firstIdx`, `lastIdx`, `idx`, `Get`.
