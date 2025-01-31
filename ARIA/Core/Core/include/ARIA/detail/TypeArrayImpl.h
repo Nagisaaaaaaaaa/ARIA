@@ -76,9 +76,10 @@ struct MakeTypeArray<T> {
 
 // \brief Build type array with 1 type array.
 // MakeTypeArray<TypeArray<int>> is the same as TypeArray<int>.
-template <ArrayType TArray>
-struct MakeTypeArray<TArray> {
-  using type = TArray;
+template <template <typename...> typename T, NonArrayType... Ts>
+  requires(ArrayType<T<Ts...>>)
+struct MakeTypeArray<T<Ts...>> {
+  using type = TypeArray<Ts...>;
 };
 
 // \brief Build type array with 2 types.
@@ -90,32 +91,36 @@ struct MakeTypeArray<T, U> {
 
 // \brief Build type array with 1 type and 1 type array.
 // MakeTypeArray<int, TypeArray<float&>> is the same as TypeArray<int, float&>.
-template <NonArrayType T, NonArrayType... Us>
-struct MakeTypeArray<T, TypeArray<Us...>> {
+template <NonArrayType T, template <typename...> typename U, NonArrayType... Us>
+  requires(ArrayType<U<Us...>>)
+struct MakeTypeArray<T, U<Us...>> {
   using type = TypeArray<T, Us...>;
 };
 
 // \brief Build type array with 1 type array and 1 type.
 // MakeTypeArray<TypeArray<int>, float&> is the same as TypeArray<int, float&>.
-template <NonArrayType... Ts, NonArrayType U>
-struct MakeTypeArray<TypeArray<Ts...>, U> {
+template <template <typename...> typename T, NonArrayType... Ts, NonArrayType U>
+  requires(ArrayType<T<Ts...>>)
+struct MakeTypeArray<T<Ts...>, U> {
   using type = TypeArray<Ts..., U>;
 };
 
 // \brief Build type array with 1 type array and 1 empty type array.
 // MakeTypeArray<TypeArray<int, float&>, TypeArray<>> is the same as TypeArray<int, float&>.
-template <ArrayType TArray>
-struct MakeTypeArray<TArray, TypeArray<>> {
-  using type = TArray;
+template <template <typename...> typename T, NonArrayType... Ts, template <typename...> typename U>
+  requires(ArrayType<T<Ts...>> && ArrayType<U<>>)
+struct MakeTypeArray<T<Ts...>, U<>> {
+  using type = TypeArray<Ts...>;
 };
 
 // \brief Build type array with 2 type arrays.
 // MakeTypeArray<TypeArray<int, float&>, TypeArray<double&&>> is the same as TypeArray<int, float&, double&&>.
-template <ArrayType TArray, NonArrayType U, NonArrayType... Us>
-struct MakeTypeArray<TArray, TypeArray<U, Us...>> {
+template <ArrayType TArray, template <typename...> typename U, NonArrayType U0, NonArrayType... Us>
+  requires(ArrayType<U<U0, Us...>>)
+struct MakeTypeArray<TArray, U<U0, Us...>> {
   // The left type array recursively grab types from the begin of
   // the right type array, until the right one is empty.
-  using type = MakeTypeArray<typename MakeTypeArray<TArray, U>::type, TypeArray<Us...>>::type;
+  using type = MakeTypeArray<typename MakeTypeArray<TArray, U0>::type, TypeArray<Us...>>::type;
 };
 
 // \brief Build type array with any combinations of types and type arrays.

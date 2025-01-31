@@ -7,6 +7,7 @@ if (ARIA_BUILD_TESTS)
       BFloat16.cu
       BitArray.cu
       BitVector.cu
+      Buyout.cpp
       Constant.cpp
       DisjointSet.cu
       Float16.cu
@@ -23,6 +24,7 @@ if (ARIA_BUILD_TESTS)
       TensorVector.cu
       Tup.cpp
       TypeArray.cpp
+      TypeSet.cpp
       HARD_DEPENDENCIES
       ARIA::Core::Core
   )

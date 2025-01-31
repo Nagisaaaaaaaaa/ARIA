@@ -1,7 +1,7 @@
 #pragma once
 
 /// \file
-/// \brief Type array is a compile-time 1D type array containing any combinations of types
+/// \brief Type array is a compile-time 1D array containing any combinations of types
 /// which themselves are not type arrays (we call them `NonArrayType`s).
 ///
 /// That is, a type array can contain int, float&, void, etc.
@@ -43,7 +43,7 @@ namespace ARIA {
 ///
 /// \see MakeTypeArray
 template <type_array::detail::NonArrayType... Ts>
-struct TypeArray final : public type_array::detail::TypeArrayBase {
+struct TypeArray final : type_array::detail::TypeArrayBase {
 private:
   /// \brief Type array support Python-like negative indices.
   ///

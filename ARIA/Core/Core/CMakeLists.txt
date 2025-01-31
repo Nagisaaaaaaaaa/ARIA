@@ -77,6 +77,7 @@ set(core_core_headers
     ARIA/BFloat16.h
     ARIA/BitArray.h
     ARIA/BitVector.h
+    ARIA/Buyout.h
     ARIA/Constant.h
     ARIA/DisjointSet.h
     ARIA/Float16.h
@@ -94,6 +95,7 @@ set(core_core_headers
     ARIA/TensorVector.h
     ARIA/Tup.h
     ARIA/TypeArray.h
+    ARIA/TypeSet.h
 )
 
 # Add the module sources (if any).
