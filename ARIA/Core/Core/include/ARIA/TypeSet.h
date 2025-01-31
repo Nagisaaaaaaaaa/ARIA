@@ -6,10 +6,12 @@
 /// Please read the comments in `TypeArray.h` before continue.
 ///
 /// You may argue that `TypeArray`s are sufficient for most cases, but
-/// it takes much longer time to compile `TypeArray`s than `TypeSet`s.
+/// it usually takes much longer time to compile `TypeArray`s than `TypeSet`s.
 /// That is because `TypeSet`s contain only UNIQUE types, which means that they can be
 /// implemented with hacks such as recursive inheritance and function overloading.
 ///
+/// ARIA's `TypeSet` is SUPER-CRAZY-FAST, such that it's able to
+/// compile a `TypeSet` containing several hundreds of types in seconds.
 /// So, it is always recommended to use `TypeSet` instead of `TypeArray` if possible.
 ///
 /// \note This file is not fully documented, since all interfaces of `TypeSet` are
