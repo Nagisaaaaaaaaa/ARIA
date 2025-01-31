@@ -23,7 +23,7 @@ public:
 private:
   //! Here, type duplications are automatically checked.
   using TArgsSet = MakeTypeSet<TArgs...>;
-  //! The return types for each arguments are not required to be the same, so
+  //! The return types for each argument are not required to be the same, so
   //! they will be stored in `Tup` instead of `std::array`.
   using TValuesTup = Tup<std::decay_t<decltype(std::declval<const F &>().template operator()<TArgs>())>...>;
 
