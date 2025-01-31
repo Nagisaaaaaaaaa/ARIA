@@ -16,8 +16,8 @@
 /// means that no runtime `if-else` is allowed at the construction stage.
 ///
 /// For example, `Buyout` may be helpful for tasks where:
-/// 1. for 95% cases, we need to do 10 things for 5 times (10 * 5).
-/// 2. for the remaining 5% cases, we only need to do 9 things for 5 times (9 * 5).
+/// 1. for 95% cases, we need to do 10 things for 5 times (totally 10 * 5).
+/// 2. for the remaining 5% cases, we only need to do 9 things for 5 times (totally 9 * 5).
 ///
 
 //
