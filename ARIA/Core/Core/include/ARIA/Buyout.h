@@ -59,7 +59,26 @@ using Buyout = buyout::detail::reduce_buyout_t<F, Ts...>;
 //
 //
 //
-/// \brief
+/// \brief Construct a `Buyout` without the need to specify the function type.
+///
+/// \example ```cpp
+/// struct SizeOf {
+///   template <typename T>
+///   constexpr size_t operator()() const {
+///     return sizeof(T);
+///   }
+/// };
+///
+/// // Here, `buyout0`, `buyout1`, and `buyout2` will have the same type.
+/// constexpr let buyout0 = make_buyout<float, double>(SizeOf{});
+/// constexpr let buyout1 = make_buyout<MakeTypeArray<float, double>>(SizeOf{});
+/// constexpr let buyout2 = make_buyout<MakeTypeSet<float, double>>(SizeOf{});
+///
+/// static_assert(buyout0.operator()<float>() == 4);
+/// static_assert(buyout0.operator()<double>() == 8);
+/// static_assert(get<float>(buyout0) == 4);
+/// static_assert(get<double>(buyout0) == 8);
+/// ```
 template <typename... Ts>
 ARIA_HOST_DEVICE static constexpr auto make_buyout(const auto &f) {
   using TBuyout = Buyout<std::decay_t<decltype(f)>, Ts...>;
