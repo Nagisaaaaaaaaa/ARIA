@@ -7,6 +7,13 @@ namespace ARIA {
 
 namespace buyout::detail {
 
+// Similar to `TensorVector`, for `Buyout`, we also want to write something like:
+// 1. `Buyout<F, C<0>, C<1>, C<2>>`.
+// 2. `Buyout<F, MakeTypeSet<C<0>, C<1>, C<2>>>`.
+// 3. `Buyout<F, MakeTypeArray<C<0>, C<1>, C<2>>>`.
+//
+// All these 3 cases will be reduced to `BuyoutReduced<F, C<0>, C<1>, C<2>>`, which
+// means that they will have exactly the same type.
 template <typename F, type_array::detail::NonArrayType... TArgs>
 class BuyoutReduced {
 public:
