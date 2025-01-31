@@ -58,7 +58,7 @@ public:
   using Slice = MakeTypeSet<typename TArray::template Slice<begin, end, step>>;
 
   template <typename Void = void>
-  using Reverse = MakeTypeSet<typename TArray::template Reverse<>>;
+  using Reverse = MakeTypeSet<typename TArray::template Reverse<Void>>;
 
   template <Idx i>
   using Erase = MakeTypeSet<typename TArray::template Erase<i>>;
@@ -67,10 +67,10 @@ public:
   using Insert = MakeTypeSet<typename TArray::template Insert<i, T>>;
 
   template <typename Void = void>
-  using PopFront = MakeTypeSet<typename TArray::template PopFront<>>;
+  using PopFront = MakeTypeSet<typename TArray::template PopFront<Void>>;
 
   template <typename Void = void>
-  using PopBack = MakeTypeSet<typename TArray::template PopBack<>>;
+  using PopBack = MakeTypeSet<typename TArray::template PopBack<Void>>;
 
   template <typename T>
   using PushFront = MakeTypeSet<typename TArray::template PushFront<T>>;
