@@ -26,6 +26,7 @@
 
 namespace ARIA {
 
+/// \brief Build type set with any combinations of `NonArrayType`s and type arrays.
 template <typename... Ts>
 using MakeTypeSet = type_set::detail::to_type_set_t<MakeTypeArray<Ts...>>;
 
@@ -34,6 +35,8 @@ using MakeTypeSet = type_set::detail::to_type_set_t<MakeTypeArray<Ts...>>;
 //
 //
 //
+/// \brief A compile-time 1D type array containing any combinations of UNIQUE types
+/// which themselves are not type arrays (we call them `NonArrayType`s).
 template <type_array::detail::NonArrayType... Ts>
   requires(type_set::detail::ValidTypeSetArgs<Ts...>)
 struct TypeSet final : type_array::detail::TypeArrayBase {
