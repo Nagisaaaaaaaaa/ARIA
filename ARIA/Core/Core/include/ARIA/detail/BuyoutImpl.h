@@ -52,14 +52,18 @@ private:
 //
 //
 //
+// Implement type reduction.
 template <typename F, typename... Ts>
 struct reduce_buyout;
 
+// 1. `Buyout<F, C<0>, C<1>, C<2>>`.
 template <typename F, type_array::detail::NonArrayType... Ts>
 struct reduce_buyout<F, Ts...> {
   using type = BuyoutReduced<F, Ts...>;
 };
 
+// 2. `Buyout<F, MakeTypeSet<C<0>, C<1>, C<2>>>`.
+// 3. `Buyout<F, MakeTypeArray<C<0>, C<1>, C<2>>>`.
 template <typename F, template <typename...> typename T, type_array::detail::NonArrayType... Ts>
   requires(type_array::detail::ArrayType<T<Ts...>>)
 struct reduce_buyout<F, T<Ts...>> {
