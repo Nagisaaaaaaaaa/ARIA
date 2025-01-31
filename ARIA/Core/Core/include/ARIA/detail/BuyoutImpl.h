@@ -9,6 +9,10 @@ namespace buyout::detail {
 
 template <typename F, type_array::detail::NonArrayType... TArgs>
 class BuyoutReduced {
+public:
+  static_assert((std::is_same_v<TArgs, std::decay_t<TArgs>> && ...),
+                "The buyout argument types should be decayed types");
+
 private:
   using TArgsSet = MakeTypeSet<TArgs...>;
   using TValuesTup = Tup<std::decay_t<decltype(std::declval<F>().template operator()<TArgs>())>...>;
