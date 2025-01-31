@@ -32,9 +32,27 @@ private:
   TValuesTup values_;
 };
 
-template <type_array::detail::NonArrayType... TArgs>
+template <typename F, typename... Ts>
+struct deduce_buyout;
+
+template <typename F, type_array::detail::NonArrayType... Ts>
+struct deduce_buyout<F, Ts...> {
+  using type = Buyout<F, Ts...>;
+};
+
+template <typename F, template <typename...> typename T, type_array::detail::NonArrayType... Ts>
+  requires(type_array::detail::ArrayType<T<Ts...>>)
+struct deduce_buyout<F, T<Ts...>> {
+  using type = Buyout<F, Ts...>;
+};
+
+template <typename F, typename... Ts>
+using deduce_buyout_t = deduce_buyout<F, Ts...>::type;
+
+template <typename... Ts>
 ARIA_HOST_DEVICE static constexpr auto make_buyout(const auto &f) {
-  return Buyout<std::decay_t<decltype(f)>, TArgs...>(f);
+  using TBuyout = deduce_buyout_t<std::decay_t<decltype(f)>, Ts...>;
+  return TBuyout{f};
 }
 
 template <typename TArg, typename F, type_array::detail::NonArrayType... TArgs>
