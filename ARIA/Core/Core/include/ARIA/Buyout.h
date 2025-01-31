@@ -30,6 +30,26 @@
 
 namespace ARIA {
 
+/// \brief A `Buyout` is defined by calling a function with several arguments and
+/// store the values for later usages.
+/// Here, the arguments are required to be determined at compile-time, which
+/// means that no runtime `if-else` is allowed at the construction stage.
+///
+/// \example ```cpp
+/// struct SizeOf {
+///   template <typename T>
+///   constexpr size_t operator()() const {
+///     return sizeof(T);
+///   }
+/// };
+///
+/// constexpr Buyout<SizeOf, float, double> buyout{SizeOf{}};
+///
+/// static_assert(buyout.operator()<float>() == 4);
+/// static_assert(buyout.operator()<double>() == 8);
+/// static_assert(get<float>(buyout) == 4);
+/// static_assert(get<double>(buyout) == 8);
+/// ```
 template <typename F, typename... Ts>
 using Buyout = buyout::detail::reduce_buyout_t<F, Ts...>;
 
