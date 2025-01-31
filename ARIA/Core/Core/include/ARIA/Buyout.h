@@ -53,6 +53,8 @@ namespace ARIA {
 /// static_assert(get<float>(buyout0) == 4);
 /// static_assert(get<double>(buyout0) == 8);
 /// ```
+///
+/// \see make_buyout
 template <typename F, typename... Ts>
 using Buyout = buyout::detail::reduce_buyout_t<F, Ts...>;
 
@@ -79,6 +81,8 @@ using Buyout = buyout::detail::reduce_buyout_t<F, Ts...>;
 /// static_assert(get<float>(buyout0) == 4);
 /// static_assert(get<double>(buyout0) == 8);
 /// ```
+///
+/// \see Buyout
 template <typename... Ts>
 ARIA_HOST_DEVICE static constexpr auto make_buyout(const auto &f) {
   using TBuyout = Buyout<std::decay_t<decltype(f)>, Ts...>;
