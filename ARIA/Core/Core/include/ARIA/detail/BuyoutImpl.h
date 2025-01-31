@@ -42,21 +42,21 @@ private:
 //
 //
 template <typename F, typename... Ts>
-struct deduce_buyout;
+struct reduce_buyout;
 
 template <typename F, type_array::detail::NonArrayType... Ts>
-struct deduce_buyout<F, Ts...> {
+struct reduce_buyout<F, Ts...> {
   using type = BuyoutReduced<F, Ts...>;
 };
 
 template <typename F, template <typename...> typename T, type_array::detail::NonArrayType... Ts>
   requires(type_array::detail::ArrayType<T<Ts...>>)
-struct deduce_buyout<F, T<Ts...>> {
+struct reduce_buyout<F, T<Ts...>> {
   using type = BuyoutReduced<F, Ts...>;
 };
 
 template <typename F, typename... Ts>
-using deduce_buyout_t = typename deduce_buyout<F, Ts...>::type;
+using reduce_buyout_t = typename reduce_buyout<F, Ts...>::type;
 
 //
 //

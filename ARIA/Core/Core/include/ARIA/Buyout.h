@@ -5,7 +5,7 @@
 namespace ARIA {
 
 template <typename F, typename... Ts>
-using Buyout = buyout::detail::deduce_buyout_t<F, Ts...>;
+using Buyout = buyout::detail::reduce_buyout_t<F, Ts...>;
 
 //
 //
