@@ -53,18 +53,9 @@ TEST(TypeSet, Base) {
     static_assert(!MakeTypeSet<int, float, double>::has<void>);
   }
 
-  // `Get`, `idx`.
+  // `nOf`, `has`, `firstIdx`, `lastIdx`, `idx`, `Get`.
   {
     using ts = MakeTypeSet<int8, int16, int, int64, const uint8, uint16 &, const uint &, uint64 &&>;
-
-    static_assert(std::is_same_v<ts::Get<0>, int8>);
-    static_assert(std::is_same_v<ts::Get<1>, int16>);
-    static_assert(std::is_same_v<ts::Get<2>, int>);
-    static_assert(std::is_same_v<ts::Get<3>, int64>);
-    static_assert(std::is_same_v<ts::Get<4>, const uint8>);
-    static_assert(std::is_same_v<ts::Get<5>, uint16 &>);
-    static_assert(std::is_same_v<ts::Get<6>, const uint &>);
-    static_assert(std::is_same_v<ts::Get<7>, uint64 &&>);
 
     static_assert(ts::idx<int8> == 0);
     static_assert(ts::idx<int16> == 1);
@@ -74,22 +65,21 @@ TEST(TypeSet, Base) {
     static_assert(ts::idx<uint16 &> == 5);
     static_assert(ts::idx<const uint &> == 6);
     static_assert(ts::idx<uint64 &&> == 7);
+
+    static_assert(std::is_same_v<ts::Get<0>, int8>);
+    static_assert(std::is_same_v<ts::Get<1>, int16>);
+    static_assert(std::is_same_v<ts::Get<2>, int>);
+    static_assert(std::is_same_v<ts::Get<3>, int64>);
+    static_assert(std::is_same_v<ts::Get<4>, const uint8>);
+    static_assert(std::is_same_v<ts::Get<5>, uint16 &>);
+    static_assert(std::is_same_v<ts::Get<6>, const uint &>);
+    static_assert(std::is_same_v<ts::Get<7>, uint64 &&>);
   }
 
   {
     using ts = MakeTypeSet<int, const int, volatile int,       //
                            int &, const int &, volatile int &, //
                            int &&, const int &&, volatile int &&>;
-
-    static_assert(std::is_same_v<ts::Get<0>, int>);
-    static_assert(std::is_same_v<ts::Get<1>, const int>);
-    static_assert(std::is_same_v<ts::Get<2>, volatile int>);
-    static_assert(std::is_same_v<ts::Get<3>, int &>);
-    static_assert(std::is_same_v<ts::Get<4>, const int &>);
-    static_assert(std::is_same_v<ts::Get<5>, volatile int &>);
-    static_assert(std::is_same_v<ts::Get<6>, int &&>);
-    static_assert(std::is_same_v<ts::Get<7>, const int &&>);
-    static_assert(std::is_same_v<ts::Get<8>, volatile int &&>);
 
     static_assert(ts::idx<int> == 0);
     static_assert(ts::idx<const int> == 1);
@@ -100,6 +90,16 @@ TEST(TypeSet, Base) {
     static_assert(ts::idx<int &&> == 6);
     static_assert(ts::idx<const int &&> == 7);
     static_assert(ts::idx<volatile int &&> == 8);
+
+    static_assert(std::is_same_v<ts::Get<0>, int>);
+    static_assert(std::is_same_v<ts::Get<1>, const int>);
+    static_assert(std::is_same_v<ts::Get<2>, volatile int>);
+    static_assert(std::is_same_v<ts::Get<3>, int &>);
+    static_assert(std::is_same_v<ts::Get<4>, const int &>);
+    static_assert(std::is_same_v<ts::Get<5>, volatile int &>);
+    static_assert(std::is_same_v<ts::Get<6>, int &&>);
+    static_assert(std::is_same_v<ts::Get<7>, const int &&>);
+    static_assert(std::is_same_v<ts::Get<8>, volatile int &&>);
   }
 }
 
