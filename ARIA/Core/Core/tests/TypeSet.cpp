@@ -57,6 +57,24 @@ TEST(TypeSet, Base) {
     static_assert(ts::has<const uint &>);
     static_assert(ts::has<uint64 &&>);
 
+    static_assert(ts::firstIdx<int8> == 0);
+    static_assert(ts::firstIdx<int16> == 1);
+    static_assert(ts::firstIdx<int> == 2);
+    static_assert(ts::firstIdx<int64> == 3);
+    static_assert(ts::firstIdx<const uint8> == 4);
+    static_assert(ts::firstIdx<uint16 &> == 5);
+    static_assert(ts::firstIdx<const uint &> == 6);
+    static_assert(ts::firstIdx<uint64 &&> == 7);
+
+    static_assert(ts::lastIdx<int8> == 0);
+    static_assert(ts::lastIdx<int16> == 1);
+    static_assert(ts::lastIdx<int> == 2);
+    static_assert(ts::lastIdx<int64> == 3);
+    static_assert(ts::lastIdx<const uint8> == 4);
+    static_assert(ts::lastIdx<uint16 &> == 5);
+    static_assert(ts::lastIdx<const uint &> == 6);
+    static_assert(ts::lastIdx<uint64 &&> == 7);
+
     static_assert(ts::idx<int8> == 0);
     static_assert(ts::idx<int16> == 1);
     static_assert(ts::idx<int> == 2);
@@ -100,6 +118,26 @@ TEST(TypeSet, Base) {
     static_assert(ts::has<int &&>);
     static_assert(ts::has<const int &&>);
     static_assert(ts::has<volatile int &&>);
+
+    static_assert(ts::firstIdx<int> == 0);
+    static_assert(ts::firstIdx<const int> == 1);
+    static_assert(ts::firstIdx<volatile int> == 2);
+    static_assert(ts::firstIdx<int &> == 3);
+    static_assert(ts::firstIdx<const int &> == 4);
+    static_assert(ts::firstIdx<volatile int &> == 5);
+    static_assert(ts::firstIdx<int &&> == 6);
+    static_assert(ts::firstIdx<const int &&> == 7);
+    static_assert(ts::firstIdx<volatile int &&> == 8);
+
+    static_assert(ts::lastIdx<int> == 0);
+    static_assert(ts::lastIdx<const int> == 1);
+    static_assert(ts::lastIdx<volatile int> == 2);
+    static_assert(ts::lastIdx<int &> == 3);
+    static_assert(ts::lastIdx<const int &> == 4);
+    static_assert(ts::lastIdx<volatile int &> == 5);
+    static_assert(ts::lastIdx<int &&> == 6);
+    static_assert(ts::lastIdx<const int &&> == 7);
+    static_assert(ts::lastIdx<volatile int &&> == 8);
 
     static_assert(ts::idx<int> == 0);
     static_assert(ts::idx<const int> == 1);
