@@ -92,6 +92,13 @@ ARIA_HOST_DEVICE static constexpr auto make_buyout(const auto &f) {
 //
 //
 //
+/// \brief Given `T`, get the corresponding stored value from a `Buyout`.
+///
+/// \example ```cpp
+/// // The same, but using `get` is more recommended.
+/// static_assert(buyout.operator()<float>() == 4);
+/// static_assert(get<float>(buyout) == 4);
+/// ```
 using buyout::detail::get;
 
 } // namespace ARIA
