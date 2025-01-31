@@ -18,6 +18,8 @@
 /// store the values for later usages.
 /// Here, the arguments are required to be determined at compile-time, which
 /// means that no runtime `if-else` is allowed at the construction stage.
+///
+/// Try `Buyout`, and sometimes, it will be faster.
 
 //
 //
