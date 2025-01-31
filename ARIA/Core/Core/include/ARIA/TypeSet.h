@@ -54,7 +54,11 @@ public:
   template <Idx i>
   using Get = TNoCheck::template Get<i>;
 
-  // TODO: Tailored implementations needed for other features.
+  template <Idx begin, Idx end, Idx step>
+  using Slice = MakeTypeSet<typename TArray::template Slice<begin, end, step>>;
+
+  template <typename Void = void>
+  using Reverse = MakeTypeSet<typename TArray::template Reverse<>>;
 };
 
 } // namespace ARIA
