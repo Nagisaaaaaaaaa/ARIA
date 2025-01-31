@@ -13,11 +13,21 @@ TEST(TypeSet, Base) {
     static_assert(type_array::detail::ArrayType<MakeTypeSet<int, float, double>>);
     // static_assert(type_array::detail::ArrayType<MakeTypeSet<int, float, float>>);
 
+    // `MakeTypeArray`.
+    static_assert(std::is_same_v<MakeTypeArray<MakeTypeSet<>>, TypeArray<>>);
+    static_assert(std::is_same_v<MakeTypeArray<MakeTypeSet<void>>, TypeArray<void>>);
+    static_assert(std::is_same_v<MakeTypeArray<MakeTypeSet<int, float>, double>, TypeArray<int, float, double>>);
+    static_assert(std::is_same_v<MakeTypeArray<int, MakeTypeSet<float>, double>, TypeArray<int, float, double>>);
+    static_assert(
+        std::is_same_v<MakeTypeArray<int, MakeTypeSet<float>, MakeTypeArray<double>>, TypeArray<int, float, double>>);
+
     // `MakeTypeSet`.
     static_assert(std::is_same_v<MakeTypeSet<MakeTypeArray<>>, TypeSet<>>);
     static_assert(std::is_same_v<MakeTypeSet<MakeTypeArray<void>>, TypeSet<void>>);
-    static_assert(std::is_same_v<MakeTypeSet<MakeTypeArray<int, float, double>>, TypeSet<int, float, double>>);
     static_assert(std::is_same_v<MakeTypeSet<MakeTypeArray<int, float>, double>, TypeSet<int, float, double>>);
+    static_assert(std::is_same_v<MakeTypeSet<int, MakeTypeArray<float>, double>, TypeSet<int, float, double>>);
+    static_assert(
+        std::is_same_v<MakeTypeSet<int, MakeTypeArray<float>, MakeTypeSet<double>>, TypeSet<int, float, double>>);
 
     // `size`.
     static_assert(MakeTypeSet<>::size == 0);
