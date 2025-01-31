@@ -43,12 +43,15 @@ namespace ARIA {
 ///   }
 /// };
 ///
-/// constexpr Buyout<SizeOf, float, double> buyout{SizeOf{}};
+/// // Here, `buyout0`, `buyout1`, and `buyout2` will have the same type.
+/// constexpr Buyout<SizeOf, float, double> buyout0{SizeOf{}};
+/// constexpr Buyout<SizeOf, MakeTypeArray<float, double>> buyout1{SizeOf{}};
+/// constexpr Buyout<SizeOf, MakeTypeSet<float, double>> buyout2{SizeOf{}};
 ///
-/// static_assert(buyout.operator()<float>() == 4);
-/// static_assert(buyout.operator()<double>() == 8);
-/// static_assert(get<float>(buyout) == 4);
-/// static_assert(get<double>(buyout) == 8);
+/// static_assert(buyout0.operator()<float>() == 4);
+/// static_assert(buyout0.operator()<double>() == 8);
+/// static_assert(get<float>(buyout0) == 4);
+/// static_assert(get<double>(buyout0) == 8);
 /// ```
 template <typename F, typename... Ts>
 using Buyout = buyout::detail::reduce_buyout_t<F, Ts...>;
@@ -56,6 +59,7 @@ using Buyout = buyout::detail::reduce_buyout_t<F, Ts...>;
 //
 //
 //
+/// \brief
 template <typename... Ts>
 ARIA_HOST_DEVICE static constexpr auto make_buyout(const auto &f) {
   using TBuyout = Buyout<std::decay_t<decltype(f)>, Ts...>;
