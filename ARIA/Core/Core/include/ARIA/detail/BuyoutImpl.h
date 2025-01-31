@@ -15,7 +15,7 @@ public:
 
 private:
   using TArgsSet = MakeTypeSet<TArgs...>;
-  using TValuesTup = Tup<std::decay_t<decltype(std::declval<F>().template operator()<TArgs>())>...>;
+  using TValuesTup = Tup<std::decay_t<decltype(std::declval<const F &>().template operator()<TArgs>())>...>;
 
 public:
   ARIA_HOST_DEVICE constexpr explicit BuyoutReduced(const F &f) {
