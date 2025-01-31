@@ -6,6 +6,11 @@ namespace ARIA {
 
 namespace type_set::detail {
 
+using Idx = type_array::detail::Idx;
+
+//
+//
+//
 //! For future developers: Please read the following comments to help you understand the codes.
 //!
 //! `TypeSet` is different from `TypeArray` in that the types are required to be unique.
@@ -116,6 +121,29 @@ struct Overloading<i, T, Ts...> : Overloading<i + 1, Ts...> {
 //
 //
 //
+// Similar to `TypeArray`, negative indices should be supported.
+// So we always need to convert indices to positive ones.
+template <Idx i, size_t n>
+struct pos_idx;
+
+template <Idx i, size_t n>
+  requires(i < 0)
+struct pos_idx<i, n> {
+  static constexpr size_t value = i + n;
+};
+
+template <Idx i, size_t n>
+  requires(i >= 0)
+struct pos_idx<i, n> {
+  static constexpr size_t value = i;
+};
+
+template <Idx i, size_t n>
+constexpr size_t pos_idx_v = pos_idx<i, n>::value;
+
+//
+//
+//
 // The `TypeSet` where duplications of `Ts...` have not been checked (`NoCheck`).
 // Thanks to `Overloading`, the implementation is trivial.
 // We only need to call `Overloading::Get` and `Overloading::idx`, then,
@@ -134,8 +162,8 @@ public:
   template <typename T>
   static constexpr bool has = idx_no_check<T> != std::numeric_limits<size_t>::max();
 
-  template <size_t i>
-  using Get = typename decltype(TOverloading::Get(C<i>{}))::type;
+  template <Idx i>
+  using Get = typename decltype(TOverloading::Get(C<pos_idx_v<i, sizeof...(Ts)>>{}))::type;
 
   template <typename T>
     requires(has<T>)
@@ -184,11 +212,5 @@ template <typename T>
 using to_type_set_t = decltype(ToTypeSetImpl(std::declval<T>()));
 
 } // namespace type_set::detail
-
-//
-//
-//
-template <typename... Ts>
-using MakeTypeSet = type_set::detail::to_type_set_t<MakeTypeArray<Ts...>>;
 
 } // namespace ARIA
