@@ -33,29 +33,29 @@ TEST(TypeSet, Base) {
     static_assert(MakeTypeSet<>::size == 0);
     static_assert(MakeTypeSet<void>::size == 1);
     static_assert(MakeTypeSet<int, float, double>::size == 3);
-
-    // `nOf`.
-    static_assert(MakeTypeSet<>::nOf<void> == 0);
-    static_assert(MakeTypeSet<void>::nOf<void> == 1);
-    static_assert(MakeTypeSet<void>::nOf<int> == 0);
-    static_assert(MakeTypeSet<int, float, double>::nOf<int> == 1);
-    static_assert(MakeTypeSet<int, float, double>::nOf<float> == 1);
-    static_assert(MakeTypeSet<int, float, double>::nOf<double> == 1);
-    static_assert(MakeTypeSet<int, float, double>::nOf<void> == 0);
-
-    // `has`.
-    static_assert(!MakeTypeSet<>::has<void>);
-    static_assert(MakeTypeSet<void>::has<void>);
-    static_assert(!MakeTypeSet<void>::has<int>);
-    static_assert(MakeTypeSet<int, float, double>::has<int>);
-    static_assert(MakeTypeSet<int, float, double>::has<float>);
-    static_assert(MakeTypeSet<int, float, double>::has<double>);
-    static_assert(!MakeTypeSet<int, float, double>::has<void>);
   }
 
   // `nOf`, `has`, `firstIdx`, `lastIdx`, `idx`, `Get`.
   {
     using ts = MakeTypeSet<int8, int16, int, int64, const uint8, uint16 &, const uint &, uint64 &&>;
+
+    static_assert(ts::nOf<int8> == 1);
+    static_assert(ts::nOf<int16> == 1);
+    static_assert(ts::nOf<int> == 1);
+    static_assert(ts::nOf<int64> == 1);
+    static_assert(ts::nOf<const uint8> == 1);
+    static_assert(ts::nOf<uint16 &> == 1);
+    static_assert(ts::nOf<const uint &> == 1);
+    static_assert(ts::nOf<uint64 &&> == 1);
+
+    static_assert(ts::has<int8>);
+    static_assert(ts::has<int16>);
+    static_assert(ts::has<int>);
+    static_assert(ts::has<int64>);
+    static_assert(ts::has<const uint8>);
+    static_assert(ts::has<uint16 &>);
+    static_assert(ts::has<const uint &>);
+    static_assert(ts::has<uint64 &&>);
 
     static_assert(ts::idx<int8> == 0);
     static_assert(ts::idx<int16> == 1);
@@ -80,6 +80,26 @@ TEST(TypeSet, Base) {
     using ts = MakeTypeSet<int, const int, volatile int,       //
                            int &, const int &, volatile int &, //
                            int &&, const int &&, volatile int &&>;
+
+    static_assert(ts::nOf<int> == 1);
+    static_assert(ts::nOf<const int> == 1);
+    static_assert(ts::nOf<volatile int> == 1);
+    static_assert(ts::nOf<int &> == 1);
+    static_assert(ts::nOf<const int &> == 1);
+    static_assert(ts::nOf<volatile int &> == 1);
+    static_assert(ts::nOf<int &&> == 1);
+    static_assert(ts::nOf<const int &&> == 1);
+    static_assert(ts::nOf<volatile int &&> == 1);
+
+    static_assert(ts::has<int>);
+    static_assert(ts::has<const int>);
+    static_assert(ts::has<volatile int>);
+    static_assert(ts::has<int &>);
+    static_assert(ts::has<const int &>);
+    static_assert(ts::has<volatile int &>);
+    static_assert(ts::has<int &&>);
+    static_assert(ts::has<const int &&>);
+    static_assert(ts::has<volatile int &&>);
 
     static_assert(ts::idx<int> == 0);
     static_assert(ts::idx<const int> == 1);
