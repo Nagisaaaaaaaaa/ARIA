@@ -51,7 +51,9 @@ TEST(Buyout, Base) {
     static_assert(std::is_same_v<decltype(buyout1), TBuyout0>);
     static_assert(std::is_same_v<decltype(buyout2), TBuyout0>);
   }
+}
 
+TEST(Buyout, Get) {
   {
     constexpr let buyout = make_buyout<int8_t, int16_t, int32_t, int64_t>(SizeOf{});
     static_assert(std::is_same_v<decltype(buyout), const Buyout<SizeOf, int8_t, int16_t, int32_t, int64_t>>);

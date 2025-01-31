@@ -16,4 +16,9 @@ ARIA_HOST_DEVICE static constexpr auto make_buyout(const auto &f) {
   return TBuyout{f};
 }
 
+//
+//
+//
+using buyout::detail::get;
+
 } // namespace ARIA
