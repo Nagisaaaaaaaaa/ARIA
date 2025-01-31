@@ -1,4 +1,5 @@
 #include "ARIA/Buyout.h"
+#include "ARIA/Let.h"
 
 #include <gtest/gtest.h>
 
@@ -27,7 +28,8 @@ struct Construct {
 
 TEST(Buyout, Base) {
   {
-    constexpr Buyout<SizeOf, int8_t, int16_t, int32_t, int64_t> buyout{SizeOf{}};
+    constexpr let buyout = make_buyout<int8_t, int16_t, int32_t, int64_t>(SizeOf{});
+    static_assert(std::is_same_v<decltype(buyout), const Buyout<SizeOf, int8_t, int16_t, int32_t, int64_t>>);
 
     static_assert(buyout.operator()<int8_t>() == 1);
     static_assert(buyout.operator()<int16_t>() == 2);
@@ -41,7 +43,9 @@ TEST(Buyout, Base) {
   }
 
   {
-    constexpr Buyout<Construct, int8_t, int16_t, int32_t, int64_t, std::array<int, 1>> buyout{Construct{}};
+    constexpr let buyout = make_buyout<int8_t, int16_t, int32_t, int64_t, std::array<int, 1>>(Construct{});
+    static_assert(std::is_same_v<decltype(buyout),
+                                 const Buyout<Construct, int8_t, int16_t, int32_t, int64_t, std::array<int, 1>>>);
 
     static_assert(std::is_same_v<decltype(buyout.operator()<int8_t>()), const int8_t &>);
     static_assert(std::is_same_v<decltype(buyout.operator()<int16_t>()), const int16_t &>);

@@ -32,6 +32,11 @@ private:
   TValuesTup values_;
 };
 
+template <type_array::detail::NonArrayType... TArgs>
+ARIA_HOST_DEVICE static constexpr auto make_buyout(const auto &f) {
+  return Buyout<std::decay_t<decltype(f)>, TArgs...>(f);
+}
+
 template <typename TArg, typename F, type_array::detail::NonArrayType... TArgs>
 ARIA_HOST_DEVICE static constexpr decltype(auto) get(const Buyout<F, TArgs...> &buyout) {
   return buyout.template operator()<TArg>();
