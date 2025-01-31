@@ -29,6 +29,7 @@ private:
 
 public:
   ARIA_HOST_DEVICE constexpr explicit BuyoutReduced(const F &f) {
+    // The constructor calls `f<TArgs>()...` and store the results into `values_`.
     ForEach<TArgsSet::size>([&]<auto i>() {
       using TArg = TArgsSet::template Get<i>;
       get<i>(values_) = f.template operator()<TArg>();
