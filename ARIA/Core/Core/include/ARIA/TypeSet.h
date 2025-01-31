@@ -1,9 +1,14 @@
 #pragma once
 
 /// \file
-/// \brief Type set is a compile-time set containing unique types.
-/// It has much higher perform than `TypeArray`.
-/// TODO: Document this.
+/// \brief Type set is a compile-time 1D array containing any combinations of UNIQUE types
+/// which themselves are not type arrays (we call them `NonArrayType`s).
+///
+/// That is, a type set can contain int, float&, void, etc.
+/// But it cannot recursively contain another type array.
+///
+/// Type set may be helpful if you want to perform complex manipulations on many types,
+/// for example, erase, remove, foreach, filter, etc.
 
 //
 //
