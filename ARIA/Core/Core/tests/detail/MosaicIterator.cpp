@@ -21,7 +21,7 @@ struct Mosaic<Tup<int, float>, Pattern> {
   Tup<int, float> operator()(const Pattern &v) const { return {v.i, v.f}; }
 };
 
-TEST(MosaicIterator, Base) {
+TEST(MosaicIterator, Mosaic) {
   using T = Tup<int, float>;
   using TMosaic = Mosaic<T, Pattern>;
 
@@ -60,6 +60,41 @@ TEST(MosaicIterator, Base) {
       } else if (it == begin + 4) {
         EXPECT_EQ(it->i, 4);
         EXPECT_FLOAT_EQ(it->f, 4.5F);
+      }
+    }
+  }
+}
+
+TEST(MosaicIterator, NonMosaic) {
+  std::array<int, 5> is = {0, 1, 2, 3, 4};
+
+  {
+    let begin = make_mosaic_iterator<int>(is.begin());
+    let end = make_mosaic_iterator<int>(is.end());
+    let beginC = make_mosaic_iterator<int>(is.cbegin());
+    let endC = make_mosaic_iterator<int>(is.cend());
+
+    static_assert(std::is_same_v<decltype(begin), decltype(is.begin())>);
+    static_assert(std::is_same_v<decltype(end), decltype(is.end())>);
+    static_assert(std::is_same_v<decltype(beginC), decltype(is.cbegin())>);
+    static_assert(std::is_same_v<decltype(endC), decltype(is.cend())>);
+  }
+
+  {
+    let begin = make_mosaic_iterator<int>(is.begin());
+    let end = make_mosaic_iterator<int>(is.end());
+
+    for (let it = begin; it != end; ++it) {
+      if (it == begin + 0) {
+        EXPECT_EQ(*it, 0);
+      } else if (it == begin + 1) {
+        EXPECT_EQ(*it, 1);
+      } else if (it == begin + 2) {
+        EXPECT_EQ(*it, 2);
+      } else if (it == begin + 3) {
+        EXPECT_EQ(*it, 3);
+      } else if (it == begin + 4) {
+        EXPECT_EQ(*it, 4);
       }
     }
   }
