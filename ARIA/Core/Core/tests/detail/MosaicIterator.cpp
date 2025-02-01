@@ -45,7 +45,8 @@ TEST(MosaicIterator, Mosaic) {
     let end = make_mosaic_iterator<TMosaic>(Tup{is.end(), fs.end()});
 
     for (let it = begin; it != end; ++it) {
-      T v = *it;
+      let v = Let(*it);
+      static_assert(std::is_same_v<decltype(v), T>);
 
       if (it == begin + 0) {
         EXPECT_EQ(get<0>(v), 0);
@@ -65,6 +66,7 @@ TEST(MosaicIterator, Mosaic) {
       }
 
       *it += T{10, 10.01F};
+      v = *it;
 
       if (it == begin + 0) {
         EXPECT_EQ(get<0>(v), 10);
