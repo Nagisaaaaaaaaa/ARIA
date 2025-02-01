@@ -30,6 +30,10 @@ namespace mosaic::detail {
 //    But `MosaicReference`s should always be copiable.
 //
 // So, this implementation is something like a compromise:
+// 1. Inherit from `PropertyBase`.
+//    Automatically generate operators, satisfy `concept Property`, support `Auto`.
+// 2. Some duplications of codes.
+//    Similar to the implementation of `ARIA_PROP`.
 template <typename TMosaic, typename TReferences>
   requires(is_mosaic_v<TMosaic>)
 class MosaicReference final : public property::detail::PropertyBase<MosaicReference<TMosaic, TReferences>> {
