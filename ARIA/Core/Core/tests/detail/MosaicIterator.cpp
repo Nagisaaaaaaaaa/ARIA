@@ -33,7 +33,7 @@ struct Mosaic<Tup<int, float>, PatternIF> {
 template <>
 struct Mosaic<Tup<int, int, int>, PatternIII> {
   PatternIII operator()(const Tup<int, int, int> &v) const {
-    return {.ii.v0 = get<0>(v), .ii.v1 = get<1>(v), .v2 = get<2>(v)};
+    return {.ii = {.v0 = get<0>(v), .v1 = get<1>(v)}, .v2 = get<2>(v)};
   }
 
   Tup<int, int, int> operator()(const PatternIII &v) const { return {v.ii.v0, v.ii.v1, v.v2}; }
