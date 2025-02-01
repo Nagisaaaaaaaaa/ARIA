@@ -23,7 +23,7 @@ private:
                 "The iterator types are inconsistent with the mosaic pattern");
 
 public:
-  ARIA_HOST_DEVICE constexpr explicit MosaicReference(TReferences references) : references_(references) {
+  ARIA_HOST_DEVICE constexpr explicit MosaicReference(const TReferences &references) : references_(references) {
     ForEach<size>([&]<auto i>() {
       static_assert(
           std::is_same_v<std::decay_t<decltype(mosaic::detail::get_recursive<i>(std::declval<TMosaicPattern>()))>,
@@ -34,6 +34,7 @@ public:
 
   ARIA_COPY_MOVE_ABILITY(MosaicReference, default, default);
 
+public:
   ARIA_HOST_DEVICE constexpr T value() const {
     TMosaicPattern mosaicPattern;
     ForEach<size>([&]<auto i>() { mosaic::detail::get_recursive<i>(mosaicPattern) = references_.template get<i>(); });
@@ -43,16 +44,17 @@ public:
   ARIA_HOST_DEVICE constexpr operator T() const { return value(); }
 
   template <typename U>
-  ARIA_HOST_DEVICE constexpr MosaicReference &operator=(U &&value) {
-    T v = std::forward<U>(value);
-    TMosaicPattern mosaicPattern = TMosaic{}(v);
+  ARIA_HOST_DEVICE constexpr MosaicReference &operator=(U &&arg) {
+    T value = std::forward<U>(arg);
+    TMosaicPattern mosaicPattern = TMosaic{}(value);
     ForEach<size>([&]<auto i>() { references_.template get<i>() = mosaic::detail::get_recursive<i>(mosaicPattern); });
     return *this;
   }
 
   template <typename U, size_t n>
   ARIA_HOST_DEVICE constexpr MosaicReference &operator=(const U (&args)[n]) {
-    return operator=(property::detail::ConstructWithArray<T>(args, std::make_index_sequence<n>{}));
+    operator=(property::detail::ConstructWithArray<T>(args, std::make_index_sequence<n>{}));
+    return *this;
   }
 
 private:
