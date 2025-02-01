@@ -110,6 +110,7 @@ ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const Tup<TIterators
 
   return boost::make_transform_iterator(boost::make_zip_iterator(iteratorsBoost),
                                         []<typename TReferences>(const TReferences &references) {
+    // Suppose `it` is a "mosaic iterator", then `*it` will return a `MosaicReference`.
     return MosaicReference<TMosaic, TReferences>{references};
   });
 }
