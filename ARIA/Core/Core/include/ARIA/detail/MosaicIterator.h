@@ -88,6 +88,20 @@ private:
 //
 //
 //
+// \brief Generate a "mosaic iterator" with a tuple of iterators which
+// are consistent with the mosaic pattern.
+//
+// \example ```cpp
+// using T = Tup<int, float>;
+// using TMosaic = Mosaic<T, MosaicPattern>;
+//
+// std::vector<int> is = {0, 1, 2, 3, 4};
+// std::array<float, 5> fs = {0.1F, 1.2F, 2.3F, 3.4F, 4.5F};
+//
+// auto begin = Auto(make_mosaic_iterator<TMosaic>(Tup{is.begin(), fs.begin()}));
+// *begin += T{10, 10.01F};
+// T value = *begin; // The value will be `{10, 10.11F}`.
+// ```
 template <typename TMosaic, typename... TIterators>
   requires(is_mosaic_v<TMosaic>)
 ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const Tup<TIterators...> &iterators) {
