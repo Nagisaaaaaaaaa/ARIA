@@ -189,10 +189,10 @@ TEST(MosaicIterator, NonMosaic) {
   std::array<int, 5> is = {0, 1, 2, 3, 4};
 
   {
-    let begin = make_mosaic_iterator<int>(is.begin());
-    let end = make_mosaic_iterator<int>(is.end());
-    let beginC = make_mosaic_iterator<int>(is.cbegin());
-    let endC = make_mosaic_iterator<int>(is.cend());
+    let begin = make_mosaic_iterator<int>(Tup{is.begin()});
+    let end = make_mosaic_iterator<int>(Tup{is.end()});
+    let beginC = make_mosaic_iterator<int>(Tup{is.cbegin()});
+    let endC = make_mosaic_iterator<int>(Tup{is.cend()});
 
     static_assert(!Property<decltype(*begin)>);
     static_assert(!Property<decltype(*end)>);
@@ -211,8 +211,8 @@ TEST(MosaicIterator, NonMosaic) {
   }
 
   {
-    let begin = make_mosaic_iterator<int>(is.begin());
-    let end = make_mosaic_iterator<int>(is.end());
+    let begin = make_mosaic_iterator<int>(Tup{is.begin()});
+    let end = make_mosaic_iterator<int>(Tup{is.end()});
 
     for (let it = begin; it != end; ++it) {
       let v = *it;

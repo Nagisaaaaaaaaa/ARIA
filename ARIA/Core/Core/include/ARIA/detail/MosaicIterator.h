@@ -78,8 +78,8 @@ ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const Tup<TIterators
 
 template <typename TNonMosaic, typename TIterator>
   requires(!mosaic::detail::is_mosaic_v<TNonMosaic>)
-ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const TIterator &iterator) {
-  return iterator;
+ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const Tup<TIterator> &iterator) {
+  return get<0>(iterator);
 }
 
 } // namespace ARIA
