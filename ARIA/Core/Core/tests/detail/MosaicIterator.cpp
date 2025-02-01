@@ -12,6 +12,15 @@ struct PatternIF {
   float f;
 };
 
+struct PatternIII {
+  struct {
+    int v0;
+    int v1;
+  } ii;
+
+  int v2;
+};
+
 } // namespace
 
 template <>
@@ -21,11 +30,20 @@ struct Mosaic<Tup<int, float>, PatternIF> {
   Tup<int, float> operator()(const PatternIF &v) const { return {v.i, v.f}; }
 };
 
+template <>
+struct Mosaic<Tup<int, int, int>, PatternIII> {
+  PatternIII operator()(const Tup<int, int, int> &v) const {
+    return {.ii.v0 = get<0>(v), .ii.v1 = get<1>(v), .v2 = get<2>(v)};
+  }
+
+  Tup<int, int, int> operator()(const PatternIII &v) const { return {v.ii.v0, v.ii.v1, v.v2}; }
+};
+
 TEST(MosaicIterator, Mosaic) {
   using T = Tup<int, float>;
   using TMosaic = Mosaic<T, PatternIF>;
 
-  std::array<int, 5> is = {0, 1, 2, 3, 4};
+  std::vector<int> is = {0, 1, 2, 3, 4};
   std::array<float, 5> fs = {0.1F, 1.2F, 2.3F, 3.4F, 4.5F};
 
   {
