@@ -102,7 +102,7 @@ private:
 // *begin += T{10, 10.01F};
 // T value = *begin; // The value will be `{10, 10.11F}`.
 // ```
-template <typename TMosaic, typename... TIterators>
+template <typename TMosaic, typename... TIterators> // For `Mosaic`, wrap the iterators with the help of `boost`.
   requires(is_mosaic_v<TMosaic>)
 ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const Tup<TIterators...> &iterators) {
   boost::tuple<TIterators...> iteratorsBoost;
@@ -114,7 +114,7 @@ ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const Tup<TIterators
   });
 }
 
-template <typename TNonMosaic, typename TIterator>
+template <typename TNonMosaic, typename TIterator> // For non-`Mosaic`, simply return the unique iterator.
   requires(!is_mosaic_v<TNonMosaic>)
 ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const Tup<TIterator> &iterator) {
   return get<0>(iterator);
