@@ -14,8 +14,8 @@
 //
 #include "ARIA/Property.h"
 
+#include <cuda/atomic>
 #include <cuda/std/array>
-#include <cuda/std/atomic>
 
 namespace ARIA {
 
