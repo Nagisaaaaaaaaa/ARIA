@@ -23,18 +23,20 @@ private:
                 "The iterator types are inconsistent with the mosaic pattern");
 
 public:
-  ARIA_HOST_DEVICE constexpr explicit MosaicReference(TReferences references) : references_(references) {}
+  ARIA_HOST_DEVICE constexpr explicit MosaicReference(TReferences references) : references_(references) {
+    ForEach<size>([&]<auto i>() {
+      static_assert(
+          std::is_same_v<std::decay_t<decltype(mosaic::detail::get_recursive<i>(std::declval<TMosaicPattern>()))>,
+                         std::decay_t<decltype(references_.template get<i>())>>,
+          "The iterator types are inconsistent with the mosaic pattern");
+    });
+  }
 
   ARIA_COPY_MOVE_ABILITY(MosaicReference, default, default);
 
   ARIA_HOST_DEVICE constexpr T value() const {
     TMosaicPattern mosaicPattern;
-    ForEach<size>([&]<auto i>() {
-      static_assert(std::is_same_v<std::decay_t<decltype(mosaic::detail::get_recursive<i>(mosaicPattern))>,
-                                   std::decay_t<decltype(references_.template get<i>())>>,
-                    "The iterator types are inconsistent with the mosaic pattern");
-      mosaic::detail::get_recursive<i>(mosaicPattern) = references_.template get<i>();
-    });
+    ForEach<size>([&]<auto i>() { mosaic::detail::get_recursive<i>(mosaicPattern) = references_.template get<i>(); });
     return TMosaic{}(mosaicPattern);
   }
 
@@ -44,12 +46,7 @@ public:
   ARIA_HOST_DEVICE constexpr MosaicReference &operator=(U &&value) {
     T v = std::forward<U>(value);
     TMosaicPattern mosaicPattern = TMosaic{}(v);
-    ForEach<size>([&]<auto i>() {
-      static_assert(std::is_same_v<std::decay_t<decltype(mosaic::detail::get_recursive<i>(mosaicPattern))>,
-                                   std::decay_t<decltype(references_.template get<i>())>>,
-                    "The iterator types are inconsistent with the mosaic pattern");
-      references_.template get<i>() = mosaic::detail::get_recursive<i>(mosaicPattern);
-    });
+    ForEach<size>([&]<auto i>() { references_.template get<i>() = mosaic::detail::get_recursive<i>(mosaicPattern); });
     return *this;
   }
 
