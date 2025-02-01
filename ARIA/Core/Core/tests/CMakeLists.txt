@@ -2,6 +2,7 @@ if (ARIA_BUILD_TESTS)
   aria_add_tests(Tests.ARIA.Core.Core
       SOURCES
       detail/Macros.cpp
+      detail/MosaicIterator.cu
       #experimental/Lua.cpp
       Auto.cu
       BFloat16.cu

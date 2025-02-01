@@ -259,6 +259,7 @@ namespace std {
 //
 //
 //
+#if 0 // TODO: No longer needed by newer versions of CUDA.
 namespace cuda::std {
 
 [[nodiscard]] ARIA_HOST_DEVICE inline ARIA::float16 abs(const ARIA::float16 &x) {
@@ -273,7 +274,7 @@ namespace cuda::std {
   return ::min(x, y);
 }
 
-#if defined(__CUDACC__) || defined(_NVHPC_CUDA)
+  #if defined(__CUDACC__) || defined(_NVHPC_CUDA)
 [[nodiscard]] ARIA_DEVICE inline ARIA::float16 ceil(const ARIA::float16 &x) {
   return ::ceil(x);
 }
@@ -333,9 +334,10 @@ namespace cuda::std {
 [[nodiscard]] ARIA_DEVICE inline ARIA::float16 trunc(const ARIA::float16 &x) {
   return ::trunc(x);
 }
-#endif
+  #endif
 
 } // namespace cuda::std
+#endif
 
 //
 //

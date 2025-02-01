@@ -19,7 +19,7 @@
 #include "ARIA/Invocations.h"
 #include "ARIA/Property.h"
 
-#include <cuda/std/atomic>
+#include <cuda/atomic>
 
 namespace ARIA {
 
