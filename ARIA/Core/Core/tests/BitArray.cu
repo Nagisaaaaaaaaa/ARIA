@@ -161,8 +161,8 @@ TEST(BitArray, Base) {
     });
 
     // Copy.
+    constexpr size_t n = 10;
     {
-      constexpr size_t n = 10;
       BitArray<n, TThreadSafety> bitArray0;
       for (size_t i = 0; i < n; ++i)
         bitArray0[i] = true;
@@ -178,7 +178,6 @@ TEST(BitArray, Base) {
 
     // Non-const `begin` and `end`.
     {
-      constexpr size_t n = 10;
       BitArray<n, TThreadSafety> bitArray;
 
       for (size_t i = 0; i < n; ++i)
@@ -210,7 +209,6 @@ TEST(BitArray, Base) {
 
     // Const `begin` and `end`.
     {
-      constexpr size_t n = 10;
       BitArray<n, TThreadSafety> bitArrayNonConst;
 
       for (size_t i = 0; i < n; ++i)
@@ -244,7 +242,6 @@ TEST(BitArray, Base) {
 
     // `cbegin` and `cend`.
     {
-      constexpr size_t n = 10;
       BitArray<n, TThreadSafety> bitArrayNonConst;
 
       for (size_t i = 0; i < n; ++i)
@@ -278,7 +275,6 @@ TEST(BitArray, Base) {
 
     // Non-const range-based for.
     {
-      constexpr size_t n = 10;
       BitArray<n, TThreadSafety> bitArray;
 
       for (size_t i = 0; i < n; ++i)
@@ -305,7 +301,6 @@ TEST(BitArray, Base) {
 
     // Const range-based for.
     {
-      constexpr size_t n = 10;
       BitArray<n, TThreadSafety> bitArrayNonConst;
 
       for (size_t i = 0; i < n; ++i)
