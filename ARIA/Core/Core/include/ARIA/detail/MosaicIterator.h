@@ -18,8 +18,8 @@ private:
   using T = typename mosaic::detail::is_mosaic<TMosaic>::T;
   using TMosaicPattern = typename mosaic::detail::is_mosaic<TMosaic>::TMosaicPattern;
 
-  static constexpr size_t size = boost::tuples::length<TReferences>::value;
-  static_assert(size == mosaic::detail::tuple_size_recursive_v<TMosaicPattern>,
+  static constexpr size_t size = mosaic::detail::tuple_size_recursive_v<TMosaicPattern>;
+  static_assert(size == boost::tuples::length<TReferences>::value,
                 "The iterator types are inconsistent with the mosaic pattern");
 
 public:
