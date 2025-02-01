@@ -9,21 +9,21 @@
 
 namespace ARIA {
 
-template <typename TMosaic, typename TReference>
+template <typename TMosaic, typename TReferences>
   requires(mosaic::detail::is_mosaic_v<TMosaic>)
-class MosaicReference final : public property::detail::PropertyBase<MosaicReference<TMosaic, TReference>> {
+class MosaicReference final : public property::detail::PropertyBase<MosaicReference<TMosaic, TReferences>> {
 private:
   static_assert(mosaic::detail::ValidMosaic<TMosaic>, "The mosaic definition is invalid");
 
   using T = typename mosaic::detail::is_mosaic<TMosaic>::T;
   using TMosaicPattern = typename mosaic::detail::is_mosaic<TMosaic>::TMosaicPattern;
 
-  static constexpr size_t size = boost::tuples::length<TReference>::value;
+  static constexpr size_t size = boost::tuples::length<TReferences>::value;
   static_assert(size == mosaic::detail::tuple_size_recursive_v<TMosaicPattern>,
                 "The iterator types are inconsistent with the mosaic pattern");
 
 public:
-  ARIA_HOST_DEVICE constexpr explicit MosaicReference(TReference reference) : reference_(reference) {}
+  ARIA_HOST_DEVICE constexpr explicit MosaicReference(TReferences references) : references_(references) {}
 
   ARIA_COPY_MOVE_ABILITY(MosaicReference, default, default);
 
@@ -31,9 +31,9 @@ public:
     TMosaicPattern mosaicPattern;
     ForEach<size>([&]<auto i>() {
       static_assert(std::is_same_v<std::decay_t<decltype(mosaic::detail::get_recursive<i>(mosaicPattern))>,
-                                   std::decay_t<decltype(reference_.template get<i>())>>,
+                                   std::decay_t<decltype(references_.template get<i>())>>,
                     "The iterator types are inconsistent with the mosaic pattern");
-      mosaic::detail::get_recursive<i>(mosaicPattern) = reference_.template get<i>();
+      mosaic::detail::get_recursive<i>(mosaicPattern) = references_.template get<i>();
     });
     return TMosaic{}(mosaicPattern);
   }
@@ -46,9 +46,9 @@ public:
     TMosaicPattern mosaicPattern = TMosaic{}(v);
     ForEach<size>([&]<auto i>() {
       static_assert(std::is_same_v<std::decay_t<decltype(mosaic::detail::get_recursive<i>(mosaicPattern))>,
-                                   std::decay_t<decltype(reference_.template get<i>())>>,
+                                   std::decay_t<decltype(references_.template get<i>())>>,
                     "The iterator types are inconsistent with the mosaic pattern");
-      reference_.template get<i>() = mosaic::detail::get_recursive<i>(mosaicPattern);
+      references_.template get<i>() = mosaic::detail::get_recursive<i>(mosaicPattern);
     });
     return *this;
   }
@@ -59,7 +59,7 @@ public:
   }
 
 private:
-  TReference reference_;
+  TReferences references_;
 };
 
 //
