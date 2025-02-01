@@ -7,7 +7,7 @@ namespace ARIA {
 
 namespace {
 
-struct Pattern {
+struct PatternIF {
   int i;
   float f;
 };
@@ -15,15 +15,15 @@ struct Pattern {
 } // namespace
 
 template <>
-struct Mosaic<Tup<int, float>, Pattern> {
-  Pattern operator()(const Tup<int, float> &v) const { return {.i = get<0>(v), .f = get<1>(v)}; }
+struct Mosaic<Tup<int, float>, PatternIF> {
+  PatternIF operator()(const Tup<int, float> &v) const { return {.i = get<0>(v), .f = get<1>(v)}; }
 
-  Tup<int, float> operator()(const Pattern &v) const { return {v.i, v.f}; }
+  Tup<int, float> operator()(const PatternIF &v) const { return {v.i, v.f}; }
 };
 
 TEST(MosaicIterator, Mosaic) {
   using T = Tup<int, float>;
-  using TMosaic = Mosaic<T, Pattern>;
+  using TMosaic = Mosaic<T, PatternIF>;
 
   std::array<int, 5> is = {0, 1, 2, 3, 4};
   std::array<float, 5> fs = {0.1F, 1.2F, 2.3F, 3.4F, 4.5F};
