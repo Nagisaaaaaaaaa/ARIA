@@ -66,7 +66,7 @@ private:
 //
 template <typename TMosaic, typename... TIterators>
   requires(mosaic::detail::is_mosaic_v<TMosaic>)
-ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(Tup<TIterators...> iterators) {
+ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const Tup<TIterators...> &iterators) {
   boost::tuple<TIterators...> iteratorsBoost;
   ForEach<sizeof...(TIterators)>([&]<auto i>() { get<i>(iteratorsBoost) = get<i>(iterators); });
 
@@ -78,7 +78,7 @@ ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(Tup<TIterators...> i
 
 template <typename TNonMosaic, typename TIterator>
   requires(!mosaic::detail::is_mosaic_v<TNonMosaic>)
-ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(TIterator iterator) {
+ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const TIterator &iterator) {
   return iterator;
 }
 
