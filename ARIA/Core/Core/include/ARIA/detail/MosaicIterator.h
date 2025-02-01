@@ -67,14 +67,13 @@ private:
 template <typename TMosaic, typename... TIterators>
   requires(mosaic::detail::is_mosaic_v<TMosaic>)
 ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(Tup<TIterators...> iterators) {
-  static_assert(mosaic::detail::ValidMosaic<TMosaic>, "The mosaic definition is invalid");
-  using TMosaicPattern = typename mosaic::detail::is_mosaic<TMosaic>::TMosaicPattern;
-
   boost::tuple<TIterators...> iteratorsBoost;
   ForEach<sizeof...(TIterators)>([&]<auto i>() { get<i>(iteratorsBoost) = get<i>(iterators); });
 
   return boost::make_transform_iterator(boost::make_zip_iterator(iteratorsBoost),
-                                        []<typename Tz>(const Tz &z) { return MosaicReference<TMosaic, Tz>{z}; });
+                                        []<typename TReferences>(const TReferences &references) {
+    return MosaicReference<TMosaic, TReferences>{references};
+  });
 }
 
 template <typename TNonMosaic, typename TIterator>
