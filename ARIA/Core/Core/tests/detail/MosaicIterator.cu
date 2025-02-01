@@ -2,6 +2,7 @@
 #include "ARIA/detail/MosaicIterator.h"
 
 #include <gtest/gtest.h>
+
 #include <thrust/device_vector.h>
 #include <thrust/host_vector.h>
 
