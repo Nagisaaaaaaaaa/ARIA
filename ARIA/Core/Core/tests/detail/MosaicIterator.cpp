@@ -2,6 +2,8 @@
 #include "ARIA/Let.h"
 
 #include <gtest/gtest.h>
+#include <thrust/device_vector.h>
+#include <thrust/host_vector.h>
 
 namespace ARIA {
 
@@ -167,6 +169,15 @@ TEST(MosaicIterator, NonMosaic) {
       }
     }
   }
+}
+
+TEST(MosaicIterator, Complex) {
+  using T = Tup<int, int, int>;
+  using TMosaic = Mosaic<T, PatternIII>;
+
+  std::array<int, 5> is0 = {0, 1, 2, 3, 4};
+  thrust::host_vector<int> is1 = {0, -2, -4, -6, -8};
+  thrust::device_vector<int> is2 = {0, 3, 6, 9, 12};
 }
 
 } // namespace ARIA
