@@ -11,6 +11,14 @@ namespace ARIA {
 
 namespace mosaic::detail {
 
+// A `MosaicReference` is a proxy returned by dereferencing a "mosaic iterator".
+// Suppose `it` is a "mosaic iterator", then `*it` will return a `MosaicReference`.
+//
+// Just like properties, several main features should be supported:
+// 1. Can be implicitly cast to `T`.
+// 2. Can be set by `T` or any other types which can be implicitly cast to `T`.
+// 3. Operators should be automatically generated.
+// 4. Can be handled by `Auto`.
 template <typename TMosaic, typename TReferences>
   requires(is_mosaic_v<TMosaic>)
 class MosaicReference final : public property::detail::PropertyBase<MosaicReference<TMosaic, TReferences>> {
