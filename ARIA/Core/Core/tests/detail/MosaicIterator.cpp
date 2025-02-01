@@ -78,6 +78,11 @@ TEST(MosaicIterator, NonMosaic) {
     static_assert(std::is_same_v<decltype(end), decltype(is.end())>);
     static_assert(std::is_same_v<decltype(beginC), decltype(is.cbegin())>);
     static_assert(std::is_same_v<decltype(endC), decltype(is.cend())>);
+
+    static_assert(std::is_same_v<decltype(*begin), int &>);
+    static_assert(std::is_same_v<decltype(*end), int &>);
+    static_assert(std::is_same_v<decltype(*beginC), const int &>);
+    static_assert(std::is_same_v<decltype(*endC), const int &>);
   }
 
   {
