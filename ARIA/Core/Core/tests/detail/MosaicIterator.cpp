@@ -97,6 +97,11 @@ TEST(MosaicIterator, NonMosaic) {
     let beginC = make_mosaic_iterator<int>(is.cbegin());
     let endC = make_mosaic_iterator<int>(is.cend());
 
+    static_assert(!Property<decltype(*begin)>);
+    static_assert(!Property<decltype(*end)>);
+    static_assert(!Property<decltype(*beginC)>);
+    static_assert(!Property<decltype(*endC)>);
+
     static_assert(std::is_same_v<decltype(begin), decltype(is.begin())>);
     static_assert(std::is_same_v<decltype(end), decltype(is.end())>);
     static_assert(std::is_same_v<decltype(beginC), decltype(is.cbegin())>);
@@ -113,16 +118,34 @@ TEST(MosaicIterator, NonMosaic) {
     let end = make_mosaic_iterator<int>(is.end());
 
     for (let it = begin; it != end; ++it) {
+      let v = *it;
+      static_assert(std::is_same_v<decltype(v), int>);
+
       if (it == begin + 0) {
-        EXPECT_EQ(*it, 0);
+        EXPECT_EQ(v, 0);
       } else if (it == begin + 1) {
-        EXPECT_EQ(*it, 1);
+        EXPECT_EQ(v, 1);
       } else if (it == begin + 2) {
-        EXPECT_EQ(*it, 2);
+        EXPECT_EQ(v, 2);
       } else if (it == begin + 3) {
-        EXPECT_EQ(*it, 3);
+        EXPECT_EQ(v, 3);
       } else if (it == begin + 4) {
-        EXPECT_EQ(*it, 4);
+        EXPECT_EQ(v, 4);
+      }
+
+      *it += 10;
+      v = *it;
+
+      if (it == begin + 0) {
+        EXPECT_EQ(v, 10);
+      } else if (it == begin + 1) {
+        EXPECT_EQ(v, 11);
+      } else if (it == begin + 2) {
+        EXPECT_EQ(v, 12);
+      } else if (it == begin + 3) {
+        EXPECT_EQ(v, 13);
+      } else if (it == begin + 4) {
+        EXPECT_EQ(v, 14);
       }
     }
   }
