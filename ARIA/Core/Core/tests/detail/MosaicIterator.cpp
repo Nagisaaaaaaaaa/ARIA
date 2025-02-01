@@ -34,10 +34,10 @@ TEST(MosaicIterator, Mosaic) {
     let beginC = make_mosaic_iterator<TMosaic>(Tup{is.cbegin(), fs.cbegin()});
     let endC = make_mosaic_iterator<TMosaic>(Tup{is.cend(), fs.cend()});
 
-    static_assert(std::is_same_v<decltype(*begin), Pattern>);
-    static_assert(std::is_same_v<decltype(*end), Pattern>);
-    static_assert(std::is_same_v<decltype(*beginC), Pattern>);
-    static_assert(std::is_same_v<decltype(*endC), Pattern>);
+    static_assert(Property<decltype(*begin)>);
+    static_assert(Property<decltype(*end)>);
+    static_assert(Property<decltype(*beginC)>);
+    static_assert(Property<decltype(*endC)>);
   }
 
   {
@@ -45,21 +45,42 @@ TEST(MosaicIterator, Mosaic) {
     let end = make_mosaic_iterator<TMosaic>(Tup{is.end(), fs.end()});
 
     for (let it = begin; it != end; ++it) {
+      T v = *it;
+
       if (it == begin + 0) {
-        EXPECT_EQ(it->i, 0);
-        EXPECT_FLOAT_EQ(it->f, 0.1F);
+        EXPECT_EQ(get<0>(v), 0);
+        EXPECT_FLOAT_EQ(get<1>(v), 0.1F);
       } else if (it == begin + 1) {
-        EXPECT_EQ(it->i, 1);
-        EXPECT_FLOAT_EQ(it->f, 1.2F);
+        EXPECT_EQ(get<0>(v), 1);
+        EXPECT_FLOAT_EQ(get<1>(v), 1.2F);
       } else if (it == begin + 2) {
-        EXPECT_EQ(it->i, 2);
-        EXPECT_FLOAT_EQ(it->f, 2.3F);
+        EXPECT_EQ(get<0>(v), 2);
+        EXPECT_FLOAT_EQ(get<1>(v), 2.3F);
       } else if (it == begin + 3) {
-        EXPECT_EQ(it->i, 3);
-        EXPECT_FLOAT_EQ(it->f, 3.4F);
+        EXPECT_EQ(get<0>(v), 3);
+        EXPECT_FLOAT_EQ(get<1>(v), 3.4F);
       } else if (it == begin + 4) {
-        EXPECT_EQ(it->i, 4);
-        EXPECT_FLOAT_EQ(it->f, 4.5F);
+        EXPECT_EQ(get<0>(v), 4);
+        EXPECT_FLOAT_EQ(get<1>(v), 4.5F);
+      }
+
+      *it += T{10, 10.01F};
+
+      if (it == begin + 0) {
+        EXPECT_EQ(get<0>(v), 10);
+        EXPECT_FLOAT_EQ(get<1>(v), 10.11F);
+      } else if (it == begin + 1) {
+        EXPECT_EQ(get<0>(v), 11);
+        EXPECT_FLOAT_EQ(get<1>(v), 11.21F);
+      } else if (it == begin + 2) {
+        EXPECT_EQ(get<0>(v), 12);
+        EXPECT_FLOAT_EQ(get<1>(v), 12.31F);
+      } else if (it == begin + 3) {
+        EXPECT_EQ(get<0>(v), 13);
+        EXPECT_FLOAT_EQ(get<1>(v), 13.41F);
+      } else if (it == begin + 4) {
+        EXPECT_EQ(get<0>(v), 14);
+        EXPECT_FLOAT_EQ(get<1>(v), 14.51F);
       }
     }
   }
