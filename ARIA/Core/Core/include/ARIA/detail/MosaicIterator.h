@@ -26,8 +26,8 @@ public:
   ARIA_HOST_DEVICE constexpr explicit MosaicReference(const TReferences &references) : references_(references) {
     ForEach<size>([&]<auto i>() {
       static_assert(
-          std::is_same_v<std::decay_t<decltype(mosaic::detail::get_recursive<i>(std::declval<TMosaicPattern>()))>,
-                         std::decay_t<decltype(references_.template get<i>())>>,
+          std::is_same_v<std::decay_t<decltype(Auto(mosaic::detail::get_recursive<i>(std::declval<TMosaicPattern>())))>,
+                         std::decay_t<decltype(Auto(references_.template get<i>()))>>,
           "The iterator types are inconsistent with the mosaic pattern");
     });
   }

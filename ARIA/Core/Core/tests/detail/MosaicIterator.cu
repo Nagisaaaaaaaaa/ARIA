@@ -1,5 +1,5 @@
-#include "ARIA/detail/MosaicIterator.h"
 #include "ARIA/Let.h"
+#include "ARIA/detail/MosaicIterator.h"
 
 #include <gtest/gtest.h>
 #include <thrust/device_vector.h>
@@ -178,6 +178,58 @@ TEST(MosaicIterator, Complex) {
   std::array<int, 5> is0 = {0, 1, 2, 3, 4};
   thrust::host_vector<int> is1 = {0, -2, -4, -6, -8};
   thrust::device_vector<int> is2 = {0, 3, 6, 9, 12};
+
+  {
+    let begin = make_mosaic_iterator<TMosaic>(Tup{is0.begin(), is1.begin(), is2.begin()});
+    let end = make_mosaic_iterator<TMosaic>(Tup{is0.end(), is1.end(), is2.end()});
+    let beginC = make_mosaic_iterator<TMosaic>(Tup{is0.cbegin(), is1.cbegin(), is2.cbegin()});
+    let endC = make_mosaic_iterator<TMosaic>(Tup{is0.cend(), is1.cend(), is2.cend()});
+
+    static_assert(Property<decltype(*begin)>);
+    static_assert(Property<decltype(*end)>);
+    static_assert(Property<decltype(*beginC)>);
+    static_assert(Property<decltype(*endC)>);
+  }
+
+  {
+    let begin = make_mosaic_iterator<TMosaic>(Tup{is0.begin(), is1.begin(), is2.begin()});
+    let end = make_mosaic_iterator<TMosaic>(Tup{is0.end(), is1.end(), is2.end()});
+
+    for (let it = begin; it != end; ++it) {
+      let v = Let(*it);
+      static_assert(std::is_same_v<decltype(v), T>);
+
+      if (it == begin + 0) {
+        EXPECT_EQ(get<0>(v), 0);
+        EXPECT_EQ(get<1>(v), 0);
+        EXPECT_EQ(get<2>(v), 0);
+      } else if (it == begin + 1) {
+        EXPECT_EQ(get<0>(v), 1);
+        EXPECT_EQ(get<1>(v), -2);
+        EXPECT_EQ(get<2>(v), 3);
+      } else if (it == begin + 2) {
+        EXPECT_EQ(get<0>(v), 2);
+        EXPECT_EQ(get<1>(v), -4);
+        EXPECT_EQ(get<2>(v), 6);
+      } else if (it == begin + 3) {
+        EXPECT_EQ(get<0>(v), 3);
+        EXPECT_EQ(get<1>(v), -6);
+        EXPECT_EQ(get<2>(v), 9);
+      } else if (it == begin + 4) {
+        EXPECT_EQ(get<0>(v), 4);
+        EXPECT_EQ(get<1>(v), -8);
+        EXPECT_EQ(get<2>(v), 12);
+      }
+
+      *it = {1, 10, 100};
+      *it *= 5;
+      v = *it;
+
+      EXPECT_EQ(get<0>(v), 5);
+      EXPECT_EQ(get<1>(v), 50);
+      EXPECT_EQ(get<2>(v), 500);
+    }
+  }
 }
 
 } // namespace ARIA
