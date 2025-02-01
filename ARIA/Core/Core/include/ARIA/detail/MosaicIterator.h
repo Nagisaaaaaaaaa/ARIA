@@ -53,6 +53,11 @@ public:
     return *this;
   }
 
+  template <typename U, size_t n>
+  ARIA_HOST_DEVICE constexpr MosaicReference &operator=(const U (&args)[n]) {
+    return operator=(property::detail::ConstructWithArray<T>(args, std::make_index_sequence<n>{}));
+  }
+
 private:
   TReference reference_;
 };
@@ -69,16 +74,8 @@ ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(Tup<TIterators...> i
   boost::tuple<TIterators...> iteratorsBoost;
   ForEach<sizeof...(TIterators)>([&]<auto i>() { get<i>(iteratorsBoost) = get<i>(iterators); });
 
-  return boost::make_transform_iterator(boost::make_zip_iterator(iteratorsBoost), [](const auto &z) -> TMosaicPattern {
-    TMosaicPattern res;
-    ForEach<sizeof...(TIterators)>([&]<auto i>() {
-      static_assert(std::is_same_v<std::decay_t<decltype(mosaic::detail::get_recursive<i>(res))>,
-                                   std::decay_t<decltype(z.template get<i>())>>,
-                    "The iterator types are inconsistent with the mosaic pattern");
-      mosaic::detail::get_recursive<i>(res) = z.template get<i>();
-    });
-    return res;
-  });
+  return boost::make_transform_iterator(boost::make_zip_iterator(iteratorsBoost),
+                                        []<typename Tz>(const Tz &z) { return MosaicReference<TMosaic, Tz>{z}; });
 }
 
 template <typename TNonMosaic, typename TIterator>
