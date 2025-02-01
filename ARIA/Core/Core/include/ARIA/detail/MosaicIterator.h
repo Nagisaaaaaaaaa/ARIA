@@ -12,25 +12,24 @@ namespace ARIA {
 namespace mosaic::detail {
 
 template <typename TMosaic, typename TReferences>
-  requires(mosaic::detail::is_mosaic_v<TMosaic>)
+  requires(is_mosaic_v<TMosaic>)
 class MosaicReference final : public property::detail::PropertyBase<MosaicReference<TMosaic, TReferences>> {
 private:
-  static_assert(mosaic::detail::ValidMosaic<TMosaic>, "The mosaic definition is invalid");
+  static_assert(ValidMosaic<TMosaic>, "The mosaic definition is invalid");
 
-  using T = typename mosaic::detail::is_mosaic<TMosaic>::T;
-  using TMosaicPattern = typename mosaic::detail::is_mosaic<TMosaic>::TMosaicPattern;
+  using T = typename is_mosaic<TMosaic>::T;
+  using TMosaicPattern = typename is_mosaic<TMosaic>::TMosaicPattern;
 
-  static constexpr size_t size = mosaic::detail::tuple_size_recursive_v<TMosaicPattern>;
+  static constexpr size_t size = tuple_size_recursive_v<TMosaicPattern>;
   static_assert(size == boost::tuples::length<TReferences>::value,
                 "The iterator types are inconsistent with the mosaic pattern");
 
 public:
   ARIA_HOST_DEVICE constexpr explicit MosaicReference(const TReferences &references) : references_(references) {
     ForEach<size>([&]<auto i>() {
-      static_assert(
-          std::is_same_v<std::decay_t<decltype(Auto(mosaic::detail::get_recursive<i>(std::declval<TMosaicPattern>())))>,
-                         std::decay_t<decltype(Auto(references_.template get<i>()))>>,
-          "The iterator types are inconsistent with the mosaic pattern");
+      static_assert(std::is_same_v<std::decay_t<decltype(Auto(get_recursive<i>(std::declval<TMosaicPattern>())))>,
+                                   std::decay_t<decltype(Auto(references_.template get<i>()))>>,
+                    "The iterator types are inconsistent with the mosaic pattern");
     });
   }
 
@@ -39,7 +38,7 @@ public:
 public:
   ARIA_HOST_DEVICE constexpr T value() const {
     TMosaicPattern mosaicPattern;
-    ForEach<size>([&]<auto i>() { mosaic::detail::get_recursive<i>(mosaicPattern) = references_.template get<i>(); });
+    ForEach<size>([&]<auto i>() { get_recursive<i>(mosaicPattern) = references_.template get<i>(); });
     return TMosaic{}(mosaicPattern);
   }
 
@@ -49,7 +48,7 @@ public:
   ARIA_HOST_DEVICE constexpr MosaicReference &operator=(U &&arg) {
     T value = std::forward<U>(arg);
     TMosaicPattern mosaicPattern = TMosaic{}(value);
-    ForEach<size>([&]<auto i>() { references_.template get<i>() = mosaic::detail::get_recursive<i>(mosaicPattern); });
+    ForEach<size>([&]<auto i>() { references_.template get<i>() = get_recursive<i>(mosaicPattern); });
     return *this;
   }
 
@@ -67,7 +66,7 @@ private:
 //
 //
 template <typename TMosaic, typename... TIterators>
-  requires(mosaic::detail::is_mosaic_v<TMosaic>)
+  requires(is_mosaic_v<TMosaic>)
 ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const Tup<TIterators...> &iterators) {
   boost::tuple<TIterators...> iteratorsBoost;
   ForEach<sizeof...(TIterators)>([&]<auto i>() { get<i>(iteratorsBoost) = get<i>(iterators); });
@@ -79,7 +78,7 @@ ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const Tup<TIterators
 }
 
 template <typename TNonMosaic, typename TIterator>
-  requires(!mosaic::detail::is_mosaic_v<TNonMosaic>)
+  requires(!is_mosaic_v<TNonMosaic>)
 ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const Tup<TIterator> &iterator) {
   return get<0>(iterator);
 }
