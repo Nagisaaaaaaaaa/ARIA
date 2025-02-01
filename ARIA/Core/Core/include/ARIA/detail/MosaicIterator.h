@@ -9,6 +9,8 @@
 
 namespace ARIA {
 
+namespace mosaic::detail {
+
 template <typename TMosaic, typename TReferences>
   requires(mosaic::detail::is_mosaic_v<TMosaic>)
 class MosaicReference final : public property::detail::PropertyBase<MosaicReference<TMosaic, TReferences>> {
@@ -81,5 +83,7 @@ template <typename TNonMosaic, typename TIterator>
 ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const Tup<TIterator> &iterator) {
   return get<0>(iterator);
 }
+
+} // namespace mosaic::detail
 
 } // namespace ARIA

@@ -42,6 +42,8 @@ struct Mosaic<Tup<int, int, int>, PatternIII> {
 };
 
 TEST(MosaicIterator, Mosaic) {
+  using namespace mosaic::detail;
+
   // `int, float`.
   {
     using T = Tup<int, float>;
@@ -185,6 +187,8 @@ TEST(MosaicIterator, Mosaic) {
 }
 
 TEST(MosaicIterator, NonMosaic) {
+  using namespace mosaic::detail;
+
   // `int`.
   std::array<int, 5> is = {0, 1, 2, 3, 4};
 
