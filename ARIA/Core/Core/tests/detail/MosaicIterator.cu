@@ -106,6 +106,11 @@ TEST(MosaicIterator, Mosaic) {
       }
     }
   }
+
+  for (int i = 0; i < 5; ++i) {
+    EXPECT_EQ(is[i], i + 10);
+    EXPECT_TRUE(std::abs(fs[i] - (i + (i + 1) * 0.1 + 10.01)) < 1e-6);
+  }
 }
 
 TEST(MosaicIterator, NonMosaic) {
@@ -169,6 +174,10 @@ TEST(MosaicIterator, NonMosaic) {
       }
     }
   }
+
+  for (int i = 0; i < 5; ++i) {
+    EXPECT_EQ(is[i], i + 10);
+  }
 }
 
 TEST(MosaicIterator, Complex) {
@@ -229,6 +238,12 @@ TEST(MosaicIterator, Complex) {
       EXPECT_EQ(get<1>(v), 50);
       EXPECT_EQ(get<2>(v), 500);
     }
+  }
+
+  for (int i = 0; i < 5; ++i) {
+    EXPECT_EQ(is0[i], 5);
+    EXPECT_EQ(is1[i], 50);
+    EXPECT_EQ(is2[i], 500);
   }
 }
 
