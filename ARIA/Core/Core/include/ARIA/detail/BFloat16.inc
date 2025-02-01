@@ -259,7 +259,7 @@ namespace std {
 //
 //
 //
-#if 0 // TODO: No longer needed by newer version of CUDA.
+#if 0 // TODO: No longer needed by newer versions of CUDA.
 namespace cuda::std {
 
 [[nodiscard]] ARIA_HOST_DEVICE inline ARIA::bfloat16 abs(const ARIA::bfloat16 &x) {
