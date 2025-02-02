@@ -165,7 +165,7 @@ TEST(MosaicVector, Base) {
       EXPECT_EQ(get<1>(v), 0);
       EXPECT_EQ(get<2>(v), 0);
 
-      vec[i] = T{i, 2 * i, 3 * i};
+      vec[i] = {i, 2 * i, 3 * i};
       v = vec[i];
       EXPECT_EQ(get<0>(v), i);
       EXPECT_EQ(get<1>(v), 2 * i);
