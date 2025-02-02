@@ -270,4 +270,36 @@ TEST(MosaicVector, Base) {
   }
 }
 
+TEST(MosaicVector, Copy) {
+  using namespace mosaic::detail;
+
+  // `int, float`.
+  {
+    using T = Tup<int, float>;
+    using TMosaic = Mosaic<T, PatternIF>;
+
+    ForEach<MakeTypeArray<Tup<SpaceHost, SpaceHost>, Tup<SpaceDevice, SpaceHost>, Tup<SpaceHost, SpaceDevice>,
+                          Tup<SpaceDevice, SpaceDevice>>>([]<typename TSpaces>() {
+      using TSpace0 = tup_elem_t<0, TSpaces>;
+      using TSpace1 = tup_elem_t<1, TSpaces>;
+
+      using TMosaicVector0 = MosaicVector<TMosaic, TSpace0>;
+      using TMosaicVector1 = MosaicVector<TMosaic, TSpace1>;
+
+      fmt::println("{} {}", typeid(TMosaicVector0).name(), typeid(TMosaicVector1).name());
+
+      TMosaicVector0 vec0{T{0, 0.1F}, T{1, 1.2F}, T{2, 2.3F}, T{3, 3.4F}, T{4, 4.5F}};
+      TMosaicVector1 vec1 = vec0;
+      EXPECT_EQ(vec1.size(), 5);
+      for (int i = 0; i < 5; ++i) {
+        T v = vec1[i];
+        EXPECT_EQ(get<0>(v), i);
+        EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
+      }
+
+      vec1 = vec0;
+    });
+  }
+}
+
 } // namespace ARIA

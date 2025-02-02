@@ -55,6 +55,10 @@ private:
   using TMosaicPattern = typename is_mosaic<TMosaic>::TMosaicPattern;
   using TStorage = mosaic_vector_storage_type_t<TMosaicPattern, TSpaceHostOrDevice, Ts...>;
 
+  template <typename UMosaic, typename USpaceHostOrDevice, typename... Us>
+    requires(is_mosaic_v<UMosaic>)
+  friend class MosaicVector;
+
 public:
   using value_type = T;
 
@@ -67,6 +71,12 @@ public:
     const T *begin = list.begin();
     for (size_t i = 0; i < list.size(); ++i)
       operator[](i) = *(begin + i);
+  }
+
+  template <typename USpaceHostOrDevice, typename... Us>
+    requires(!std::is_same_v<MosaicVector, MosaicVector<TMosaic, USpaceHostOrDevice, Us...>>)
+  MosaicVector(const MosaicVector<TMosaic, USpaceHostOrDevice, Us...> &v) {
+    ForEach<rank_v<TStorage>>([&]<auto i>() { get<i>(storage_) = get<i>(v.storage_); });
   }
 
   ARIA_COPY_MOVE_ABILITY(MosaicVector, default, default);
