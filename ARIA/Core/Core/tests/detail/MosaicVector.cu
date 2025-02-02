@@ -296,7 +296,7 @@ TEST(MosaicVector, Copy) {
       }
 
       vec1.resize(10);
-      vec1 = vec0;
+      TMosaicVector1 &vec1Ref = (vec1 = vec0);
       EXPECT_EQ(vec1.size(), 5);
       for (int i = 0; i < 5; ++i) {
         T v = vec1[i];

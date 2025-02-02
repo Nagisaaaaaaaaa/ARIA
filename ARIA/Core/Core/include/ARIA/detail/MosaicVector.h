@@ -76,7 +76,14 @@ public:
   template <typename USpaceHostOrDevice, typename... Us>
     requires(!std::is_same_v<MosaicVector, MosaicVector<TMosaic, USpaceHostOrDevice, Us...>>)
   MosaicVector(const MosaicVector<TMosaic, USpaceHostOrDevice, Us...> &v) {
+    operator=(v);
+  }
+
+  template <typename USpaceHostOrDevice, typename... Us>
+    requires(!std::is_same_v<MosaicVector, MosaicVector<TMosaic, USpaceHostOrDevice, Us...>>)
+  MosaicVector &operator=(const MosaicVector<TMosaic, USpaceHostOrDevice, Us...> &v) {
     ForEach<rank_v<TStorage>>([&]<auto i>() { get<i>(storage_) = get<i>(v.storage_); });
+    return *this;
   }
 
   ARIA_COPY_MOVE_ABILITY(MosaicVector, default, default);
