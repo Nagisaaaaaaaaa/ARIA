@@ -136,6 +136,9 @@ TEST(MosaicVector, Base) {
           EXPECT_EQ(get<0>(v), 0);
           EXPECT_FLOAT_EQ(get<1>(v), 0.0F);
         }
+
+        vec1.clear();
+        EXPECT_EQ(vec1.size(), 0);
       }
 
       {
@@ -146,6 +149,9 @@ TEST(MosaicVector, Base) {
           EXPECT_EQ(get<0>(v), i);
           EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
         }
+
+        vec1.clear();
+        EXPECT_EQ(vec1.size(), 0);
       }
     });
   }
@@ -254,6 +260,9 @@ TEST(MosaicVector, Base) {
           EXPECT_EQ(get<1>(v), 0);
           EXPECT_EQ(get<2>(v), 0);
         }
+
+        vec1.clear();
+        EXPECT_EQ(vec1.size(), 0);
       }
 
       {
@@ -265,6 +274,9 @@ TEST(MosaicVector, Base) {
           EXPECT_EQ(get<1>(v), 2 * i);
           EXPECT_EQ(get<2>(v), 3 * i);
         }
+
+        vec1.clear();
+        EXPECT_EQ(vec1.size(), 0);
       }
     });
   }
@@ -295,7 +307,7 @@ TEST(MosaicVector, Copy) {
         EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
       }
 
-      vec1.resize(10);
+      vec1.clear();
       TMosaicVector1 &vec1Ref = (vec1 = vec0);
       EXPECT_EQ(vec1.size(), 5);
       for (int i = 0; i < 5; ++i) {
