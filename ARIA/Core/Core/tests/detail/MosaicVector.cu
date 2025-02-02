@@ -50,11 +50,6 @@ TEST(MosaicVector, Base) {
     MosaicVector<TMosaic> vec;
     EXPECT_EQ(vec.size(), 0);
 
-    {
-      MosaicVector<TMosaic> vec1(5);
-      EXPECT_EQ(vec1.size(), 5);
-    }
-
     vec.resize(5);
     EXPECT_EQ(vec.size(), 5);
 
@@ -122,10 +117,31 @@ TEST(MosaicVector, Base) {
         EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
 
         vProp *= 0;
+        v = vProp;
         EXPECT_EQ(get<0>(v), 0);
         EXPECT_FLOAT_EQ(get<1>(v), 0.0F);
 
         ++i;
+      }
+    }
+
+    {
+      MosaicVector<TMosaic> vec1(5);
+      EXPECT_EQ(vec1.size(), 5);
+      for (int i = 0; i < 5; ++i) {
+        T v = vec1[i];
+        EXPECT_EQ(get<0>(v), 0);
+        EXPECT_FLOAT_EQ(get<1>(v), 0.0F);
+      }
+    }
+
+    {
+      MosaicVector<TMosaic> vec1{T{0, 0.1F}, T{1, 1.2F}, T{2, 2.3F}, T{3, 3.4F}, T{4, 4.5F}};
+      EXPECT_EQ(vec1.size(), 5);
+      for (int i = 0; i < 5; ++i) {
+        T v = vec1[i];
+        EXPECT_EQ(get<0>(v), i);
+        EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
       }
     }
   }

@@ -59,9 +59,15 @@ public:
   using value_type = T;
 
 public:
-  constexpr MosaicVector() {}
+  constexpr MosaicVector() = default;
 
   constexpr explicit MosaicVector(size_t n) { resize(n); }
+
+  constexpr MosaicVector(std::initializer_list<T> list) : MosaicVector(list.size()) {
+    const T *begin = list.begin();
+    for (size_t i = 0; i < list.size(); ++i)
+      operator[](i) = *(begin + i);
+  }
 
   ARIA_COPY_MOVE_ABILITY(MosaicVector, default, default);
 
