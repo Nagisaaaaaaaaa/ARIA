@@ -10,10 +10,10 @@ namespace ARIA {
 namespace mosaic::detail {
 
 template <MosaicPattern TMosaicPattern, typename TSpaceHostOrDevice, typename... Ts>
-struct reduce_mosaic_vector_storage_type;
+struct mosaic_vector_storage_type;
 
 template <MosaicPattern TMosaicPattern, typename... Ts>
-struct reduce_mosaic_vector_storage_type<TMosaicPattern, SpaceHost, Ts...> {
+struct mosaic_vector_storage_type<TMosaicPattern, SpaceHost, Ts...> {
 private:
   template <type_array::detail::NonArrayType... Us>
   static consteval auto impl(TypeArray<Us...>) {
@@ -26,7 +26,7 @@ public:
 };
 
 template <MosaicPattern TMosaicPattern, typename... Ts>
-struct reduce_mosaic_vector_storage_type<TMosaicPattern, SpaceDevice, Ts...> {
+struct mosaic_vector_storage_type<TMosaicPattern, SpaceDevice, Ts...> {
 private:
   template <type_array::detail::NonArrayType... Us>
   static consteval auto impl(TypeArray<Us...>) {
@@ -39,8 +39,8 @@ public:
 };
 
 template <MosaicPattern TMosaicPattern, typename TSpaceHostOrDevice, typename... Ts>
-using reduce_mosaic_vector_storage_type_t =
-    typename reduce_mosaic_vector_storage_type<TMosaicPattern, TSpaceHostOrDevice, Ts...>::type;
+using mosaic_vector_storage_type_t =
+    typename mosaic_vector_storage_type<TMosaicPattern, TSpaceHostOrDevice, Ts...>::type;
 
 //
 //
@@ -53,7 +53,7 @@ private:
 
   using T = typename is_mosaic<TMosaic>::T;
   using TMosaicPattern = typename is_mosaic<TMosaic>::TMosaicPattern;
-  using TStorage = reduce_mosaic_vector_storage_type_t<TMosaicPattern, SpaceHost, Ts...>;
+  using TStorage = mosaic_vector_storage_type_t<TMosaicPattern, SpaceHost, Ts...>;
 
 public:
   using value_type = T;
@@ -121,6 +121,9 @@ public:
 private:
   TStorage storage_;
 };
+
+//! CTAD is not supported because `TMosaic` can never
+//! be deduced by the constructor parameters.
 
 } // namespace mosaic::detail
 
