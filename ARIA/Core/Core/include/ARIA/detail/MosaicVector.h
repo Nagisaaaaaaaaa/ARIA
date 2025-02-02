@@ -55,10 +55,19 @@ private:
   using TMosaicPattern = typename is_mosaic<TMosaic>::TMosaicPattern;
   using TStorage = reduce_mosaic_vector_storage_type_t<TMosaicPattern, SpaceHost, Ts...>;
 
-  static constexpr size_t size = tuple_size_recursive_v<TMosaicPattern>;
-
 public:
   using value_type = T;
+
+public:
+  constexpr MosaicVector() : MosaicVector(0) {}
+
+  constexpr explicit MosaicVector(size_t n) { resize(n); }
+
+  constexpr void resize(size_t n) {
+    ForEach<rank_v<TStorage>>([&]<auto i>() { get<i>(storage_).resize(n); });
+  }
+
+  constexpr size_t size() const { return get<0>(storage_).size(); }
 
 private:
   TStorage storage_;
