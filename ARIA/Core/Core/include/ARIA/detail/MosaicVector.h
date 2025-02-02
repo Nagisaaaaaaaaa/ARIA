@@ -69,6 +69,36 @@ public:
 
   constexpr size_t size() const { return get<0>(storage_).size(); }
 
+  constexpr auto begin() {
+    return cute::apply(storage_, []<typename... S>(S &&...s) {
+      return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).begin()...});
+    });
+  }
+
+  constexpr auto end() {
+    return cute::apply(storage_, []<typename... S>(S &&...s) {
+      return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).end()...});
+    });
+  }
+
+  constexpr auto cbegin() const {
+    return cute::apply(storage_, []<typename... S>(S &&...s) {
+      return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).cbegin()...});
+    });
+  }
+
+  constexpr auto cend() const {
+    return cute::apply(storage_, []<typename... S>(S &&...s) {
+      return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).cend()...});
+    });
+  }
+
+  constexpr auto data() {
+    return cute::apply(storage_, []<typename... S>(S &&...s) {
+      return make_mosaic_pointer<TMosaic>(Tup{std::forward<S>(s).data()...});
+    });
+  }
+
 private:
   TStorage storage_;
 };
