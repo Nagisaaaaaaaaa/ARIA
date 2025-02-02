@@ -59,10 +59,17 @@ public:
   using value_type = T;
 
 public:
-  constexpr MosaicVector() : MosaicVector(0) {}
+  constexpr MosaicVector() {}
 
   constexpr explicit MosaicVector(size_t n) { resize(n); }
 
+  constexpr explicit MosaicVector(std::initializer_list<value_type> list) {
+    ForEach<rank_v<TStorage>>([&]<auto i>() { get<i>(storage_) = list; });
+  }
+
+  ARIA_COPY_MOVE_ABILITY(MosaicVector, default, default);
+
+public:
   constexpr void resize(size_t n) {
     ForEach<rank_v<TStorage>>([&]<auto i>() { get<i>(storage_).resize(n); });
   }
