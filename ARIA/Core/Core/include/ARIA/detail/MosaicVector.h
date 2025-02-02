@@ -45,7 +45,7 @@ using mosaic_vector_storage_type_t =
 //
 //
 //
-template <typename TMosaic, typename... Ts>
+template <typename TMosaic, typename TSpaceHostOrDevice, typename... Ts>
   requires(is_mosaic_v<TMosaic>)
 class MosaicVector final {
 private:
@@ -53,7 +53,7 @@ private:
 
   using T = typename is_mosaic<TMosaic>::T;
   using TMosaicPattern = typename is_mosaic<TMosaic>::TMosaicPattern;
-  using TStorage = mosaic_vector_storage_type_t<TMosaicPattern, SpaceHost, Ts...>;
+  using TStorage = mosaic_vector_storage_type_t<TMosaicPattern, TSpaceHostOrDevice, Ts...>;
 
 public:
   using value_type = T;
