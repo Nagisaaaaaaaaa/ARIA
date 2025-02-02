@@ -16,7 +16,7 @@ template <MosaicPattern TMosaicPattern, typename... Ts>
 struct reduce_mosaic_vector_storage_type<TMosaicPattern, SpaceHost, Ts...> {
 private:
   template <type_array::detail::NonArrayType... Us>
-  consteval auto impl(MakeTypeArray<Us...>) {
+  static consteval auto impl(TypeArray<Us...>) {
     using TStorage = Tup<thrust::host_vector<Us, Ts...>...>;
     return TStorage{};
   }
@@ -29,7 +29,7 @@ template <MosaicPattern TMosaicPattern, typename... Ts>
 struct reduce_mosaic_vector_storage_type<TMosaicPattern, SpaceDevice, Ts...> {
 private:
   template <type_array::detail::NonArrayType... Us>
-  consteval auto impl(MakeTypeArray<Us...>) {
+  static consteval auto impl(TypeArray<Us...>) {
     using TStorage = Tup<thrust::device_vector<Us, Ts...>...>;
     return TStorage{};
   }
