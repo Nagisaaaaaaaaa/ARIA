@@ -121,6 +121,15 @@ ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const Tup<TIterator>
   return get<0>(iterator);
 }
 
+//
+//
+//
+// "Pointers" can be regarded as a subset of "iterators".
+template <typename T, typename... TPointers>
+ARIA_HOST_DEVICE static constexpr auto make_mosaic_pointer(const Tup<TPointers...> &pointers) {
+  return make_mosaic_iterator<T>(pointers);
+}
+
 } // namespace mosaic::detail
 
 } // namespace ARIA
