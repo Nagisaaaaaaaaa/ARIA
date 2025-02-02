@@ -52,22 +52,34 @@ TEST(MosaicIterator, Mosaic) {
 
     std::vector<int> is = {0, 1, 2, 3, 4};
     std::array<float, 5> fs = {0.1F, 1.2F, 2.3F, 3.4F, 4.5F};
+    const let &isC = is;
+    const let &fsC = fs;
 
     {
       let begin = make_mosaic_iterator<TMosaic>(Tup{is.begin(), fs.begin()});
       let end = make_mosaic_iterator<TMosaic>(Tup{is.end(), fs.end()});
       let beginC = make_mosaic_iterator<TMosaic>(Tup{is.cbegin(), fs.cbegin()});
       let endC = make_mosaic_iterator<TMosaic>(Tup{is.cend(), fs.cend()});
+      let data = make_mosaic_pointer<TMosaic>(Tup{is.data(), fs.data()});
+      let dataC = make_mosaic_pointer<TMosaic>(Tup{isC.data(), fsC.data()});
 
       static_assert(Property<decltype(*begin)>);
       static_assert(Property<decltype(*end)>);
       static_assert(Property<decltype(*beginC)>);
       static_assert(Property<decltype(*endC)>);
+      static_assert(Property<decltype(*data)>);
+      static_assert(Property<decltype(*dataC)>);
+
+      static_assert(std::is_same_v<decltype(*begin), decltype(*data)>);
+      static_assert(std::is_same_v<decltype(*end), decltype(*data)>);
+      static_assert(std::is_same_v<decltype(*beginC), decltype(*dataC)>);
+      static_assert(std::is_same_v<decltype(*endC), decltype(*dataC)>);
     }
 
     {
       let begin = make_mosaic_iterator<TMosaic>(Tup{is.begin(), fs.begin()});
       let end = make_mosaic_iterator<TMosaic>(Tup{is.end(), fs.end()});
+      let data = make_mosaic_pointer<TMosaic>(Tup{is.data(), fs.data()});
 
       for (let it = begin; it != end; ++it) {
         let v = Let(*it);
@@ -110,6 +122,30 @@ TEST(MosaicIterator, Mosaic) {
           EXPECT_FLOAT_EQ(get<1>(v), 14.51F);
         }
       }
+
+      EXPECT_EQ(end - begin, 5);
+      for (size_t i = 0; i < end - begin; ++i) {
+        let ptr = data + i;
+        let v = Let(*ptr);
+        static_assert(std::is_same_v<decltype(v), T>);
+
+        if (ptr == data + 0) {
+          EXPECT_EQ(get<0>(v), 10);
+          EXPECT_FLOAT_EQ(get<1>(v), 10.11F);
+        } else if (ptr == data + 1) {
+          EXPECT_EQ(get<0>(v), 11);
+          EXPECT_FLOAT_EQ(get<1>(v), 11.21F);
+        } else if (ptr == data + 2) {
+          EXPECT_EQ(get<0>(v), 12);
+          EXPECT_FLOAT_EQ(get<1>(v), 12.31F);
+        } else if (ptr == data + 3) {
+          EXPECT_EQ(get<0>(v), 13);
+          EXPECT_FLOAT_EQ(get<1>(v), 13.41F);
+        } else if (ptr == data + 4) {
+          EXPECT_EQ(get<0>(v), 14);
+          EXPECT_FLOAT_EQ(get<1>(v), 14.51F);
+        }
+      }
     }
 
     for (int i = 0; i < 5; ++i) {
@@ -126,22 +162,35 @@ TEST(MosaicIterator, Mosaic) {
     std::array<int, 5> is0 = {0, 1, 2, 3, 4};
     thrust::host_vector<int> is1 = {0, -2, -4, -6, -8};
     thrust::device_vector<int> is2 = {0, 3, 6, 9, 12};
+    const let &is0C = is0;
+    const let &is1C = is1;
+    const let &is2C = is2;
 
     {
       let begin = make_mosaic_iterator<TMosaic>(Tup{is0.begin(), is1.begin(), is2.begin()});
       let end = make_mosaic_iterator<TMosaic>(Tup{is0.end(), is1.end(), is2.end()});
       let beginC = make_mosaic_iterator<TMosaic>(Tup{is0.cbegin(), is1.cbegin(), is2.cbegin()});
       let endC = make_mosaic_iterator<TMosaic>(Tup{is0.cend(), is1.cend(), is2.cend()});
+      let data = make_mosaic_pointer<TMosaic>(Tup{is0.data(), is1.data(), is2.data()});
+      let dataC = make_mosaic_pointer<TMosaic>(Tup{is0C.data(), is1C.data(), is2C.data()});
 
       static_assert(Property<decltype(*begin)>);
       static_assert(Property<decltype(*end)>);
       static_assert(Property<decltype(*beginC)>);
       static_assert(Property<decltype(*endC)>);
+      static_assert(Property<decltype(*data)>);
+      static_assert(Property<decltype(*dataC)>);
+
+      static_assert(std::is_same_v<decltype(*begin), decltype(*data)>);
+      static_assert(std::is_same_v<decltype(*end), decltype(*data)>);
+      static_assert(std::is_same_v<decltype(*beginC), decltype(*dataC)>);
+      static_assert(std::is_same_v<decltype(*endC), decltype(*dataC)>);
     }
 
     {
       let begin = make_mosaic_iterator<TMosaic>(Tup{is0.begin(), is1.begin(), is2.begin()});
       let end = make_mosaic_iterator<TMosaic>(Tup{is0.end(), is1.end(), is2.end()});
+      let data = make_mosaic_pointer<TMosaic>(Tup{is0.data(), is1.data(), is2.data()});
 
       for (let it = begin; it != end; ++it) {
         let v = Let(*it);
@@ -177,6 +226,17 @@ TEST(MosaicIterator, Mosaic) {
         EXPECT_EQ(get<1>(v), 50);
         EXPECT_EQ(get<2>(v), 500);
       }
+
+      EXPECT_EQ(end - begin, 5);
+      for (size_t i = 0; i < end - begin; ++i) {
+        let ptr = data + i;
+        let v = Let(*ptr);
+        static_assert(std::is_same_v<decltype(v), T>);
+
+        EXPECT_EQ(get<0>(v), 5);
+        EXPECT_EQ(get<1>(v), 50);
+        EXPECT_EQ(get<2>(v), 500);
+      }
     }
 
     for (int i = 0; i < 5; ++i) {
@@ -192,32 +252,47 @@ TEST(MosaicIterator, NonMosaic) {
 
   // `int`.
   std::array<int, 5> is = {0, 1, 2, 3, 4};
+  const let &isC = is;
 
   {
     let begin = make_mosaic_iterator<int>(Tup{is.begin()});
     let end = make_mosaic_iterator<int>(Tup{is.end()});
     let beginC = make_mosaic_iterator<int>(Tup{is.cbegin()});
     let endC = make_mosaic_iterator<int>(Tup{is.cend()});
+    let data = make_mosaic_pointer<int>(Tup{is.data()});
+    let dataC = make_mosaic_pointer<int>(Tup{isC.data()});
 
     static_assert(!Property<decltype(*begin)>);
     static_assert(!Property<decltype(*end)>);
     static_assert(!Property<decltype(*beginC)>);
     static_assert(!Property<decltype(*endC)>);
+    static_assert(!Property<decltype(*data)>);
+    static_assert(!Property<decltype(*dataC)>);
 
     static_assert(std::is_same_v<decltype(begin), decltype(is.begin())>);
     static_assert(std::is_same_v<decltype(end), decltype(is.end())>);
     static_assert(std::is_same_v<decltype(beginC), decltype(is.cbegin())>);
     static_assert(std::is_same_v<decltype(endC), decltype(is.cend())>);
+    static_assert(std::is_same_v<decltype(data), decltype(is.data())>);
+    static_assert(std::is_same_v<decltype(dataC), decltype(isC.data())>);
 
     static_assert(std::is_same_v<decltype(*begin), int &>);
     static_assert(std::is_same_v<decltype(*end), int &>);
     static_assert(std::is_same_v<decltype(*beginC), const int &>);
     static_assert(std::is_same_v<decltype(*endC), const int &>);
+    static_assert(std::is_same_v<decltype(*data), int &>);
+    static_assert(std::is_same_v<decltype(*dataC), const int &>);
+
+    static_assert(std::is_same_v<decltype(*begin), decltype(*data)>);
+    static_assert(std::is_same_v<decltype(*end), decltype(*data)>);
+    static_assert(std::is_same_v<decltype(*beginC), decltype(*dataC)>);
+    static_assert(std::is_same_v<decltype(*endC), decltype(*dataC)>);
   }
 
   {
     let begin = make_mosaic_iterator<int>(Tup{is.begin()});
     let end = make_mosaic_iterator<int>(Tup{is.end()});
+    let data = make_mosaic_pointer<int>(Tup{is.data()});
 
     for (let it = begin; it != end; ++it) {
       let v = *it;
@@ -247,6 +322,25 @@ TEST(MosaicIterator, NonMosaic) {
       } else if (it == begin + 3) {
         EXPECT_EQ(v, 13);
       } else if (it == begin + 4) {
+        EXPECT_EQ(v, 14);
+      }
+    }
+
+    EXPECT_EQ(end - begin, 5);
+    for (size_t i = 0; i < end - begin; ++i) {
+      let ptr = data + i;
+      let v = *ptr;
+      static_assert(std::is_same_v<decltype(v), int>);
+
+      if (ptr == data + 0) {
+        EXPECT_EQ(v, 10);
+      } else if (ptr == data + 1) {
+        EXPECT_EQ(v, 11);
+      } else if (ptr == data + 2) {
+        EXPECT_EQ(v, 12);
+      } else if (ptr == data + 3) {
+        EXPECT_EQ(v, 13);
+      } else if (ptr == data + 4) {
         EXPECT_EQ(v, 14);
       }
     }
