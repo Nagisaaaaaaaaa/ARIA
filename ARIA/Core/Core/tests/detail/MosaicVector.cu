@@ -61,7 +61,7 @@ TEST(MosaicVector, Base) {
       vec[i] = T{i, i + (i + 1) * 0.1F};
       v = vec[i];
       EXPECT_EQ(get<0>(v), i);
-      EXPECT_FLOAT_EQ(get<1>(v), (i + 1) * 0.1F);
+      EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
     }
   }
 }
