@@ -1,3 +1,4 @@
+#include "ARIA/Let.h"
 #include "ARIA/detail/MosaicVector.h"
 
 #include <gtest/gtest.h>
@@ -46,7 +47,17 @@ TEST(MosaicVector, Base) {
     using T = Tup<int, float>;
     using TMosaic = Mosaic<T, PatternIF>;
 
-    MosaicVector<TMosaic> v;
+    MosaicVector<TMosaic> vec;
+    EXPECT_EQ(vec.size(), 0);
+
+    vec.resize(5);
+    EXPECT_EQ(vec.size(), 5);
+
+    for (int i = 0; i < 5; ++i) {
+      T v = vec[i];
+      EXPECT_EQ(get<0>(v), 0);
+      EXPECT_FLOAT_EQ(get<1>(v), 0.0F);
+    }
   }
 }
 
