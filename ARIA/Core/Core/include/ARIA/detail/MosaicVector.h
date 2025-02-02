@@ -70,6 +70,10 @@ public:
   ARIA_COPY_MOVE_ABILITY(MosaicVector, default, default);
 
 public:
+  constexpr auto operator[](size_t i) const { return *(data() + i); }
+
+  constexpr auto operator[](size_t i) { return *(data() + i); }
+
   constexpr void resize(size_t n) {
     ForEach<rank_v<TStorage>>([&]<auto i>() { get<i>(storage_).resize(n); });
   }
@@ -97,6 +101,12 @@ public:
   constexpr auto cend() const {
     return cute::apply(storage_, []<typename... S>(S &&...s) {
       return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).cend()...});
+    });
+  }
+
+  constexpr auto data() const {
+    return cute::apply(storage_, []<typename... S>(S &&...s) {
+      return make_mosaic_pointer<TMosaic>(Tup{std::forward<S>(s).data()...});
     });
   }
 
