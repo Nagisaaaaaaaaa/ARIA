@@ -92,6 +92,20 @@ TEST(MosaicVector, Base) {
       EXPECT_EQ(get<0>(v), 0);
       EXPECT_FLOAT_EQ(get<1>(v), 0.0F);
     }
+
+    for (int i = 0; i < 5; ++i) {
+      let ptr = vec.data() + i;
+      let v = Let(*ptr);
+      static_assert(Property<decltype(*ptr)>);
+      static_assert(std::is_same_v<decltype(v), T>);
+      EXPECT_EQ(get<0>(v), 0);
+      EXPECT_FLOAT_EQ(get<1>(v), 0.0F);
+
+      *ptr += T{i, i + (i + 1) * 0.1F};
+      v = *ptr;
+      EXPECT_EQ(get<0>(v), i);
+      EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
+    }
   }
 }
 
