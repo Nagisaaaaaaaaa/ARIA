@@ -3,6 +3,7 @@ if (ARIA_BUILD_TESTS)
       SOURCES
       detail/Macros.cpp
       detail/MosaicIterator.cu
+      detail/MosaicVector.cu
       #experimental/Lua.cpp
       Auto.cu
       BFloat16.cu
