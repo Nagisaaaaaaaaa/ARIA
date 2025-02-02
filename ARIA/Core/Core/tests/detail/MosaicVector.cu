@@ -50,6 +50,11 @@ TEST(MosaicVector, Base) {
     MosaicVector<TMosaic> vec;
     EXPECT_EQ(vec.size(), 0);
 
+    {
+      MosaicVector<TMosaic> vec1(5);
+      EXPECT_EQ(vec1.size(), 5);
+    }
+
     vec.resize(5);
     EXPECT_EQ(vec.size(), 5);
 
