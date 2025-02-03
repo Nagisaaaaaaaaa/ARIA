@@ -9,6 +9,9 @@ namespace ARIA {
 
 namespace mosaic::detail {
 
+// Given the `MosaicPattern` and some other template parameters,
+// deduce the storage type of the `MosaicVector`.
+// It will be something such as `Tup<thrust::host_vector<...>, thrust::host_vector<...>, ...>`.
 template <MosaicPattern TMosaicPattern, typename TSpaceHostOrDevice, typename... Ts>
 struct mosaic_vector_storage_type;
 
@@ -17,6 +20,7 @@ struct mosaic_vector_storage_type<TMosaicPattern, SpaceHost, Ts...> {
 private:
   template <type_array::detail::NonArrayType... Us>
   static consteval auto impl(TypeArray<Us...>) {
+    // Use `thrust::host_vector` for `SpaceHost`.
     using TStorage = Tup<thrust::host_vector<Us, Ts...>...>;
     return TStorage{};
   }
@@ -30,6 +34,7 @@ struct mosaic_vector_storage_type<TMosaicPattern, SpaceDevice, Ts...> {
 private:
   template <type_array::detail::NonArrayType... Us>
   static consteval auto impl(TypeArray<Us...>) {
+    // Use `thrust::device_vector` for `SpaceDevice`.
     using TStorage = Tup<thrust::device_vector<Us, Ts...>...>;
     return TStorage{};
   }
