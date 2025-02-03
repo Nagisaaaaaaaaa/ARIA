@@ -462,8 +462,8 @@ TEST(MosaicIterator, Copy) {
 
     const std::vector<int> srcIs = {0, 1, 2, 3, 4};
     const std::array<float, 5> srcFs = {0.1F, 1.2F, 2.3F, 3.4F, 4.5F};
-    std::vector<int> dstIs(5);
-    std::array<float, 5> dstFs;
+    std::array<int, 5> dstIs;
+    std::vector<float> dstFs(5);
 
     let srcBegin = make_mosaic_iterator<TMosaic>(Tup{srcIs.cbegin(), srcFs.cbegin()});
     let srcEnd = make_mosaic_iterator<TMosaic>(Tup{srcIs.cend(), srcFs.cend()});
