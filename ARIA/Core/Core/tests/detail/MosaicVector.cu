@@ -318,6 +318,42 @@ TEST(MosaicVector, Copy) {
       }
     });
   }
+
+  // `int, int, int`.
+  {
+    using T = Tup<int, int, int>;
+    using TMosaic = Mosaic<T, PatternIII>;
+
+    ForEach<MakeTypeArray<Tup<SpaceHost, SpaceHost>, Tup<SpaceDevice, SpaceHost>, Tup<SpaceHost, SpaceDevice>,
+                          Tup<SpaceDevice, SpaceDevice>>>([]<typename TSpaces>() {
+      using TSpace0 = tup_elem_t<0, TSpaces>;
+      using TSpace1 = tup_elem_t<1, TSpaces>;
+
+      using TMosaicVector0 = MosaicVector<TMosaic, TSpace0>;
+      using TMosaicVector1 = MosaicVector<TMosaic, TSpace1>;
+
+      TMosaicVector0 vec0{T{0, 0, 0}, T{1, 2, 3}, T{2, 4, 6}, T{3, 6, 9}, T{4, 8, 12}};
+      TMosaicVector1 vec1 = vec0; // Copy constructor.
+      EXPECT_EQ(vec1.size(), 5);
+      for (int i = 0; i < 5; ++i) {
+        T v = vec1[i];
+        EXPECT_EQ(get<0>(v), i);
+        EXPECT_EQ(get<1>(v), 2 * i);
+        EXPECT_EQ(get<2>(v), 3 * i);
+      }
+
+      vec1.clear();
+      EXPECT_EQ(vec1.size(), 0);
+      TMosaicVector1 &vec1Ref = (vec1 = vec0); // Copy assignment operator.
+      EXPECT_EQ(vec1.size(), 5);
+      for (int i = 0; i < 5; ++i) {
+        T v = vec1[i];
+        EXPECT_EQ(get<0>(v), i);
+        EXPECT_EQ(get<1>(v), 2 * i);
+        EXPECT_EQ(get<2>(v), 3 * i);
+      }
+    });
+  }
 }
 
 } // namespace ARIA
