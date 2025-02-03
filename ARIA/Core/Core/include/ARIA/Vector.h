@@ -4,6 +4,7 @@
 
 namespace ARIA {
 
+/// \example ```cpp
 /// // Define a mosaic pattern for `Vec3<T>`.
 /// template <typename T>
 /// struct Pattern {
@@ -27,6 +28,7 @@ namespace ARIA {
 /// VectorDevice<T> v1;       // Device vector with array of structures (AoS).
 /// VectorHost<TMosaic> v2;   // Host   vector with structure of arrays (SoA).
 /// VectorDevice<TMosaic> v3; // Device vector with structure of arrays (SoA).
+/// ```
 template <typename T, typename TSpaceHostOrDevice, typename... Ts>
 using Vector = mosaic::detail::reduce_vector_t<T, TSpaceHostOrDevice, Ts...>;
 
