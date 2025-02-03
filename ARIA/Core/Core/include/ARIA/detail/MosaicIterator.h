@@ -12,8 +12,8 @@ namespace ARIA {
 
 namespace mosaic::detail {
 
-// A `MosaicReference` is a proxy returned by dereferencing a "mosaic iterator".
-// Suppose `it` is a "mosaic iterator", then `*it` will return a `MosaicReference`.
+// A `MosaicReference` is a proxy returned by dereferencing a `MosaicIterator`.
+// Suppose `it` is a `MosaicIterator`, then `*it` will return a `MosaicReference`.
 //
 // Just like properties, several main features should be supported:
 // 1. Can be implicitly cast to `T`.
@@ -92,7 +92,7 @@ private:
 //
 //
 //
-// \brief Generate a "mosaic iterator" with a tuple of iterators which
+// \brief Generate a `MosaicIterator` with a tuple of iterators which
 // are consistent with the mosaic pattern.
 //
 // \example ```cpp
@@ -114,7 +114,7 @@ ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const Tup<TIterators
 
   return boost::make_transform_iterator(boost::make_zip_iterator(iteratorsBoost),
                                         []<typename TReferences>(const TReferences &references) {
-    // Suppose `it` is a "mosaic iterator", then `*it` will return a `MosaicReference`.
+    // Suppose `it` is a `MosaicIterator`, then `*it` will return a `MosaicReference`.
     return MosaicReference<TMosaic, TReferences>{references};
   });
 }
@@ -176,17 +176,17 @@ consteval auto BoostTuple2Tup(const boost::tuples::tuple<Ts...> &) {
 template <typename TBoostTuple>
 using boost_tuple_2_tup_t = decltype(BoostTuple2Tup(std::declval<TBoostTuple>()));
 
-// Cast "mosaic iterator" to `Tup`.
+// Cast `MosaicIterator` to `Tup`.
 template <typename TMosaicIterator>
 using mosaic_iterator_2_tup_t =
     boost_tuple_2_tup_t<decltype(std::declval<TMosaicIterator>().base().get_iterator_tuple())>;
 
-// Cast "mosaic pointer" to `Tup`.
+// Cast `MosaicPointer` to `Tup`.
 template <typename TMosaicPointer>
 using mosaic_pointer_2_tup_t =
     boost_tuple_2_tup_t<decltype(std::declval<TMosaicPointer>().base().get_iterator_tuple())>;
 
-// Cast "mosaic iterator" to `Tup`.
+// Cast `MosaicIterator` to `Tup`.
 template <typename TMosaicIterator>
 static constexpr auto MosaicIterator2Tup(const TMosaicIterator &iterator) {
   using TTup = mosaic_iterator_2_tup_t<TMosaicIterator>;
@@ -197,7 +197,7 @@ static constexpr auto MosaicIterator2Tup(const TMosaicIterator &iterator) {
   return res;
 }
 
-// Cast "mosaic pointer" to `Tup`.
+// Cast `MosaicPointer` to `Tup`.
 template <typename TMosaicPointer>
 static constexpr auto MosaicPointer2Tup(const TMosaicPointer &pointer) {
   using TTup = mosaic_pointer_2_tup_t<TMosaicPointer>;
