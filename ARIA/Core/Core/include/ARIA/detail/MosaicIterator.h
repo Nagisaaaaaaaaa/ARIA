@@ -35,9 +35,12 @@ namespace mosaic::detail {
 //    Automatically generate operators, satisfy `concept Property`, support `Auto`.
 // 2. Some duplications of codes.
 //    Similar to the implementation of `ARIA_PROP`.
-template <typename TMosaic, typename TReferences>
-  requires(is_mosaic_v<TMosaic>)
-class MosaicReference final : public property::detail::PropertyBase<MosaicReference<TMosaic, TReferences>> {
+template <typename TMosaic_, typename TReferences>
+  requires(is_mosaic_v<TMosaic_>)
+class MosaicReference final : public property::detail::PropertyBase<MosaicReference<TMosaic_, TReferences>> {
+public:
+  using TMosaic = TMosaic_;
+
 private:
   static_assert(ValidMosaic<TMosaic>, "The mosaic definition is invalid");
 
@@ -185,6 +188,11 @@ static constexpr auto MosaicPointer2Tup(const TMosaicPointer &pointer) {
 // Implementation of `copy` for "mosaic iterators".
 template <typename TItIn, typename TItOut>
 TItOut copy_mosaic(TItIn srcBegin, TItIn srcEnd, TItOut dst) {
+  using TMosaic = typename decltype(*dst)::TMosaic;
+  static_assert(std::is_same_v<typename decltype(*srcBegin)::TMosaic, TMosaic> &&
+                    std::is_same_v<typename decltype(*srcEnd)::TMosaic, TMosaic>,
+                "Inconsistent mosaic definitions of mosaic iterators");
+
   auto srcBeginTup = Auto(MosaicIterator2Tup(srcBegin));
   auto srcEndTup = Auto(MosaicIterator2Tup(srcEnd));
   auto dstTup = Auto(MosaicIterator2Tup(dst));
@@ -200,7 +208,7 @@ TItOut copy_mosaic(TItIn srcBegin, TItIn srcEnd, TItOut dst) {
   ForEach<rank>(
       [&]<auto i>() { get<i>(resTup) = thrust::copy(get<i>(srcBeginTup), get<i>(srcEndTup), get<i>(dstTup)); });
 
-  return make_mosaic_iterator<...>(resTup);
+  return make_mosaic_iterator<TMosaic>(resTup);
 }
 
 } // namespace mosaic::detail
