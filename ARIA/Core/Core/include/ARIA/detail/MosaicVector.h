@@ -96,12 +96,14 @@ public:
   }
 
   template <typename USpaceHostOrDevice, typename... Us>
+  //! Should skip the copy constructor.
     requires(!std::is_same_v<MosaicVector, MosaicVector<TMosaic, USpaceHostOrDevice, Us...>>)
   MosaicVector(const MosaicVector<TMosaic, USpaceHostOrDevice, Us...> &v) {
     operator=(v);
   }
 
   template <typename USpaceHostOrDevice, typename... Us>
+  //! Should skip the copy assignment operator.
     requires(!std::is_same_v<MosaicVector, MosaicVector<TMosaic, USpaceHostOrDevice, Us...>>)
   MosaicVector &operator=(const MosaicVector<TMosaic, USpaceHostOrDevice, Us...> &v) {
     ForEach<rank_v<TStorage>>([&]<auto i>() { get<i>(storage_) = get<i>(v.storage_); });
