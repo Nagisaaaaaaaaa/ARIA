@@ -4,26 +4,24 @@
 
 namespace ARIA {
 
+/// // Define a mosaic pattern for `Vec3<T>`.
+/// template <typename T>
 /// struct Pattern {
-///   struct {
-///     int v0;
-///     int v1;
-///   } v01;
-///
-///   int v2;
+///   T x, y, z;
 /// };
 ///
-/// template <>
-/// struct Mosaic<Tec<int, int, int>, Pattern> {
-///   Pattern operator()(const Tec<int, int, int> &v) const {
-///     return {.v01 = {.v0 = get<0>(v), .v1 = get<1>(v)}, .v2 = get<2>(v)};
-///   }
+/// // Define the mosaic for `Vec3<T>` and `Pattern<T>`.
+/// template <typename T>
+/// struct Mosaic<Vec3<T>, Pattern<T>> {
+///   // How to convert `Vec3<T>` to `Pattern<T>`.
+///   Pattern<T> operator()(const Vec3<T> &v) const { return {.x = v.x(), .y = v.y(), .z = v.z()}; }
 ///
-///   Tec<int, int, int> operator()(const Pattern &v) const { return {v.v01.v0, v.v01.v1, v.v2}; }
+///   // How to convert `Pattern<T>` to `Vec3<T>`.
+///   Vec3<T> operator()(const Pattern<T> &v) const { return {v.x, v.y, v.z}; }
 /// };
 ///
-/// using T = Tec<int, int, int>;
-/// using TMosaic = Mosaic<T, Pattern>;
+/// using T = Vec3<int>;
+/// using TMosaic = Mosaic<T, Pattern<int>>;
 ///
 /// VectorHost<T> v0;         // Host   vector with array of structures (AoS).
 /// VectorDevice<T> v1;       // Device vector with array of structures (AoS).
