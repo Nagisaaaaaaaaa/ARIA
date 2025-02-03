@@ -213,7 +213,7 @@ static constexpr auto MosaicPointer2Tup(const TMosaicPointer &pointer) {
 //
 // Implementation of `copy` for "mosaic iterators".
 template <MosaicIterator TItIn, MosaicIterator TItOut>
-TItOut copy_mosaic(TItIn srcBegin, TItIn srcEnd, TItOut dst) {
+TItOut copy(TItIn srcBegin, TItIn srcEnd, TItOut dst) {
   using TMosaic = typename decltype(*dst)::TMosaic;
   static_assert(std::is_same_v<typename decltype(*srcBegin)::TMosaic, TMosaic> &&
                     std::is_same_v<typename decltype(*srcEnd)::TMosaic, TMosaic>,
@@ -235,6 +235,12 @@ TItOut copy_mosaic(TItIn srcBegin, TItIn srcEnd, TItOut dst) {
       [&]<auto i>() { get<i>(resTup) = thrust::copy(get<i>(srcBeginTup), get<i>(srcEndTup), get<i>(dstTup)); });
 
   return make_mosaic_iterator<TMosaic>(resTup);
+}
+
+template <typename TItIn, typename TItOut>
+  requires(!MosaicIterator<TItIn> && !MosaicIterator<TItOut>)
+TItOut copy(TItIn srcBegin, TItIn srcEnd, TItOut dst) {
+  return thrust::copy(srcBegin, srcEnd, dst);
 }
 
 } // namespace mosaic::detail

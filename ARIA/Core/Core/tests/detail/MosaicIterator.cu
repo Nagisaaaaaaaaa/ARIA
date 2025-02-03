@@ -470,7 +470,7 @@ TEST(MosaicIterator, Copy) {
     let dstBegin = make_mosaic_iterator<TMosaic>(Tup{dstIs.begin(), dstFs.begin()});
     let dstEnd = make_mosaic_iterator<TMosaic>(Tup{dstIs.end(), dstFs.end()});
 
-    let res = copy_mosaic(srcBegin, srcEnd, dstBegin);
+    let res = copy(srcBegin, srcEnd, dstBegin);
     EXPECT_EQ(res, dstEnd);
     for (int i = 0; i < 5; ++i) {
       EXPECT_EQ(dstIs[i], i);
@@ -495,7 +495,7 @@ TEST(MosaicIterator, Copy) {
     let dstBegin = make_mosaic_iterator<TMosaic>(Tup{dstIs0.begin(), dstIs1.begin(), dstIs2.begin()});
     let dstEnd = make_mosaic_iterator<TMosaic>(Tup{dstIs0.end(), dstIs1.end(), dstIs2.end()});
 
-    let res = copy_mosaic(srcBegin, srcEnd, dstBegin);
+    let res = copy(srcBegin, srcEnd, dstBegin);
     EXPECT_EQ(res, dstEnd);
     for (int i = 0; i < 5; ++i) {
       EXPECT_EQ(dstIs0[i], i);
@@ -503,6 +503,8 @@ TEST(MosaicIterator, Copy) {
       EXPECT_EQ(dstIs2[i], 3 * i);
     }
   }
+
+  // `int`.
 }
 
 } // namespace ARIA
