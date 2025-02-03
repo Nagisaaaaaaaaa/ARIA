@@ -201,6 +201,9 @@ template <MosaicPointer TMosaicPointer>
 using mosaic_pointer_2_tup_t =
     boost_tuple_2_tup_t<decltype(std::declval<TMosaicPointer>().base().get_iterator_tuple())>;
 
+//
+//
+//
 // Cast `boost::tuples::tuple` to `Tup`.
 template <typename TBoostTuple>
 static constexpr auto BoostTuple2Tup(const TBoostTuple &tupleBoost) {
