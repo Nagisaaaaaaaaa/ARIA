@@ -70,10 +70,54 @@ TEST(MosaicIterator, Mosaic) {
       static_assert(Property<decltype(*data)>);
       static_assert(Property<decltype(*dataC)>);
 
+      static_assert(is_mosaic_reference_v<decltype(*begin)>);
+      static_assert(is_mosaic_reference_v<decltype(*end)>);
+      static_assert(is_mosaic_reference_v<decltype(*beginC)>);
+      static_assert(is_mosaic_reference_v<decltype(*endC)>);
+      static_assert(is_mosaic_reference_v<decltype(*data)>);
+      static_assert(is_mosaic_reference_v<decltype(*dataC)>);
+
+      static_assert(MosaicIterator<decltype(begin)>);
+      static_assert(MosaicIterator<decltype(end)>);
+      static_assert(MosaicIterator<decltype(beginC)>);
+      static_assert(MosaicIterator<decltype(endC)>);
+      static_assert(MosaicPointer<decltype(data)>);
+      static_assert(MosaicPointer<decltype(dataC)>);
+      static_assert(!MosaicIterator<decltype(is.begin())>);
+      static_assert(!MosaicPointer<decltype(is.data())>);
+      static_assert(!MosaicPointer<decltype(isC.data())>);
+
       static_assert(std::is_same_v<decltype(*begin), decltype(*data)>);
       static_assert(std::is_same_v<decltype(*end), decltype(*data)>);
       static_assert(std::is_same_v<decltype(*beginC), decltype(*dataC)>);
       static_assert(std::is_same_v<decltype(*endC), decltype(*dataC)>);
+
+      static_assert(std::is_same_v<boost_tuple_2_tup_t<decltype(begin.base().get_iterator_tuple())>,
+                                   decltype(Tup{is.begin(), fs.begin()})>);
+      static_assert(std::is_same_v<boost_tuple_2_tup_t<decltype(end.base().get_iterator_tuple())>,
+                                   decltype(Tup{is.end(), fs.end()})>);
+      static_assert(std::is_same_v<boost_tuple_2_tup_t<decltype(beginC.base().get_iterator_tuple())>,
+                                   decltype(Tup{is.cbegin(), fs.cbegin()})>);
+      static_assert(std::is_same_v<boost_tuple_2_tup_t<decltype(endC.base().get_iterator_tuple())>,
+                                   decltype(Tup{is.cend(), fs.cend()})>);
+      static_assert(std::is_same_v<boost_tuple_2_tup_t<decltype(data.base().get_iterator_tuple())>,
+                                   decltype(Tup{is.data(), fs.data()})>);
+      static_assert(std::is_same_v<boost_tuple_2_tup_t<decltype(dataC.base().get_iterator_tuple())>,
+                                   decltype(Tup{isC.data(), fsC.data()})>);
+
+      static_assert(std::is_same_v<mosaic_iterator_2_tup_t<decltype(begin)>, decltype(Tup{is.begin(), fs.begin()})>);
+      static_assert(std::is_same_v<mosaic_iterator_2_tup_t<decltype(end)>, decltype(Tup{is.end(), fs.end()})>);
+      static_assert(std::is_same_v<mosaic_iterator_2_tup_t<decltype(beginC)>, decltype(Tup{is.cbegin(), fs.cbegin()})>);
+      static_assert(std::is_same_v<mosaic_iterator_2_tup_t<decltype(endC)>, decltype(Tup{is.cend(), fs.cend()})>);
+      static_assert(std::is_same_v<mosaic_pointer_2_tup_t<decltype(data)>, decltype(Tup{is.data(), fs.data()})>);
+      static_assert(std::is_same_v<mosaic_pointer_2_tup_t<decltype(dataC)>, decltype(Tup{isC.data(), fsC.data()})>);
+
+      EXPECT_EQ(make_mosaic_iterator<TMosaic>(MosaicIterator2Tup(begin)), begin);
+      EXPECT_EQ(make_mosaic_iterator<TMosaic>(MosaicIterator2Tup(end)), end);
+      EXPECT_EQ(make_mosaic_iterator<TMosaic>(MosaicIterator2Tup(beginC)), beginC);
+      EXPECT_EQ(make_mosaic_iterator<TMosaic>(MosaicIterator2Tup(endC)), endC);
+      EXPECT_EQ(make_mosaic_pointer<TMosaic>(MosaicPointer2Tup(data)), data);
+      EXPECT_EQ(make_mosaic_pointer<TMosaic>(MosaicPointer2Tup(dataC)), dataC);
     }
 
     {
@@ -181,10 +225,60 @@ TEST(MosaicIterator, Mosaic) {
       static_assert(Property<decltype(*data)>);
       static_assert(Property<decltype(*dataC)>);
 
+      static_assert(is_mosaic_reference_v<decltype(*begin)>);
+      static_assert(is_mosaic_reference_v<decltype(*end)>);
+      static_assert(is_mosaic_reference_v<decltype(*beginC)>);
+      static_assert(is_mosaic_reference_v<decltype(*endC)>);
+      static_assert(is_mosaic_reference_v<decltype(*data)>);
+      static_assert(is_mosaic_reference_v<decltype(*dataC)>);
+
+      static_assert(MosaicIterator<decltype(begin)>);
+      static_assert(MosaicIterator<decltype(end)>);
+      static_assert(MosaicIterator<decltype(beginC)>);
+      static_assert(MosaicIterator<decltype(endC)>);
+      static_assert(MosaicPointer<decltype(data)>);
+      static_assert(MosaicPointer<decltype(dataC)>);
+      static_assert(!MosaicIterator<decltype(is0.begin())>);
+      static_assert(!MosaicPointer<decltype(is0.data())>);
+      static_assert(!MosaicPointer<decltype(is0C.data())>);
+
       static_assert(std::is_same_v<decltype(*begin), decltype(*data)>);
       static_assert(std::is_same_v<decltype(*end), decltype(*data)>);
       static_assert(std::is_same_v<decltype(*beginC), decltype(*dataC)>);
       static_assert(std::is_same_v<decltype(*endC), decltype(*dataC)>);
+
+      static_assert(std::is_same_v<boost_tuple_2_tup_t<decltype(begin.base().get_iterator_tuple())>,
+                                   decltype(Tup{is0.begin(), is1.begin(), is2.begin()})>);
+      static_assert(std::is_same_v<boost_tuple_2_tup_t<decltype(end.base().get_iterator_tuple())>,
+                                   decltype(Tup{is0.end(), is1.end(), is2.end()})>);
+      static_assert(std::is_same_v<boost_tuple_2_tup_t<decltype(beginC.base().get_iterator_tuple())>,
+                                   decltype(Tup{is0.cbegin(), is1.cbegin(), is2.cbegin()})>);
+      static_assert(std::is_same_v<boost_tuple_2_tup_t<decltype(endC.base().get_iterator_tuple())>,
+                                   decltype(Tup{is0.cend(), is1.cend(), is2.cend()})>);
+      static_assert(std::is_same_v<boost_tuple_2_tup_t<decltype(data.base().get_iterator_tuple())>,
+                                   decltype(Tup{is0.data(), is1.data(), is2.data()})>);
+      static_assert(std::is_same_v<boost_tuple_2_tup_t<decltype(dataC.base().get_iterator_tuple())>,
+                                   decltype(Tup{is0C.data(), is1C.data(), is2C.data()})>);
+
+      static_assert(std::is_same_v<mosaic_iterator_2_tup_t<decltype(begin)>, //
+                                   decltype(Tup{is0.begin(), is1.begin(), is2.begin()})>);
+      static_assert(std::is_same_v<mosaic_iterator_2_tup_t<decltype(end)>, //
+                                   decltype(Tup{is0.end(), is1.end(), is2.end()})>);
+      static_assert(std::is_same_v<mosaic_iterator_2_tup_t<decltype(beginC)>, //
+                                   decltype(Tup{is0.cbegin(), is1.cbegin(), is2.cbegin()})>);
+      static_assert(std::is_same_v<mosaic_iterator_2_tup_t<decltype(endC)>, //
+                                   decltype(Tup{is0.cend(), is1.cend(), is2.cend()})>);
+      static_assert(std::is_same_v<mosaic_pointer_2_tup_t<decltype(data)>, //
+                                   decltype(Tup{is0.data(), is1.data(), is2.data()})>);
+      static_assert(std::is_same_v<mosaic_pointer_2_tup_t<decltype(dataC)>, //
+                                   decltype(Tup{is0C.data(), is1C.data(), is2C.data()})>);
+
+      EXPECT_EQ(make_mosaic_iterator<TMosaic>(MosaicIterator2Tup(begin)), begin);
+      EXPECT_EQ(make_mosaic_iterator<TMosaic>(MosaicIterator2Tup(end)), end);
+      EXPECT_EQ(make_mosaic_iterator<TMosaic>(MosaicIterator2Tup(beginC)), beginC);
+      EXPECT_EQ(make_mosaic_iterator<TMosaic>(MosaicIterator2Tup(endC)), endC);
+      EXPECT_EQ(make_mosaic_pointer<TMosaic>(MosaicPointer2Tup(data)), data);
+      EXPECT_EQ(make_mosaic_pointer<TMosaic>(MosaicPointer2Tup(dataC)), dataC);
     }
 
     {
@@ -269,6 +363,13 @@ TEST(MosaicIterator, NonMosaic) {
     static_assert(!Property<decltype(*data)>);
     static_assert(!Property<decltype(*dataC)>);
 
+    static_assert(!MosaicIterator<decltype(begin)>);
+    static_assert(!MosaicIterator<decltype(end)>);
+    static_assert(!MosaicIterator<decltype(beginC)>);
+    static_assert(!MosaicIterator<decltype(endC)>);
+    static_assert(!MosaicPointer<decltype(data)>);
+    static_assert(!MosaicPointer<decltype(dataC)>);
+
     static_assert(std::is_same_v<decltype(begin), decltype(is.begin())>);
     static_assert(std::is_same_v<decltype(end), decltype(is.end())>);
     static_assert(std::is_same_v<decltype(beginC), decltype(is.cbegin())>);
@@ -348,6 +449,76 @@ TEST(MosaicIterator, NonMosaic) {
 
   for (int i = 0; i < 5; ++i) {
     EXPECT_EQ(is[i], i + 10);
+  }
+}
+
+TEST(MosaicIterator, Copy) {
+  using namespace mosaic::detail;
+
+  // `int, float`.
+  {
+    using T = Tup<int, float>;
+    using TMosaic = Mosaic<T, PatternIF>;
+
+    const std::vector<int> srcIs = {0, 1, 2, 3, 4};
+    const std::array<float, 5> srcFs = {0.1F, 1.2F, 2.3F, 3.4F, 4.5F};
+    std::array<int, 5> dstIs;
+    std::vector<float> dstFs(5);
+
+    let srcBegin = make_mosaic_iterator<TMosaic>(Tup{srcIs.cbegin(), srcFs.cbegin()});
+    let srcEnd = make_mosaic_iterator<TMosaic>(Tup{srcIs.cend(), srcFs.cend()});
+    let dstBegin = make_mosaic_iterator<TMosaic>(Tup{dstIs.begin(), dstFs.begin()});
+    let dstEnd = make_mosaic_iterator<TMosaic>(Tup{dstIs.end(), dstFs.end()});
+
+    let res = copy(srcBegin, srcEnd, dstBegin);
+    EXPECT_EQ(res, dstEnd);
+    for (int i = 0; i < 5; ++i) {
+      EXPECT_EQ(dstIs[i], i);
+      EXPECT_FLOAT_EQ(dstFs[i], i + (i + 1) * 0.1F);
+    }
+  }
+
+  // `int, int, int`.
+  {
+    using T = Tup<int, int, int>;
+    using TMosaic = Mosaic<T, PatternIII>;
+
+    const std::array<int, 5> srcIs0 = {0, 1, 2, 3, 4};
+    const thrust::host_vector<int> srcIs1 = {0, -2, -4, -6, -8};
+    const thrust::device_vector<int> srcIs2 = {0, 3, 6, 9, 12};
+    thrust::device_vector<int> dstIs0(5);
+    thrust::device_vector<int> dstIs1(5);
+    thrust::host_vector<int> dstIs2(5);
+
+    let srcBegin = make_mosaic_iterator<TMosaic>(Tup{srcIs0.cbegin(), srcIs1.cbegin(), srcIs2.cbegin()});
+    let srcEnd = make_mosaic_iterator<TMosaic>(Tup{srcIs0.cend(), srcIs1.cend(), srcIs2.cend()});
+    let dstBegin = make_mosaic_iterator<TMosaic>(Tup{dstIs0.begin(), dstIs1.begin(), dstIs2.begin()});
+    let dstEnd = make_mosaic_iterator<TMosaic>(Tup{dstIs0.end(), dstIs1.end(), dstIs2.end()});
+
+    let res = copy(srcBegin, srcEnd, dstBegin);
+    EXPECT_EQ(res, dstEnd);
+    for (int i = 0; i < 5; ++i) {
+      EXPECT_EQ(dstIs0[i], i);
+      EXPECT_EQ(dstIs1[i], -2 * i);
+      EXPECT_EQ(dstIs2[i], 3 * i);
+    }
+  }
+
+  // `int`.
+  {
+    const thrust::device_vector<int> srcIs = {0, 1, 2, 3, 4};
+    std::array<int, 5> dstIs;
+
+    let srcBegin = make_mosaic_iterator<int>(Tup{srcIs.begin()});
+    let srcEnd = make_mosaic_iterator<int>(Tup{srcIs.end()});
+    let dstBegin = make_mosaic_iterator<int>(Tup{dstIs.begin()});
+    let dstEnd = make_mosaic_iterator<int>(Tup{dstIs.end()});
+
+    let res = copy(srcBegin, srcEnd, dstBegin);
+    EXPECT_EQ(res, dstEnd);
+    for (int i = 0; i < 5; ++i) {
+      EXPECT_EQ(dstIs[i], i);
+    }
   }
 }
 

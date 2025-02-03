@@ -6,13 +6,14 @@
 
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/iterator/zip_iterator.hpp>
+#include <thrust/detail/copy.h>
 
 namespace ARIA {
 
 namespace mosaic::detail {
 
-// A `MosaicReference` is a proxy returned by dereferencing a "mosaic iterator".
-// Suppose `it` is a "mosaic iterator", then `*it` will return a `MosaicReference`.
+// A `MosaicReference` is a proxy returned by dereferencing a `MosaicIterator`.
+// Suppose `it` is a `MosaicIterator`, then `*it` will return a `MosaicReference`.
 //
 // Just like properties, several main features should be supported:
 // 1. Can be implicitly cast to `T`.
@@ -34,9 +35,12 @@ namespace mosaic::detail {
 //    Automatically generate operators, satisfy `concept Property`, support `Auto`.
 // 2. Some duplications of codes.
 //    Similar to the implementation of `ARIA_PROP`.
-template <typename TMosaic, typename TReferences>
-  requires(is_mosaic_v<TMosaic>)
-class MosaicReference final : public property::detail::PropertyBase<MosaicReference<TMosaic, TReferences>> {
+template <typename TMosaic_, typename TReferences>
+  requires(is_mosaic_v<TMosaic_>)
+class MosaicReference final : public property::detail::PropertyBase<MosaicReference<TMosaic_, TReferences>> {
+public:
+  using TMosaic = TMosaic_;
+
 private:
   static_assert(ValidMosaic<TMosaic>, "The mosaic definition is invalid");
 
@@ -88,7 +92,22 @@ private:
 //
 //
 //
-// \brief Generate a "mosaic iterator" with a tuple of iterators which
+// Whether the given type is `MosaicReference<...>`.
+template <typename T>
+struct is_mosaic_reference : std::false_type {};
+
+template <typename TMosaic, typename TReferences>
+struct is_mosaic_reference<MosaicReference<TMosaic, TReferences>> : std::true_type {};
+
+template <typename T>
+constexpr bool is_mosaic_reference_v = is_mosaic_reference<T>::value;
+
+//
+//
+//
+//
+//
+// \brief Generate a `MosaicIterator` with a tuple of iterators which
 // are consistent with the mosaic pattern.
 //
 // \example ```cpp
@@ -110,7 +129,7 @@ ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const Tup<TIterators
 
   return boost::make_transform_iterator(boost::make_zip_iterator(iteratorsBoost),
                                         []<typename TReferences>(const TReferences &references) {
-    // Suppose `it` is a "mosaic iterator", then `*it` will return a `MosaicReference`.
+    // Suppose `it` is a `MosaicIterator`, then `*it` will return a `MosaicReference`.
     return MosaicReference<TMosaic, TReferences>{references};
   });
 }
@@ -128,6 +147,119 @@ ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const Tup<TIterator>
 template <typename T, typename... TPointers>
 ARIA_HOST_DEVICE static constexpr auto make_mosaic_pointer(const Tup<TPointers...> &pointers) {
   return make_mosaic_iterator<T>(pointers);
+}
+
+//
+//
+//
+// Concepts `MosaicIterator` and `MosaicPointer`.
+template <typename T>
+struct is_mosaic_iterator : std::false_type {};
+
+template <typename T>
+  requires(is_mosaic_reference_v<decltype(*std::declval<T>())>)
+struct is_mosaic_iterator<T> : std::true_type {};
+
+template <typename T>
+constexpr bool is_mosaic_iterator_v = is_mosaic_iterator<T>::value;
+
+template <typename T>
+concept MosaicIterator = is_mosaic_iterator_v<T>;
+
+template <typename T>
+struct is_mosaic_pointer : is_mosaic_iterator<T> {}; // "Pointers" can be regarded as a subset of "iterators".
+
+template <typename T>
+constexpr bool is_mosaic_pointer_v = is_mosaic_pointer<T>::value;
+
+template <typename T>
+concept MosaicPointer = is_mosaic_pointer_v<T>;
+
+//
+//
+//
+//
+//
+template <typename... Ts>
+consteval auto BoostTuple2TupImpl(const boost::tuples::tuple<Ts...> &) {
+  using TArrayWithNullTypes = MakeTypeArray<Ts...>;
+  using TArray = TArrayWithNullTypes::template Remove<boost::tuples::null_type>;
+  return to_tup_t<TArray>{};
+}
+
+// Cast `boost::tuples::tuple` to `Tup`.
+template <typename TBoostTuple>
+using boost_tuple_2_tup_t = decltype(BoostTuple2TupImpl(std::declval<TBoostTuple>()));
+
+// Cast `MosaicIterator` to `Tup`.
+template <MosaicIterator TMosaicIterator>
+using mosaic_iterator_2_tup_t =
+    boost_tuple_2_tup_t<decltype(std::declval<TMosaicIterator>().base().get_iterator_tuple())>;
+
+// Cast `MosaicPointer` to `Tup`.
+template <MosaicPointer TMosaicPointer>
+using mosaic_pointer_2_tup_t =
+    boost_tuple_2_tup_t<decltype(std::declval<TMosaicPointer>().base().get_iterator_tuple())>;
+
+//
+//
+//
+// Cast `boost::tuples::tuple` to `Tup`.
+template <typename TBoostTuple>
+static constexpr auto BoostTuple2Tup(const TBoostTuple &tupleBoost) {
+  using TTup = boost_tuple_2_tup_t<TBoostTuple>;
+
+  TTup res;
+  ForEach<rank_v<TTup>>([&]<auto i>() { get<i>(res) = get<i>(tupleBoost); });
+  return res;
+}
+
+// Cast `MosaicIterator` to `Tup`.
+template <MosaicIterator TMosaicIterator>
+static constexpr auto MosaicIterator2Tup(const TMosaicIterator &iterator) {
+  return BoostTuple2Tup(iterator.base().get_iterator_tuple());
+}
+
+// Cast `MosaicPointer` to `Tup`.
+template <MosaicPointer TMosaicPointer>
+static constexpr auto MosaicPointer2Tup(const TMosaicPointer &pointer) {
+  return BoostTuple2Tup(pointer.base().get_iterator_tuple());
+}
+
+//
+//
+//
+//
+//
+//! `copy` does the same thing as `thrust::copy` but is able to handle `MosaicIterator`s.
+template <MosaicIterator TItIn, MosaicIterator TItOut>
+TItOut copy(TItIn srcBegin, TItIn srcEnd, TItOut dst) {
+  using TMosaic = typename decltype(*dst)::TMosaic;
+  static_assert(std::is_same_v<typename decltype(*srcBegin)::TMosaic, TMosaic>,
+                "Inconsistent mosaic definitions of mosaic iterators");
+
+  auto srcBeginTup = Auto(MosaicIterator2Tup(srcBegin));
+  auto srcEndTup = Auto(MosaicIterator2Tup(srcEnd));
+  auto dstTup = Auto(MosaicIterator2Tup(dst));
+
+  using TSrcTup = decltype(srcBeginTup);
+  using TDstTup = decltype(dstTup);
+
+  constexpr uint rank = rank_v<TDstTup>;
+  static_assert(rank_v<TSrcTup> == rank, "Inconsistent ranks of mosaic iterators");
+
+  TDstTup resTup;
+  ForEach<rank>(
+      [&]<auto i>() { get<i>(resTup) = thrust::copy(get<i>(srcBeginTup), get<i>(srcEndTup), get<i>(dstTup)); });
+
+  return make_mosaic_iterator<TMosaic>(resTup);
+}
+
+template <typename TItIn, typename TItOut>
+  requires(!MosaicIterator<TItIn> && !MosaicIterator<TItOut>)
+TItOut copy(TItIn srcBegin, TItIn srcEnd, TItOut dst) {
+  using T = decltype(Auto(*dst));
+  return make_mosaic_iterator<T>(Tup{thrust::copy(srcBegin, srcEnd, dst)});
 }
 
 } // namespace mosaic::detail
