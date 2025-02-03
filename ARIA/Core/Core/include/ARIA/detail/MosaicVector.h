@@ -113,11 +113,12 @@ public:
   ARIA_COPY_MOVE_ABILITY(MosaicVector, default, default);
 
 public:
-  constexpr size_t size() const { return get<0>(storage_).size(); }
-
   constexpr auto operator[](size_t i) const { return *(data() + i); }
 
   constexpr auto operator[](size_t i) { return *(data() + i); }
+
+public:
+  constexpr size_t size() const { return get<0>(storage_).size(); }
 
   constexpr void resize(size_t n) {
     ForEach<rank_v<TStorage>>([&]<auto i>() { get<i>(storage_).resize(n); });
