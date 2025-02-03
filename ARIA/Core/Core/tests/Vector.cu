@@ -158,6 +158,105 @@ TEST(Vector, Base) {
       }
     });
   }
+
+  // `int, int, int`.
+  {
+    using T = Tup<int, int, int>;
+    using TMosaic = Mosaic<T, PatternIII>;
+
+    ForEach<MakeTypeArray<     //
+        VectorHost<TMosaic>,   //
+        VectorDevice<TMosaic>, //
+        VectorHost<T>,         //
+        VectorDevice<T>        //
+        >>([]<typename TVector>() {
+      TVector vec;
+      EXPECT_EQ(vec.size(), 0);
+
+      vec.resize(5);
+      EXPECT_EQ(vec.size(), 5);
+
+      for (int i = 0; i < 5; ++i) {
+        T v = vec[i];
+        EXPECT_EQ(get<0>(v), 0);
+        EXPECT_EQ(get<1>(v), 0);
+        EXPECT_EQ(get<2>(v), 0);
+
+        vec[i] = T{i, 2 * i, 3 * i};
+        v = vec[i];
+        EXPECT_EQ(get<0>(v), i);
+        EXPECT_EQ(get<1>(v), 2 * i);
+        EXPECT_EQ(get<2>(v), 3 * i);
+      }
+
+      for (let it = vec.begin(); it != vec.end(); ++it) {
+        T v = *it;
+        let k = it - vec.begin();
+        int i = k;
+        static_assert(std::is_same_v<decltype(k), int64>);
+        EXPECT_EQ(get<0>(v), i);
+        EXPECT_EQ(get<1>(v), 2 * i);
+        EXPECT_EQ(get<2>(v), 3 * i);
+
+        *it = T{0, 0, 0};
+        v = vec[i];
+        EXPECT_EQ(get<0>(v), 0);
+        EXPECT_EQ(get<1>(v), 0);
+        EXPECT_EQ(get<2>(v), 0);
+      }
+
+      for (let it = vec.cbegin(); it != vec.cend(); ++it) {
+        T v = *it;
+        let k = it - vec.cbegin();
+        static_assert(std::is_same_v<decltype(k), int64>);
+        EXPECT_EQ(get<0>(v), 0);
+        EXPECT_EQ(get<1>(v), 0);
+        EXPECT_EQ(get<2>(v), 0);
+      }
+
+      for (int i = 0; i < 5; ++i) {
+        let ptr = vec.data() + i;
+        T v = *ptr;
+        EXPECT_EQ(get<0>(v), 0);
+        EXPECT_EQ(get<1>(v), 0);
+        EXPECT_EQ(get<2>(v), 0);
+
+        *ptr = T{i, 2 * i, 3 * i};
+        v = *ptr;
+        EXPECT_EQ(get<0>(v), i);
+        EXPECT_EQ(get<1>(v), 2 * i);
+        EXPECT_EQ(get<2>(v), 3 * i);
+      }
+
+      {
+        TVector vec1(5);
+        EXPECT_EQ(vec1.size(), 5);
+        for (int i = 0; i < 5; ++i) {
+          T v = vec1[i];
+          EXPECT_EQ(get<0>(v), 0);
+          EXPECT_EQ(get<1>(v), 0);
+          EXPECT_EQ(get<2>(v), 0);
+        }
+
+        vec1.clear();
+        EXPECT_EQ(vec1.size(), 0);
+      }
+
+      {
+        TVector vec1{T{0, 0, 0}, T{1, 2, 3}, T{2, 4, 6}, T{3, 6, 9}, T{4, 8, 12}};
+        EXPECT_EQ(vec1.size(), 5);
+        for (int i = 0; i < 5; ++i) {
+          T v = vec1[i];
+          EXPECT_EQ(get<0>(v), i);
+          EXPECT_EQ(get<1>(v), 2 * i);
+          EXPECT_EQ(get<2>(v), 3 * i);
+        }
+
+        vec1.clear();
+        EXPECT_EQ(vec1.size(), 0);
+      }
+    });
+  }
 }
 
 } // namespace ARIA
