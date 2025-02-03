@@ -168,8 +168,8 @@ private:
   TStorage storage_;
 };
 
-//! CTAD is not supported because `TMosaic` can never
-//! be deduced by the constructor parameters.
+//! Unable to define CTAD for `MosaicVector` because
+//! `TMosaic` can never be deduced by the constructor parameters.
 
 } // namespace mosaic::detail
 
