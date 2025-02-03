@@ -318,12 +318,12 @@ TEST(MosaicVector, Copy) {
       }
 
       for (int i = 0; i < 5; ++i)
-        vec1[i] = T{0, 0.0F};
-      copy(vec0.begin(), vec0.end(), vec1.begin());
+        vec0[i] *= -1;
+      copy(vec0.begin(), vec0.end(), vec1.begin()); // Copy by iterators.
       for (int i = 0; i < 5; ++i) {
         T v = vec1[i];
-        EXPECT_EQ(get<0>(v), i);
-        EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
+        EXPECT_EQ(get<0>(v), -i);
+        EXPECT_FLOAT_EQ(get<1>(v), -i - (i + 1) * 0.1F);
       }
     });
   }
@@ -363,13 +363,13 @@ TEST(MosaicVector, Copy) {
       }
 
       for (int i = 0; i < 5; ++i)
-        vec1[i] = {0, 0, 0};
-      copy(vec0.begin(), vec0.end(), vec1.begin());
+        vec0[i] *= -1;
+      copy(vec0.begin(), vec0.end(), vec1.begin()); // Copy by iterators.
       for (int i = 0; i < 5; ++i) {
         T v = vec1[i];
-        EXPECT_EQ(get<0>(v), i);
-        EXPECT_EQ(get<1>(v), 2 * i);
-        EXPECT_EQ(get<2>(v), 3 * i);
+        EXPECT_EQ(get<0>(v), -i);
+        EXPECT_EQ(get<1>(v), -2 * i);
+        EXPECT_EQ(get<2>(v), -3 * i);
       }
     });
   }
