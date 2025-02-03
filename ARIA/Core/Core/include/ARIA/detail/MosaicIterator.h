@@ -137,6 +137,32 @@ ARIA_HOST_DEVICE static constexpr auto make_mosaic_pointer(const Tup<TPointers..
 //
 //
 //
+// Concepts `MosaicIterator` and `MosaicPointer`.
+template <typename T>
+struct is_mosaic_iterator : std::false_type {};
+
+template <typename T>
+  requires(is_mosaic_v<typename decltype(*std::declval<T>())::TMosaic>)
+struct is_mosaic_iterator<T> : std::true_type {};
+
+template <typename T>
+constexpr bool is_mosaic_iterator_v = is_mosaic_iterator<T>::value;
+
+template <typename T>
+concept MosaicIterator = is_mosaic_iterator_v<T>;
+
+template <typename T>
+struct is_mosaic_pointer : is_mosaic_iterator<T> {};
+
+template <typename T>
+constexpr bool is_mosaic_pointer_v = is_mosaic_pointer<T>::value;
+
+template <typename T>
+concept MosaicPointer = is_mosaic_pointer_v<T>;
+
+//
+//
+//
 //
 //
 // Cast `boost::tuples::tuple` to `Tup`.
