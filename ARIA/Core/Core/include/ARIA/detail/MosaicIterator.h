@@ -240,7 +240,8 @@ TItOut copy(TItIn srcBegin, TItIn srcEnd, TItOut dst) {
 template <typename TItIn, typename TItOut>
   requires(!MosaicIterator<TItIn> && !MosaicIterator<TItOut>)
 TItOut copy(TItIn srcBegin, TItIn srcEnd, TItOut dst) {
-  return thrust::copy(srcBegin, srcEnd, dst);
+  using T = decltype(Auto(*dst));
+  return make_mosaic_iterator<T>(Tup{thrust::copy(srcBegin, srcEnd, dst)});
 }
 
 } // namespace mosaic::detail
