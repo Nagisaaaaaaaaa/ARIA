@@ -113,12 +113,12 @@ public:
   ARIA_COPY_MOVE_ABILITY(MosaicVector, default, default);
 
 public:
-  constexpr auto operator[](size_t i) const { return *(data() + i); }
+  [[nodiscard]] constexpr auto operator[](size_t i) const { return *(data() + i); }
 
-  constexpr auto operator[](size_t i) { return *(data() + i); }
+  [[nodiscard]] constexpr auto operator[](size_t i) { return *(data() + i); }
 
 public:
-  constexpr size_t size() const { return get<0>(storage_).size(); }
+  [[nodiscard]] constexpr size_t size() const { return get<0>(storage_).size(); }
 
   constexpr void resize(size_t n) {
     ForEach<rank_v<TStorage>>([&]<auto i>() { get<i>(storage_).resize(n); });
@@ -128,37 +128,37 @@ public:
     ForEach<rank_v<TStorage>>([&]<auto i>() { get<i>(storage_).clear(); });
   }
 
-  constexpr auto begin() {
+  [[nodiscard]] constexpr auto begin() {
     return cute::apply(storage_, []<typename... S>(S &&...s) {
       return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).begin()...});
     });
   }
 
-  constexpr auto end() {
+  [[nodiscard]] constexpr auto end() {
     return cute::apply(storage_, []<typename... S>(S &&...s) {
       return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).end()...});
     });
   }
 
-  constexpr auto cbegin() const {
+  [[nodiscard]] constexpr auto cbegin() const {
     return cute::apply(storage_, []<typename... S>(S &&...s) {
       return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).cbegin()...});
     });
   }
 
-  constexpr auto cend() const {
+  [[nodiscard]] constexpr auto cend() const {
     return cute::apply(storage_, []<typename... S>(S &&...s) {
       return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).cend()...});
     });
   }
 
-  constexpr auto data() const {
+  [[nodiscard]] constexpr auto data() const {
     return cute::apply(storage_, []<typename... S>(S &&...s) {
       return make_mosaic_pointer<TMosaic>(Tup{std::forward<S>(s).data()...});
     });
   }
 
-  constexpr auto data() {
+  [[nodiscard]] constexpr auto data() {
     return cute::apply(storage_, []<typename... S>(S &&...s) {
       return make_mosaic_pointer<TMosaic>(Tup{std::forward<S>(s).data()...});
     });
