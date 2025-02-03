@@ -105,6 +105,8 @@ constexpr bool is_mosaic_reference_v = is_mosaic_reference<T>::value;
 //
 //
 //
+//
+//
 // \brief Generate a `MosaicIterator` with a tuple of iterators which
 // are consistent with the mosaic pattern.
 //
@@ -165,7 +167,7 @@ template <typename T>
 concept MosaicIterator = is_mosaic_iterator_v<T>;
 
 template <typename T>
-struct is_mosaic_pointer : is_mosaic_iterator<T> {};
+struct is_mosaic_pointer : is_mosaic_iterator<T> {}; // "Pointers" can be regarded as a subset of "iterators".
 
 template <typename T>
 constexpr bool is_mosaic_pointer_v = is_mosaic_pointer<T>::value;
