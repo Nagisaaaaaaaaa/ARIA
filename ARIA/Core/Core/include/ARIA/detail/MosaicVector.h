@@ -45,9 +45,12 @@ using mosaic_vector_storage_type_t =
 //
 //
 //
-template <typename TMosaic, typename TSpaceHostOrDevice, typename... Ts>
-  requires(is_mosaic_v<TMosaic>)
+template <typename TMosaic_, typename TSpaceHostOrDevice, typename... Ts>
+  requires(is_mosaic_v<TMosaic_>)
 class MosaicVector final {
+public:
+  using TMosaic = TMosaic_;
+
 private:
   static_assert(ValidMosaic<TMosaic>, "The mosaic definition is invalid");
 
