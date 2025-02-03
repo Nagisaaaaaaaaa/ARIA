@@ -21,6 +21,26 @@ struct PatternIII {
   int v2;
 };
 
+template <typename T>
+class Vec3 {
+public:
+  Vec3(const T &x, const T &y, const T &z) : x_(x), y_(y), z_(z) {}
+
+  ARIA_COPY_MOVE_ABILITY(Vec3, default, default);
+
+  ARIA_REF_PROP(public, , x, x_);
+  ARIA_REF_PROP(public, , y, y_);
+  ARIA_REF_PROP(public, , z, z_);
+
+private:
+  T x_{}, y_{}, z_{};
+};
+
+template <typename T>
+struct PatternVec3 {
+  T x, y, z;
+};
+
 } // namespace
 
 template <>
@@ -39,12 +59,21 @@ struct Mosaic<Tec<int, int, int>, PatternIII> {
   Tec<int, int, int> operator()(const PatternIII &v) const { return {v.ii.v0, v.ii.v1, v.v2}; }
 };
 
+template <typename T>
+struct Mosaic<Vec3<T>, PatternVec3<T>> {
+  PatternVec3<T> operator()(const Vec3<T> &v) const { return {.x = v.x(), .y = v.y(), .z = v.z()}; }
+
+  Vec3<T> operator()(const PatternVec3<T> &v) const { return {v.x, v.y, v.z}; }
+};
+
 TEST(Vector, Base) {
   // Mosaic.
   {
-    ForEach<MakeTypeArray<                     //
-        Mosaic<Tup<int, float>, PatternIF>,    //
-        Mosaic<Tup<int, int, int>, PatternIII> //
+    ForEach<MakeTypeArray<                      //
+        Mosaic<Tup<int, float>, PatternIF>,     //
+        Mosaic<Tup<int, int, int>, PatternIII>, //
+        Mosaic<Vec3<int>, PatternVec3<int>>,    //
+        Mosaic<Vec3<float>, PatternVec3<float>> //
         >>([]<typename TMosaic>() {
       static_assert(std::is_same_v<Vector<TMosaic, SpaceHost>, mosaic::detail::MosaicVector<TMosaic, SpaceHost>>);
       static_assert(std::is_same_v<VectorHost<TMosaic>, mosaic::detail::MosaicVector<TMosaic, SpaceHost>>);
