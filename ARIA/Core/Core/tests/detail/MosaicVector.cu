@@ -299,7 +299,7 @@ TEST(MosaicVector, Copy) {
       using TMosaicVector1 = MosaicVector<TMosaic, TSpace1>;
 
       TMosaicVector0 vec0{T{0, 0.1F}, T{1, 1.2F}, T{2, 2.3F}, T{3, 3.4F}, T{4, 4.5F}};
-      TMosaicVector1 vec1 = vec0;
+      TMosaicVector1 vec1 = vec0; // Copy constructor.
       EXPECT_EQ(vec1.size(), 5);
       for (int i = 0; i < 5; ++i) {
         T v = vec1[i];
@@ -308,7 +308,8 @@ TEST(MosaicVector, Copy) {
       }
 
       vec1.clear();
-      TMosaicVector1 &vec1Ref = (vec1 = vec0);
+      EXPECT_EQ(vec1.size(), 0);
+      TMosaicVector1 &vec1Ref = (vec1 = vec0); // Copy assignment operator.
       EXPECT_EQ(vec1.size(), 5);
       for (int i = 0; i < 5; ++i) {
         T v = vec1[i];
