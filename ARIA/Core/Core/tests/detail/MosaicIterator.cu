@@ -505,6 +505,21 @@ TEST(MosaicIterator, Copy) {
   }
 
   // `int`.
+  {
+    const std::array<int, 5> srcIs = {0, 1, 2, 3, 4};
+    std::array<int, 5> dstIs;
+
+    let srcBegin = make_mosaic_iterator<int>(Tup{srcIs.begin()});
+    let srcEnd = make_mosaic_iterator<int>(Tup{srcIs.end()});
+    let dstBegin = make_mosaic_iterator<int>(Tup{dstIs.begin()});
+    let dstEnd = make_mosaic_iterator<int>(Tup{dstIs.end()});
+
+    let res = copy(srcBegin, srcEnd, dstBegin);
+    EXPECT_EQ(res, dstEnd);
+    for (int i = 0; i < 5; ++i) {
+      EXPECT_EQ(dstIs[i], i);
+    }
+  }
 }
 
 } // namespace ARIA
