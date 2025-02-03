@@ -155,7 +155,7 @@ template <typename T>
 struct is_mosaic_iterator : std::false_type {};
 
 template <typename T>
-  requires(is_mosaic_v<typename decltype(*std::declval<T>())::TMosaic>)
+  requires(is_mosaic_reference_v<decltype(*std::declval<T>())>)
 struct is_mosaic_iterator<T> : std::true_type {};
 
 template <typename T>
