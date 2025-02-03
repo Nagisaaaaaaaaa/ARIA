@@ -27,6 +27,7 @@ if (ARIA_BUILD_TESTS)
       Tup.cpp
       TypeArray.cpp
       TypeSet.cpp
+      Vector.cu
       HARD_DEPENDENCIES
       ARIA::Core::Core
   )
