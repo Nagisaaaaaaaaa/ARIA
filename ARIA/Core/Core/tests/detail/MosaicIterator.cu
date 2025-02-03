@@ -477,6 +477,32 @@ TEST(MosaicIterator, Copy) {
       EXPECT_FLOAT_EQ(dstFs[i], i + (i + 1) * 0.1F);
     }
   }
+
+  // `int, int, int`.
+  {
+    using T = Tup<int, int, int>;
+    using TMosaic = Mosaic<T, PatternIII>;
+
+    const std::array<int, 5> srcIs0 = {0, 1, 2, 3, 4};
+    const thrust::host_vector<int> srcIs1 = {0, -2, -4, -6, -8};
+    const thrust::device_vector<int> srcIs2 = {0, 3, 6, 9, 12};
+    std::array<int, 5> dstIs0;
+    thrust::host_vector<int> dstIs1(5);
+    thrust::device_vector<int> dstIs2(5);
+
+    let srcBegin = make_mosaic_iterator<TMosaic>(Tup{srcIs0.cbegin(), srcIs1.cbegin(), srcIs2.cbegin()});
+    let srcEnd = make_mosaic_iterator<TMosaic>(Tup{srcIs0.cend(), srcIs1.cend(), srcIs2.cend()});
+    let dstBegin = make_mosaic_iterator<TMosaic>(Tup{dstIs0.begin(), dstIs1.begin(), dstIs2.begin()});
+    let dstEnd = make_mosaic_iterator<TMosaic>(Tup{dstIs0.end(), dstIs1.end(), dstIs2.end()});
+
+    let res = copy_mosaic(srcBegin, srcEnd, dstBegin);
+    EXPECT_EQ(res, dstEnd);
+    for (int i = 0; i < 5; ++i) {
+      EXPECT_EQ(dstIs0[i], i);
+      EXPECT_EQ(dstIs1[i], -2 * i);
+      EXPECT_EQ(dstIs2[i], 3 * i);
+    }
+  }
 }
 
 } // namespace ARIA
