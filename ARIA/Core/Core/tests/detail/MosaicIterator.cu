@@ -77,15 +77,15 @@ TEST(MosaicIterator, Mosaic) {
       static_assert(std::is_same_v<decltype(*data)::TMosaic, TMosaic>);
       static_assert(std::is_same_v<decltype(*dataC)::TMosaic, TMosaic>);
 
-      static_assert(is_mosaic_iterator_v<decltype(begin)>);
-      static_assert(is_mosaic_iterator_v<decltype(end)>);
-      static_assert(is_mosaic_iterator_v<decltype(beginC)>);
-      static_assert(is_mosaic_iterator_v<decltype(endC)>);
-      static_assert(is_mosaic_pointer_v<decltype(data)>);
-      static_assert(is_mosaic_pointer_v<decltype(dataC)>);
-      static_assert(!is_mosaic_iterator_v<decltype(is.begin())>);
-      static_assert(!is_mosaic_pointer_v<decltype(is.data())>);
-      static_assert(!is_mosaic_pointer_v<decltype(isC.data())>);
+      static_assert(MosaicIterator<decltype(begin)>);
+      static_assert(MosaicIterator<decltype(end)>);
+      static_assert(MosaicIterator<decltype(beginC)>);
+      static_assert(MosaicIterator<decltype(endC)>);
+      static_assert(MosaicPointer<decltype(data)>);
+      static_assert(MosaicPointer<decltype(dataC)>);
+      static_assert(!MosaicIterator<decltype(is.begin())>);
+      static_assert(!MosaicPointer<decltype(is.data())>);
+      static_assert(!MosaicPointer<decltype(isC.data())>);
 
       static_assert(std::is_same_v<decltype(*begin), decltype(*data)>);
       static_assert(std::is_same_v<decltype(*end), decltype(*data)>);
@@ -232,15 +232,15 @@ TEST(MosaicIterator, Mosaic) {
       static_assert(std::is_same_v<decltype(*data)::TMosaic, TMosaic>);
       static_assert(std::is_same_v<decltype(*dataC)::TMosaic, TMosaic>);
 
-      static_assert(is_mosaic_iterator_v<decltype(begin)>);
-      static_assert(is_mosaic_iterator_v<decltype(end)>);
-      static_assert(is_mosaic_iterator_v<decltype(beginC)>);
-      static_assert(is_mosaic_iterator_v<decltype(endC)>);
-      static_assert(is_mosaic_pointer_v<decltype(data)>);
-      static_assert(is_mosaic_pointer_v<decltype(dataC)>);
-      static_assert(!is_mosaic_iterator_v<decltype(is0.begin())>);
-      static_assert(!is_mosaic_pointer_v<decltype(is0.data())>);
-      static_assert(!is_mosaic_pointer_v<decltype(is0C.data())>);
+      static_assert(MosaicIterator<decltype(begin)>);
+      static_assert(MosaicIterator<decltype(end)>);
+      static_assert(MosaicIterator<decltype(beginC)>);
+      static_assert(MosaicIterator<decltype(endC)>);
+      static_assert(MosaicPointer<decltype(data)>);
+      static_assert(MosaicPointer<decltype(dataC)>);
+      static_assert(!MosaicIterator<decltype(is0.begin())>);
+      static_assert(!MosaicPointer<decltype(is0.data())>);
+      static_assert(!MosaicPointer<decltype(is0C.data())>);
 
       static_assert(std::is_same_v<decltype(*begin), decltype(*data)>);
       static_assert(std::is_same_v<decltype(*end), decltype(*data)>);
@@ -363,12 +363,12 @@ TEST(MosaicIterator, NonMosaic) {
     static_assert(!Property<decltype(*data)>);
     static_assert(!Property<decltype(*dataC)>);
 
-    static_assert(!is_mosaic_iterator_v<decltype(begin)>);
-    static_assert(!is_mosaic_iterator_v<decltype(end)>);
-    static_assert(!is_mosaic_iterator_v<decltype(beginC)>);
-    static_assert(!is_mosaic_iterator_v<decltype(endC)>);
-    static_assert(!is_mosaic_pointer_v<decltype(data)>);
-    static_assert(!is_mosaic_pointer_v<decltype(dataC)>);
+    static_assert(!MosaicIterator<decltype(begin)>);
+    static_assert(!MosaicIterator<decltype(end)>);
+    static_assert(!MosaicIterator<decltype(beginC)>);
+    static_assert(!MosaicIterator<decltype(endC)>);
+    static_assert(!MosaicPointer<decltype(data)>);
+    static_assert(!MosaicPointer<decltype(dataC)>);
 
     static_assert(std::is_same_v<decltype(begin), decltype(is.begin())>);
     static_assert(std::is_same_v<decltype(end), decltype(is.end())>);

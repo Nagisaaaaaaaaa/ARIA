@@ -177,17 +177,17 @@ template <typename TBoostTuple>
 using boost_tuple_2_tup_t = decltype(BoostTuple2Tup(std::declval<TBoostTuple>()));
 
 // Cast `MosaicIterator` to `Tup`.
-template <typename TMosaicIterator>
+template <MosaicIterator TMosaicIterator>
 using mosaic_iterator_2_tup_t =
     boost_tuple_2_tup_t<decltype(std::declval<TMosaicIterator>().base().get_iterator_tuple())>;
 
 // Cast `MosaicPointer` to `Tup`.
-template <typename TMosaicPointer>
+template <MosaicPointer TMosaicPointer>
 using mosaic_pointer_2_tup_t =
     boost_tuple_2_tup_t<decltype(std::declval<TMosaicPointer>().base().get_iterator_tuple())>;
 
 // Cast `MosaicIterator` to `Tup`.
-template <typename TMosaicIterator>
+template <MosaicIterator TMosaicIterator>
 static constexpr auto MosaicIterator2Tup(const TMosaicIterator &iterator) {
   using TTup = mosaic_iterator_2_tup_t<TMosaicIterator>;
 
@@ -198,7 +198,7 @@ static constexpr auto MosaicIterator2Tup(const TMosaicIterator &iterator) {
 }
 
 // Cast `MosaicPointer` to `Tup`.
-template <typename TMosaicPointer>
+template <MosaicPointer TMosaicPointer>
 static constexpr auto MosaicPointer2Tup(const TMosaicPointer &pointer) {
   using TTup = mosaic_pointer_2_tup_t<TMosaicPointer>;
 
