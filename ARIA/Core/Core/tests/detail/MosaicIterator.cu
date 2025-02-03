@@ -116,8 +116,8 @@ TEST(MosaicIterator, Mosaic) {
       EXPECT_EQ(make_mosaic_iterator<TMosaic>(MosaicIterator2Tup(end)), end);
       EXPECT_EQ(make_mosaic_iterator<TMosaic>(MosaicIterator2Tup(beginC)), beginC);
       EXPECT_EQ(make_mosaic_iterator<TMosaic>(MosaicIterator2Tup(endC)), endC);
-      EXPECT_EQ(make_mosaic_iterator<TMosaic>(MosaicPointer2Tup(data)), data);
-      EXPECT_EQ(make_mosaic_iterator<TMosaic>(MosaicPointer2Tup(dataC)), dataC);
+      EXPECT_EQ(make_mosaic_pointer<TMosaic>(MosaicPointer2Tup(data)), data);
+      EXPECT_EQ(make_mosaic_pointer<TMosaic>(MosaicPointer2Tup(dataC)), dataC);
     }
 
     {
@@ -277,8 +277,8 @@ TEST(MosaicIterator, Mosaic) {
       EXPECT_EQ(make_mosaic_iterator<TMosaic>(MosaicIterator2Tup(end)), end);
       EXPECT_EQ(make_mosaic_iterator<TMosaic>(MosaicIterator2Tup(beginC)), beginC);
       EXPECT_EQ(make_mosaic_iterator<TMosaic>(MosaicIterator2Tup(endC)), endC);
-      EXPECT_EQ(make_mosaic_iterator<TMosaic>(MosaicPointer2Tup(data)), data);
-      EXPECT_EQ(make_mosaic_iterator<TMosaic>(MosaicPointer2Tup(dataC)), dataC);
+      EXPECT_EQ(make_mosaic_pointer<TMosaic>(MosaicPointer2Tup(data)), data);
+      EXPECT_EQ(make_mosaic_pointer<TMosaic>(MosaicPointer2Tup(dataC)), dataC);
     }
 
     {
