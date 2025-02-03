@@ -452,4 +452,31 @@ TEST(MosaicIterator, NonMosaic) {
   }
 }
 
+TEST(MosaicIterator, Copy) {
+  using namespace mosaic::detail;
+
+  // `int, float`.
+  {
+    using T = Tup<int, float>;
+    using TMosaic = Mosaic<T, PatternIF>;
+
+    const std::vector<int> srcIs = {0, 1, 2, 3, 4};
+    const std::array<float, 5> srcFs = {0.1F, 1.2F, 2.3F, 3.4F, 4.5F};
+    std::vector<int> dstIs(5);
+    std::array<float, 5> dstFs;
+
+    let srcBegin = make_mosaic_iterator<TMosaic>(Tup{srcIs.cbegin(), srcFs.cbegin()});
+    let srcEnd = make_mosaic_iterator<TMosaic>(Tup{srcIs.cend(), srcFs.cend()});
+    let dstBegin = make_mosaic_iterator<TMosaic>(Tup{dstIs.begin(), dstFs.begin()});
+    let dstEnd = make_mosaic_iterator<TMosaic>(Tup{dstIs.end(), dstFs.end()});
+
+    let res = copy_mosaic(srcBegin, srcEnd, dstBegin);
+    EXPECT_EQ(res, dstEnd);
+    for (int i = 0; i < 5; ++i) {
+      EXPECT_EQ(dstIs[i], i);
+      EXPECT_FLOAT_EQ(dstFs[i], i + (i + 1) * 0.1F);
+    }
+  }
+}
+
 } // namespace ARIA
