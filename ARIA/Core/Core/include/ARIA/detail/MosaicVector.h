@@ -71,6 +71,7 @@ private:
   using TMosaicPattern = typename is_mosaic<TMosaic>::TMosaicPattern;
   using TStorage = mosaic_vector_storage_type_t<TMosaicPattern, TSpaceHostOrDevice, Ts...>;
 
+  // `friend` is added to access `storage_` of other `MosaicVector` types.
   template <typename UMosaic, typename USpaceHostOrDevice, typename... Us>
     requires(is_mosaic_v<UMosaic>)
   friend class MosaicVector;
@@ -84,9 +85,14 @@ public:
   constexpr explicit MosaicVector(size_t n) { resize(n); }
 
   constexpr MosaicVector(std::initializer_list<T> list) : MosaicVector(list.size()) {
-    const T *begin = list.begin();
-    for (size_t i = 0; i < list.size(); ++i)
-      operator[](i) = *(begin + i);
+    if constexpr (std::is_same_v<TSpaceHostOrDevice, SpaceHost>) { // For host storages, no optimizations needed.
+      const T *begin = list.begin();
+      for (size_t i = 0; i < list.size(); ++i)
+        operator[](i) = *(begin + i);
+    } else {                                               // For device storages:
+      MosaicVector<TMosaic, SpaceHost, Ts...> temp = list; // Construct the host version.
+      *this = std::move(temp);                             // Copy to device.
+    }
   }
 
   template <typename USpaceHostOrDevice, typename... Us>
