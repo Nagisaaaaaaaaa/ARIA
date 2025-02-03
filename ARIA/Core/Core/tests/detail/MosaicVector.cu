@@ -316,6 +316,15 @@ TEST(MosaicVector, Copy) {
         EXPECT_EQ(get<0>(v), i);
         EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
       }
+
+      for (int i = 0; i < 5; ++i)
+        vec1[i] = T{0, 0.0F};
+      copy(vec0.begin(), vec0.end(), vec1.begin());
+      for (int i = 0; i < 5; ++i) {
+        T v = vec1[i];
+        EXPECT_EQ(get<0>(v), i);
+        EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
+      }
     });
   }
 
@@ -346,6 +355,16 @@ TEST(MosaicVector, Copy) {
       EXPECT_EQ(vec1.size(), 0);
       TMosaicVector1 &vec1Ref = (vec1 = vec0); // Copy assignment operator.
       EXPECT_EQ(vec1.size(), 5);
+      for (int i = 0; i < 5; ++i) {
+        T v = vec1[i];
+        EXPECT_EQ(get<0>(v), i);
+        EXPECT_EQ(get<1>(v), 2 * i);
+        EXPECT_EQ(get<2>(v), 3 * i);
+      }
+
+      for (int i = 0; i < 5; ++i)
+        vec1[i] = {0, 0, 0};
+      copy(vec0.begin(), vec0.end(), vec1.begin());
       for (int i = 0; i < 5; ++i) {
         T v = vec1[i];
         EXPECT_EQ(get<0>(v), i);
