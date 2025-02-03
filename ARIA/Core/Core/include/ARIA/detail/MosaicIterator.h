@@ -130,6 +130,54 @@ ARIA_HOST_DEVICE static constexpr auto make_mosaic_pointer(const Tup<TPointers..
   return make_mosaic_iterator<T>(pointers);
 }
 
+//
+//
+//
+//
+//
+// Cast `boost::tuples::tuple` to `Tup`.
+template <typename... Ts>
+consteval auto BoostTuple2Tup(const boost::tuples::tuple<Ts...> &) {
+  using TArrayWithNullTypes = MakeTypeArray<Ts...>;
+  using TArray = TArrayWithNullTypes::template Remove<boost::tuples::null_type>;
+  return to_tup_t<TArray>{};
+}
+
+template <typename TBoostTuple>
+using boost_tuple_2_tup_t = decltype(BoostTuple2Tup(std::declval<TBoostTuple>()));
+
+// Cast "mosaic iterator" to `Tup`.
+template <typename TMosaicIterator>
+using mosaic_iterator_2_tup_t =
+    boost_tuple_2_tup_t<decltype(std::declval<TMosaicIterator>().base().get_iterator_tuple())>;
+
+// Cast "mosaic pointer" to `Tup`.
+template <typename TMosaicPointer>
+using mosaic_pointer_2_tup_t =
+    boost_tuple_2_tup_t<decltype(std::declval<TMosaicPointer>().base().get_iterator_tuple())>;
+
+// Cast "mosaic iterator" to `Tup`.
+template <typename TMosaicIterator>
+static constexpr auto MosaicIterator2Tup(const TMosaicIterator &iterator) {
+  using TTup = mosaic_iterator_2_tup_t<TMosaicIterator>;
+
+  TTup res;
+  auto iteratorsBoost = iterator.base().get_iterator_tuple();
+  ForEach<rank_v<TTup>>([&]<auto i>() { get<i>(res) = get<i>(iteratorsBoost); });
+  return res;
+}
+
+// Cast "mosaic pointer" to `Tup`.
+template <typename TMosaicPointer>
+static constexpr auto MosaicPointer2Tup(const TMosaicPointer &pointer) {
+  using TTup = mosaic_pointer_2_tup_t<TMosaicPointer>;
+
+  TTup res;
+  auto pointersBoost = pointer.base().get_iterator_tuple();
+  ForEach<rank_v<TTup>>([&]<auto i>() { get<i>(res) = get<i>(pointersBoost); });
+  return res;
+}
+
 } // namespace mosaic::detail
 
 } // namespace ARIA
