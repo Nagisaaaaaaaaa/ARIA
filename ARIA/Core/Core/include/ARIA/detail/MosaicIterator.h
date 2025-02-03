@@ -92,6 +92,19 @@ private:
 //
 //
 //
+// Whether the given type is `MosaicReference<...>`.
+template <typename T>
+struct is_mosaic_reference : std::false_type {};
+
+template <typename TMosaic, typename TReferences>
+struct is_mosaic_reference<MosaicReference<TMosaic, TReferences>> : std::true_type {};
+
+template <typename T>
+constexpr bool is_mosaic_reference_v = is_mosaic_reference<T>::value;
+
+//
+//
+//
 // \brief Generate a `MosaicIterator` with a tuple of iterators which
 // are consistent with the mosaic pattern.
 //
