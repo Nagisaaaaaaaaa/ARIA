@@ -68,7 +68,9 @@ TEST(Vector, Base) {
       static_assert(std::is_same_v<VectorDevice<T>, thrust::device_vector<T>>);
     });
   }
+}
 
+TEST(Vector, Methods) {
   // `int, float`.
   {
     using T = Tup<int, float>;
