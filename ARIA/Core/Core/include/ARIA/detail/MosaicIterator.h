@@ -182,14 +182,14 @@ concept MosaicPointer = is_mosaic_pointer_v<T>;
 //
 // Cast `boost::tuples::tuple` to `Tup`.
 template <typename... Ts>
-consteval auto BoostTuple2Tup(const boost::tuples::tuple<Ts...> &) {
+consteval auto BoostTuple2TupImpl(const boost::tuples::tuple<Ts...> &) {
   using TArrayWithNullTypes = MakeTypeArray<Ts...>;
   using TArray = TArrayWithNullTypes::template Remove<boost::tuples::null_type>;
   return to_tup_t<TArray>{};
 }
 
 template <typename TBoostTuple>
-using boost_tuple_2_tup_t = decltype(BoostTuple2Tup(std::declval<TBoostTuple>()));
+using boost_tuple_2_tup_t = decltype(BoostTuple2TupImpl(std::declval<TBoostTuple>()));
 
 // Cast `MosaicIterator` to `Tup`.
 template <MosaicIterator TMosaicIterator>
