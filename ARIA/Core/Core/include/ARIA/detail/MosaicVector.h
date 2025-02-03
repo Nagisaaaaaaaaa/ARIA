@@ -171,6 +171,35 @@ private:
 //! Unable to define CTAD for `MosaicVector` because
 //! `TMosaic` can never be deduced by the constructor parameters.
 
+//
+//
+//
+// When `T` is `Mosaic`, reduce `Vector` to `MosaicVector`,
+// else, reduce to `thrust::host_vector` or `thrust::device_vector`.
+template <typename T, typename TSpaceHostOrDevice, typename... Ts>
+struct reduce_vector;
+
+template <typename TMosaic, typename TSpaceHostOrDevice, typename... Ts>
+  requires(is_mosaic_v<TMosaic>)
+struct reduce_vector<TMosaic, TSpaceHostOrDevice, Ts...> {
+  using type = MosaicVector<TMosaic, TSpaceHostOrDevice, Ts...>;
+};
+
+template <typename T, typename... Ts>
+  requires(!is_mosaic_v<T>)
+struct reduce_vector<T, SpaceHost, Ts...> {
+  using type = thrust::host_vector<T, Ts...>;
+};
+
+template <typename T, typename... Ts>
+  requires(!is_mosaic_v<T>)
+struct reduce_vector<T, SpaceDevice, Ts...> {
+  using type = thrust::device_vector<T, Ts...>;
+};
+
+template <typename T, typename TSpaceHostOrDevice, typename... Ts>
+using reduce_vector_t = typename reduce_vector<T, TSpaceHostOrDevice, Ts...>::type;
+
 } // namespace mosaic::detail
 
 } // namespace ARIA
