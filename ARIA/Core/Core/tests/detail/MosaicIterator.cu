@@ -363,6 +363,13 @@ TEST(MosaicIterator, NonMosaic) {
     static_assert(!Property<decltype(*data)>);
     static_assert(!Property<decltype(*dataC)>);
 
+    static_assert(!is_mosaic_iterator_v<decltype(begin)>);
+    static_assert(!is_mosaic_iterator_v<decltype(end)>);
+    static_assert(!is_mosaic_iterator_v<decltype(beginC)>);
+    static_assert(!is_mosaic_iterator_v<decltype(endC)>);
+    static_assert(!is_mosaic_pointer_v<decltype(data)>);
+    static_assert(!is_mosaic_pointer_v<decltype(dataC)>);
+
     static_assert(std::is_same_v<decltype(begin), decltype(is.begin())>);
     static_assert(std::is_same_v<decltype(end), decltype(is.end())>);
     static_assert(std::is_same_v<decltype(beginC), decltype(is.cbegin())>);
