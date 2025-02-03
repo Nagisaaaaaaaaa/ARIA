@@ -487,8 +487,8 @@ TEST(MosaicIterator, Copy) {
     const thrust::host_vector<int> srcIs1 = {0, -2, -4, -6, -8};
     const thrust::device_vector<int> srcIs2 = {0, 3, 6, 9, 12};
     std::array<int, 5> dstIs0;
-    thrust::host_vector<int> dstIs1(5);
-    thrust::device_vector<int> dstIs2(5);
+    thrust::device_vector<int> dstIs1(5);
+    thrust::host_vector<int> dstIs2(5);
 
     let srcBegin = make_mosaic_iterator<TMosaic>(Tup{srcIs0.cbegin(), srcIs1.cbegin(), srcIs2.cbegin()});
     let srcEnd = make_mosaic_iterator<TMosaic>(Tup{srcIs0.cend(), srcIs1.cend(), srcIs2.cend()});
@@ -506,8 +506,8 @@ TEST(MosaicIterator, Copy) {
 
   // `int`.
   {
-    const std::array<int, 5> srcIs = {0, 1, 2, 3, 4};
-    std::array<int, 5> dstIs;
+    const thrust::device_vector<int> srcIs = {0, 1, 2, 3, 4};
+    thrust::host_vector<int> dstIs(5);
 
     let srcBegin = make_mosaic_iterator<int>(Tup{srcIs.begin()});
     let srcEnd = make_mosaic_iterator<int>(Tup{srcIs.end()});
