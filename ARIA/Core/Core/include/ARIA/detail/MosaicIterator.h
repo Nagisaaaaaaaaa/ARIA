@@ -6,6 +6,7 @@
 
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/iterator/zip_iterator.hpp>
+#include <thrust/detail/copy.h>
 
 namespace ARIA {
 
@@ -176,6 +177,30 @@ static constexpr auto MosaicPointer2Tup(const TMosaicPointer &pointer) {
   auto pointersBoost = pointer.base().get_iterator_tuple();
   ForEach<rank_v<TTup>>([&]<auto i>() { get<i>(res) = get<i>(pointersBoost); });
   return res;
+}
+
+//
+//
+//
+// Implementation of `copy` for "mosaic iterators".
+template <typename TItIn, typename TItOut>
+TItOut copy_mosaic(TItIn srcBegin, TItIn srcEnd, TItOut dst) {
+  auto srcBeginTup = Auto(MosaicIterator2Tup(srcBegin));
+  auto srcEndTup = Auto(MosaicIterator2Tup(srcEnd));
+  auto dstTup = Auto(MosaicIterator2Tup(dst));
+
+  using TSrcBeginTup = decltype(srcBeginTup);
+  using TSrcEndTup = decltype(srcEndTup);
+  using TDstTup = decltype(dstTup);
+
+  constexpr uint rank = rank_v<TDstTup>;
+  static_assert(rank_v<TSrcBeginTup> == rank && rank_v<TSrcEndTup> == rank, "Inconsistent ranks of mosaic iterators");
+
+  TDstTup resTup;
+  ForEach<rank>(
+      [&]<auto i>() { get<i>(resTup) = thrust::copy(get<i>(srcBeginTup), get<i>(srcEndTup), get<i>(dstTup)); });
+
+  return make_mosaic_iterator<...>(resTup);
 }
 
 } // namespace mosaic::detail
