@@ -212,7 +212,7 @@ static constexpr auto MosaicPointer2Tup(const TMosaicPointer &pointer) {
 //
 //
 // Implementation of `copy` for "mosaic iterators".
-template <typename TItIn, typename TItOut>
+template <MosaicIterator TItIn, MosaicIterator TItOut>
 TItOut copy_mosaic(TItIn srcBegin, TItIn srcEnd, TItOut dst) {
   using TMosaic = typename decltype(*dst)::TMosaic;
   static_assert(std::is_same_v<typename decltype(*srcBegin)::TMosaic, TMosaic> &&
