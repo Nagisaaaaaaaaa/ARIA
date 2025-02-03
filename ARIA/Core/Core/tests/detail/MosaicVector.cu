@@ -88,7 +88,6 @@ TEST(MosaicVector, Base) {
       for (let it = vec.cbegin(); it != vec.cend(); ++it) {
         let v = Let(*it);
         let k = it - vec.cbegin();
-        int i = k;
         static_assert(Property<decltype(*it)>);
         static_assert(std::is_same_v<decltype(v), T>);
         static_assert(std::is_same_v<decltype(k), int64>);
@@ -206,7 +205,6 @@ TEST(MosaicVector, Base) {
       for (let it = vec.cbegin(); it != vec.cend(); ++it) {
         let v = Let(*it);
         let k = it - vec.cbegin();
-        int i = k;
         static_assert(Property<decltype(*it)>);
         static_assert(std::is_same_v<decltype(v), T>);
         static_assert(std::is_same_v<decltype(k), int64>);
