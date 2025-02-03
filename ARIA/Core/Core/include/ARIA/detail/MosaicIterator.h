@@ -229,24 +229,24 @@ static constexpr auto MosaicPointer2Tup(const TMosaicPointer &pointer) {
 //
 //
 //
+//
+//
 //! `copy` does the same thing as `thrust::copy` but is able to handle `MosaicIterator`s.
 template <MosaicIterator TItIn, MosaicIterator TItOut>
 TItOut copy(TItIn srcBegin, TItIn srcEnd, TItOut dst) {
   using TMosaic = typename decltype(*dst)::TMosaic;
-  static_assert(std::is_same_v<typename decltype(*srcBegin)::TMosaic, TMosaic> &&
-                    std::is_same_v<typename decltype(*srcEnd)::TMosaic, TMosaic>,
+  static_assert(std::is_same_v<typename decltype(*srcBegin)::TMosaic, TMosaic>,
                 "Inconsistent mosaic definitions of mosaic iterators");
 
   auto srcBeginTup = Auto(MosaicIterator2Tup(srcBegin));
   auto srcEndTup = Auto(MosaicIterator2Tup(srcEnd));
   auto dstTup = Auto(MosaicIterator2Tup(dst));
 
-  using TSrcBeginTup = decltype(srcBeginTup);
-  using TSrcEndTup = decltype(srcEndTup);
+  using TSrcTup = decltype(srcBeginTup);
   using TDstTup = decltype(dstTup);
 
   constexpr uint rank = rank_v<TDstTup>;
-  static_assert(rank_v<TSrcBeginTup> == rank && rank_v<TSrcEndTup> == rank, "Inconsistent ranks of mosaic iterators");
+  static_assert(rank_v<TSrcTup> == rank, "Inconsistent ranks of mosaic iterators");
 
   TDstTup resTup;
   ForEach<rank>(
