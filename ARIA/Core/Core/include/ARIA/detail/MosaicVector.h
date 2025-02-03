@@ -50,6 +50,14 @@ using mosaic_vector_storage_type_t =
 //
 //
 //
+//
+//
+// \brief Just like `std::vector`, `thrust::host_vector`, and `thrust::device_vector`, but
+// only accept `Mosaic`s as the first template parameter.
+//
+// The internal storages are structure of arrays (SoA) which are consistent with
+// the definitions of `MosaicPattern`s.
+// Accessors such as `operator[]` and `begin` are implemented similar to `std::vector<bool>`.
 template <typename TMosaic_, typename TSpaceHostOrDevice, typename... Ts>
   requires(is_mosaic_v<TMosaic_>)
 class MosaicVector final {
