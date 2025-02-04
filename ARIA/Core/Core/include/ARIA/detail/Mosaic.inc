@@ -40,9 +40,9 @@ template <typename T>
     return false;
 
   // For aggregate types.
-  //! `> 1` is required here because classes with only one member are considered unnecessary.
   if constexpr (std::is_aggregate_v<T>) {
-    if (boost::pfr::tuple_size_v<T> <= 1)
+    //! `> 0` is required here because empty classes are considered unnecessary.
+    if (boost::pfr::tuple_size_v<T> == 0)
       return false;
 
     bool res = true;
