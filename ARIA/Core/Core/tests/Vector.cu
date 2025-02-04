@@ -291,7 +291,7 @@ TEST(Vector, Methods) {
     });
   }
 
-  // `Vec3`.
+  // `Vec3<int>`.
   {
     using T = Vec3<int>;
     using TMosaic = Mosaic<T, PatternVec3<int>>;
