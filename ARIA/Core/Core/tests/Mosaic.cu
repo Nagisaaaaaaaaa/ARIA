@@ -10,7 +10,7 @@ namespace {
 
 struct Test0Member {};
 
-//! Structures with 1 member is considered unnecessary.
+// TODO: Currently not supported by `boost::pfr`.
 struct Test1Member {
   int v = 5;
 };
@@ -50,7 +50,7 @@ struct TestRecursion0Member {
   } s0;
 };
 
-//! Structures with 1 member is considered unnecessary.
+// TODO: Currently not supported by `boost::pfr`.
 struct TestRecursion1Member {
   int v0 = 5;
 
