@@ -57,42 +57,42 @@ public:
   ARIA_COPY_MOVE_ABILITY(MosaicArray, default, default);
 
 public:
-  [[nodiscard]] constexpr auto operator[](size_t i) const { return *(data() + i); }
+  [[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator[](size_t i) const { return *(data() + i); }
 
-  [[nodiscard]] constexpr auto operator[](size_t i) { return *(data() + i); }
+  [[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator[](size_t i) { return *(data() + i); }
 
 public:
-  [[nodiscard]] constexpr auto begin() {
+  [[nodiscard]] ARIA_HOST_DEVICE constexpr auto begin() {
     return cute::apply(storage_, []<typename... S>(S &&...s) {
       return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).begin()...});
     });
   }
 
-  [[nodiscard]] constexpr auto end() {
+  [[nodiscard]] ARIA_HOST_DEVICE constexpr auto end() {
     return cute::apply(storage_, []<typename... S>(S &&...s) {
       return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).end()...});
     });
   }
 
-  [[nodiscard]] constexpr auto cbegin() const {
+  [[nodiscard]] ARIA_HOST_DEVICE constexpr auto cbegin() const {
     return cute::apply(storage_, []<typename... S>(S &&...s) {
       return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).cbegin()...});
     });
   }
 
-  [[nodiscard]] constexpr auto cend() const {
+  [[nodiscard]] ARIA_HOST_DEVICE constexpr auto cend() const {
     return cute::apply(storage_, []<typename... S>(S &&...s) {
       return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).cend()...});
     });
   }
 
-  [[nodiscard]] constexpr auto data() const {
+  [[nodiscard]] ARIA_HOST_DEVICE constexpr auto data() const {
     return cute::apply(storage_, []<typename... S>(S &&...s) {
       return make_mosaic_pointer<TMosaic>(Tup{std::forward<S>(s).data()...});
     });
   }
 
-  [[nodiscard]] constexpr auto data() {
+  [[nodiscard]] ARIA_HOST_DEVICE constexpr auto data() {
     return cute::apply(storage_, []<typename... S>(S &&...s) {
       return make_mosaic_pointer<TMosaic>(Tup{std::forward<S>(s).data()...});
     });
