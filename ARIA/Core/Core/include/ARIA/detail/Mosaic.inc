@@ -332,8 +332,11 @@ using mosaic_pattern_types_recursive_t = typename mosaic_pattern_types_recursive
 //
 // Whether the given type is `Mosaic<T, TMosaicPattern>`.
 // Here, the second template parameter is restricted with concept.
-template <typename T>
-struct is_mosaic : std::false_type {};
+template <typename T_>
+struct is_mosaic : std::false_type {
+  using T = void;
+  using TMosaicPattern = void;
+};
 
 template <typename T_, typename TMosaicPattern_>
 struct is_mosaic<Mosaic<T_, TMosaicPattern_>> : std::true_type {

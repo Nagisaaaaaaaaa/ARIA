@@ -233,7 +233,7 @@ private:
   using TDerived = TensorVectorReduced<T, TypeArray<TRank, TSpace, TLayout>>;
 
 public:
-  using value_type = T;
+  using value_type = std::conditional_t<mosaic::detail::is_mosaic_v<T>, typename mosaic::detail::is_mosaic<T>::T, T>;
 
   using Space = TSpace;
 
