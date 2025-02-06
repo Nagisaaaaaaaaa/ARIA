@@ -522,6 +522,35 @@ private:
   thrust::device_vector<T> engine_;
 };
 
+// Mosaic + device + static.
+template <NonArrayType TMosaic, NonArrayType TStaticLayout>
+  requires(mosaic::detail::is_mosaic_v<TMosaic> && is_static_v<TStaticLayout>)
+class TensorVectorReduced<TMosaic, TypeArray<UInt<TStaticLayout::rank>, SpaceDevice, TStaticLayout>>
+    : public TensorVectorMembers<TMosaic, UInt<TStaticLayout::rank>, SpaceDevice, TStaticLayout> {
+public:
+  using Layout = TStaticLayout;
+  using Tensor = std::decay_t<decltype(cute::make_tensor(std::declval<VectorDevice<TMosaic>>().data(),
+                                                         std::declval<TStaticLayout>()))>;
+  //! `RawTensor` is not defined for mosaic ones.
+
+public:
+  TensorVectorReduced() = default;
+
+  explicit TensorVectorReduced(const TStaticLayout &) : engine_(cosize_safe_v<TStaticLayout>) {}
+
+  ARIA_COPY_MOVE_ABILITY(TensorVectorReduced, default, default);
+
+public:
+  [[nodiscard]] constexpr TStaticLayout layout() const { return {}; }
+
+  [[nodiscard]] constexpr decltype(auto) tensor() const { return cute::make_tensor(engine_.data(), layout()); }
+
+  [[nodiscard]] constexpr decltype(auto) tensor() { return cute::make_tensor(engine_.data(), layout()); }
+
+private:
+  VectorDevice<TMosaic> engine_;
+};
+
 //
 //
 //
