@@ -99,6 +99,8 @@ template <auto iNonRec, typename T>
 //
 //
 //
+//
+//
 // `MosaicPattern`s are classes which can be easily serialized.
 // For example:
 // 1. `int` and `int *` are "scalar" types, which
