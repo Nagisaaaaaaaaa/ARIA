@@ -25,10 +25,10 @@ namespace ARIA {
 /// using T = Vec3<int>;
 /// using TMosaic = Mosaic<T, Pattern<int>>;
 ///
-/// VectorHost<T> v0;         // Host   vector with array of structures (AoS).
-/// VectorDevice<T> v1;       // Device vector with array of structures (AoS).
-/// VectorHost<TMosaic> v2;   // Host   vector with structure of arrays (SoA).
-/// VectorDevice<TMosaic> v3; // Device vector with structure of arrays (SoA).
+/// VectorHost<T> v0;         // Host   vector with array of structures (AoS), that is, `host_vector<Vec3<int>>`.
+/// VectorDevice<T> v1;       // Device vector with array of structures (AoS), that is, `device_vector<Vec3<int>>`.
+/// VectorHost<TMosaic> v2;   // Host   vector with structure of arrays (SoA), that is, `3 * host_vector<int>`.
+/// VectorDevice<TMosaic> v3; // Device vector with structure of arrays (SoA), that is, `3 * device_vector<int>`.
 /// ```
 template <typename T, typename TSpaceHostOrDevice, typename... Ts>
 using Vector = mosaic::detail::reduce_vector_t<T, TSpaceHostOrDevice, Ts...>;
