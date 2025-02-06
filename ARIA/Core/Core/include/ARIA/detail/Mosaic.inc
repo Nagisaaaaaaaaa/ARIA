@@ -88,7 +88,8 @@ template <auto iNonRec, typename T>
   }
   // Else, return copies.
   else {
-    auto res = Auto(std::forward<T>(v)[iNonRec]);
+    using TElem = typename array_trait<std::remove_cvref_t<T>>::T;
+    TElem res = std::forward<T>(v)[iNonRec];
     return res;
   }
 }
