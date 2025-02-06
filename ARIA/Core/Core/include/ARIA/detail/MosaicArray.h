@@ -8,6 +8,9 @@ namespace ARIA {
 
 namespace mosaic::detail {
 
+// Given the `MosaicPattern` and `size`,
+// deduce the storage type of the `MosaicArray`.
+// It will be something such as `Tup<cuda::std::array<...>, ...>`.
 template <MosaicPattern TMosaicPattern, size_t size>
 struct mosaic_array_storage_type {
 private:
