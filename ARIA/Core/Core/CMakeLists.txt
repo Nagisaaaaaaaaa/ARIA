@@ -235,6 +235,7 @@ target_include_directories(CUTLASS INTERFACE ${cutlass_SOURCE_DIR}/include)
 # Add the module headers.
 set(core_core_headers
     ARIA/ARIA.h
+    ARIA/Array.h
     ARIA/Auto.h
     ARIA/BFloat16.h
     ARIA/BitArray.h

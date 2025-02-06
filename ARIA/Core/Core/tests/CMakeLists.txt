@@ -6,6 +6,7 @@ if (ARIA_BUILD_TESTS)
       detail/MosaicIterator.cu
       detail/MosaicVector.cu
       #experimental/Lua.cpp
+      Array.cu
       Auto.cu
       BFloat16.cu
       BitArray.cu
