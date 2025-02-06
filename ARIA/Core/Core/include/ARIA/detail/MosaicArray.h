@@ -53,6 +53,48 @@ public:
 
 public:
   constexpr MosaicArray() = default;
+
+  ARIA_COPY_MOVE_ABILITY(MosaicArray, default, default);
+
+public:
+  [[nodiscard]] constexpr auto begin() {
+    return cute::apply(storage_, []<typename... S>(S &&...s) {
+      return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).begin()...});
+    });
+  }
+
+  [[nodiscard]] constexpr auto end() {
+    return cute::apply(storage_, []<typename... S>(S &&...s) {
+      return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).end()...});
+    });
+  }
+
+  [[nodiscard]] constexpr auto cbegin() const {
+    return cute::apply(storage_, []<typename... S>(S &&...s) {
+      return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).cbegin()...});
+    });
+  }
+
+  [[nodiscard]] constexpr auto cend() const {
+    return cute::apply(storage_, []<typename... S>(S &&...s) {
+      return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).cend()...});
+    });
+  }
+
+  [[nodiscard]] constexpr auto data() const {
+    return cute::apply(storage_, []<typename... S>(S &&...s) {
+      return make_mosaic_pointer<TMosaic>(Tup{std::forward<S>(s).data()...});
+    });
+  }
+
+  [[nodiscard]] constexpr auto data() {
+    return cute::apply(storage_, []<typename... S>(S &&...s) {
+      return make_mosaic_pointer<TMosaic>(Tup{std::forward<S>(s).data()...});
+    });
+  }
+
+private:
+  TStorage storage_;
 };
 
 } // namespace mosaic::detail
