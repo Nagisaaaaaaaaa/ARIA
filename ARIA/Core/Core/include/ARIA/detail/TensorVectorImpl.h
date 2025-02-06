@@ -1,11 +1,10 @@
 #pragma once
 
+#include "ARIA/Array.h"
 #include "ARIA/Layout.h"
-#include "ARIA/TypeArray.h"
+#include "ARIA/Vector.h"
 
 #include <cute/tensor.hpp>
-#include <thrust/device_vector.h>
-#include <thrust/host_vector.h>
 
 namespace ARIA {
 
@@ -276,12 +275,12 @@ public:
   }
 
   template <typename U>
-  [[nodiscard]] constexpr decltype(auto) operator[](U &&u) const {
+  [[nodiscard]] constexpr decltype(auto) operator[](U && u) const {
     return tensor()[std::forward<U>(u)];
   }
 
   template <typename U>
-  [[nodiscard]] constexpr decltype(auto) operator[](U &&u) {
+  [[nodiscard]] constexpr decltype(auto) operator[](U && u) {
     return tensor()[std::forward<U>(u)];
   }
 
