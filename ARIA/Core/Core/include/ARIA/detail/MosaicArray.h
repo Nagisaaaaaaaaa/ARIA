@@ -33,6 +33,12 @@ using mosaic_array_storage_type_t = typename mosaic_array_storage_type<TMosaicPa
 //
 //
 //
+// \brief Just like `std::array` and `cuda::std::array`, but
+// only accept `Mosaic`s as the first template parameter.
+//
+// The internal storages are structure of arrays (SoA) which are consistent with
+// the definitions of `MosaicPattern`s.
+// Accessors such as `operator[]` and `begin` are implemented similar to `std::vector<bool>`.
 template <typename TMosaic_, size_t size_>
   requires(is_mosaic_v<TMosaic_>)
 class MosaicArray final {
