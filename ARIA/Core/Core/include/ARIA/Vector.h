@@ -8,8 +8,9 @@ namespace ARIA {
 /// // Define a mosaic pattern for `Vec3<T>`.
 /// template <typename T>
 /// struct Pattern {
-///   T x, y, z;
+///   T x, y, z; // `T values[3]` is also allowed here.
 /// };
+/// // You can similarly define a more generic pattern for `Vec<T, size>`.
 ///
 /// // Define the mosaic for `Vec3<T>` and `Pattern<T>`.
 /// template <typename T>
