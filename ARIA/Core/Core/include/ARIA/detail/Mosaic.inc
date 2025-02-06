@@ -28,6 +28,8 @@ struct array_trait<T_[]> : std::true_type {
 //
 //
 //
+namespace pfr {
+
 // A wrapper for `boost::pfr::tuple_size`, which takes C arrays into account.
 // For example, `tuple_size_v<int[3]>` will be 3, not 1.
 template <typename T>
@@ -90,6 +92,8 @@ template <auto iNonRec, typename T>
     return res;
   }
 }
+
+} // namespace pfr
 
 //
 //
@@ -268,10 +272,12 @@ template <auto iNonRec, MosaicPattern T_>
 //
 //
 //
+namespace pfr {
+
 // We should be able to recursively or non-recursively
 // iterate through all the elements of a `MosaicPattern` instance.
 template <auto iRec, MosaicPattern T>
-[[nodiscard]] static inline constexpr decltype(auto) get_recursive(T &&v) noexcept {
+[[nodiscard]] static constexpr decltype(auto) get_recursive(T &&v) noexcept {
   using TCleaned = std::remove_cvref_t<T>;
   static_assert(iRec < tuple_size_recursive_v<TCleaned>, "Index out of range");
 
@@ -284,6 +290,8 @@ template <auto iRec, MosaicPattern T>
     return get<iRec>(std::forward<T>(v));
   }
 }
+
+} // namespace pfr
 
 //
 //
