@@ -30,6 +30,30 @@ using mosaic_array_storage_type_t = typename mosaic_array_storage_type<TMosaicPa
 //
 //
 //
+template <typename TMosaic_, size_t size>
+  requires(is_mosaic_v<TMosaic_>)
+class MosaicArray final {
+public:
+  using TMosaic = TMosaic_;
+
+private:
+  static_assert(ValidMosaic<TMosaic>, "The mosaic definition is invalid");
+
+  using T = typename is_mosaic<TMosaic>::T;
+  using TMosaicPattern = typename is_mosaic<TMosaic>::TMosaicPattern;
+  using TStorage = mosaic_array_storage_type_t<TMosaicPattern, size>;
+
+  // `friend` is added to access `storage_` of other `MosaicArray` types.
+  template <typename UMosaic, size_t size1>
+    requires(is_mosaic_v<UMosaic>)
+  friend class MosaicArray;
+
+public:
+  using value_type = T;
+
+public:
+  constexpr MosaicArray() = default;
+};
 
 } // namespace mosaic::detail
 
