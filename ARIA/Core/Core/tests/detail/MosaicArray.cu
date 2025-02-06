@@ -250,4 +250,43 @@ TEST(MosaicArray, Base) {
   }
 }
 
+TEST(MosaicArray, Copy) {
+  using namespace mosaic::detail;
+
+  // `int, float`.
+  {
+    using T = Tup<int, float>;
+    using TMosaic = Mosaic<T, PatternIF>;
+
+    using TMosaicArray = MosaicArray<TMosaic, 5>;
+    using TArray = cuda::std::array<T, 5>;
+
+    TArray vec0{T{0, 0.1F}, T{1, 1.2F}, T{2, 2.3F}, T{3, 3.4F}, T{4, 4.5F}};
+    TMosaicArray vec1 = vec0;
+    for (int i = 0; i < 5; ++i) {
+      T v = vec1[i];
+      EXPECT_EQ(get<0>(v), i);
+      EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
+    }
+  }
+
+  // `int, int, int`.
+  {
+    using T = Tec<int, int, int>;
+    using TMosaic = Mosaic<T, PatternIII>;
+
+    using TMosaicArray = MosaicArray<TMosaic, 5>;
+    using TArray = cuda::std::array<T, 5>;
+
+    TArray vec0{T{0, 0, 0}, T{1, 2, 3}, T{2, 4, 6}, T{3, 6, 9}, T{4, 8, 12}};
+    TMosaicArray vec1 = vec0;
+    for (int i = 0; i < 5; ++i) {
+      T v = vec1[i];
+      EXPECT_EQ(get<0>(v), i);
+      EXPECT_EQ(get<1>(v), 2 * i);
+      EXPECT_EQ(get<2>(v), 3 * i);
+    }
+  }
+}
+
 } // namespace ARIA
