@@ -352,6 +352,7 @@ public:
 //
 //
 //! Now, we are ready to implement the 4 variants of `TensorVectorReduced` with template specialization.
+//! Actually, there are totally 8 variants below, since we should also implement the `Mosaic`-versions.
 
 // Host + static.
 template <NonArrayType T, NonArrayType TStaticLayout>
