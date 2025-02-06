@@ -5,7 +5,6 @@
 #include "ARIA/Tup.h"
 
 #include <boost/iterator/transform_iterator.hpp>
-#include <boost/iterator/zip_iterator.hpp>
 #include <thrust/detail/copy.h>
 
 namespace ARIA {
@@ -48,7 +47,7 @@ private:
   using TMosaicPattern = typename is_mosaic<TMosaic>::TMosaicPattern;
 
   static constexpr size_t size = pfr::tuple_size_recursive_v<TMosaicPattern>;
-  static_assert(size == boost::tuples::length<TReferences>::value,
+  static_assert(size == thrust::tuple_size<TReferences>::value,
                 "The iterator types are inconsistent with the mosaic pattern");
 
 public:
@@ -56,7 +55,7 @@ public:
     ForEach<size>([&]<auto i>() {
       static_assert(
           std::is_same_v<std::decay_t<decltype(Auto(pfr::get_recursive<i>(std::declval<TMosaicPattern &>())))>,
-                         std::decay_t<decltype(Auto(references_.template get<i>()))>>,
+                         std::decay_t<decltype(Auto(get<i>(references_)))>>,
           "The iterator types are inconsistent with the mosaic pattern");
     });
   }
@@ -66,7 +65,7 @@ public:
 public:
   ARIA_HOST_DEVICE constexpr T value() const {
     TMosaicPattern mosaicPattern;
-    ForEach<size>([&]<auto i>() { pfr::get_recursive<i>(mosaicPattern) = references_.template get<i>(); });
+    ForEach<size>([&]<auto i>() { pfr::get_recursive<i>(mosaicPattern) = get<i>(references_); });
     return TMosaic{}(mosaicPattern);
   }
 
@@ -76,7 +75,7 @@ public:
   ARIA_HOST_DEVICE constexpr MosaicReference &operator=(U &&arg) {
     T value = std::forward<U>(arg);
     TMosaicPattern mosaicPattern = TMosaic{}(value);
-    ForEach<size>([&]<auto i>() { references_.template get<i>() = pfr::get_recursive<i>(mosaicPattern); });
+    ForEach<size>([&]<auto i>() { get<i>(references_) = pfr::get_recursive<i>(mosaicPattern); });
     return *this;
   }
 
@@ -122,13 +121,13 @@ constexpr bool is_mosaic_reference_v = is_mosaic_reference<T>::value;
 // *begin += T{10, 10.01F};
 // T value = *begin; // The value will be `{10, 10.11F}`.
 // ```
-template <typename TMosaic, typename... TIterators> // For `Mosaic`, wrap the iterators with the help of `boost`.
+template <typename TMosaic, typename... TIterators> // For `Mosaic`, wrap the iterators with `thrust` and `boost`.
   requires(is_mosaic_v<TMosaic>)
 ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const Tup<TIterators...> &iterators) {
-  boost::tuple<TIterators...> iteratorsBoost;
-  ForEach<sizeof...(TIterators)>([&]<auto i>() { get<i>(iteratorsBoost) = get<i>(iterators); });
+  thrust::tuple<TIterators...> iteratorsThrust;
+  ForEach<sizeof...(TIterators)>([&]<auto i>() { get<i>(iteratorsThrust) = get<i>(iterators); });
 
-  return boost::make_transform_iterator(boost::make_zip_iterator(iteratorsBoost),
+  return boost::make_transform_iterator(thrust::make_zip_iterator(iteratorsThrust),
                                         []<typename TReferences>(const TReferences &references) {
     // Suppose `it` is a `MosaicIterator`, then `*it` will return a `MosaicReference`.
     return MosaicReference<TMosaic, TReferences>{references};
@@ -182,49 +181,48 @@ concept MosaicPointer = is_mosaic_pointer_v<T>;
 //
 //
 template <typename... Ts>
-consteval auto BoostTuple2TupImpl(const boost::tuples::tuple<Ts...> &) {
-  using TArrayWithNullTypes = MakeTypeArray<Ts...>;
-  using TArray = TArrayWithNullTypes::template Remove<boost::tuples::null_type>;
+consteval auto ThrustTuple2TupImpl(const thrust::tuple<Ts...> &) {
+  using TArray = MakeTypeArray<Ts...>;
   return to_tup_t<TArray>{};
 }
 
-// Cast `boost::tuples::tuple` to `Tup`.
-template <typename TBoostTuple>
-using boost_tuple_2_tup_t = decltype(BoostTuple2TupImpl(std::declval<TBoostTuple>()));
+// Cast `thrust::tuple` to `Tup`.
+template <typename TThrustTuple>
+using thrust_tuple_2_tup_t = decltype(ThrustTuple2TupImpl(std::declval<TThrustTuple>()));
 
 // Cast `MosaicIterator` to `Tup`.
 template <MosaicIterator TMosaicIterator>
 using mosaic_iterator_2_tup_t =
-    boost_tuple_2_tup_t<decltype(std::declval<TMosaicIterator>().base().get_iterator_tuple())>;
+    thrust_tuple_2_tup_t<decltype(std::declval<TMosaicIterator>().base().get_iterator_tuple())>;
 
 // Cast `MosaicPointer` to `Tup`.
 template <MosaicPointer TMosaicPointer>
 using mosaic_pointer_2_tup_t =
-    boost_tuple_2_tup_t<decltype(std::declval<TMosaicPointer>().base().get_iterator_tuple())>;
+    thrust_tuple_2_tup_t<decltype(std::declval<TMosaicPointer>().base().get_iterator_tuple())>;
 
 //
 //
 //
-// Cast `boost::tuples::tuple` to `Tup`.
-template <typename TBoostTuple>
-static constexpr auto BoostTuple2Tup(const TBoostTuple &tupleBoost) {
-  using TTup = boost_tuple_2_tup_t<TBoostTuple>;
+// Cast `thrust::tuple` to `Tup`.
+template <typename TThrustTuple>
+static constexpr auto ThrustTuple2Tup(const TThrustTuple &tupleThrust) {
+  using TTup = thrust_tuple_2_tup_t<TThrustTuple>;
 
   TTup res;
-  ForEach<rank_v<TTup>>([&]<auto i>() { get<i>(res) = get<i>(tupleBoost); });
+  ForEach<rank_v<TTup>>([&]<auto i>() { get<i>(res) = get<i>(tupleThrust); });
   return res;
 }
 
 // Cast `MosaicIterator` to `Tup`.
 template <MosaicIterator TMosaicIterator>
 static constexpr auto MosaicIterator2Tup(const TMosaicIterator &iterator) {
-  return BoostTuple2Tup(iterator.base().get_iterator_tuple());
+  return ThrustTuple2Tup(iterator.base().get_iterator_tuple());
 }
 
 // Cast `MosaicPointer` to `Tup`.
 template <MosaicPointer TMosaicPointer>
 static constexpr auto MosaicPointer2Tup(const TMosaicPointer &pointer) {
-  return BoostTuple2Tup(pointer.base().get_iterator_tuple());
+  return ThrustTuple2Tup(pointer.base().get_iterator_tuple());
 }
 
 //
