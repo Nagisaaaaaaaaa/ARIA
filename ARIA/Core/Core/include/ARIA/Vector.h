@@ -1,9 +1,24 @@
 #pragma once
 
+/// \file
+/// \brief A policy-based vector implementation, which supports both
+/// array of structures (AoS) and structure of arrays (SoA).
+/// Please read the comments in `Mosaic.h` before continue.
+
+//
+//
+//
+//
+//
 #include "ARIA/detail/MosaicVector.h"
 
 namespace ARIA {
 
+/// \brief A policy-based vector implementation, which supports both
+/// array of structures (AoS) and structure of arrays (SoA).
+///
+/// Interfaces are the same as `thrust::host_vector` and `thrust::device_vector`.
+///
 /// \example ```cpp
 /// // Define a mosaic pattern for `Vec3<T>`.
 /// template <typename T>
