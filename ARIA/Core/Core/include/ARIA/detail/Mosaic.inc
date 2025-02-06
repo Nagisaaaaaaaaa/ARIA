@@ -145,7 +145,7 @@ template <typename T_>
     ForEach<tuple_size_v<T>>([&](auto i) {
       //! Here, `std::declval<T &>` is used instead of `std::declval<T>` in order to
       //! prevent array types such as `int[3]` from being converted to `int*`.
-      using U = decltype(get<i>(std::declval<T &>()));
+      using U = decltype(pfr::get<i>(std::declval<T &>()));
       if (!IsMosaicPatternImpl<U>())
         res = false;
     });
@@ -182,7 +182,7 @@ template <MosaicPattern T_>
   if constexpr (std::is_aggregate_v<T>) {
     TInteger sum = 0;
     ForEach<tuple_size_v<T>>([&](auto i) {
-      using U = decltype(get<i>(std::declval<T &>()));
+      using U = decltype(pfr::get<i>(std::declval<T &>()));
       sum += TupleSizeRecursiveImpl<U>();
     });
     return sum;
@@ -225,7 +225,7 @@ template <auto iRec, MosaicPattern T_>
   TInteger iNonRec = 0;
 
   ForEach<tuple_size_v<T>>([&](auto i) {
-    using U = decltype(get<i>(std::declval<T &>()));
+    using U = decltype(pfr::get<i>(std::declval<T &>()));
     sum += tuple_size_recursive_v<U>;
 
     if (iRec >= sum)
@@ -262,7 +262,7 @@ template <auto iNonRec, MosaicPattern T_>
     if (i >= iNonRec)
       return;
 
-    using U = decltype(get<i>(std::declval<T &>()));
+    using U = decltype(pfr::get<i>(std::declval<T &>()));
     sum += tuple_size_recursive_v<U>;
   });
 
@@ -285,7 +285,7 @@ template <auto iRec, MosaicPattern T>
 
   if constexpr (std::is_aggregate_v<TCleaned>) {
     constexpr TInteger iNonRec = IRec2INonRec<iRec, TCleaned>();
-    return get_recursive<iRec - INonRec2IRec<iNonRec, TCleaned>()>(get<iNonRec>(std::forward<T>(v)));
+    return get_recursive<iRec - INonRec2IRec<iNonRec, TCleaned>()>(pfr::get<iNonRec>(std::forward<T>(v)));
   } else {
     return get<iRec>(std::forward<T>(v));
   }
@@ -306,7 +306,7 @@ struct mosaic_pattern_types_recursive_impl<T, i, TArray> {
   using type = typename mosaic_pattern_types_recursive_impl<
       T,
       i + 1,
-      MakeTypeArray<TArray, std::remove_cvref_t<decltype(get_recursive<i>(std::declval<T &>()))>>>::type;
+      MakeTypeArray<TArray, std::remove_cvref_t<decltype(pfr::get_recursive<i>(std::declval<T &>()))>>>::type;
 };
 
 template <MosaicPattern T, auto i, typename TArray>
