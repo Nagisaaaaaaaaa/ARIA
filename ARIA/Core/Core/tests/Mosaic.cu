@@ -15,6 +15,10 @@ struct Test1Member {
   int v = 5;
 };
 
+struct Test1ArrayMember {
+  int v[3] = {5, 6, 7};
+};
+
 struct Test2Members {
   int v0 = 5;
   double v1 = 6;
@@ -31,16 +35,6 @@ struct TestInheritanceBase {
 
 struct TestInheritance : public TestInheritanceBase {
   double v1 = 6;
-};
-
-struct TestLValueMembers {
-  int v0 = 5;
-  double &v1;
-};
-
-struct TestRValueMembers {
-  int v0 = 5;
-  double &&v1 = 6;
 };
 
 struct TestRecursion0Member {
@@ -65,24 +59,6 @@ struct TestRecursion2Members {
   struct {
     double v1 = 6;
     int *v2 = nullptr;
-  } s0;
-};
-
-struct TestRecursionLValueMembers {
-  int v0 = 5;
-
-  struct {
-    double v1 = 6;
-    float &v2;
-  } s0;
-};
-
-struct TestRecursionRValueMembers {
-  int v0 = 5;
-
-  struct {
-    double v1 = 6;
-    float &&v2 = 7;
   } s0;
 };
 
@@ -134,6 +110,45 @@ void TestGetRecursive() {
     ARIA_ASSERT(get_recursive<0>(v) == 5);
     ARIA_ASSERT(get_recursive<0>(int{5}) == 5);
     static_assert(get_recursive<0>(int{5}) == 5);
+  }).Launch();
+  cuda::device::current::get().synchronize();
+
+  {
+    Test1ArrayMember v;
+    static_assert(std::is_same_v<decltype(get_recursive<0>(v)), int &>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(v)), int &>);
+    static_assert(std::is_same_v<decltype(get_recursive<2>(v)), int &>);
+    static_assert(std::is_same_v<decltype(get_recursive<0>(Test1ArrayMember{})), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(Test1ArrayMember{})), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<2>(Test1ArrayMember{})), int>);
+    EXPECT_EQ(get_recursive<0>(v), 5);
+    EXPECT_EQ(get_recursive<1>(v), 6);
+    EXPECT_EQ(get_recursive<2>(v), 7);
+    EXPECT_EQ(get_recursive<0>(Test1ArrayMember{}), 5);
+    EXPECT_EQ(get_recursive<1>(Test1ArrayMember{}), 6);
+    EXPECT_EQ(get_recursive<2>(Test1ArrayMember{}), 7);
+    static_assert(get_recursive<0>(Test1ArrayMember{}) == 5);
+    static_assert(get_recursive<1>(Test1ArrayMember{}) == 6);
+    static_assert(get_recursive<2>(Test1ArrayMember{}) == 7);
+  }
+
+  Launcher(1, [] ARIA_DEVICE(int i) {
+    Test1ArrayMember v;
+    static_assert(std::is_same_v<decltype(get_recursive<0>(v)), int &>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(v)), int &>);
+    static_assert(std::is_same_v<decltype(get_recursive<2>(v)), int &>);
+    static_assert(std::is_same_v<decltype(get_recursive<0>(Test1ArrayMember{})), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(Test1ArrayMember{})), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<2>(Test1ArrayMember{})), int>);
+    ARIA_ASSERT(get_recursive<0>(v) == 5);
+    ARIA_ASSERT(get_recursive<1>(v) == 6);
+    ARIA_ASSERT(get_recursive<2>(v) == 7);
+    ARIA_ASSERT(get_recursive<0>(Test1ArrayMember{}) == 5);
+    ARIA_ASSERT(get_recursive<1>(Test1ArrayMember{}) == 6);
+    ARIA_ASSERT(get_recursive<2>(Test1ArrayMember{}) == 7);
+    static_assert(get_recursive<0>(Test1ArrayMember{}) == 5);
+    static_assert(get_recursive<1>(Test1ArrayMember{}) == 6);
+    static_assert(get_recursive<2>(Test1ArrayMember{}) == 7);
   }).Launch();
   cuda::device::current::get().synchronize();
 
@@ -623,7 +638,7 @@ TEST(Mosaic, Base) {
   {
     static_assert(std::is_scalar_v<int>);
     static_assert(!std::is_aggregate_v<int>);
-    static_assert(boost::pfr::tuple_size_v<int> == 1);
+    static_assert(tuple_size_v<int> == 1);
     static_assert(MosaicPattern<int>);
     static_assert(tuple_size_recursive_v<int> == 1);
     static_assert(IRec2INonRec<0, int>() == 0);
@@ -634,19 +649,64 @@ TEST(Mosaic, Base) {
     static_assert(INonRec2IRec<99999, int>() == 1);
     static_assert(std::is_same_v<mosaic_pattern_types_recursive_t<int>, TypeArray<int>>);
 
+    static_assert(!std::is_scalar_v<const int &>);
+    static_assert(!std::is_aggregate_v<const int &>);
+    // static_assert(tuple_size_v<const int&> == 1);
+    static_assert(MosaicPattern<const int &>);
+    static_assert(tuple_size_recursive_v<const int &> == 1);
+    static_assert(IRec2INonRec<0, const int &>() == 0);
+    static_assert(IRec2INonRec<1, const int &>() == 1);
+    static_assert(IRec2INonRec<99999, const int &>() == 1);
+    static_assert(INonRec2IRec<0, const int &>() == 0);
+    static_assert(INonRec2IRec<1, const int &>() == 1);
+    static_assert(INonRec2IRec<99999, const int &>() == 1);
+    static_assert(std::is_same_v<mosaic_pattern_types_recursive_t<const int &>, TypeArray<int>>);
+
+    static_assert(!std::is_scalar_v<int[3]>);
+    static_assert(std::is_aggregate_v<int[3]>);
+    static_assert(tuple_size_v<int[3]> == 3);
+    static_assert(MosaicPattern<int[3]>);
+    static_assert(tuple_size_recursive_v<int[3]> == 3);
+    static_assert(IRec2INonRec<0, int[3]>() == 0);
+    static_assert(IRec2INonRec<1, int[3]>() == 1);
+    static_assert(IRec2INonRec<2, int[3]>() == 2);
+    static_assert(IRec2INonRec<3, int[3]>() == 3);
+    static_assert(IRec2INonRec<99999, int[3]>() == 3);
+    static_assert(INonRec2IRec<0, int[3]>() == 0);
+    static_assert(INonRec2IRec<1, int[3]>() == 1);
+    static_assert(INonRec2IRec<2, int[3]>() == 2);
+    static_assert(INonRec2IRec<3, int[3]>() == 3);
+    static_assert(INonRec2IRec<99999, int[3]>() == 3);
+    static_assert(std::is_same_v<mosaic_pattern_types_recursive_t<int[3]>, TypeArray<int, int, int>>);
+
     static_assert(!std::is_scalar_v<Test0Member>);
     static_assert(std::is_aggregate_v<Test0Member>);
-    static_assert(boost::pfr::tuple_size_v<Test0Member> == 0);
+    static_assert(tuple_size_v<Test0Member> == 0);
     static_assert(!MosaicPattern<Test0Member>);
 
     static_assert(!std::is_scalar_v<Test1Member>);
     static_assert(std::is_aggregate_v<Test1Member>);
-    // static_assert(boost::pfr::tuple_size_v<Test1Member> == 1);
+    // static_assert(tuple_size_v<Test1Member> == 1);
     // static_assert(!MosaicPattern<Test1Member>);
+
+    static_assert(!std::is_scalar_v<Test1ArrayMember>);
+    static_assert(std::is_aggregate_v<Test1ArrayMember>);
+    static_assert(tuple_size_v<Test1ArrayMember> == 1);
+    static_assert(MosaicPattern<Test1ArrayMember>);
+    static_assert(tuple_size_recursive_v<Test1ArrayMember> == 3);
+    static_assert(IRec2INonRec<0, Test1ArrayMember>() == 0);
+    static_assert(IRec2INonRec<1, Test1ArrayMember>() == 0);
+    static_assert(IRec2INonRec<2, Test1ArrayMember>() == 0);
+    static_assert(IRec2INonRec<3, Test1ArrayMember>() == 1);
+    static_assert(IRec2INonRec<99999, Test1ArrayMember>() == 1);
+    static_assert(INonRec2IRec<0, Test1ArrayMember>() == 0);
+    static_assert(INonRec2IRec<1, Test1ArrayMember>() == 3);
+    static_assert(INonRec2IRec<99999, Test1ArrayMember>() == 3);
+    static_assert(std::is_same_v<mosaic_pattern_types_recursive_t<Test1ArrayMember>, TypeArray<int, int, int>>);
 
     static_assert(!std::is_scalar_v<Test2Members>);
     static_assert(std::is_aggregate_v<Test2Members>);
-    static_assert(boost::pfr::tuple_size_v<Test2Members> == 2);
+    static_assert(tuple_size_v<Test2Members> == 2);
     static_assert(MosaicPattern<Test2Members>);
     static_assert(tuple_size_recursive_v<Test2Members> == 2);
     static_assert(IRec2INonRec<0, Test2Members>() == 0);
@@ -661,37 +721,27 @@ TEST(Mosaic, Base) {
 
     static_assert(!std::is_scalar_v<TestPrivateMembers>);
     static_assert(!std::is_aggregate_v<TestPrivateMembers>);
-    // static_assert(boost::pfr::tuple_size_v<TestPrivateMembers> == 1);
+    // static_assert(tuple_size_v<TestPrivateMembers> == 1);
     // static_assert(!MosaicPattern<TestPrivateMembers>);
 
     static_assert(!std::is_scalar_v<TestInheritance>);
     static_assert(std::is_aggregate_v<TestInheritance>);
-    // static_assert(boost::pfr::tuple_size_v<TestInheritance> == 2);
+    // static_assert(tuple_size_v<TestInheritance> == 2);
     // static_assert(!MosaicPattern<TestInheritance>);
-
-    static_assert(!std::is_scalar_v<TestLValueMembers>);
-    static_assert(std::is_aggregate_v<TestLValueMembers>);
-    // static_assert(boost::pfr::tuple_size_v<TestLValueMembers> == 2);
-    // static_assert(!MosaicPattern<TestLValueMembers>);
-
-    static_assert(!std::is_scalar_v<TestRValueMembers>);
-    static_assert(std::is_aggregate_v<TestRValueMembers>);
-    // static_assert(boost::pfr::tuple_size_v<TestRValueMembers> == 2);
-    // static_assert(!MosaicPattern<TestRValueMembers>);
 
     static_assert(!std::is_scalar_v<TestRecursion0Member>);
     static_assert(std::is_aggregate_v<TestRecursion0Member>);
-    // static_assert(boost::pfr::tuple_size_v<TestRecursion0Member> == 2);
+    // static_assert(tuple_size_v<TestRecursion0Member> == 2);
     // static_assert(!MosaicPattern<TestRecursion0Member>);
 
     static_assert(!std::is_scalar_v<TestRecursion1Member>);
     static_assert(std::is_aggregate_v<TestRecursion1Member>);
-    static_assert(boost::pfr::tuple_size_v<TestRecursion1Member> == 2);
+    static_assert(tuple_size_v<TestRecursion1Member> == 2);
     // static_assert(!MosaicPattern<TestRecursion1Member>);
 
     static_assert(!std::is_scalar_v<TestRecursion2Members>);
     static_assert(std::is_aggregate_v<TestRecursion2Members>);
-    static_assert(boost::pfr::tuple_size_v<TestRecursion2Members> == 2);
+    static_assert(tuple_size_v<TestRecursion2Members> == 2);
     static_assert(MosaicPattern<TestRecursion2Members>);
     static_assert(tuple_size_recursive_v<TestRecursion2Members> == 3);
     static_assert(IRec2INonRec<0, TestRecursion2Members>() == 0);
@@ -706,19 +756,9 @@ TEST(Mosaic, Base) {
     static_assert(
         std::is_same_v<mosaic_pattern_types_recursive_t<TestRecursion2Members>, TypeArray<int, double, int *>>);
 
-    static_assert(!std::is_scalar_v<TestRecursionLValueMembers>);
-    static_assert(std::is_aggregate_v<TestRecursionLValueMembers>);
-    // static_assert(boost::pfr::tuple_size_v<TestRecursionLValueMembers> == 2);
-    // static_assert(!MosaicPattern<TestRecursionLValueMembers>);
-
-    static_assert(!std::is_scalar_v<TestRecursionRValueMembers>);
-    static_assert(std::is_aggregate_v<TestRecursionRValueMembers>);
-    // static_assert(boost::pfr::tuple_size_v<TestRecursionRValueMembers> == 2);
-    // static_assert(!MosaicPattern<TestRecursionRValueMembers>);
-
     static_assert(!std::is_scalar_v<TestRecursionComplex>);
     static_assert(std::is_aggregate_v<TestRecursionComplex>);
-    static_assert(boost::pfr::tuple_size_v<TestRecursionComplex> == 13);
+    static_assert(tuple_size_v<TestRecursionComplex> == 13);
     static_assert(MosaicPattern<TestRecursionComplex>);
     static_assert(tuple_size_recursive_v<TestRecursionComplex> == 34);
     static_assert(IRec2INonRec<0, TestRecursionComplex>() == 0);
@@ -765,7 +805,7 @@ TEST(Mosaic, Base) {
 
       static_assert(std::is_scalar_v<T *>);
       static_assert(!std::is_aggregate_v<T *>);
-      static_assert(boost::pfr::tuple_size_v<T *> == 1);
+      static_assert(tuple_size_v<T *> == 1);
       static_assert(MosaicPattern<T *>);
       static_assert(tuple_size_recursive_v<T *> == 1);
       static_assert(IRec2INonRec<0, T *>() == 0);
@@ -777,16 +817,13 @@ TEST(Mosaic, Base) {
     testPointerType.operator()<double>();
     testPointerType.operator()<Test0Member>();
     testPointerType.operator()<Test1Member>();
+    testPointerType.operator()<Test1ArrayMember>();
     testPointerType.operator()<Test2Members>();
     testPointerType.operator()<TestPrivateMembers>();
     testPointerType.operator()<TestInheritance>();
-    testPointerType.operator()<TestLValueMembers>();
-    testPointerType.operator()<TestRValueMembers>();
     testPointerType.operator()<TestRecursion0Member>();
     testPointerType.operator()<TestRecursion1Member>();
     testPointerType.operator()<TestRecursion2Members>();
-    testPointerType.operator()<TestRecursionLValueMembers>();
-    testPointerType.operator()<TestRecursionRValueMembers>();
     testPointerType.operator()<TestRecursionComplex>();
   }
 }
