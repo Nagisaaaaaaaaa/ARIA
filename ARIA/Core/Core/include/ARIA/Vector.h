@@ -45,6 +45,9 @@ namespace ARIA {
 /// VectorHost<TMosaic> v2;   // Host   vector with structure of arrays (SoA), that is, `3 * host_vector<int>`.
 /// VectorDevice<TMosaic> v3; // Device vector with structure of arrays (SoA), that is, `3 * device_vector<int>`.
 /// ```
+///
+/// \warning Just like `thrust::device_vector`, `operator[]`s of SoA or device variants
+/// will return proxies instead of simple references, see `Auto.h`.
 template <typename T, typename TSpaceHostOrDevice, typename... Ts>
 using Vector = mosaic::detail::reduce_vector_t<T, TSpaceHostOrDevice, Ts...>;
 
