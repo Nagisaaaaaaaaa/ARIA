@@ -54,6 +54,13 @@ public:
 public:
   constexpr MosaicArray() = default;
 
+  ARIA_HOST_DEVICE constexpr MosaicArray(const std::array<T, size> &v) { operator=(v); }
+
+  ARIA_HOST_DEVICE MosaicArray &operator=(const std::array<T, size> &v) {
+    ForEach<size>([&]<auto i>() { operator[](i) = v[i]; });
+    return *this;
+  }
+
   ARIA_COPY_MOVE_ABILITY(MosaicArray, default, default);
 
 public:
