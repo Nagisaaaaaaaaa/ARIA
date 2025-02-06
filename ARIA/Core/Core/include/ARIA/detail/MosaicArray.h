@@ -75,7 +75,7 @@ public:
   [[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator[](size_t i) { return *(data() + i); }
 
 public:
-  ARIA_HOST_DEVICE void fill(const T &value) {
+  ARIA_HOST_DEVICE constexpr void fill(const T &value) {
     ForEach<size()>([&]<auto i>() { operator[](i) = value; });
   }
 
