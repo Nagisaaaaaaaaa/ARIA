@@ -29,7 +29,7 @@ static constexpr bool isReferenceOrPointer = std::is_reference_v<T> || std::is_p
 /// Constructors can accept something like {0, 1.0, "Hello"}, while
 /// `operator=()`s can only accept arguments with same types, for example, {0.1, 0.2, 0.3}.
 template <typename ValueType, typename T, size_t... is>
-ARIA_HOST_DEVICE auto ConstructWithArray(const T *args, std::index_sequence<is...>) {
+ARIA_HOST_DEVICE constexpr auto ConstructWithArray(const T *args, std::index_sequence<is...>) {
   return ValueType{args[is]...};
 }
 
