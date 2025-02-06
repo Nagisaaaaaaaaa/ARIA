@@ -62,7 +62,14 @@ public:
 
   ARIA_HOST_DEVICE constexpr MosaicArray(const std::array<T, size()> &v) { operator=(v); }
 
-  ARIA_HOST_DEVICE MosaicArray &operator=(const std::array<T, size()> &v) {
+  ARIA_HOST_DEVICE constexpr MosaicArray(const cuda::std::array<T, size()> &v) { operator=(v); }
+
+  ARIA_HOST_DEVICE constexpr MosaicArray &operator=(const std::array<T, size()> &v) {
+    ForEach<size()>([&]<auto i>() { operator[](i) = v[i]; });
+    return *this;
+  }
+
+  ARIA_HOST_DEVICE constexpr MosaicArray &operator=(const cuda::std::array<T, size()> &v) {
     ForEach<size()>([&]<auto i>() { operator[](i) = v[i]; });
     return *this;
   }
