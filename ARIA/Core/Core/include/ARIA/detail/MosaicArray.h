@@ -60,14 +60,18 @@ public:
 public:
   constexpr MosaicArray() = default;
 
+#if 0
   ARIA_HOST_DEVICE constexpr MosaicArray(const std::array<T, size()> &v) { operator=(v); }
+#endif
 
   ARIA_HOST_DEVICE constexpr MosaicArray(const cuda::std::array<T, size()> &v) { operator=(v); }
 
+#if 0
   ARIA_HOST_DEVICE constexpr MosaicArray &operator=(const std::array<T, size()> &v) {
     ForEach<size()>([&]<auto i>() { operator[](i) = v[i]; });
     return *this;
   }
+#endif
 
   ARIA_HOST_DEVICE constexpr MosaicArray &operator=(const cuda::std::array<T, size()> &v) {
     ForEach<size()>([&]<auto i>() { operator[](i) = v[i]; });
