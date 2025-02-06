@@ -703,7 +703,7 @@ concept TensorVectorType = is_tensor_vector_v<T>;
 //
 //
 //
-// Copy is simply implemented with `thrust::copy`.
+// Copy is simply implemented with `mosaic::detail::copy`.
 template <typename T, ArrayType ArgsDst, ArrayType ArgsSrc>
 ARIA_HOST_DEVICE void copy(TensorVectorReduced<T, ArgsDst> &dst, const TensorVectorReduced<T, ArgsSrc> &src) {
   using TVDst = TensorVectorReduced<T, ArgsDst>;
@@ -722,7 +722,7 @@ ARIA_HOST_DEVICE void copy(TensorVectorReduced<T, ArgsDst> &dst, const TensorVec
   ARIA_ASSERT(dst.cosize_safe() == src.cosize_safe(), "Unable to copy tensor vectors with different cosizes");
 #endif
 
-  thrust::copy(src.tensor().data(), src.tensor().data() + src.cosize_safe(), dst.tensor().data());
+  mosaic::detail::copy(src.tensor().data(), src.tensor().data() + src.cosize_safe(), dst.tensor().data());
 }
 
 } // namespace tensor_vector::detail
