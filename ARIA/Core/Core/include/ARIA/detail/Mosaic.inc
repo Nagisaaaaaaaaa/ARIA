@@ -171,6 +171,8 @@ concept MosaicPattern = is_mosaic_pattern_v<T>;
 //
 //
 //
+namespace pfr {
+
 // As we have known, one of the mean features of `MosaicPattern` is
 // compile-time number of elements (tuple size).
 // It should be computed non-recursively or recursively.
@@ -192,6 +194,8 @@ template <MosaicPattern T_>
 
 template <MosaicPattern T>
 static constexpr auto tuple_size_recursive_v = TupleSizeRecursiveImpl<T>();
+
+} // namespace pfr
 
 //
 //
