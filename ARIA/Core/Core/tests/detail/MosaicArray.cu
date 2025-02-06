@@ -46,6 +46,7 @@ TEST(MosaicArray, Base) {
   {
     using T = Tup<int, float>;
     using TMosaic = Mosaic<T, PatternIF>;
+
     using TMosaicArray = MosaicArray<TMosaic, 5>;
 
     TMosaicArray vec{};
@@ -135,6 +136,115 @@ TEST(MosaicArray, Base) {
         T v = vec1[i];
         EXPECT_EQ(get<0>(v), 0);
         EXPECT_FLOAT_EQ(get<1>(v), 0.0F);
+      }
+    }
+  }
+
+  // `int, int, int`.
+  {
+    using T = Tec<int, int, int>;
+    using TMosaic = Mosaic<T, PatternIII>;
+
+    using TMosaicArray = MosaicArray<TMosaic, 5>;
+
+    TMosaicArray vec{};
+    static_assert(vec.size() == 5);
+
+    for (int i = 0; i < 5; ++i) {
+      let v = Let(vec[i]);
+      static_assert(Property<decltype(vec[i])>);
+      static_assert(std::is_same_v<decltype(v), T>);
+      EXPECT_EQ(get<0>(v), 0);
+      EXPECT_EQ(get<1>(v), 0);
+      EXPECT_EQ(get<2>(v), 0);
+
+      vec[i] = {i, 2 * i, 3 * i};
+      v = vec[i];
+      EXPECT_EQ(get<0>(v), i);
+      EXPECT_EQ(get<1>(v), 2 * i);
+      EXPECT_EQ(get<2>(v), 3 * i);
+    }
+
+    for (let it = vec.begin(); it != vec.end(); ++it) {
+      let v = Let(*it);
+      let k = it - vec.begin();
+      int i = k;
+      static_assert(Property<decltype(*it)>);
+      static_assert(std::is_same_v<decltype(v), T>);
+      static_assert(std::is_same_v<decltype(k), int64>);
+      EXPECT_EQ(get<0>(v), i);
+      EXPECT_EQ(get<1>(v), 2 * i);
+      EXPECT_EQ(get<2>(v), 3 * i);
+
+      *it -= T{i, 2 * i, 3 * i};
+      v = vec[i];
+      EXPECT_EQ(get<0>(v), 0);
+      EXPECT_EQ(get<1>(v), 0);
+      EXPECT_EQ(get<2>(v), 0);
+    }
+
+    for (let it = vec.cbegin(); it != vec.cend(); ++it) {
+      let v = Let(*it);
+      let k = it - vec.cbegin();
+      static_assert(Property<decltype(*it)>);
+      static_assert(std::is_same_v<decltype(v), T>);
+      static_assert(std::is_same_v<decltype(k), int64>);
+      EXPECT_EQ(get<0>(v), 0);
+      EXPECT_EQ(get<1>(v), 0);
+      EXPECT_EQ(get<2>(v), 0);
+    }
+
+    for (int i = 0; i < 5; ++i) {
+      let ptr = vec.data() + i;
+      let v = Let(*ptr);
+      static_assert(Property<decltype(*ptr)>);
+      static_assert(std::is_same_v<decltype(v), T>);
+      EXPECT_EQ(get<0>(v), 0);
+      EXPECT_EQ(get<1>(v), 0);
+      EXPECT_EQ(get<2>(v), 0);
+
+      *ptr += T{i, 2 * i, 3 * i};
+      v = *ptr;
+      EXPECT_EQ(get<0>(v), i);
+      EXPECT_EQ(get<1>(v), 2 * i);
+      EXPECT_EQ(get<2>(v), 3 * i);
+    }
+
+    {
+      int i = 0;
+      for (auto vProp : vec) {
+        let v = Let(vProp);
+        static_assert(Property<decltype(vProp)>);
+        static_assert(std::is_same_v<decltype(v), T>);
+        EXPECT_EQ(get<0>(v), i);
+        EXPECT_EQ(get<1>(v), 2 * i);
+        EXPECT_EQ(get<2>(v), 3 * i);
+
+        vProp *= 0;
+        v = vProp;
+        EXPECT_EQ(get<0>(v), 0);
+        EXPECT_EQ(get<1>(v), 0);
+        EXPECT_EQ(get<2>(v), 0);
+
+        ++i;
+      }
+    }
+
+    {
+      TMosaicArray vec1{{T{0, 0, 0}, T{1, 2, 3}, T{2, 4, 6}, T{3, 6, 9}, T{4, 8, 12}}};
+      for (int i = 0; i < 5; ++i) {
+        T v = vec1[i];
+        EXPECT_EQ(get<0>(v), i);
+        EXPECT_EQ(get<1>(v), 2 * i);
+        EXPECT_EQ(get<2>(v), 3 * i);
+      }
+
+      vec1.fill(T{0, 0, 0});
+      for (int i = 0; i < 5; ++i) {
+        T v = vec1[i];
+        EXPECT_EQ(get<0>(v), 0);
+        EXPECT_EQ(get<1>(v), 0);
+        EXPECT_EQ(get<2>(v), 0);
       }
     }
   }
