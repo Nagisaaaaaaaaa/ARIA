@@ -386,6 +386,34 @@ private:
   Tensor tensor_;
 };
 
+// Mosaic + host + static.
+template <NonArrayType TMosaic, NonArrayType TStaticLayout>
+  requires(mosaic::detail::is_mosaic_v<TMosaic> && is_static_v<TStaticLayout>)
+class TensorVectorReduced<TMosaic, TypeArray<UInt<TStaticLayout::rank>, SpaceHost, TStaticLayout>>
+    : public TensorVectorMembers<TMosaic, UInt<TStaticLayout::rank>, SpaceHost, TStaticLayout> {
+public:
+  using Layout = TStaticLayout;
+  using Tensor = cute::Tensor<Array<TMosaic, cosize_safe_v<TStaticLayout>>, TStaticLayout>;
+  //! `RawTensor` is not defined for mosaic ones.
+
+public:
+  TensorVectorReduced() = default;
+
+  explicit TensorVectorReduced(const TStaticLayout &) {}
+
+  ARIA_COPY_MOVE_ABILITY(TensorVectorReduced, default, default);
+
+public:
+  [[nodiscard]] constexpr TStaticLayout layout() const { return {}; }
+
+  [[nodiscard]] constexpr decltype(auto) tensor() const { return cute::make_tensor(tensor_.data(), layout()); }
+
+  [[nodiscard]] constexpr decltype(auto) tensor() { return cute::make_tensor(tensor_.data(), layout()); }
+
+private:
+  Tensor tensor_;
+};
+
 //
 //
 //
