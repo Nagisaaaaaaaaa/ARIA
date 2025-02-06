@@ -54,11 +54,6 @@ private:
   using TMosaicPattern = typename is_mosaic<TMosaic>::TMosaicPattern;
   using TStorage = mosaic_array_storage_type_t<TMosaicPattern, size()>;
 
-  // `friend` is added to access `storage_` of other `MosaicArray` types.
-  template <typename UMosaic, size_t size1>
-    requires(is_mosaic_v<UMosaic>)
-  friend class MosaicArray;
-
 public:
   using value_type = T;
 
