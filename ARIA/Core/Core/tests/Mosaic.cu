@@ -665,9 +665,9 @@ TEST(Mosaic, Base) {
   {
     static_assert(std::is_scalar_v<int>);
     static_assert(!std::is_aggregate_v<int>);
-    static_assert(tuple_size_v<int> == 1);
+    static_assert(pfr::tuple_size_v<int> == 1);
     static_assert(MosaicPattern<int>);
-    static_assert(tuple_size_recursive_v<int> == 1);
+    static_assert(pfr::tuple_size_recursive_v<int> == 1);
     static_assert(IRec2INonRec<0, int>() == 0);
     static_assert(IRec2INonRec<1, int>() == 1);
     static_assert(IRec2INonRec<99999, int>() == 1);
@@ -678,9 +678,9 @@ TEST(Mosaic, Base) {
 
     static_assert(!std::is_scalar_v<const int &>);
     static_assert(!std::is_aggregate_v<const int &>);
-    // static_assert(tuple_size_v<const int&> == 1);
+    // static_assert(pfr::tuple_size_v<const int&> == 1);
     static_assert(MosaicPattern<const int &>);
-    static_assert(tuple_size_recursive_v<const int &> == 1);
+    static_assert(pfr::tuple_size_recursive_v<const int &> == 1);
     static_assert(IRec2INonRec<0, const int &>() == 0);
     static_assert(IRec2INonRec<1, const int &>() == 1);
     static_assert(IRec2INonRec<99999, const int &>() == 1);
@@ -691,9 +691,9 @@ TEST(Mosaic, Base) {
 
     static_assert(!std::is_scalar_v<int[3]>);
     static_assert(std::is_aggregate_v<int[3]>);
-    static_assert(tuple_size_v<int[3]> == 3);
+    static_assert(pfr::tuple_size_v<int[3]> == 3);
     static_assert(MosaicPattern<int[3]>);
-    static_assert(tuple_size_recursive_v<int[3]> == 3);
+    static_assert(pfr::tuple_size_recursive_v<int[3]> == 3);
     static_assert(IRec2INonRec<0, int[3]>() == 0);
     static_assert(IRec2INonRec<1, int[3]>() == 1);
     static_assert(IRec2INonRec<2, int[3]>() == 2);
@@ -708,19 +708,19 @@ TEST(Mosaic, Base) {
 
     static_assert(!std::is_scalar_v<Test0Member>);
     static_assert(std::is_aggregate_v<Test0Member>);
-    static_assert(tuple_size_v<Test0Member> == 0);
+    static_assert(pfr::tuple_size_v<Test0Member> == 0);
     static_assert(!MosaicPattern<Test0Member>);
 
     static_assert(!std::is_scalar_v<Test1Member>);
     static_assert(std::is_aggregate_v<Test1Member>);
-    // static_assert(tuple_size_v<Test1Member> == 1);
+    // static_assert(pfr::tuple_size_v<Test1Member> == 1);
     // static_assert(!MosaicPattern<Test1Member>);
 
     static_assert(!std::is_scalar_v<Test1ArrayMember>);
     static_assert(std::is_aggregate_v<Test1ArrayMember>);
-    static_assert(tuple_size_v<Test1ArrayMember> == 1);
+    static_assert(pfr::tuple_size_v<Test1ArrayMember> == 1);
     static_assert(MosaicPattern<Test1ArrayMember>);
-    static_assert(tuple_size_recursive_v<Test1ArrayMember> == 3);
+    static_assert(pfr::tuple_size_recursive_v<Test1ArrayMember> == 3);
     static_assert(IRec2INonRec<0, Test1ArrayMember>() == 0);
     static_assert(IRec2INonRec<1, Test1ArrayMember>() == 0);
     static_assert(IRec2INonRec<2, Test1ArrayMember>() == 0);
@@ -733,9 +733,9 @@ TEST(Mosaic, Base) {
 
     static_assert(!std::is_scalar_v<Test2Members>);
     static_assert(std::is_aggregate_v<Test2Members>);
-    static_assert(tuple_size_v<Test2Members> == 2);
+    static_assert(pfr::tuple_size_v<Test2Members> == 2);
     static_assert(MosaicPattern<Test2Members>);
-    static_assert(tuple_size_recursive_v<Test2Members> == 2);
+    static_assert(pfr::tuple_size_recursive_v<Test2Members> == 2);
     static_assert(IRec2INonRec<0, Test2Members>() == 0);
     static_assert(IRec2INonRec<1, Test2Members>() == 1);
     static_assert(IRec2INonRec<2, Test2Members>() == 2);
@@ -748,29 +748,29 @@ TEST(Mosaic, Base) {
 
     static_assert(!std::is_scalar_v<TestPrivateMembers>);
     static_assert(!std::is_aggregate_v<TestPrivateMembers>);
-    // static_assert(tuple_size_v<TestPrivateMembers> == 1);
+    // static_assert(pfr::tuple_size_v<TestPrivateMembers> == 1);
     // static_assert(!MosaicPattern<TestPrivateMembers>);
 
     static_assert(!std::is_scalar_v<TestInheritance>);
     static_assert(std::is_aggregate_v<TestInheritance>);
-    // static_assert(tuple_size_v<TestInheritance> == 2);
+    // static_assert(pfr::tuple_size_v<TestInheritance> == 2);
     // static_assert(!MosaicPattern<TestInheritance>);
 
     static_assert(!std::is_scalar_v<TestRecursion0Member>);
     static_assert(std::is_aggregate_v<TestRecursion0Member>);
-    // static_assert(tuple_size_v<TestRecursion0Member> == 2);
+    // static_assert(pfr::tuple_size_v<TestRecursion0Member> == 2);
     // static_assert(!MosaicPattern<TestRecursion0Member>);
 
     static_assert(!std::is_scalar_v<TestRecursion1Member>);
     static_assert(std::is_aggregate_v<TestRecursion1Member>);
-    static_assert(tuple_size_v<TestRecursion1Member> == 2);
+    static_assert(pfr::tuple_size_v<TestRecursion1Member> == 2);
     // static_assert(!MosaicPattern<TestRecursion1Member>);
 
     static_assert(!std::is_scalar_v<TestRecursion2Members>);
     static_assert(std::is_aggregate_v<TestRecursion2Members>);
-    static_assert(tuple_size_v<TestRecursion2Members> == 2);
+    static_assert(pfr::tuple_size_v<TestRecursion2Members> == 2);
     static_assert(MosaicPattern<TestRecursion2Members>);
-    static_assert(tuple_size_recursive_v<TestRecursion2Members> == 3);
+    static_assert(pfr::tuple_size_recursive_v<TestRecursion2Members> == 3);
     static_assert(IRec2INonRec<0, TestRecursion2Members>() == 0);
     static_assert(IRec2INonRec<1, TestRecursion2Members>() == 1);
     static_assert(IRec2INonRec<2, TestRecursion2Members>() == 1);
@@ -785,9 +785,9 @@ TEST(Mosaic, Base) {
 
     static_assert(!std::is_scalar_v<TestRecursionComplex>);
     static_assert(std::is_aggregate_v<TestRecursionComplex>);
-    static_assert(tuple_size_v<TestRecursionComplex> == 13);
+    static_assert(pfr::tuple_size_v<TestRecursionComplex> == 13);
     static_assert(MosaicPattern<TestRecursionComplex>);
-    static_assert(tuple_size_recursive_v<TestRecursionComplex> == 34);
+    static_assert(pfr::tuple_size_recursive_v<TestRecursionComplex> == 34);
     static_assert(IRec2INonRec<0, TestRecursionComplex>() == 0);
     static_assert(IRec2INonRec<1, TestRecursionComplex>() == 1);
     static_assert(IRec2INonRec<2, TestRecursionComplex>() == 2);
@@ -832,9 +832,9 @@ TEST(Mosaic, Base) {
 
       static_assert(std::is_scalar_v<T *>);
       static_assert(!std::is_aggregate_v<T *>);
-      static_assert(tuple_size_v<T *> == 1);
+      static_assert(pfr::tuple_size_v<T *> == 1);
       static_assert(MosaicPattern<T *>);
-      static_assert(tuple_size_recursive_v<T *> == 1);
+      static_assert(pfr::tuple_size_recursive_v<T *> == 1);
       static_assert(IRec2INonRec<0, T *>() == 0);
       static_assert(IRec2INonRec<1, T *>() == 1);
       static_assert(IRec2INonRec<99999, T *>() == 1);
