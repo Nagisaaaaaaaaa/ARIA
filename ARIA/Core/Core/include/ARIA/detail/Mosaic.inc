@@ -138,11 +138,11 @@ template <typename T_>
   // For aggregate types (structures, or array types).
   if constexpr (std::is_aggregate_v<T>) {
     //! `> 0` is required here because empty classes are considered unnecessary.
-    if (tuple_size_v<T> == 0)
+    if (pfr::tuple_size_v<T> == 0)
       return false;
 
     bool res = true;
-    ForEach<tuple_size_v<T>>([&](auto i) {
+    ForEach<pfr::tuple_size_v<T>>([&](auto i) {
       //! Here, `std::declval<T &>` is used instead of `std::declval<T>` in order to
       //! prevent array types such as `int[3]` from being converted to `int*`.
       using U = decltype(pfr::get<i>(std::declval<T &>()));
@@ -179,11 +179,11 @@ namespace pfr {
 template <MosaicPattern T_>
 [[nodiscard]] static consteval auto TupleSizeRecursiveImpl() {
   using T = std::remove_cvref_t<T_>;
-  using TInteger = std::decay_t<decltype(tuple_size_v<T>)>;
+  using TInteger = std::decay_t<decltype(pfr::tuple_size_v<T>)>;
 
   if constexpr (std::is_aggregate_v<T>) {
     TInteger sum = 0;
-    ForEach<tuple_size_v<T>>([&](auto i) {
+    ForEach<pfr::tuple_size_v<T>>([&](auto i) {
       using U = decltype(pfr::get<i>(std::declval<T &>()));
       sum += TupleSizeRecursiveImpl<U>();
     });
@@ -223,14 +223,14 @@ static constexpr auto tuple_size_recursive_v = TupleSizeRecursiveImpl<T>();
 template <auto iRec, MosaicPattern T_>
 [[nodiscard]] static consteval auto IRec2INonRec() {
   using T = std::remove_cvref_t<T_>;
-  using TInteger = std::decay_t<decltype(tuple_size_v<T>)>;
+  using TInteger = std::decay_t<decltype(pfr::tuple_size_v<T>)>;
 
   TInteger sum = 0;
   TInteger iNonRec = 0;
 
-  ForEach<tuple_size_v<T>>([&](auto i) {
+  ForEach<pfr::tuple_size_v<T>>([&](auto i) {
     using U = decltype(pfr::get<i>(std::declval<T &>()));
-    sum += tuple_size_recursive_v<U>;
+    sum += pfr::tuple_size_recursive_v<U>;
 
     if (iRec >= sum)
       iNonRec = i + 1;
@@ -258,16 +258,16 @@ template <auto iRec, MosaicPattern T_>
 template <auto iNonRec, MosaicPattern T_>
 [[nodiscard]] static consteval auto INonRec2IRec() {
   using T = std::remove_cvref_t<T_>;
-  using TInteger = std::decay_t<decltype(tuple_size_v<T>)>;
+  using TInteger = std::decay_t<decltype(pfr::tuple_size_v<T>)>;
 
   TInteger sum = 0;
 
-  ForEach<tuple_size_v<T>>([&](auto i) {
+  ForEach<pfr::tuple_size_v<T>>([&](auto i) {
     if (i >= iNonRec)
       return;
 
     using U = decltype(pfr::get<i>(std::declval<T &>()));
-    sum += tuple_size_recursive_v<U>;
+    sum += pfr::tuple_size_recursive_v<U>;
   });
 
   return sum;
@@ -283,9 +283,9 @@ namespace pfr {
 template <auto iRec, MosaicPattern T>
 [[nodiscard]] static constexpr decltype(auto) get_recursive(T &&v) noexcept {
   using TCleaned = std::remove_cvref_t<T>;
-  static_assert(iRec < tuple_size_recursive_v<TCleaned>, "Index out of range");
+  static_assert(iRec < pfr::tuple_size_recursive_v<TCleaned>, "Index out of range");
 
-  using TInteger = std::decay_t<decltype(tuple_size_v<TCleaned>)>;
+  using TInteger = std::decay_t<decltype(pfr::tuple_size_v<TCleaned>)>;
 
   if constexpr (std::is_aggregate_v<TCleaned>) {
     constexpr TInteger iNonRec = IRec2INonRec<iRec, TCleaned>();
@@ -305,7 +305,7 @@ template <MosaicPattern T, auto i, typename TArray>
 struct mosaic_pattern_types_recursive_impl;
 
 template <MosaicPattern T, auto i, typename TArray>
-  requires(i < tuple_size_recursive_v<T>)
+  requires(i < pfr::tuple_size_recursive_v<T>)
 struct mosaic_pattern_types_recursive_impl<T, i, TArray> {
   using type = typename mosaic_pattern_types_recursive_impl<
       T,
@@ -314,7 +314,7 @@ struct mosaic_pattern_types_recursive_impl<T, i, TArray> {
 };
 
 template <MosaicPattern T, auto i, typename TArray>
-  requires(i == tuple_size_recursive_v<T>)
+  requires(i == pfr::tuple_size_recursive_v<T>)
 struct mosaic_pattern_types_recursive_impl<T, i, TArray> {
   using type = TArray;
 };
