@@ -31,12 +31,12 @@ struct Mosaic<Tup<int, float>, PatternIF> {
 };
 
 template <>
-struct Mosaic<Tup<int, int, int>, PatternIII> {
-  PatternIII operator()(const Tup<int, int, int> &v) const {
+struct Mosaic<Tec<int, int, int>, PatternIII> {
+  PatternIII operator()(const Tec<int, int, int> &v) const {
     return {.ii = {.v0 = get<0>(v), .v1 = get<1>(v)}, .v2 = get<2>(v)};
   }
 
-  Tup<int, int, int> operator()(const PatternIII &v) const { return {v.ii.v0, v.ii.v1, v.v2}; }
+  Tec<int, int, int> operator()(const PatternIII &v) const { return {v.ii.v0, v.ii.v1, v.v2}; }
 };
 
 TEST(MosaicVector, Base) {
@@ -88,7 +88,6 @@ TEST(MosaicVector, Base) {
       for (let it = vec.cbegin(); it != vec.cend(); ++it) {
         let v = Let(*it);
         let k = it - vec.cbegin();
-        int i = k;
         static_assert(Property<decltype(*it)>);
         static_assert(std::is_same_v<decltype(v), T>);
         static_assert(std::is_same_v<decltype(k), int64>);
@@ -158,7 +157,7 @@ TEST(MosaicVector, Base) {
 
   // `int, int, int`.
   {
-    using T = Tup<int, int, int>;
+    using T = Tec<int, int, int>;
     using TMosaic = Mosaic<T, PatternIII>;
 
     ForEach<MakeTypeArray<SpaceHost, SpaceDevice>>([]<typename TSpace>() {
@@ -206,7 +205,6 @@ TEST(MosaicVector, Base) {
       for (let it = vec.cbegin(); it != vec.cend(); ++it) {
         let v = Let(*it);
         let k = it - vec.cbegin();
-        int i = k;
         static_assert(Property<decltype(*it)>);
         static_assert(std::is_same_v<decltype(v), T>);
         static_assert(std::is_same_v<decltype(k), int64>);
@@ -330,7 +328,7 @@ TEST(MosaicVector, Copy) {
 
   // `int, int, int`.
   {
-    using T = Tup<int, int, int>;
+    using T = Tec<int, int, int>;
     using TMosaic = Mosaic<T, PatternIII>;
 
     ForEach<MakeTypeArray<Tup<SpaceHost, SpaceHost>, Tup<SpaceDevice, SpaceHost>, Tup<SpaceHost, SpaceDevice>,

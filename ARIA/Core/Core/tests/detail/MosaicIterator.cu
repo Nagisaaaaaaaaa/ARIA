@@ -34,12 +34,12 @@ struct Mosaic<Tup<int, float>, PatternIF> {
 };
 
 template <>
-struct Mosaic<Tup<int, int, int>, PatternIII> {
-  PatternIII operator()(const Tup<int, int, int> &v) const {
+struct Mosaic<Tec<int, int, int>, PatternIII> {
+  PatternIII operator()(const Tec<int, int, int> &v) const {
     return {.ii = {.v0 = get<0>(v), .v1 = get<1>(v)}, .v2 = get<2>(v)};
   }
 
-  Tup<int, int, int> operator()(const PatternIII &v) const { return {v.ii.v0, v.ii.v1, v.v2}; }
+  Tec<int, int, int> operator()(const PatternIII &v) const { return {v.ii.v0, v.ii.v1, v.v2}; }
 };
 
 TEST(MosaicIterator, Mosaic) {
@@ -200,7 +200,7 @@ TEST(MosaicIterator, Mosaic) {
 
   // `int, int, int`.
   {
-    using T = Tup<int, int, int>;
+    using T = Tec<int, int, int>;
     using TMosaic = Mosaic<T, PatternIII>;
 
     std::array<int, 5> is0 = {0, 1, 2, 3, 4};
@@ -480,7 +480,7 @@ TEST(MosaicIterator, Copy) {
 
   // `int, int, int`.
   {
-    using T = Tup<int, int, int>;
+    using T = Tec<int, int, int>;
     using TMosaic = Mosaic<T, PatternIII>;
 
     const std::array<int, 5> srcIs0 = {0, 1, 2, 3, 4};

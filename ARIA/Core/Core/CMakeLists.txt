@@ -258,6 +258,7 @@ set(core_core_headers
     ARIA/Tup.h
     ARIA/TypeArray.h
     ARIA/TypeSet.h
+    ARIA/Vector.h
 )
 
 # Add the module sources (if any).

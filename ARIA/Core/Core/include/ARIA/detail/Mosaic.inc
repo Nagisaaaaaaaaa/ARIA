@@ -4,6 +4,103 @@ namespace ARIA {
 
 namespace mosaic::detail {
 
+//! ARIA's `Mosaic` system is implemented mainly based on `boost::pfr`, but
+//! unfortunately, it still has many limitations and undefined behaviors.
+//! So, we have to extend the functionalities of `boost::pfr`, that is,
+//! we will have wrappers for `boost::pfr::tuple_size` and `boost::pfr::get`.
+
+// `array_trait` has the same `value` as `std::is_array` but
+// contains more information about the array, including type and size.
+template <typename T>
+struct array_trait : std::false_type {};
+
+template <typename T_, size_t n_>
+struct array_trait<T_[n_]> : std::true_type {
+  using T = T_;
+  static constexpr size_t n = n_;
+};
+
+template <typename T_>
+struct array_trait<T_[]> : std::true_type {
+  using T = T_;
+};
+
+//
+//
+//
+namespace pfr {
+
+// A wrapper for `boost::pfr::tuple_size`, which takes C arrays into account.
+// For example, `tuple_size_v<int[3]>` will be 3, not 1.
+template <typename T>
+struct tuple_size;
+
+// For non-array types, simply call `boost::pfr::tuple_size_v`.
+template <typename T>
+  requires(!std::is_array_v<T>)
+struct tuple_size<T> {
+  static constexpr size_t value = boost::pfr::tuple_size_v<T>;
+};
+
+// For array types, use `array_trait`.
+template <typename T>
+  requires(std::is_array_v<T>)
+struct tuple_size<T> {
+  static constexpr size_t value = array_trait<T>::n;
+};
+
+template <typename T>
+constexpr size_t tuple_size_v = tuple_size<T>::value;
+
+//
+//
+//
+// A wrapper for `boost::pfr::get`, which takes C arrays into account.
+// For example, `int v[3] = {0, 1, 2}`, then
+// `get<0>(v)`, `get<1>(v)`, and `get<2>(v)` will
+// return references to `0`, `1`, and `2`.
+
+// For non-array types, simply call `boost::pfr::get`.
+template <auto iNonRec, typename T>
+  requires(!std::is_array_v<std::remove_cvref_t<T>>)
+[[nodiscard]] static constexpr decltype(auto) get(T &&v) noexcept {
+  //! Check `boost::pfr` limitations and undefined behaviors by
+  //! requiring that the following types are the same.
+  //! 1. The type get by perfect forwarding.
+  using TCheck0 = std::remove_cvref_t<decltype(boost::pfr::get<iNonRec>(std::forward<T>(v)))>;
+  //! 2. The type get by l-value reference.
+  using TCheck1 = std::remove_cvref_t<decltype(boost::pfr::get<iNonRec>(std::declval<            //
+                                                                        std::remove_cvref_t<T> & //
+                                                                        >()))>;
+  static_assert(std::is_same_v<TCheck0, TCheck1>,
+                "`get` is currently not supported for this type because of the limitations of `boost::pfr`");
+
+  return boost::pfr::get<iNonRec>(std::forward<T>(v));
+}
+
+// For array types.
+template <auto iNonRec, typename T>
+  requires(std::is_array_v<std::remove_cvref_t<T>>)
+[[nodiscard]] static constexpr decltype(auto) get(T &&v) noexcept {
+  // For l-value references, return references.
+  if constexpr (std::is_lvalue_reference_v<std::remove_const_t<decltype(v)>>) {
+    return std::forward<T>(v)[iNonRec];
+  }
+  // Else, return copies.
+  else {
+    using TElem = typename array_trait<std::remove_cvref_t<T>>::T;
+    TElem res = std::forward<T>(v)[iNonRec];
+    return res;
+  }
+}
+
+} // namespace pfr
+
+//
+//
+//
+//
+//
 // `MosaicPattern`s are classes which can be easily serialized.
 // For example:
 // 1. `int` and `int *` are "scalar" types, which
@@ -29,25 +126,29 @@ namespace mosaic::detail {
 //!    `double` can be serialized with `float`, but precision lost.
 //!    `float` can be serialized with `double`, but nothing better.
 //!    `float` can be serialized with `float`, of course.
-template <typename T>
+//
+//! Unfortunately, `const`, `volatile`, and references are not allowed and
+//! will be automatically considered as their `std::remove_cvref_t`-versions.
+template <typename T_>
 [[nodiscard]] static consteval bool IsMosaicPatternImpl() {
-  static_assert(std::is_same_v<T, std::decay_t<T>>, "The given type should be a decayed type");
+  using T = std::remove_cvref_t<T_>;
 
-  //! The "strongest" copy and move ability is required, which means that
-  //! types such as l-value or r-value references are not allowed here.
-  if (!(std::is_copy_constructible_v<T> && std::is_copy_assignable_v<T> && std::is_move_constructible_v<T> &&
-        std::is_move_assignable_v<T>))
+  //! For non-array types, the "strongest" copy and move ability is required.
+  if (!std::is_array_v<T> && !(std::is_copy_constructible_v<T> && std::is_copy_assignable_v<T> &&
+                               std::is_move_constructible_v<T> && std::is_move_assignable_v<T>))
     return false;
 
-  // For aggregate types.
-  //! `> 1` is required here because classes with only one member are considered unnecessary.
+  // For aggregate types (structures, or array types).
   if constexpr (std::is_aggregate_v<T>) {
-    if (boost::pfr::tuple_size_v<T> <= 1)
+    //! `> 0` is required here because empty classes are considered unnecessary.
+    if (pfr::tuple_size_v<T> == 0)
       return false;
 
     bool res = true;
-    ForEach<boost::pfr::tuple_size_v<T>>([&](auto i) {
-      using U = decltype(boost::pfr::get<i>(std::declval<T>()));
+    ForEach<pfr::tuple_size_v<T>>([&](auto i) {
+      //! Here, `std::declval<T &>` is used instead of `std::declval<T>` in order to
+      //! prevent array types such as `int[3]` from being converted to `int*`.
+      using U = decltype(pfr::get<i>(std::declval<T &>()));
       if (!IsMosaicPatternImpl<U>())
         res = false;
     });
@@ -73,17 +174,20 @@ concept MosaicPattern = is_mosaic_pattern_v<T>;
 //
 //
 //
+namespace pfr {
+
 // As we have known, one of the mean features of `MosaicPattern` is
 // compile-time number of elements (tuple size).
 // It should be computed non-recursively or recursively.
-template <MosaicPattern T>
+template <MosaicPattern T_>
 [[nodiscard]] static consteval auto TupleSizeRecursiveImpl() {
-  using TInteger = std::decay_t<decltype(boost::pfr::tuple_size_v<T>)>;
+  using T = std::remove_cvref_t<T_>;
+  using TInteger = std::decay_t<decltype(pfr::tuple_size_v<T>)>;
 
   if constexpr (std::is_aggregate_v<T>) {
     TInteger sum = 0;
-    ForEach<boost::pfr::tuple_size_v<T>>([&](auto i) {
-      using U = decltype(boost::pfr::get<i>(std::declval<T>()));
+    ForEach<pfr::tuple_size_v<T>>([&](auto i) {
+      using U = decltype(pfr::get<i>(std::declval<T &>()));
       sum += TupleSizeRecursiveImpl<U>();
     });
     return sum;
@@ -93,6 +197,8 @@ template <MosaicPattern T>
 
 template <MosaicPattern T>
 static constexpr auto tuple_size_recursive_v = TupleSizeRecursiveImpl<T>();
+
+} // namespace pfr
 
 //
 //
@@ -117,16 +223,17 @@ static constexpr auto tuple_size_recursive_v = TupleSizeRecursiveImpl<T>();
 // static_assert(IRec2INonRec<3, Pattern>() == 2);
 // static_assert(IRec2INonRec<99999, Pattern>() == 2);
 // ```
-template <auto iRec, MosaicPattern T>
+template <auto iRec, MosaicPattern T_>
 [[nodiscard]] static consteval auto IRec2INonRec() {
-  using TInteger = std::decay_t<decltype(boost::pfr::tuple_size_v<T>)>;
+  using T = std::remove_cvref_t<T_>;
+  using TInteger = std::decay_t<decltype(pfr::tuple_size_v<T>)>;
 
   TInteger sum = 0;
   TInteger iNonRec = 0;
 
-  ForEach<boost::pfr::tuple_size_v<T>>([&](auto i) {
-    using U = decltype(boost::pfr::get<i>(std::declval<T>()));
-    sum += tuple_size_recursive_v<U>;
+  ForEach<pfr::tuple_size_v<T>>([&](auto i) {
+    using U = decltype(pfr::get<i>(std::declval<T &>()));
+    sum += pfr::tuple_size_recursive_v<U>;
 
     if (iRec >= sum)
       iNonRec = i + 1;
@@ -151,18 +258,19 @@ template <auto iRec, MosaicPattern T>
 // static_assert(INonRec2IRec<1, Pattern>() == 1);
 // static_assert(INonRec2IRec<2, Pattern>() == 3);
 // static_assert(INonRec2IRec<99999, Pattern>() == 3);
-template <auto iNonRec, MosaicPattern T>
+template <auto iNonRec, MosaicPattern T_>
 [[nodiscard]] static consteval auto INonRec2IRec() {
-  using TInteger = std::decay_t<decltype(boost::pfr::tuple_size_v<T>)>;
+  using T = std::remove_cvref_t<T_>;
+  using TInteger = std::decay_t<decltype(pfr::tuple_size_v<T>)>;
 
   TInteger sum = 0;
 
-  ForEach<boost::pfr::tuple_size_v<T>>([&](auto i) {
+  ForEach<pfr::tuple_size_v<T>>([&](auto i) {
     if (i >= iNonRec)
       return;
 
-    using U = decltype(boost::pfr::get<i>(std::declval<T>()));
-    sum += tuple_size_recursive_v<U>;
+    using U = decltype(pfr::get<i>(std::declval<T &>()));
+    sum += pfr::tuple_size_recursive_v<U>;
   });
 
   return sum;
@@ -171,22 +279,26 @@ template <auto iNonRec, MosaicPattern T>
 //
 //
 //
+namespace pfr {
+
 // We should be able to recursively or non-recursively
 // iterate through all the elements of a `MosaicPattern` instance.
-template <auto iRec, typename T>
-[[nodiscard]] static inline constexpr decltype(auto) get_recursive(T &&v) noexcept {
-  using TDecayed = std::decay_t<T>;
-  static_assert(MosaicPattern<TDecayed>, "The decayed given type should be a `MosaicPattern`");
-  static_assert(iRec < tuple_size_recursive_v<TDecayed>, "Index out of range");
+template <auto iRec, MosaicPattern T>
+[[nodiscard]] static constexpr decltype(auto) get_recursive(T &&v) noexcept {
+  using TCleaned = std::remove_cvref_t<T>;
+  static_assert(iRec < pfr::tuple_size_recursive_v<TCleaned>, "Index out of range");
 
-  using TInteger = std::decay_t<decltype(boost::pfr::tuple_size_v<TDecayed>)>;
+  using TInteger = std::decay_t<decltype(pfr::tuple_size_v<TCleaned>)>;
 
-  if constexpr (std::is_aggregate_v<TDecayed>) {
-    constexpr TInteger iNonRec = IRec2INonRec<iRec, TDecayed>();
-    return get_recursive<iRec - INonRec2IRec<iNonRec, TDecayed>()>(boost::pfr::get<iNonRec>(std::forward<T>(v)));
-  } else
-    return boost::pfr::get<iRec>(std::forward<T>(v));
+  if constexpr (std::is_aggregate_v<TCleaned>) {
+    constexpr TInteger iNonRec = IRec2INonRec<iRec, TCleaned>();
+    return get_recursive<iRec - INonRec2IRec<iNonRec, TCleaned>()>(pfr::get<iNonRec>(std::forward<T>(v)));
+  } else {
+    return get<iRec>(std::forward<T>(v));
+  }
 }
+
+} // namespace pfr
 
 //
 //
@@ -196,16 +308,16 @@ template <MosaicPattern T, auto i, typename TArray>
 struct mosaic_pattern_types_recursive_impl;
 
 template <MosaicPattern T, auto i, typename TArray>
-  requires(i < tuple_size_recursive_v<T>)
+  requires(i < pfr::tuple_size_recursive_v<T>)
 struct mosaic_pattern_types_recursive_impl<T, i, TArray> {
   using type = typename mosaic_pattern_types_recursive_impl<
       T,
       i + 1,
-      MakeTypeArray<TArray, decltype(get_recursive<i>(std::declval<T>()))>>::type;
+      MakeTypeArray<TArray, std::remove_cvref_t<decltype(pfr::get_recursive<i>(std::declval<T &>()))>>>::type;
 };
 
 template <MosaicPattern T, auto i, typename TArray>
-  requires(i == tuple_size_recursive_v<T>)
+  requires(i == pfr::tuple_size_recursive_v<T>)
 struct mosaic_pattern_types_recursive_impl<T, i, TArray> {
   using type = TArray;
 };
