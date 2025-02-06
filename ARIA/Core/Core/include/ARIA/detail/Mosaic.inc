@@ -62,13 +62,14 @@ constexpr size_t tuple_size_v = tuple_size<T>::value;
 template <auto iNonRec, typename T>
   requires(!std::is_array_v<std::remove_cvref_t<T>>)
 [[nodiscard]] static constexpr decltype(auto) get(T &&v) noexcept {
-  //! The type get by perfect forwarding.
+  //! Check `boost::pfr` limitations and undefined behaviors by
+  //! requiring that the following types are the same.
+  //! 1. The type get by perfect forwarding.
   using TCheck0 = std::remove_cvref_t<decltype(boost::pfr::get<iNonRec>(std::forward<T>(v)))>;
-  //! The type get by l-value reference.
+  //! 2. The type get by l-value reference.
   using TCheck1 = std::remove_cvref_t<decltype(boost::pfr::get<iNonRec>(std::declval<            //
                                                                         std::remove_cvref_t<T> & //
                                                                         >()))>;
-  //! Check `boost::pfr` limitations and undefined behaviors.
   static_assert(std::is_same_v<TCheck0, TCheck1>,
                 "`get` is currently not supported for this type because of the limitations of `boost::pfr`");
 
