@@ -62,6 +62,16 @@ constexpr size_t tuple_size_v = tuple_size<T>::value;
 template <auto iNonRec, typename T>
   requires(!std::is_array_v<std::remove_cvref_t<T>>)
 [[nodiscard]] static constexpr decltype(auto) get(T &&v) noexcept {
+  //! The type get by perfect forwarding.
+  using TCheck0 = std::remove_cvref_t<decltype(boost::pfr::get<iNonRec>(std::forward<T>(v)))>;
+  //! The type get by l-value reference.
+  using TCheck1 = std::remove_cvref_t<decltype(boost::pfr::get<iNonRec>(std::declval<            //
+                                                                        std::remove_cvref_t<T> & //
+                                                                        >()))>;
+  //! Check `boost::pfr` limitations and undefined behaviors.
+  static_assert(std::is_same_v<TCheck0, TCheck1>,
+                "`get` is currently not supported for this type because of the limitations of `boost::pfr`");
+
   return boost::pfr::get<iNonRec>(std::forward<T>(v));
 }
 
@@ -69,13 +79,14 @@ template <auto iNonRec, typename T>
 template <auto iNonRec, typename T>
   requires(std::is_array_v<std::remove_cvref_t<T>>)
 [[nodiscard]] static constexpr decltype(auto) get(T &&v) noexcept {
-  // For r-value references, return copies.
-  // Else, return references.
-  if constexpr (std::is_rvalue_reference_v<decltype(v)>) {
+  // For l-value references, return references.
+  if constexpr (std::is_lvalue_reference_v<std::remove_const_t<decltype(v)>>) {
+    return std::forward<T>(v)[iNonRec];
+  }
+  // Else, return copies.
+  else {
     auto res = Auto(std::forward<T>(v)[iNonRec]);
     return res;
-  } else {
-    return std::forward<T>(v)[iNonRec];
   }
 }
 
