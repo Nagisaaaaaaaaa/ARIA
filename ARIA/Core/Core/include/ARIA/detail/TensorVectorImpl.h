@@ -354,9 +354,9 @@ public:
 //! Now, we are ready to implement the 4 variants of `TensorVectorReduced` with template specialization.
 //! Actually, there are totally 8 variants below, since we should also implement the `Mosaic`-versions.
 
-// Host + static.
+// Non-mosaic + host + static.
 template <NonArrayType T, NonArrayType TStaticLayout>
-  requires is_static_v<TStaticLayout>
+  requires(!mosaic::detail::is_mosaic_v<T> && is_static_v<TStaticLayout>)
 class TensorVectorReduced<T, TypeArray<UInt<TStaticLayout::rank>, SpaceHost, TStaticLayout>>
     : public TensorVectorMembers<T, UInt<TStaticLayout::rank>, SpaceHost, TStaticLayout> {
 public:
@@ -389,9 +389,9 @@ private:
 //
 //
 //
-// Host + dynamic.
+// Non-mosaic + host + dynamic.
 template <NonArrayType T, NonArrayType TDynLayout>
-  requires(!is_static_v<TDynLayout>)
+  requires(!mosaic::detail::is_mosaic_v<T> && !is_static_v<TDynLayout>)
 class TensorVectorReduced<T, TypeArray<UInt<TDynLayout::rank>, SpaceHost, TDynLayout>>
     : public TensorVectorMembers<T, UInt<TDynLayout::rank>, SpaceHost, TDynLayout> {
 public:
@@ -426,9 +426,9 @@ private:
 //
 //
 //
-// Device + static.
+// Non-mosaic + device + static.
 template <NonArrayType T, NonArrayType TStaticLayout>
-  requires is_static_v<TStaticLayout>
+  requires(!mosaic::detail::is_mosaic_v<T> && is_static_v<TStaticLayout>)
 class TensorVectorReduced<T, TypeArray<UInt<TStaticLayout::rank>, SpaceDevice, TStaticLayout>>
     : public TensorVectorMembers<T, UInt<TStaticLayout::rank>, SpaceDevice, TStaticLayout> {
 public:
@@ -467,9 +467,9 @@ private:
 //
 //
 //
-// Device + dynamic.
+// Non-mosaic + device + dynamic.
 template <NonArrayType T, NonArrayType TDynLayout>
-  requires(!is_static_v<TDynLayout>)
+  requires(!mosaic::detail::is_mosaic_v<T> && !is_static_v<TDynLayout>)
 class TensorVectorReduced<T, TypeArray<UInt<TDynLayout::rank>, SpaceDevice, TDynLayout>>
     : public TensorVectorMembers<T, UInt<TDynLayout::rank>, SpaceDevice, TDynLayout> {
 public:
