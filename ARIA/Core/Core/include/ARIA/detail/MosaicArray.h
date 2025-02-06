@@ -69,6 +69,12 @@ public:
   [[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator[](size_t i) { return *(data() + i); }
 
 public:
+  [[nodiscard]] ARIA_HOST_DEVICE constexpr size_t size() const { return size; }
+
+  ARIA_HOST_DEVICE void fill(const T &value) {
+    ForEach<size>([&]<auto i>() { operator[](i) = value; });
+  }
+
   [[nodiscard]] ARIA_HOST_DEVICE constexpr auto begin() {
     return cute::apply(storage_, []<typename... S>(S &&...s) {
       return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).begin()...});
