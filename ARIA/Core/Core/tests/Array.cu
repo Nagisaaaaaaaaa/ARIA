@@ -137,4 +137,74 @@ TEST(Array, Base) {
   }
 }
 
+TEST(Array, Methods) {
+  // `int, float`.
+  {
+    using T = Tup<int, float>;
+    using TMosaic = Mosaic<T, PatternIF>;
+
+    ForEach<MakeTypeArray< //
+        Array<TMosaic, 5>, //
+        Array<T, 5>        //
+        >>([]<typename TArray>() {
+      TArray vec{};
+      static_assert(vec.size() == 5);
+
+      for (int i = 0; i < 5; ++i) {
+        T v = vec[i];
+        EXPECT_EQ(get<0>(v), 0);
+        EXPECT_FLOAT_EQ(get<1>(v), 0.0F);
+
+        vec[i] = T{i, i + (i + 1) * 0.1F};
+        v = vec[i];
+        EXPECT_EQ(get<0>(v), i);
+        EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
+      }
+
+      for (let it = vec.begin(); it != vec.end(); ++it) {
+        T v = *it;
+        let k = it - vec.begin();
+        int i = k;
+        static_assert(std::is_same_v<decltype(k), int64>);
+        EXPECT_EQ(get<0>(v), i);
+        EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
+
+        *it = T{0, 0.0F};
+        v = vec[i];
+        EXPECT_EQ(get<0>(v), 0);
+        EXPECT_FLOAT_EQ(get<1>(v), 0.0F);
+      }
+
+      for (let it = vec.cbegin(); it != vec.cend(); ++it) {
+        T v = *it;
+        let k = it - vec.cbegin();
+        static_assert(std::is_same_v<decltype(k), int64>);
+        EXPECT_EQ(get<0>(v), 0);
+        EXPECT_FLOAT_EQ(get<1>(v), 0.0F);
+      }
+
+      for (int i = 0; i < 5; ++i) {
+        let ptr = vec.data() + i;
+        T v = *ptr;
+        EXPECT_EQ(get<0>(v), 0);
+        EXPECT_FLOAT_EQ(get<1>(v), 0.0F);
+
+        *ptr = T{i, i + (i + 1) * 0.1F};
+        v = *ptr;
+        EXPECT_EQ(get<0>(v), i);
+        EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
+      }
+
+      {
+        TArray vec1{{T{0, 0.1F}, T{1, 1.2F}, T{2, 2.3F}, T{3, 3.4F}, T{4, 4.5F}}};
+        for (int i = 0; i < 5; ++i) {
+          T v = vec1[i];
+          EXPECT_EQ(get<0>(v), i);
+          EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
+        }
+      }
+    });
+  }
+}
+
 } // namespace ARIA
