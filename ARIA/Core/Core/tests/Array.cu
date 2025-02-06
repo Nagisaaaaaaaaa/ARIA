@@ -112,6 +112,29 @@ struct Mosaic<Vec<T, size>, PatternVec<T, size>> {
   }
 };
 
-TEST(Vector, Base) {}
+TEST(Array, Base) {
+  // Mosaic.
+  {
+    ForEach<MakeTypeArray<                          //
+        Mosaic<Tup<int, float>, PatternIF>,         //
+        Mosaic<Tup<int, int, int>, PatternIII>,     //
+        Mosaic<Vec3<int>, PatternVec3<int>>,        //
+        Mosaic<Vec3<float>, PatternVec3<float>>,    //
+        Mosaic<Vec<int, 3>, PatternVec<int, 3>>,    //
+        Mosaic<Vec<float, 4>, PatternVec<float, 4>> //
+        >>([]<typename TMosaic>() {
+      static_assert(std::is_same_v<Array<TMosaic, 5>, mosaic::detail::MosaicArray<TMosaic, 5>>);
+    });
+  }
+
+  // Non-mosaic.
+  {
+    ForEach<MakeTypeArray<                          //
+        int,                                        //
+        Tup<int, float, double>,                    //
+        Tup<Tec2i<int, Int<5>>, Tec<float, double>> //
+        >>([]<typename T>() { static_assert(std::is_same_v<Array<T, 5>, cuda::std::array<T, 5>>); });
+  }
+}
 
 } // namespace ARIA
