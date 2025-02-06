@@ -115,6 +115,32 @@ private:
   TStorage storage_;
 };
 
+//! Unable to define CTAD for `MosaicArray` because
+//! `TMosaic` can never be deduced by the constructor parameters.
+
+//
+//
+//
+// When `T` is `Mosaic`, reduce `Array` to `MosaicArray`,
+// else, reduce to `cuda::std::array`.
+template <typename T, size_t size>
+struct reduce_array;
+
+template <typename TMosaic, size_t size>
+  requires(is_mosaic_v<TMosaic>)
+struct reduce_array<TMosaic, size> {
+  using type = MosaicArray<TMosaic, size>;
+};
+
+template <typename T, size_t size>
+  requires(!is_mosaic_v<T>)
+struct reduce_array<T, size> {
+  using type = cuda::std::array<T, size>;
+};
+
+template <typename T, size_t size>
+using reduce_array_t = typename reduce_array<T, size>::type;
+
 } // namespace mosaic::detail
 
 } // namespace ARIA
