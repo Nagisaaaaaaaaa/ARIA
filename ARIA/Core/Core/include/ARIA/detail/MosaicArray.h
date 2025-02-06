@@ -30,18 +30,20 @@ using mosaic_array_storage_type_t = typename mosaic_array_storage_type<TMosaicPa
 //
 //
 //
-template <typename TMosaic_, size_t size>
+template <typename TMosaic_, size_t size_>
   requires(is_mosaic_v<TMosaic_>)
 class MosaicArray final {
 public:
   using TMosaic = TMosaic_;
+
+  [[nodiscard]] ARIA_HOST_DEVICE static consteval size_t size() { return size_; }
 
 private:
   static_assert(ValidMosaic<TMosaic>, "The mosaic definition is invalid");
 
   using T = typename is_mosaic<TMosaic>::T;
   using TMosaicPattern = typename is_mosaic<TMosaic>::TMosaicPattern;
-  using TStorage = mosaic_array_storage_type_t<TMosaicPattern, size>;
+  using TStorage = mosaic_array_storage_type_t<TMosaicPattern, size()>;
 
   // `friend` is added to access `storage_` of other `MosaicArray` types.
   template <typename UMosaic, size_t size1>
@@ -54,10 +56,10 @@ public:
 public:
   constexpr MosaicArray() = default;
 
-  ARIA_HOST_DEVICE constexpr MosaicArray(const std::array<T, size> &v) { operator=(v); }
+  ARIA_HOST_DEVICE constexpr MosaicArray(const std::array<T, size()> &v) { operator=(v); }
 
-  ARIA_HOST_DEVICE MosaicArray &operator=(const std::array<T, size> &v) {
-    ForEach<size>([&]<auto i>() { operator[](i) = v[i]; });
+  ARIA_HOST_DEVICE MosaicArray &operator=(const std::array<T, size()> &v) {
+    ForEach<size()>([&]<auto i>() { operator[](i) = v[i]; });
     return *this;
   }
 
@@ -69,10 +71,8 @@ public:
   [[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator[](size_t i) { return *(data() + i); }
 
 public:
-  [[nodiscard]] ARIA_HOST_DEVICE constexpr size_t size() const { return size; }
-
   ARIA_HOST_DEVICE void fill(const T &value) {
-    ForEach<size>([&]<auto i>() { operator[](i) = value; });
+    ForEach<size()>([&]<auto i>() { operator[](i) = value; });
   }
 
   [[nodiscard]] ARIA_HOST_DEVICE constexpr auto begin() {
