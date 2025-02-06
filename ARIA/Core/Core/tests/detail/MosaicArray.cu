@@ -41,6 +41,103 @@ struct Mosaic<Tec<int, int, int>, PatternIII> {
 
 TEST(MosaicArray, Base) {
   using namespace mosaic::detail;
+
+  // `int, float`.
+  {
+    using T = Tup<int, float>;
+    using TMosaic = Mosaic<T, PatternIF>;
+    using TMosaicArray = MosaicArray<TMosaic, 5>;
+
+    TMosaicArray vec{};
+    static_assert(vec.size() == 5);
+
+    for (int i = 0; i < 5; ++i) {
+      let v = Let(vec[i]);
+      static_assert(Property<decltype(vec[i])>);
+      static_assert(std::is_same_v<decltype(v), T>);
+      EXPECT_EQ(get<0>(v), 0);
+      EXPECT_FLOAT_EQ(get<1>(v), 0.0F);
+
+      vec[i] = T{i, i + (i + 1) * 0.1F};
+      v = vec[i];
+      EXPECT_EQ(get<0>(v), i);
+      EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
+    }
+
+    for (let it = vec.begin(); it != vec.end(); ++it) {
+      let v = Let(*it);
+      let k = it - vec.begin();
+      int i = k;
+      static_assert(Property<decltype(*it)>);
+      static_assert(std::is_same_v<decltype(v), T>);
+      static_assert(std::is_same_v<decltype(k), int64>);
+      EXPECT_EQ(get<0>(v), i);
+      EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
+
+      *it -= T{i, i + (i + 1) * 0.1F};
+      v = vec[i];
+      EXPECT_EQ(get<0>(v), 0);
+      EXPECT_FLOAT_EQ(get<1>(v), 0.0F);
+    }
+
+    for (let it = vec.cbegin(); it != vec.cend(); ++it) {
+      let v = Let(*it);
+      let k = it - vec.cbegin();
+      static_assert(Property<decltype(*it)>);
+      static_assert(std::is_same_v<decltype(v), T>);
+      static_assert(std::is_same_v<decltype(k), int64>);
+      EXPECT_EQ(get<0>(v), 0);
+      EXPECT_FLOAT_EQ(get<1>(v), 0.0F);
+    }
+
+    for (int i = 0; i < 5; ++i) {
+      let ptr = vec.data() + i;
+      let v = Let(*ptr);
+      static_assert(Property<decltype(*ptr)>);
+      static_assert(std::is_same_v<decltype(v), T>);
+      EXPECT_EQ(get<0>(v), 0);
+      EXPECT_FLOAT_EQ(get<1>(v), 0.0F);
+
+      *ptr += T{i, i + (i + 1) * 0.1F};
+      v = *ptr;
+      EXPECT_EQ(get<0>(v), i);
+      EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
+    }
+
+    {
+      int i = 0;
+      for (auto vProp : vec) {
+        let v = Let(vProp);
+        static_assert(Property<decltype(vProp)>);
+        static_assert(std::is_same_v<decltype(v), T>);
+        EXPECT_EQ(get<0>(v), i);
+        EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
+
+        vProp *= 0;
+        v = vProp;
+        EXPECT_EQ(get<0>(v), 0);
+        EXPECT_FLOAT_EQ(get<1>(v), 0.0F);
+
+        ++i;
+      }
+    }
+
+    {
+      TMosaicArray vec1{{T{0, 0.1F}, T{1, 1.2F}, T{2, 2.3F}, T{3, 3.4F}, T{4, 4.5F}}};
+      for (int i = 0; i < 5; ++i) {
+        T v = vec1[i];
+        EXPECT_EQ(get<0>(v), i);
+        EXPECT_FLOAT_EQ(get<1>(v), i + (i + 1) * 0.1F);
+      }
+
+      vec1.fill(T{0, 0.0F});
+      for (int i = 0; i < 5; ++i) {
+        T v = vec1[i];
+        EXPECT_EQ(get<0>(v), 0);
+        EXPECT_FLOAT_EQ(get<1>(v), 0.0F);
+      }
+    }
+  }
 }
 
 } // namespace ARIA
