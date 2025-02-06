@@ -57,6 +57,11 @@ public:
   ARIA_COPY_MOVE_ABILITY(MosaicArray, default, default);
 
 public:
+  [[nodiscard]] constexpr auto operator[](size_t i) const { return *(data() + i); }
+
+  [[nodiscard]] constexpr auto operator[](size_t i) { return *(data() + i); }
+
+public:
   [[nodiscard]] constexpr auto begin() {
     return cute::apply(storage_, []<typename... S>(S &&...s) {
       return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).begin()...});
