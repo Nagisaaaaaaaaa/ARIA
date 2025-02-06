@@ -114,6 +114,33 @@ void TestGetRecursive() {
   cuda::device::current::get().synchronize();
 
   {
+    int v[3] = {5, 6, 7};
+    static_assert(std::is_same_v<decltype(get_recursive<0>(v)), int &>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(v)), int &>);
+    static_assert(std::is_same_v<decltype(get_recursive<2>(v)), int &>);
+    static_assert(std::is_same_v<decltype(get_recursive<0>(std::declval<int[3]>())), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(std::declval<int[3]>())), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<2>(std::declval<int[3]>())), int>);
+    EXPECT_EQ(get_recursive<0>(v), 5);
+    EXPECT_EQ(get_recursive<1>(v), 6);
+    EXPECT_EQ(get_recursive<2>(v), 7);
+  }
+
+  Launcher(1, [] ARIA_DEVICE(int i) {
+    int v[3] = {5, 6, 7};
+    static_assert(std::is_same_v<decltype(get_recursive<0>(v)), int &>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(v)), int &>);
+    static_assert(std::is_same_v<decltype(get_recursive<2>(v)), int &>);
+    static_assert(std::is_same_v<decltype(get_recursive<0>(std::declval<int[3]>())), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<1>(std::declval<int[3]>())), int>);
+    static_assert(std::is_same_v<decltype(get_recursive<2>(std::declval<int[3]>())), int>);
+    ARIA_ASSERT(get_recursive<0>(v) == 5);
+    ARIA_ASSERT(get_recursive<1>(v) == 6);
+    ARIA_ASSERT(get_recursive<2>(v) == 7);
+  }).Launch();
+  cuda::device::current::get().synchronize();
+
+  {
     Test1ArrayMember v;
     static_assert(std::is_same_v<decltype(get_recursive<0>(v)), int &>);
     static_assert(std::is_same_v<decltype(get_recursive<1>(v)), int &>);
