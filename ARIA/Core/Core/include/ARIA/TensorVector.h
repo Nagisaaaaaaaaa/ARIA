@@ -118,6 +118,9 @@ namespace ARIA {
 ///
 /// \warning CuTe only support `int` as indices, so does `TensorVector`.
 /// So, pay attention to large `TensorVector`s.
+///
+/// \note `TensorVector` supports both array of structures (AoS) and structure of arrays (SoA).
+/// See `Mosaic.h`, `Array.h`, and `Vector.h` for more details.
 using tensor_vector::detail::TensorVector;
 
 /// \brief A host `TensorVector`.
