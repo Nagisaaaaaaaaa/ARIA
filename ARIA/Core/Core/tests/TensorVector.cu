@@ -549,7 +549,127 @@ TEST(TensorVector, Mirrored) {
   }
 }
 
-TEST(TensorVector, AssignmentAndCopy) {
+TEST(TensorVector, AssignmentAndCopyStatic) {
+  using T = float;
+  using TMosaic = Mosaic<T, PatternFloats>;
+
+  // 1D.
+  ForEach<MakeTypeArray<                                 //
+      Tup<TensorVectorHost<T>, TensorVectorHost<T>>,     //
+      Tup<TensorVectorDevice<T>, TensorVectorHost<T>>,   //
+      Tup<TensorVectorHost<T>, TensorVectorDevice<T>>,   //
+      Tup<TensorVectorDevice<T>, TensorVectorDevice<T>>, //
+      //
+      Tup<TensorVectorHost<TMosaic>, TensorVectorHost<TMosaic>>,    //
+      Tup<TensorVectorDevice<TMosaic>, TensorVectorHost<TMosaic>>,  //
+      Tup<TensorVectorHost<TMosaic>, TensorVectorDevice<TMosaic>>,  //
+      Tup<TensorVectorDevice<TMosaic>, TensorVectorDevice<TMosaic>> //
+      >>([]<typename TVectors>() {
+    using TVector0 = tup_elem_t<0, TVectors>;
+    using TVector1 = tup_elem_t<1, TVectors>;
+    static_assert(std::is_same_v<typename TVector0::value_type, float>);
+    static_assert(std::is_same_v<typename TVector1::value_type, float>);
+
+    TVector0 dst;
+    TVector1 src;
+    dst.Realloc(make_layout_major(10));
+    src.Realloc(make_layout_major(10));
+
+    for (int i = 0; i < 10; ++i)
+      src(i) = i;
+
+    copy(dst, src);
+
+    for (int i = 0; i < 10; ++i)
+      EXPECT_FLOAT_EQ(dst(i), i);
+  });
+
+  // 2D.
+  ForEach<MakeTypeArray<                                         //
+      Tup<TensorVectorHost<T, _2>, TensorVectorHost<T, _2>>,     //
+      Tup<TensorVectorDevice<T, _2>, TensorVectorHost<T, _2>>,   //
+      Tup<TensorVectorHost<T, _2>, TensorVectorDevice<T, _2>>,   //
+      Tup<TensorVectorDevice<T, _2>, TensorVectorDevice<T, _2>>, //
+      //
+      Tup<TensorVectorHost<TMosaic, _2>, TensorVectorHost<TMosaic, _2>>,    //
+      Tup<TensorVectorDevice<TMosaic, _2>, TensorVectorHost<TMosaic, _2>>,  //
+      Tup<TensorVectorHost<TMosaic, _2>, TensorVectorDevice<TMosaic, _2>>,  //
+      Tup<TensorVectorDevice<TMosaic, _2>, TensorVectorDevice<TMosaic, _2>> //
+      >>([]<typename TVectors>() {
+    using TVector0 = tup_elem_t<0, TVectors>;
+    using TVector1 = tup_elem_t<1, TVectors>;
+    static_assert(std::is_same_v<typename TVector0::value_type, float>);
+    static_assert(std::is_same_v<typename TVector1::value_type, float>);
+
+    TVector0 dst;
+    TVector1 src;
+    dst.Realloc(make_layout_major(5, 6));
+    src.Realloc(make_layout_major(5, 6));
+
+    for (int i = 0; i < 30; ++i)
+      src(i) = i;
+
+    copy(dst, src);
+
+    for (int i = 0; i < 30; ++i)
+      EXPECT_FLOAT_EQ(dst(i), i);
+
+    for (int y = 0; y < 6; ++y)
+      for (int x = 0; x < 5; ++x)
+        src(x, y) = x + 3 * y + 1;
+
+    copy(dst, src);
+
+    for (int y = 0; y < 6; ++y)
+      for (int x = 0; x < 5; ++x)
+        EXPECT_FLOAT_EQ(dst(x, y), x + 3 * y + 1);
+  });
+
+  // 3D.
+  ForEach<MakeTypeArray<                                         //
+      Tup<TensorVectorHost<T, _3>, TensorVectorHost<T, _3>>,     //
+      Tup<TensorVectorDevice<T, _3>, TensorVectorHost<T, _3>>,   //
+      Tup<TensorVectorHost<T, _3>, TensorVectorDevice<T, _3>>,   //
+      Tup<TensorVectorDevice<T, _3>, TensorVectorDevice<T, _3>>, //
+      //
+      Tup<TensorVectorHost<TMosaic, _3>, TensorVectorHost<TMosaic, _3>>,    //
+      Tup<TensorVectorDevice<TMosaic, _3>, TensorVectorHost<TMosaic, _3>>,  //
+      Tup<TensorVectorHost<TMosaic, _3>, TensorVectorDevice<TMosaic, _3>>,  //
+      Tup<TensorVectorDevice<TMosaic, _3>, TensorVectorDevice<TMosaic, _3>> //
+      >>([]<typename TVectors>() {
+    using TVector0 = tup_elem_t<0, TVectors>;
+    using TVector1 = tup_elem_t<1, TVectors>;
+    static_assert(std::is_same_v<typename TVector0::value_type, float>);
+    static_assert(std::is_same_v<typename TVector1::value_type, float>);
+
+    TVector0 dst;
+    TVector1 src;
+    dst.Realloc(make_layout_major(2, 3, 4));
+    src.Realloc(make_layout_major(2, 3, 4));
+
+    for (int i = 0; i < 24; ++i)
+      src(i) = i;
+
+    copy(dst, src);
+
+    for (int i = 0; i < 24; ++i)
+      EXPECT_FLOAT_EQ(dst(i), i);
+
+    for (int z = 0; z < 4; ++z)
+      for (int y = 0; y < 3; ++y)
+        for (int x = 0; x < 2; ++x)
+          src(x, y, z) = x + 2 * y + 3 * z + 1;
+
+    copy(dst, src);
+
+    for (int z = 0; z < 4; ++z)
+      for (int y = 0; y < 3; ++y)
+        for (int x = 0; x < 2; ++x)
+          EXPECT_FLOAT_EQ(dst(x, y, z), x + 2 * y + 3 * z + 1);
+  });
+}
+
+TEST(TensorVector, AssignmentAndCopyDynamic) {
   using T = float;
   using TMosaic = Mosaic<T, PatternFloats>;
 
