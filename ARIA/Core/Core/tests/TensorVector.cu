@@ -540,9 +540,17 @@ TEST(TensorVector, Mirrored) {
 
 TEST(TensorVector, Copy) {
   // 1D.
-  { // Host <- host.
-    TensorVectorHost<float> dst;
-    TensorVectorHost<float> src;
+  ForEach<MakeTypeArray<                                        //
+      Tup<TensorVectorHost<float>, TensorVectorHost<float>>,    //
+      Tup<TensorVectorDevice<float>, TensorVectorHost<float>>,  //
+      Tup<TensorVectorHost<float>, TensorVectorDevice<float>>,  //
+      Tup<TensorVectorDevice<float>, TensorVectorDevice<float>> //
+      >>([]<typename TVectors>() {
+    using TVector0 = tup_elem_t<0, TVectors>;
+    using TVector1 = tup_elem_t<1, TVectors>;
+
+    TVector0 dst;
+    TVector1 src;
     dst.Realloc(make_layout_major(10));
     src.Realloc(make_layout_major(10));
 
@@ -553,57 +561,20 @@ TEST(TensorVector, Copy) {
 
     for (int i = 0; i < 10; ++i)
       EXPECT_TRUE(dst(i) == i);
-  }
-
-  { // Host <- device.
-    TensorVectorHost<float> dst;
-    TensorVectorDevice<float> src;
-    dst.Realloc(make_layout_major(10));
-    src.Realloc(make_layout_major(10));
-
-    for (int i = 0; i < 10; ++i)
-      src(i) = i;
-
-    copy(dst, src);
-
-    for (int i = 0; i < 10; ++i)
-      EXPECT_TRUE(dst(i) == i);
-  }
-
-  { // Device <- host.
-    TensorVectorDevice<float> dst;
-    TensorVectorHost<float> src;
-    dst.Realloc(make_layout_major(10));
-    src.Realloc(make_layout_major(10));
-
-    for (int i = 0; i < 10; ++i)
-      src(i) = i;
-
-    copy(dst, src);
-
-    for (int i = 0; i < 10; ++i)
-      EXPECT_TRUE(dst(i) == i);
-  }
-
-  { // Device <- device.
-    TensorVectorDevice<float> dst;
-    TensorVectorDevice<float> src;
-    dst.Realloc(make_layout_major(10));
-    src.Realloc(make_layout_major(10));
-
-    for (int i = 0; i < 10; ++i)
-      src(i) = i;
-
-    copy(dst, src);
-
-    for (int i = 0; i < 10; ++i)
-      EXPECT_TRUE(dst(i) == i);
-  }
+  });
 
   // 2D.
-  { // Host <- host.
-    TensorVectorHost<float, _2> dst;
-    TensorVectorHost<float, _2> src;
+  ForEach<MakeTypeArray<                                                //
+      Tup<TensorVectorHost<float, _2>, TensorVectorHost<float, _2>>,    //
+      Tup<TensorVectorDevice<float, _2>, TensorVectorHost<float, _2>>,  //
+      Tup<TensorVectorHost<float, _2>, TensorVectorDevice<float, _2>>,  //
+      Tup<TensorVectorDevice<float, _2>, TensorVectorDevice<float, _2>> //
+      >>([]<typename TVectors>() {
+    using TVector0 = tup_elem_t<0, TVectors>;
+    using TVector1 = tup_elem_t<1, TVectors>;
+
+    TVector0 dst;
+    TVector1 src;
     dst.Realloc(make_layout_major(5, 6));
     src.Realloc(make_layout_major(5, 6));
 
@@ -624,87 +595,20 @@ TEST(TensorVector, Copy) {
     for (int y = 0; y < 6; ++y)
       for (int x = 0; x < 5; ++x)
         EXPECT_TRUE(dst(x, y) == x + 3 * y + 1);
-  }
-
-  { // Host <- device.
-    TensorVectorHost<float, _2> dst;
-    TensorVectorDevice<float, _2> src;
-    dst.Realloc(make_layout_major(5, 6));
-    src.Realloc(make_layout_major(5, 6));
-
-    for (int i = 0; i < 30; ++i)
-      src(i) = i;
-
-    copy(dst, src);
-
-    for (int i = 0; i < 30; ++i)
-      EXPECT_TRUE(dst(i) == i);
-
-    for (int y = 0; y < 6; ++y)
-      for (int x = 0; x < 5; ++x)
-        src(x, y) = x + 3 * y + 1;
-
-    copy(dst, src);
-
-    for (int y = 0; y < 6; ++y)
-      for (int x = 0; x < 5; ++x)
-        EXPECT_TRUE(dst(x, y) == x + 3 * y + 1);
-  }
-
-  { // Device <- host.
-    TensorVectorDevice<float, _2> dst;
-    TensorVectorHost<float, _2> src;
-    dst.Realloc(make_layout_major(5, 6));
-    src.Realloc(make_layout_major(5, 6));
-
-    for (int i = 0; i < 30; ++i)
-      src(i) = i;
-
-    copy(dst, src);
-
-    for (int i = 0; i < 30; ++i)
-      EXPECT_TRUE(dst(i) == i);
-
-    for (int y = 0; y < 6; ++y)
-      for (int x = 0; x < 5; ++x)
-        src(x, y) = x + 3 * y + 1;
-
-    copy(dst, src);
-
-    for (int y = 0; y < 6; ++y)
-      for (int x = 0; x < 5; ++x)
-        EXPECT_TRUE(dst(x, y) == x + 3 * y + 1);
-  }
-
-  { // Device <- device.
-    TensorVectorDevice<float, _2> dst;
-    TensorVectorDevice<float, _2> src;
-    dst.Realloc(make_layout_major(5, 6));
-    src.Realloc(make_layout_major(5, 6));
-
-    for (int i = 0; i < 30; ++i)
-      src(i) = i;
-
-    copy(dst, src);
-
-    for (int i = 0; i < 30; ++i)
-      EXPECT_TRUE(dst(i) == i);
-
-    for (int y = 0; y < 6; ++y)
-      for (int x = 0; x < 5; ++x)
-        src(x, y) = x + 3 * y + 1;
-
-    copy(dst, src);
-
-    for (int y = 0; y < 6; ++y)
-      for (int x = 0; x < 5; ++x)
-        EXPECT_TRUE(dst(x, y) == x + 3 * y + 1);
-  }
+  });
 
   // 3D.
-  { // Host <- host.
-    TensorVectorHost<float, _3> dst;
-    TensorVectorHost<float, _3> src;
+  ForEach<MakeTypeArray<                                                //
+      Tup<TensorVectorHost<float, _3>, TensorVectorHost<float, _3>>,    //
+      Tup<TensorVectorDevice<float, _3>, TensorVectorHost<float, _3>>,  //
+      Tup<TensorVectorHost<float, _3>, TensorVectorDevice<float, _3>>,  //
+      Tup<TensorVectorDevice<float, _3>, TensorVectorDevice<float, _3>> //
+      >>([]<typename TVectors>() {
+    using TVector0 = tup_elem_t<0, TVectors>;
+    using TVector1 = tup_elem_t<1, TVectors>;
+
+    TVector0 dst;
+    TVector1 src;
     dst.Realloc(make_layout_major(2, 3, 4));
     src.Realloc(make_layout_major(2, 3, 4));
 
@@ -727,88 +631,7 @@ TEST(TensorVector, Copy) {
       for (int y = 0; y < 3; ++y)
         for (int x = 0; x < 2; ++x)
           EXPECT_TRUE(dst(x, y, z) == x + 2 * y + 3 * z + 1);
-  }
-
-  { // Host <- device.
-    TensorVectorHost<float, _3> dst;
-    TensorVectorDevice<float, _3> src;
-    dst.Realloc(make_layout_major(2, 3, 4));
-    src.Realloc(make_layout_major(2, 3, 4));
-
-    for (int i = 0; i < 24; ++i)
-      src(i) = i;
-
-    copy(dst, src);
-
-    for (int i = 0; i < 24; ++i)
-      EXPECT_TRUE(dst(i) == i);
-
-    for (int z = 0; z < 4; ++z)
-      for (int y = 0; y < 3; ++y)
-        for (int x = 0; x < 2; ++x)
-          src(x, y, z) = x + 2 * y + 3 * z + 1;
-
-    copy(dst, src);
-
-    for (int z = 0; z < 4; ++z)
-      for (int y = 0; y < 3; ++y)
-        for (int x = 0; x < 2; ++x)
-          EXPECT_TRUE(dst(x, y, z) == x + 2 * y + 3 * z + 1);
-  }
-
-  { // Device <- host.
-    TensorVectorDevice<float, _3> dst;
-    TensorVectorHost<float, _3> src;
-    dst.Realloc(make_layout_major(2, 3, 4));
-    src.Realloc(make_layout_major(2, 3, 4));
-
-    for (int i = 0; i < 24; ++i)
-      src(i) = i;
-
-    copy(dst, src);
-
-    for (int i = 0; i < 24; ++i)
-      EXPECT_TRUE(dst(i) == i);
-
-    for (int z = 0; z < 4; ++z)
-      for (int y = 0; y < 3; ++y)
-        for (int x = 0; x < 2; ++x)
-          src(x, y, z) = x + 2 * y + 3 * z + 1;
-
-    copy(dst, src);
-
-    for (int z = 0; z < 4; ++z)
-      for (int y = 0; y < 3; ++y)
-        for (int x = 0; x < 2; ++x)
-          EXPECT_TRUE(dst(x, y, z) == x + 2 * y + 3 * z + 1);
-  }
-
-  { // Device <- device.
-    TensorVectorDevice<float, _3> dst;
-    TensorVectorDevice<float, _3> src;
-    dst.Realloc(make_layout_major(2, 3, 4));
-    src.Realloc(make_layout_major(2, 3, 4));
-
-    for (int i = 0; i < 24; ++i)
-      src(i) = i;
-
-    copy(dst, src);
-
-    for (int i = 0; i < 24; ++i)
-      EXPECT_TRUE(dst(i) == i);
-
-    for (int z = 0; z < 4; ++z)
-      for (int y = 0; y < 3; ++y)
-        for (int x = 0; x < 2; ++x)
-          src(x, y, z) = x + 2 * y + 3 * z + 1;
-
-    copy(dst, src);
-
-    for (int z = 0; z < 4; ++z)
-      for (int y = 0; y < 3; ++y)
-        for (int x = 0; x < 2; ++x)
-          EXPECT_TRUE(dst(x, y, z) == x + 2 * y + 3 * z + 1);
-  }
+  });
 }
 
 } // namespace ARIA
