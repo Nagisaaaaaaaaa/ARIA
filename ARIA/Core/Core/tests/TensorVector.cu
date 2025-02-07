@@ -552,6 +552,7 @@ TEST(TensorVector, Mirrored) {
 TEST(TensorVector, AssignmentAndCopyStatic) {
   using T = float;
   using TMosaic = Mosaic<T, PatternFloats>;
+  using TLayout = decltype(make_layout_major(C<10>{}));
 
   // 1D.
   ForEach<MakeTypeArray<                                 //
@@ -572,8 +573,6 @@ TEST(TensorVector, AssignmentAndCopyStatic) {
 
     TVector0 dst;
     TVector1 src;
-    dst.Realloc(make_layout_major(10));
-    src.Realloc(make_layout_major(10));
 
     for (int i = 0; i < 10; ++i)
       src(i) = i;
@@ -603,8 +602,6 @@ TEST(TensorVector, AssignmentAndCopyStatic) {
 
     TVector0 dst;
     TVector1 src;
-    dst.Realloc(make_layout_major(5, 6));
-    src.Realloc(make_layout_major(5, 6));
 
     for (int i = 0; i < 30; ++i)
       src(i) = i;
@@ -644,8 +641,6 @@ TEST(TensorVector, AssignmentAndCopyStatic) {
 
     TVector0 dst;
     TVector1 src;
-    dst.Realloc(make_layout_major(2, 3, 4));
-    src.Realloc(make_layout_major(2, 3, 4));
 
     for (int i = 0; i < 24; ++i)
       src(i) = i;
