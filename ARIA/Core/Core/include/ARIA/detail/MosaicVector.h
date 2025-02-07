@@ -78,6 +78,9 @@ private:
 
 public:
   using value_type = T;
+  using element_type = void;
+  using reference = void;
+  using iterator = void;
 
 public:
   constexpr MosaicVector() = default;
@@ -128,9 +131,21 @@ public:
     ForEach<rank_v<TStorage>>([&]<auto i>() { get<i>(storage_).clear(); });
   }
 
+  [[nodiscard]] constexpr auto begin() const {
+    return cute::apply(storage_, []<typename... S>(S &&...s) {
+      return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).begin()...});
+    });
+  }
+
   [[nodiscard]] constexpr auto begin() {
     return cute::apply(storage_, []<typename... S>(S &&...s) {
       return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).begin()...});
+    });
+  }
+
+  [[nodiscard]] constexpr auto end() const {
+    return cute::apply(storage_, []<typename... S>(S &&...s) {
+      return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).end()...});
     });
   }
 
