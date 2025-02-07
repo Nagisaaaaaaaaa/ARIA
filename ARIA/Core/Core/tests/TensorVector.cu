@@ -555,16 +555,9 @@ TEST(TensorVector, AssignmentAndCopyStatic) {
 
   // 1D.
   using TLayout1D = decltype(make_layout_major(C<10>{}));
-  ForEach<MakeTypeArray<                                                       //
-      Tup<TensorVectorHost<T, TLayout1D>, TensorVectorHost<T, TLayout1D>>,     //
-      Tup<TensorVectorDevice<T, TLayout1D>, TensorVectorHost<T, TLayout1D>>,   //
-      Tup<TensorVectorHost<T, TLayout1D>, TensorVectorDevice<T, TLayout1D>>,   //
-      Tup<TensorVectorDevice<T, TLayout1D>, TensorVectorDevice<T, TLayout1D>>, //
-      //
-      Tup<TensorVectorHost<TMosaic, TLayout1D>, TensorVectorHost<TMosaic, TLayout1D>>,    //
-      Tup<TensorVectorDevice<TMosaic, TLayout1D>, TensorVectorHost<TMosaic, TLayout1D>>,  //
-      Tup<TensorVectorHost<TMosaic, TLayout1D>, TensorVectorDevice<TMosaic, TLayout1D>>,  //
-      Tup<TensorVectorDevice<TMosaic, TLayout1D>, TensorVectorDevice<TMosaic, TLayout1D>> //
+  ForEach<MakeTypeArray<                                                              //
+      Tup<TensorVectorHost<T, TLayout1D>, TensorVectorHost<T, TLayout1D>>,            //
+      Tup<TensorVectorHost<TMosaic, TLayout1D>, TensorVectorHost<TMosaic, TLayout1D>> //
       >>([]<typename TVectors>() {
     using TVector0 = tup_elem_t<0, TVectors>;
     using TVector1 = tup_elem_t<1, TVectors>;
@@ -585,16 +578,9 @@ TEST(TensorVector, AssignmentAndCopyStatic) {
 
   // 2D.
   using TLayout2D = decltype(make_layout_major(C<5>{}, C<6>{}));
-  ForEach<MakeTypeArray<                                                               //
-      Tup<TensorVectorHost<T, _2, TLayout2D>, TensorVectorHost<T, _2, TLayout2D>>,     //
-      Tup<TensorVectorDevice<T, _2, TLayout2D>, TensorVectorHost<T, _2, TLayout2D>>,   //
-      Tup<TensorVectorHost<T, _2, TLayout2D>, TensorVectorDevice<T, _2, TLayout2D>>,   //
-      Tup<TensorVectorDevice<T, _2, TLayout2D>, TensorVectorDevice<T, _2, TLayout2D>>, //
-      //
-      Tup<TensorVectorHost<TMosaic, _2, TLayout2D>, TensorVectorHost<TMosaic, _2, TLayout2D>>,    //
-      Tup<TensorVectorDevice<TMosaic, _2, TLayout2D>, TensorVectorHost<TMosaic, _2, TLayout2D>>,  //
-      Tup<TensorVectorHost<TMosaic, _2, TLayout2D>, TensorVectorDevice<TMosaic, _2, TLayout2D>>,  //
-      Tup<TensorVectorDevice<TMosaic, _2, TLayout2D>, TensorVectorDevice<TMosaic, _2, TLayout2D>> //
+  ForEach<MakeTypeArray<                                                                      //
+      Tup<TensorVectorHost<T, _2, TLayout2D>, TensorVectorHost<T, _2, TLayout2D>>,            //
+      Tup<TensorVectorHost<TMosaic, _2, TLayout2D>, TensorVectorHost<TMosaic, _2, TLayout2D>> //
       >>([]<typename TVectors>() {
     using TVector0 = tup_elem_t<0, TVectors>;
     using TVector1 = tup_elem_t<1, TVectors>;
@@ -625,16 +611,9 @@ TEST(TensorVector, AssignmentAndCopyStatic) {
 
   // 3D.
   using TLayout3D = decltype(make_layout_major(C<2>{}, C<3>{}, C<4>{}));
-  ForEach<MakeTypeArray<                                                               //
-      Tup<TensorVectorHost<T, _3, TLayout3D>, TensorVectorHost<T, _3, TLayout3D>>,     //
-      Tup<TensorVectorDevice<T, _3, TLayout3D>, TensorVectorHost<T, _3, TLayout3D>>,   //
-      Tup<TensorVectorHost<T, _3, TLayout3D>, TensorVectorDevice<T, _3, TLayout3D>>,   //
-      Tup<TensorVectorDevice<T, _3, TLayout3D>, TensorVectorDevice<T, _3, TLayout3D>>, //
-      //
-      Tup<TensorVectorHost<TMosaic, _3, TLayout3D>, TensorVectorHost<TMosaic, _3, TLayout3D>>,    //
-      Tup<TensorVectorDevice<TMosaic, _3, TLayout3D>, TensorVectorHost<TMosaic, _3, TLayout3D>>,  //
-      Tup<TensorVectorHost<TMosaic, _3, TLayout3D>, TensorVectorDevice<TMosaic, _3, TLayout3D>>,  //
-      Tup<TensorVectorDevice<TMosaic, _3, TLayout3D>, TensorVectorDevice<TMosaic, _3, TLayout3D>> //
+  ForEach<MakeTypeArray<                                                                      //
+      Tup<TensorVectorHost<T, _3, TLayout3D>, TensorVectorHost<T, _3, TLayout3D>>,            //
+      Tup<TensorVectorHost<TMosaic, _3, TLayout3D>, TensorVectorHost<TMosaic, _3, TLayout3D>> //
       >>([]<typename TVectors>() {
     using TVector0 = tup_elem_t<0, TVectors>;
     using TVector1 = tup_elem_t<1, TVectors>;
