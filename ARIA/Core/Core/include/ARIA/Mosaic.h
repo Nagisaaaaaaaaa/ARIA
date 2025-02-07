@@ -81,6 +81,10 @@ namespace ARIA {
 /// \note Very complex pattern structures are also supported, but
 /// member variables should be either "scalar" or "aggregate".
 /// See `std::scalar` and `std::aggregate`.
+///
+/// \see Array.h
+/// \see TensorVector.h
+/// \see Vector.h
 template <typename T, typename TMosaicPattern>
 class Mosaic;
 
