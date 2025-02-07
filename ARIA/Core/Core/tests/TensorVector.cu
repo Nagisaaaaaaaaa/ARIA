@@ -549,16 +549,20 @@ TEST(TensorVector, Mirrored) {
   }
 }
 
-TEST(TensorVector, Copy) {
+TEST(TensorVector, AssignmentAndCopy) {
   using T = float;
   using TMosaic = Mosaic<T, PatternFloats>;
 
   // 1D.
-  ForEach<MakeTypeArray<                                //
-      Tup<TensorVectorHost<T>, TensorVectorHost<T>>,    //
-      Tup<TensorVectorDevice<T>, TensorVectorHost<T>>,  //
-      Tup<TensorVectorHost<T>, TensorVectorDevice<T>>,  //
-      Tup<TensorVectorDevice<T>, TensorVectorDevice<T>> //
+  ForEach<MakeTypeArray<                                            //
+      Tup<TensorVectorHost<T>, TensorVectorHost<T>>,                //
+      Tup<TensorVectorDevice<T>, TensorVectorHost<T>>,              //
+      Tup<TensorVectorHost<T>, TensorVectorDevice<T>>,              //
+      Tup<TensorVectorDevice<T>, TensorVectorDevice<T>>,            //
+      Tup<TensorVectorHost<TMosaic>, TensorVectorHost<TMosaic>>,    //
+      Tup<TensorVectorDevice<TMosaic>, TensorVectorHost<TMosaic>>,  //
+      Tup<TensorVectorHost<TMosaic>, TensorVectorDevice<TMosaic>>,  //
+      Tup<TensorVectorDevice<TMosaic>, TensorVectorDevice<TMosaic>> //
       >>([]<typename TVectors>() {
     using TVector0 = tup_elem_t<0, TVectors>;
     using TVector1 = tup_elem_t<1, TVectors>;
@@ -578,11 +582,15 @@ TEST(TensorVector, Copy) {
   });
 
   // 2D.
-  ForEach<MakeTypeArray<                                        //
-      Tup<TensorVectorHost<T, _2>, TensorVectorHost<T, _2>>,    //
-      Tup<TensorVectorDevice<T, _2>, TensorVectorHost<T, _2>>,  //
-      Tup<TensorVectorHost<T, _2>, TensorVectorDevice<T, _2>>,  //
-      Tup<TensorVectorDevice<T, _2>, TensorVectorDevice<T, _2>> //
+  ForEach<MakeTypeArray<                                                    //
+      Tup<TensorVectorHost<T, _2>, TensorVectorHost<T, _2>>,                //
+      Tup<TensorVectorDevice<T, _2>, TensorVectorHost<T, _2>>,              //
+      Tup<TensorVectorHost<T, _2>, TensorVectorDevice<T, _2>>,              //
+      Tup<TensorVectorDevice<T, _2>, TensorVectorDevice<T, _2>>,            //
+      Tup<TensorVectorHost<TMosaic, _2>, TensorVectorHost<TMosaic, _2>>,    //
+      Tup<TensorVectorDevice<TMosaic, _2>, TensorVectorHost<TMosaic, _2>>,  //
+      Tup<TensorVectorHost<TMosaic, _2>, TensorVectorDevice<TMosaic, _2>>,  //
+      Tup<TensorVectorDevice<TMosaic, _2>, TensorVectorDevice<TMosaic, _2>> //
       >>([]<typename TVectors>() {
     using TVector0 = tup_elem_t<0, TVectors>;
     using TVector1 = tup_elem_t<1, TVectors>;
@@ -612,11 +620,15 @@ TEST(TensorVector, Copy) {
   });
 
   // 3D.
-  ForEach<MakeTypeArray<                                        //
-      Tup<TensorVectorHost<T, _3>, TensorVectorHost<T, _3>>,    //
-      Tup<TensorVectorDevice<T, _3>, TensorVectorHost<T, _3>>,  //
-      Tup<TensorVectorHost<T, _3>, TensorVectorDevice<T, _3>>,  //
-      Tup<TensorVectorDevice<T, _3>, TensorVectorDevice<T, _3>> //
+  ForEach<MakeTypeArray<                                                    //
+      Tup<TensorVectorHost<T, _3>, TensorVectorHost<T, _3>>,                //
+      Tup<TensorVectorDevice<T, _3>, TensorVectorHost<T, _3>>,              //
+      Tup<TensorVectorHost<T, _3>, TensorVectorDevice<T, _3>>,              //
+      Tup<TensorVectorDevice<T, _3>, TensorVectorDevice<T, _3>>,            //
+      Tup<TensorVectorHost<TMosaic, _3>, TensorVectorHost<TMosaic, _3>>,    //
+      Tup<TensorVectorDevice<TMosaic, _3>, TensorVectorHost<TMosaic, _3>>,  //
+      Tup<TensorVectorHost<TMosaic, _3>, TensorVectorDevice<TMosaic, _3>>,  //
+      Tup<TensorVectorDevice<TMosaic, _3>, TensorVectorDevice<TMosaic, _3>> //
       >>([]<typename TVectors>() {
     using TVector0 = tup_elem_t<0, TVectors>;
     using TVector1 = tup_elem_t<1, TVectors>;
