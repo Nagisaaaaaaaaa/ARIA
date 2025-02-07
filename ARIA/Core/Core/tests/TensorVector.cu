@@ -566,6 +566,8 @@ TEST(TensorVector, AssignmentAndCopy) {
       >>([]<typename TVectors>() {
     using TVector0 = tup_elem_t<0, TVectors>;
     using TVector1 = tup_elem_t<1, TVectors>;
+    static_assert(std::is_same_v<typename TVector0::value_type, float>);
+    static_assert(std::is_same_v<typename TVector1::value_type, float>);
 
     TVector0 dst;
     TVector1 src;
@@ -594,6 +596,8 @@ TEST(TensorVector, AssignmentAndCopy) {
       >>([]<typename TVectors>() {
     using TVector0 = tup_elem_t<0, TVectors>;
     using TVector1 = tup_elem_t<1, TVectors>;
+    static_assert(std::is_same_v<typename TVector0::value_type, float>);
+    static_assert(std::is_same_v<typename TVector1::value_type, float>);
 
     TVector0 dst;
     TVector1 src;
@@ -632,6 +636,8 @@ TEST(TensorVector, AssignmentAndCopy) {
       >>([]<typename TVectors>() {
     using TVector0 = tup_elem_t<0, TVectors>;
     using TVector1 = tup_elem_t<1, TVectors>;
+    static_assert(std::is_same_v<typename TVector0::value_type, float>);
+    static_assert(std::is_same_v<typename TVector1::value_type, float>);
 
     TVector0 dst;
     TVector1 src;
