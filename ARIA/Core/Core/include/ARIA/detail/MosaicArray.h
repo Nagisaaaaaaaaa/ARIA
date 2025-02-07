@@ -56,6 +56,9 @@ private:
 
 public:
   using value_type = T;
+  using element_type = void;
+  using reference = void;
+  using iterator = void;
 
 public:
   constexpr MosaicArray() = default;
@@ -90,9 +93,21 @@ public:
     ForEach<size()>([&]<auto i>() { operator[](i) = value; });
   }
 
+  [[nodiscard]] ARIA_HOST_DEVICE constexpr auto begin() const {
+    return cute::apply(storage_, []<typename... S>(S &&...s) {
+      return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).begin()...});
+    });
+  }
+
   [[nodiscard]] ARIA_HOST_DEVICE constexpr auto begin() {
     return cute::apply(storage_, []<typename... S>(S &&...s) {
       return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).begin()...});
+    });
+  }
+
+  [[nodiscard]] ARIA_HOST_DEVICE constexpr auto end() const {
+    return cute::apply(storage_, []<typename... S>(S &&...s) {
+      return make_mosaic_iterator<TMosaic>(Tup{std::forward<S>(s).end()...});
     });
   }
 

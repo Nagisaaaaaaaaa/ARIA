@@ -14,7 +14,9 @@
 ///
 /// Here lists all the ARIA built-in features which
 /// are compatible with `Mosaic`:
-/// 1. (Nothing now, we are still working on them, QAQ.)
+/// 1. See `Array.h`.
+/// 2. See `TensorVector.h`.
+/// 3. See `Vector.h`.
 ///
 /// Users only need to define some simple types and methods,
 /// see `class Mosaic` below, and all things will be ready.
@@ -79,6 +81,10 @@ namespace ARIA {
 /// \note Very complex pattern structures are also supported, but
 /// member variables should be either "scalar" or "aggregate".
 /// See `std::scalar` and `std::aggregate`.
+///
+/// \see Array.h
+/// \see TensorVector.h
+/// \see Vector.h
 template <typename T, typename TMosaicPattern>
 class Mosaic;
 

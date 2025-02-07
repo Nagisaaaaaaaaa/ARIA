@@ -1,11 +1,10 @@
 #pragma once
 
+#include "ARIA/Array.h"
 #include "ARIA/Layout.h"
-#include "ARIA/TypeArray.h"
+#include "ARIA/Vector.h"
 
 #include <cute/tensor.hpp>
-#include <thrust/device_vector.h>
-#include <thrust/host_vector.h>
 
 namespace ARIA {
 
@@ -234,7 +233,7 @@ private:
   using TDerived = TensorVectorReduced<T, TypeArray<TRank, TSpace, TLayout>>;
 
 public:
-  using value_type = T;
+  using value_type = std::conditional_t<mosaic::detail::is_mosaic_v<T>, typename mosaic::detail::is_mosaic<T>::T, T>;
 
   using Space = TSpace;
 
@@ -276,12 +275,12 @@ public:
   }
 
   template <typename U>
-  [[nodiscard]] constexpr decltype(auto) operator[](U &&u) const {
+  [[nodiscard]] constexpr decltype(auto) operator[](U && u) const {
     return tensor()[std::forward<U>(u)];
   }
 
   template <typename U>
-  [[nodiscard]] constexpr decltype(auto) operator[](U &&u) {
+  [[nodiscard]] constexpr decltype(auto) operator[](U && u) {
     return tensor()[std::forward<U>(u)];
   }
 
@@ -289,6 +288,7 @@ public:
   // `Realloc` is implemented by simply call the constructor.
   template <typename ULayout>
   constexpr void Realloc(const ULayout &layout) {
+    static_assert(!is_static_v<TLayout>, "`Realloc` is not allowed for static layouts");
     derived() = TDerived(layout);
   }
 
@@ -353,10 +353,11 @@ public:
 //
 //
 //! Now, we are ready to implement the 4 variants of `TensorVectorReduced` with template specialization.
+//! Actually, there are totally 8 variants below, since we should also implement the `Mosaic`-versions.
 
-// Host + static.
+// Non-mosaic + host + static.
 template <NonArrayType T, NonArrayType TStaticLayout>
-  requires is_static_v<TStaticLayout>
+  requires(!mosaic::detail::is_mosaic_v<T> && is_static_v<TStaticLayout>)
 class TensorVectorReduced<T, TypeArray<UInt<TStaticLayout::rank>, SpaceHost, TStaticLayout>>
     : public TensorVectorMembers<T, UInt<TStaticLayout::rank>, SpaceHost, TStaticLayout> {
 public:
@@ -386,12 +387,40 @@ private:
   Tensor tensor_;
 };
 
+// Mosaic + host + static.
+template <NonArrayType TMosaic, NonArrayType TStaticLayout>
+  requires(mosaic::detail::is_mosaic_v<TMosaic> && is_static_v<TStaticLayout>)
+class TensorVectorReduced<TMosaic, TypeArray<UInt<TStaticLayout::rank>, SpaceHost, TStaticLayout>>
+    : public TensorVectorMembers<TMosaic, UInt<TStaticLayout::rank>, SpaceHost, TStaticLayout> {
+public:
+  using Layout = TStaticLayout;
+  using Tensor = cute::Tensor<Array<TMosaic, cosize_safe_v<TStaticLayout>>, TStaticLayout>;
+  //! `RawTensor` is not defined for mosaic ones.
+
+public:
+  TensorVectorReduced() = default;
+
+  explicit TensorVectorReduced(const TStaticLayout &) {}
+
+  ARIA_COPY_MOVE_ABILITY(TensorVectorReduced, default, default);
+
+public:
+  [[nodiscard]] constexpr TStaticLayout layout() const { return {}; }
+
+  [[nodiscard]] constexpr decltype(auto) tensor() const { return cute::make_tensor(tensor_.data(), layout()); }
+
+  [[nodiscard]] constexpr decltype(auto) tensor() { return cute::make_tensor(tensor_.data(), layout()); }
+
+private:
+  Tensor tensor_;
+};
+
 //
 //
 //
-// Host + dynamic.
+// Non-mosaic + host + dynamic.
 template <NonArrayType T, NonArrayType TDynLayout>
-  requires(!is_static_v<TDynLayout>)
+  requires(!mosaic::detail::is_mosaic_v<T> && !is_static_v<TDynLayout>)
 class TensorVectorReduced<T, TypeArray<UInt<TDynLayout::rank>, SpaceHost, TDynLayout>>
     : public TensorVectorMembers<T, UInt<TDynLayout::rank>, SpaceHost, TDynLayout> {
 public:
@@ -423,12 +452,42 @@ private:
   TDynLayout layout_;
 };
 
+// Mosaic + host + dynamic.
+template <NonArrayType TMosaic, NonArrayType TDynLayout>
+  requires(mosaic::detail::is_mosaic_v<TMosaic> && !is_static_v<TDynLayout>)
+class TensorVectorReduced<TMosaic, TypeArray<UInt<TDynLayout::rank>, SpaceHost, TDynLayout>>
+    : public TensorVectorMembers<TMosaic, UInt<TDynLayout::rank>, SpaceHost, TDynLayout> {
+public:
+  using Layout = TDynLayout;
+  using Tensor =
+      std::decay_t<decltype(cute::make_tensor(std::declval<VectorHost<TMosaic>>().data(), std::declval<TDynLayout>()))>;
+  //! `RawTensor` is not defined for mosaic ones.
+
+public:
+  TensorVectorReduced() = default;
+
+  explicit TensorVectorReduced(const TDynLayout &layout) : engine_(cosize_safe(layout)), layout_(layout) {}
+
+  ARIA_COPY_MOVE_ABILITY(TensorVectorReduced, default, default);
+
+public:
+  [[nodiscard]] constexpr decltype(auto) layout() const { return layout_; }
+
+  [[nodiscard]] constexpr decltype(auto) tensor() const { return cute::make_tensor(engine_.data(), layout()); }
+
+  [[nodiscard]] constexpr decltype(auto) tensor() { return cute::make_tensor(engine_.data(), layout()); }
+
+private:
+  VectorHost<TMosaic> engine_;
+  TDynLayout layout_;
+};
+
 //
 //
 //
-// Device + static.
+// Non-mosaic + device + static.
 template <NonArrayType T, NonArrayType TStaticLayout>
-  requires is_static_v<TStaticLayout>
+  requires(!mosaic::detail::is_mosaic_v<T> && is_static_v<TStaticLayout>)
 class TensorVectorReduced<T, TypeArray<UInt<TStaticLayout::rank>, SpaceDevice, TStaticLayout>>
     : public TensorVectorMembers<T, UInt<TStaticLayout::rank>, SpaceDevice, TStaticLayout> {
 public:
@@ -464,12 +523,41 @@ private:
   thrust::device_vector<T> engine_;
 };
 
+// Mosaic + device + static.
+template <NonArrayType TMosaic, NonArrayType TStaticLayout>
+  requires(mosaic::detail::is_mosaic_v<TMosaic> && is_static_v<TStaticLayout>)
+class TensorVectorReduced<TMosaic, TypeArray<UInt<TStaticLayout::rank>, SpaceDevice, TStaticLayout>>
+    : public TensorVectorMembers<TMosaic, UInt<TStaticLayout::rank>, SpaceDevice, TStaticLayout> {
+public:
+  using Layout = TStaticLayout;
+  using Tensor = std::decay_t<decltype(cute::make_tensor(std::declval<VectorDevice<TMosaic>>().data(),
+                                                         std::declval<TStaticLayout>()))>;
+  //! `RawTensor` is not defined for mosaic ones.
+
+public:
+  TensorVectorReduced() = default;
+
+  explicit TensorVectorReduced(const TStaticLayout &) : engine_(cosize_safe_v<TStaticLayout>) {}
+
+  ARIA_COPY_MOVE_ABILITY(TensorVectorReduced, default, default);
+
+public:
+  [[nodiscard]] constexpr TStaticLayout layout() const { return {}; }
+
+  [[nodiscard]] constexpr decltype(auto) tensor() const { return cute::make_tensor(engine_.data(), layout()); }
+
+  [[nodiscard]] constexpr decltype(auto) tensor() { return cute::make_tensor(engine_.data(), layout()); }
+
+private:
+  VectorDevice<TMosaic> engine_;
+};
+
 //
 //
 //
-// Device + dynamic.
+// Non-mosaic + device + dynamic.
 template <NonArrayType T, NonArrayType TDynLayout>
-  requires(!is_static_v<TDynLayout>)
+  requires(!mosaic::detail::is_mosaic_v<T> && !is_static_v<TDynLayout>)
 class TensorVectorReduced<T, TypeArray<UInt<TDynLayout::rank>, SpaceDevice, TDynLayout>>
     : public TensorVectorMembers<T, UInt<TDynLayout::rank>, SpaceDevice, TDynLayout> {
 public:
@@ -503,6 +591,36 @@ public:
 
 private:
   thrust::device_vector<T> engine_;
+  TDynLayout layout_;
+};
+
+// Mosaic + device + dynamic.
+template <NonArrayType TMosaic, NonArrayType TDynLayout>
+  requires(mosaic::detail::is_mosaic_v<TMosaic> && !is_static_v<TDynLayout>)
+class TensorVectorReduced<TMosaic, TypeArray<UInt<TDynLayout::rank>, SpaceDevice, TDynLayout>>
+    : public TensorVectorMembers<TMosaic, UInt<TDynLayout::rank>, SpaceDevice, TDynLayout> {
+public:
+  using Layout = TDynLayout;
+  using Tensor = std::decay_t<decltype(cute::make_tensor(std::declval<VectorDevice<TMosaic>>().data(),
+                                                         std::declval<TDynLayout>()))>;
+  //! `RawTensor` is not defined for mosaic ones.
+
+public:
+  TensorVectorReduced() = default;
+
+  explicit TensorVectorReduced(const TDynLayout &layout) : engine_(cosize_safe(layout)), layout_(layout) {}
+
+  ARIA_COPY_MOVE_ABILITY(TensorVectorReduced, default, default);
+
+public:
+  [[nodiscard]] constexpr decltype(auto) layout() const { return layout_; }
+
+  [[nodiscard]] constexpr decltype(auto) tensor() const { return cute::make_tensor(engine_.data(), layout()); }
+
+  [[nodiscard]] constexpr decltype(auto) tensor() { return cute::make_tensor(engine_.data(), layout()); }
+
+private:
+  VectorDevice<TMosaic> engine_;
   TDynLayout layout_;
 };
 
@@ -586,7 +704,7 @@ concept TensorVectorType = is_tensor_vector_v<T>;
 //
 //
 //
-// Copy is simply implemented with `thrust::copy`.
+// Copy is simply implemented with `mosaic::detail::copy`.
 template <typename T, ArrayType ArgsDst, ArrayType ArgsSrc>
 ARIA_HOST_DEVICE void copy(TensorVectorReduced<T, ArgsDst> &dst, const TensorVectorReduced<T, ArgsSrc> &src) {
   using TVDst = TensorVectorReduced<T, ArgsDst>;
@@ -605,7 +723,7 @@ ARIA_HOST_DEVICE void copy(TensorVectorReduced<T, ArgsDst> &dst, const TensorVec
   ARIA_ASSERT(dst.cosize_safe() == src.cosize_safe(), "Unable to copy tensor vectors with different cosizes");
 #endif
 
-  thrust::copy(src.tensor().data(), src.tensor().data() + src.cosize_safe(), dst.tensor().data());
+  mosaic::detail::copy(src.tensor().data(), src.tensor().data() + src.cosize_safe(), dst.tensor().data());
 }
 
 } // namespace tensor_vector::detail
