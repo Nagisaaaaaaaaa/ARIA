@@ -552,19 +552,19 @@ TEST(TensorVector, Mirrored) {
 TEST(TensorVector, AssignmentAndCopyStatic) {
   using T = float;
   using TMosaic = Mosaic<T, PatternFloats>;
-  using TLayout = decltype(make_layout_major(C<10>{}));
 
   // 1D.
-  ForEach<MakeTypeArray<                                 //
-      Tup<TensorVectorHost<T>, TensorVectorHost<T>>,     //
-      Tup<TensorVectorDevice<T>, TensorVectorHost<T>>,   //
-      Tup<TensorVectorHost<T>, TensorVectorDevice<T>>,   //
-      Tup<TensorVectorDevice<T>, TensorVectorDevice<T>>, //
+  using TLayout1D = decltype(make_layout_major(C<10>{}));
+  ForEach<MakeTypeArray<                                                       //
+      Tup<TensorVectorHost<T, TLayout1D>, TensorVectorHost<T, TLayout1D>>,     //
+      Tup<TensorVectorDevice<T, TLayout1D>, TensorVectorHost<T, TLayout1D>>,   //
+      Tup<TensorVectorHost<T, TLayout1D>, TensorVectorDevice<T, TLayout1D>>,   //
+      Tup<TensorVectorDevice<T, TLayout1D>, TensorVectorDevice<T, TLayout1D>>, //
       //
-      Tup<TensorVectorHost<TMosaic>, TensorVectorHost<TMosaic>>,    //
-      Tup<TensorVectorDevice<TMosaic>, TensorVectorHost<TMosaic>>,  //
-      Tup<TensorVectorHost<TMosaic>, TensorVectorDevice<TMosaic>>,  //
-      Tup<TensorVectorDevice<TMosaic>, TensorVectorDevice<TMosaic>> //
+      Tup<TensorVectorHost<TMosaic, TLayout1D>, TensorVectorHost<TMosaic, TLayout1D>>,    //
+      Tup<TensorVectorDevice<TMosaic, TLayout1D>, TensorVectorHost<TMosaic, TLayout1D>>,  //
+      Tup<TensorVectorHost<TMosaic, TLayout1D>, TensorVectorDevice<TMosaic, TLayout1D>>,  //
+      Tup<TensorVectorDevice<TMosaic, TLayout1D>, TensorVectorDevice<TMosaic, TLayout1D>> //
       >>([]<typename TVectors>() {
     using TVector0 = tup_elem_t<0, TVectors>;
     using TVector1 = tup_elem_t<1, TVectors>;
@@ -584,16 +584,17 @@ TEST(TensorVector, AssignmentAndCopyStatic) {
   });
 
   // 2D.
-  ForEach<MakeTypeArray<                                         //
-      Tup<TensorVectorHost<T, _2>, TensorVectorHost<T, _2>>,     //
-      Tup<TensorVectorDevice<T, _2>, TensorVectorHost<T, _2>>,   //
-      Tup<TensorVectorHost<T, _2>, TensorVectorDevice<T, _2>>,   //
-      Tup<TensorVectorDevice<T, _2>, TensorVectorDevice<T, _2>>, //
+  using TLayout2D = decltype(make_layout_major(C<5>{}, C<6>{}));
+  ForEach<MakeTypeArray<                                                               //
+      Tup<TensorVectorHost<T, _2, TLayout2D>, TensorVectorHost<T, _2, TLayout2D>>,     //
+      Tup<TensorVectorDevice<T, _2, TLayout2D>, TensorVectorHost<T, _2, TLayout2D>>,   //
+      Tup<TensorVectorHost<T, _2, TLayout2D>, TensorVectorDevice<T, _2, TLayout2D>>,   //
+      Tup<TensorVectorDevice<T, _2, TLayout2D>, TensorVectorDevice<T, _2, TLayout2D>>, //
       //
-      Tup<TensorVectorHost<TMosaic, _2>, TensorVectorHost<TMosaic, _2>>,    //
-      Tup<TensorVectorDevice<TMosaic, _2>, TensorVectorHost<TMosaic, _2>>,  //
-      Tup<TensorVectorHost<TMosaic, _2>, TensorVectorDevice<TMosaic, _2>>,  //
-      Tup<TensorVectorDevice<TMosaic, _2>, TensorVectorDevice<TMosaic, _2>> //
+      Tup<TensorVectorHost<TMosaic, _2, TLayout2D>, TensorVectorHost<TMosaic, _2, TLayout2D>>,    //
+      Tup<TensorVectorDevice<TMosaic, _2, TLayout2D>, TensorVectorHost<TMosaic, _2, TLayout2D>>,  //
+      Tup<TensorVectorHost<TMosaic, _2, TLayout2D>, TensorVectorDevice<TMosaic, _2, TLayout2D>>,  //
+      Tup<TensorVectorDevice<TMosaic, _2, TLayout2D>, TensorVectorDevice<TMosaic, _2, TLayout2D>> //
       >>([]<typename TVectors>() {
     using TVector0 = tup_elem_t<0, TVectors>;
     using TVector1 = tup_elem_t<1, TVectors>;
@@ -623,16 +624,17 @@ TEST(TensorVector, AssignmentAndCopyStatic) {
   });
 
   // 3D.
-  ForEach<MakeTypeArray<                                         //
-      Tup<TensorVectorHost<T, _3>, TensorVectorHost<T, _3>>,     //
-      Tup<TensorVectorDevice<T, _3>, TensorVectorHost<T, _3>>,   //
-      Tup<TensorVectorHost<T, _3>, TensorVectorDevice<T, _3>>,   //
-      Tup<TensorVectorDevice<T, _3>, TensorVectorDevice<T, _3>>, //
+  using TLayout3D = decltype(make_layout_major(C<2>{}, C<3>{}, C<4>{}));
+  ForEach<MakeTypeArray<                                                               //
+      Tup<TensorVectorHost<T, _3, TLayout3D>, TensorVectorHost<T, _3, TLayout3D>>,     //
+      Tup<TensorVectorDevice<T, _3, TLayout3D>, TensorVectorHost<T, _3, TLayout3D>>,   //
+      Tup<TensorVectorHost<T, _3, TLayout3D>, TensorVectorDevice<T, _3, TLayout3D>>,   //
+      Tup<TensorVectorDevice<T, _3, TLayout3D>, TensorVectorDevice<T, _3, TLayout3D>>, //
       //
-      Tup<TensorVectorHost<TMosaic, _3>, TensorVectorHost<TMosaic, _3>>,    //
-      Tup<TensorVectorDevice<TMosaic, _3>, TensorVectorHost<TMosaic, _3>>,  //
-      Tup<TensorVectorHost<TMosaic, _3>, TensorVectorDevice<TMosaic, _3>>,  //
-      Tup<TensorVectorDevice<TMosaic, _3>, TensorVectorDevice<TMosaic, _3>> //
+      Tup<TensorVectorHost<TMosaic, _3, TLayout3D>, TensorVectorHost<TMosaic, _3, TLayout3D>>,    //
+      Tup<TensorVectorDevice<TMosaic, _3, TLayout3D>, TensorVectorHost<TMosaic, _3, TLayout3D>>,  //
+      Tup<TensorVectorHost<TMosaic, _3, TLayout3D>, TensorVectorDevice<TMosaic, _3, TLayout3D>>,  //
+      Tup<TensorVectorDevice<TMosaic, _3, TLayout3D>, TensorVectorDevice<TMosaic, _3, TLayout3D>> //
       >>([]<typename TVectors>() {
     using TVector0 = tup_elem_t<0, TVectors>;
     using TVector1 = tup_elem_t<1, TVectors>;
