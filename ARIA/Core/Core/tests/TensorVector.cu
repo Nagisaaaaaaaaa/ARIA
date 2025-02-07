@@ -12,7 +12,18 @@ using cute::_2;
 using cute::_3;
 using cute::_4;
 
+struct PatternFloats {
+  float v[2];
+};
+
 } // namespace
+
+template <>
+struct Mosaic<float, PatternFloats> {
+  PatternFloats operator()(const float &v) const { return {.v = {v * (2.0F / 5.0F), v * (3.0F / 5.0F)}}; }
+
+  float operator()(const PatternFloats &v) const { return v.v[0] + v.v[1]; }
+};
 
 TEST(TensorVector, HostStatic) {
   auto layout = make_layout(make_shape(_2{}, make_shape(_2{}, _2{})), make_stride(_4{}, make_stride(_2{}, _1{})));
@@ -560,7 +571,7 @@ TEST(TensorVector, Copy) {
     copy(dst, src);
 
     for (int i = 0; i < 10; ++i)
-      EXPECT_TRUE(dst(i) == i);
+      EXPECT_FLOAT_EQ(dst(i), i);
   });
 
   // 2D.
@@ -584,7 +595,7 @@ TEST(TensorVector, Copy) {
     copy(dst, src);
 
     for (int i = 0; i < 30; ++i)
-      EXPECT_TRUE(dst(i) == i);
+      EXPECT_FLOAT_EQ(dst(i), i);
 
     for (int y = 0; y < 6; ++y)
       for (int x = 0; x < 5; ++x)
@@ -594,7 +605,7 @@ TEST(TensorVector, Copy) {
 
     for (int y = 0; y < 6; ++y)
       for (int x = 0; x < 5; ++x)
-        EXPECT_TRUE(dst(x, y) == x + 3 * y + 1);
+        EXPECT_FLOAT_EQ(dst(x, y), x + 3 * y + 1);
   });
 
   // 3D.
@@ -618,7 +629,7 @@ TEST(TensorVector, Copy) {
     copy(dst, src);
 
     for (int i = 0; i < 24; ++i)
-      EXPECT_TRUE(dst(i) == i);
+      EXPECT_FLOAT_EQ(dst(i), i);
 
     for (int z = 0; z < 4; ++z)
       for (int y = 0; y < 3; ++y)
@@ -630,7 +641,7 @@ TEST(TensorVector, Copy) {
     for (int z = 0; z < 4; ++z)
       for (int y = 0; y < 3; ++y)
         for (int x = 0; x < 2; ++x)
-          EXPECT_TRUE(dst(x, y, z) == x + 2 * y + 3 * z + 1);
+          EXPECT_FLOAT_EQ(dst(x, y, z), x + 2 * y + 3 * z + 1);
   });
 }
 
