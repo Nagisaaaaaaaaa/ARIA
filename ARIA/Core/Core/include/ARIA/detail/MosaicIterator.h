@@ -205,7 +205,7 @@ using mosaic_pointer_2_tup_t =
 //
 // Cast `thrust::tuple` to `Tup`.
 template <typename TThrustTuple>
-static constexpr auto ThrustTuple2Tup(const TThrustTuple &tupleThrust) {
+ARIA_HOST_DEVICE static constexpr auto ThrustTuple2Tup(const TThrustTuple &tupleThrust) {
   using TTup = thrust_tuple_2_tup_t<TThrustTuple>;
 
   TTup res;
@@ -215,13 +215,13 @@ static constexpr auto ThrustTuple2Tup(const TThrustTuple &tupleThrust) {
 
 // Cast `MosaicIterator` to `Tup`.
 template <MosaicIterator TMosaicIterator>
-static constexpr auto MosaicIterator2Tup(const TMosaicIterator &iterator) {
+ARIA_HOST_DEVICE static constexpr auto MosaicIterator2Tup(const TMosaicIterator &iterator) {
   return ThrustTuple2Tup(iterator.base().get_iterator_tuple());
 }
 
 // Cast `MosaicPointer` to `Tup`.
 template <MosaicPointer TMosaicPointer>
-static constexpr auto MosaicPointer2Tup(const TMosaicPointer &pointer) {
+ARIA_HOST_DEVICE static constexpr auto MosaicPointer2Tup(const TMosaicPointer &pointer) {
   return ThrustTuple2Tup(pointer.base().get_iterator_tuple());
 }
 
@@ -232,7 +232,7 @@ static constexpr auto MosaicPointer2Tup(const TMosaicPointer &pointer) {
 //
 //! `copy` does the same thing as `thrust::copy` but is able to handle `MosaicIterator`s.
 template <MosaicIterator TItIn, MosaicIterator TItOut>
-TItOut copy(TItIn srcBegin, TItIn srcEnd, TItOut dst) {
+ARIA_HOST_DEVICE TItOut copy(TItIn srcBegin, TItIn srcEnd, TItOut dst) {
   using TMosaic = typename decltype(*dst)::TMosaic;
   static_assert(std::is_same_v<typename decltype(*srcBegin)::TMosaic, TMosaic>,
                 "Inconsistent mosaic definitions of mosaic iterators");
@@ -256,7 +256,7 @@ TItOut copy(TItIn srcBegin, TItIn srcEnd, TItOut dst) {
 
 template <typename TItIn, typename TItOut>
   requires(!MosaicIterator<TItIn> && !MosaicIterator<TItOut>)
-TItOut copy(TItIn srcBegin, TItIn srcEnd, TItOut dst) {
+ARIA_HOST_DEVICE TItOut copy(TItIn srcBegin, TItIn srcEnd, TItOut dst) {
   using T = decltype(Auto(*dst));
   return make_mosaic_iterator<T>(Tup{thrust::copy(srcBegin, srcEnd, dst)});
 }
