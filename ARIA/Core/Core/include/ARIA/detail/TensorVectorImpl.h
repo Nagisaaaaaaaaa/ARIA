@@ -288,6 +288,7 @@ public:
   // `Realloc` is implemented by simply call the constructor.
   template <typename ULayout>
   constexpr void Realloc(const ULayout &layout) {
+    static_assert(!is_static_v<TLayout>, "`Realloc` is not allowed for static layouts");
     derived() = TDerived(layout);
   }
 
