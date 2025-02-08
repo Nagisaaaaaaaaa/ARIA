@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ARIA/Array.h"
 #include "ARIA/BitArray.h"
 #include "ARIA/Launcher.h"
 #include "ARIA/Math.h"
@@ -139,12 +140,13 @@ concept DeviceVDBHandleType = is_device_vdb_handle_v<T>;
 template <typename T, auto dim, typename TSpace>
 class VDBDefinitions;
 
-template <typename T, auto dim_>
-class VDBDefinitions<T, dim_, SpaceDevice> {
+template <typename T_, auto dim_>
+class VDBDefinitions<T_, dim_, SpaceDevice> {
 public:
-  using value_type = T;
+  using T = T_;
   static constexpr auto dim = dim_;
   using TSpace = SpaceDevice;
+  using value_type = std::conditional_t<mosaic::detail::is_mosaic_v<T>, typename mosaic::detail::is_mosaic<T>::T, T>;
 
   //
   //
@@ -206,7 +208,7 @@ public:
   using TBlockStorageOnOff = BitArray<nCellsPerBlock, ThreadSafe>;
 
   // Type of the block storage part, which contains the actual value of each cell.
-  using TBlockStorageData = cuda::std::array<T, nCellsPerBlock>;
+  using TBlockStorageData = Array<T, nCellsPerBlock>;
 
   // Type of the block storage.
   struct TBlockStorage {
@@ -314,16 +316,17 @@ public:
 //
 //
 // Device VDB handle.
-template <typename T, auto dim_>
-class VDBHandle<T, dim_, SpaceDevice> : public VDBDefinitions<T, dim_, SpaceDevice> {
+template <typename T_, auto dim_>
+class VDBHandle<T_, dim_, SpaceDevice> : public VDBDefinitions<T_, dim_, SpaceDevice> {
 private:
-  using Base = VDBDefinitions<T, dim_, SpaceDevice>;
+  using Base = VDBDefinitions<T_, dim_, SpaceDevice>;
 
 public:
   // clang-format off
-  using typename Base::value_type;
+  using typename Base::T;
   using Base::dim;
   using typename Base::TSpace;
+  using typename Base::value_type;
   // clang-format on
 
 public:
@@ -638,9 +641,9 @@ private:
   //
 public:
   // Get or set the value at `cellCoord`.
-  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AllocateIfNotExist);
+  ARIA_PROP(public, public, ARIA_HOST_DEVICE, value_type, value_AllocateIfNotExist);
 
-  ARIA_PROP(public, public, ARIA_HOST_DEVICE, T, value_AssumeExist);
+  ARIA_PROP(public, public, ARIA_HOST_DEVICE, value_type, value_AssumeExist);
 
   //
   //
@@ -648,11 +651,11 @@ public:
 private:
   //! It is considered undefined behavior to get the value which has not been set yet.
   //! So, the getter of `value_AllocateIfNotExist` can be implemented the same as `value_AssumeExist`'s.
-  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_GETTER(value_AllocateIfNotExist)(const TVec &cellCoord) const {
+  [[nodiscard]] ARIA_HOST_DEVICE value_type ARIA_PROP_GETTER(value_AllocateIfNotExist)(const TVec &cellCoord) const {
     return ARIA_PROP_GETTER(value_AssumeExist)(cellCoord);
   }
 
-  ARIA_HOST_DEVICE void ARIA_PROP_SETTER(value_AllocateIfNotExist)(const TVec &cellCoord, const T &value) {
+  ARIA_HOST_DEVICE void ARIA_PROP_SETTER(value_AllocateIfNotExist)(const TVec &cellCoord, const value_type &value) {
 #if ARIA_IS_DEVICE_CODE
     TBlock &b = block_AllocateIfNotExist(cellCoord);
 
@@ -669,7 +672,7 @@ private:
     ARIA_PROP_SETTER(value_AssumeExist)(cellCoord, off);
   }
 
-  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_GETTER(value_AssumeExist)(const TVec &cellCoord) const {
+  [[nodiscard]] ARIA_HOST_DEVICE value_type ARIA_PROP_GETTER(value_AssumeExist)(const TVec &cellCoord) const {
 #if ARIA_IS_DEVICE_CODE
     const TBlock &b = block_AssumeExist(cellCoord);
 
@@ -682,7 +685,7 @@ private:
 #endif
   }
 
-  ARIA_HOST_DEVICE void ARIA_PROP_SETTER(value_AssumeExist)(const TVec &cellCoord, const T &value) {
+  ARIA_HOST_DEVICE void ARIA_PROP_SETTER(value_AssumeExist)(const TVec &cellCoord, const value_type &value) {
 #if ARIA_IS_DEVICE_CODE
     const TBlock &b = block_AssumeExist(cellCoord);
 
@@ -706,7 +709,7 @@ private:
     // If the block exists, clear the storage.
     auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
     b->storage()->onOff.Clear(cellIdxInBlock);
-    b->storage()->data[cellIdxInBlock] = T{};
+    b->storage()->data[cellIdxInBlock] = value_type{};
 #else
     ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
 #endif
@@ -716,13 +719,13 @@ private:
   //
   //
   // The following methods are similar to the above ones, but will update the cache.
-  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_GETTER(value_AllocateIfNotExist)(const TVec &cellCoord,
-                                                                              const TCache &cache) const {
+  [[nodiscard]] ARIA_HOST_DEVICE value_type ARIA_PROP_GETTER(value_AllocateIfNotExist)(const TVec &cellCoord,
+                                                                                       const TCache &cache) const {
     return ARIA_PROP_GETTER(value_AssumeExist)(cellCoord, cache);
   }
 
   ARIA_HOST_DEVICE void
-  ARIA_PROP_SETTER(value_AllocateIfNotExist)(const TVec &cellCoord, const TCache &cache, const T &value) {
+  ARIA_PROP_SETTER(value_AllocateIfNotExist)(const TVec &cellCoord, const TCache &cache, const value_type &value) {
 #if ARIA_IS_DEVICE_CODE
     auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
     TBlockStorage *storage = nullptr;
@@ -756,8 +759,8 @@ private:
     ARIA_PROP_SETTER(value_AssumeExist)(cellCoord, cache, off);
   }
 
-  [[nodiscard]] ARIA_HOST_DEVICE T ARIA_PROP_GETTER(value_AssumeExist)(const TVec &cellCoord,
-                                                                       const TCache &cache) const {
+  [[nodiscard]] ARIA_HOST_DEVICE value_type ARIA_PROP_GETTER(value_AssumeExist)(const TVec &cellCoord,
+                                                                                const TCache &cache) const {
 #if ARIA_IS_DEVICE_CODE
     auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
     const TBlockStorage *storage = nullptr;
@@ -781,7 +784,7 @@ private:
   }
 
   ARIA_HOST_DEVICE void
-  ARIA_PROP_SETTER(value_AssumeExist)(const TVec &cellCoord, const TCache &cache, const T &value) {
+  ARIA_PROP_SETTER(value_AssumeExist)(const TVec &cellCoord, const TCache &cache, const value_type &value) {
 #if ARIA_IS_DEVICE_CODE
     auto cellIdxInBlock = Auto(CellCoord2CellIdxInBlock(cellCoord));
     TBlockStorage *storage = nullptr;
@@ -842,7 +845,7 @@ private:
 
     // Clear the storage.
     storage->onOff.Clear(cellIdxInBlock);
-    storage->data[cellIdxInBlock] = T{};
+    storage->data[cellIdxInBlock] = value_type{};
 #else
     ARIA_STATIC_ASSERT_FALSE("This method is not allowed to be called at host side");
 #endif
@@ -1130,7 +1133,7 @@ ARIA_KERNEL static void KernelLaunchVDBBlock(THandle handle,
                                              typename THandle::TBlockStorage *blockStorage,
                                              typename THandle::TTec cellCoordOffset,
                                              F f) {
-  using T = typename THandle::value_type;
+  using T = typename THandle::T;
   static constexpr auto dim = THandle::dim;
   using TSpace = typename THandle::TSpace;
 
