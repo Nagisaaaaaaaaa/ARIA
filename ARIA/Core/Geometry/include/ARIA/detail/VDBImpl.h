@@ -208,6 +208,7 @@ public:
   using TBlockStorageOnOff = BitArray<nCellsPerBlock, ThreadSafe>;
 
   // Type of the block storage part, which contains the actual value of each cell.
+  //! The `Mosaic`-versions are automatically handled by `Array`.
   using TBlockStorageData = Array<T, nCellsPerBlock>;
 
   // Type of the block storage.
