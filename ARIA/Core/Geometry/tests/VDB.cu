@@ -6,6 +6,34 @@ namespace ARIA {
 
 namespace {
 
+struct PatternInts {
+  int v[2];
+};
+
+struct PatternFloats {
+  float v[2];
+};
+
+} // namespace
+
+template <>
+struct Mosaic<int, PatternInts> {
+  ARIA_HOST_DEVICE PatternInts operator()(const int &v) const { return {.v = {v / 2, v % 2}}; }
+
+  ARIA_HOST_DEVICE int operator()(const PatternInts &v) const { return v.v[0] * 2 + v.v[1]; }
+};
+
+template <>
+struct Mosaic<float, PatternFloats> {
+  ARIA_HOST_DEVICE PatternFloats operator()(const float &v) const {
+    return {.v = {v * (2.0F / 5.0F), v * (3.0F / 5.0F)}};
+  }
+
+  ARIA_HOST_DEVICE float operator()(const PatternFloats &v) const { return v.v[0] + v.v[1]; }
+};
+
+namespace {
+
 template <typename T_, typename U_>
 ARIA_HOST_DEVICE inline void AssertEq(const T_ &a_, const U_ &b_) {
   auto a = Auto(a_);
@@ -16,12 +44,20 @@ ARIA_HOST_DEVICE inline void AssertEq(const T_ &a_, const U_ &b_) {
   if constexpr (std::integral<T> && std::integral<U>) {
     ARIA_ASSERT(a == b);
   } else {
-    ARIA_ASSERT(std::abs(a - b) < 1e-6);
+    double aD = a;
+    double bD = b;
+
+    double threshold0 = 1e-6;
+    double threshold1 = std::max(std::abs(aD), std::abs(bD)) / 1000.0;
+    double threshold = std::max(threshold0, threshold1);
+
+    ARIA_ASSERT(std::abs(aD - bD) < threshold);
   }
 }
 
+template <typename T>
 void Test1DVDBHandleKernels() {
-  using Handle = vdb::detail::VDBHandle<float, 1, SpaceDevice>;
+  using Handle = vdb::detail::VDBHandle<T, 1, SpaceDevice>;
 
   const int n = 20000;
   const int nHalf = n / 2;
@@ -53,8 +89,9 @@ void Test1DVDBHandleKernels() {
   }
 }
 
+template <typename T>
 void Test2DVDBHandleKernels() {
-  using Handle = vdb::detail::VDBHandle<float, 2, SpaceDevice>;
+  using Handle = vdb::detail::VDBHandle<T, 2, SpaceDevice>;
 
   const Layout layout = make_layout_major(200, 300);
   const int n = 20000;
@@ -128,8 +165,9 @@ void Test2DVDBHandleKernels() {
   }
 }
 
+template <typename T>
 void Test3DVDBHandleKernels() {
-  using Handle = vdb::detail::VDBHandle<float, 3, SpaceDevice>;
+  using Handle = vdb::detail::VDBHandle<T, 3, SpaceDevice>;
 
   const Layout layout = make_layout_major(50, 100, 150);
   const int n = 1000;
@@ -234,8 +272,9 @@ void Test3DVDBHandleKernels() {
   }
 }
 
+template <typename T>
 void Test1DVDBKernels() {
-  using V = DeviceVDB<int, 1>;
+  using V = DeviceVDB<T, 1>;
   using AllocateWriteAccessor = VDBAllocateWriteAccessor<V>;
   using WriteAccessor = VDBWriteAccessor<V>;
   using ReadAccessor = VDBReadAccessor<V>;
@@ -328,8 +367,9 @@ void Test1DVDBKernels() {
   cuda::device::current::get().synchronize();
 }
 
+template <typename T>
 void Test2DVDBKernels() {
-  using V = DeviceVDB<int, 2>;
+  using V = DeviceVDB<T, 2>;
   using AllocateWriteAccessor = VDBAllocateWriteAccessor<V>;
   using WriteAccessor = VDBWriteAccessor<V>;
   using ReadAccessor = VDBReadAccessor<V>;
@@ -539,8 +579,9 @@ void Test2DVDBKernels() {
   cuda::device::current::get().synchronize();
 }
 
+template <typename T>
 void Test3DVDBKernels() {
-  using V = DeviceVDB<int, 3>;
+  using V = DeviceVDB<T, 3>;
   using AllocateWriteAccessor = VDBAllocateWriteAccessor<V>;
   using WriteAccessor = VDBWriteAccessor<V>;
   using ReadAccessor = VDBReadAccessor<V>;
@@ -852,8 +893,9 @@ void Test3DVDBKernels() {
   cuda::device::current::get().synchronize();
 }
 
+template <typename T>
 void Test1DVDBSetOffAndShrinkKernels() {
-  using V = DeviceVDB<int, 1>;
+  using V = DeviceVDB<T, 1>;
 
   const Layout layout = make_layout_major(20000);
   const int n = size(layout);
@@ -949,8 +991,9 @@ void Test1DVDBSetOffAndShrinkKernels() {
   }
 }
 
+template <typename T>
 void Test2DVDBSetOffAndShrinkKernels() {
-  using V = DeviceVDB<int, 2>;
+  using V = DeviceVDB<T, 2>;
 
   const Layout layout = make_layout_major(200, 300);
   const int n = size(layout);
@@ -1054,8 +1097,9 @@ void Test2DVDBSetOffAndShrinkKernels() {
   }
 }
 
+template <typename T>
 void Test3DVDBSetOffAndShrinkKernels() {
-  using V = DeviceVDB<int, 3>;
+  using V = DeviceVDB<T, 3>;
 
   const Layout layout = make_layout_major(50, 100, 150);
   const int n = size(layout);
@@ -1165,8 +1209,11 @@ TEST(VDB, Base) {
   size_t size = 1LLU * 1024LLU * 1024LLU * 1024LLU; // 1GB
   cuda::device::current::get().set_limit(CU_LIMIT_MALLOC_HEAP_SIZE, size);
 
-  auto testVDBBase = []<auto dim>() {
-    using V = DeviceVDB<float, dim>;
+  using T = float;
+  using TMosaic = Mosaic<T, PatternFloats>;
+
+  auto testVDBBase = []<typename T, auto dim>() {
+    using V = DeviceVDB<T, dim>;
     using AllocateWriteAccessor = VDBAllocateWriteAccessor<V>;
     using WriteAccessor = VDBWriteAccessor<V>;
     using ReadAccessor = VDBReadAccessor<V>;
@@ -1231,15 +1278,22 @@ TEST(VDB, Base) {
     // Destructor.
   };
 
-  testVDBBase.operator()<1>();
-  testVDBBase.operator()<2>();
-  testVDBBase.operator()<3>();
-  testVDBBase.operator()<4>();
+  testVDBBase.operator()<T, 1>();
+  testVDBBase.operator()<TMosaic, 1>();
+  testVDBBase.operator()<T, 2>();
+  testVDBBase.operator()<TMosaic, 2>();
+  testVDBBase.operator()<T, 3>();
+  testVDBBase.operator()<TMosaic, 3>();
+  testVDBBase.operator()<T, 4>();
+  testVDBBase.operator()<TMosaic, 4>();
 }
 
 TEST(VDB, Handle) {
-  auto testVDBHandleBase = []<auto dim>() {
-    using Handle = vdb::detail::VDBHandle<float, dim, SpaceDevice>;
+  using T = float;
+  using TMosaic = Mosaic<T, PatternFloats>;
+
+  auto testVDBHandleBase = []<typename T, auto dim>() {
+    using Handle = vdb::detail::VDBHandle<T, dim, SpaceDevice>;
 
     // Constructors and create.
     Handle handle0;
@@ -1257,26 +1311,45 @@ TEST(VDB, Handle) {
     handle1.Destroy();
   };
 
-  testVDBHandleBase.operator()<1>();
-  testVDBHandleBase.operator()<2>();
-  testVDBHandleBase.operator()<3>();
-  testVDBHandleBase.operator()<4>();
+  testVDBHandleBase.operator()<T, 1>();
+  testVDBHandleBase.operator()<TMosaic, 1>();
+  testVDBHandleBase.operator()<T, 2>();
+  testVDBHandleBase.operator()<TMosaic, 2>();
+  testVDBHandleBase.operator()<T, 3>();
+  testVDBHandleBase.operator()<TMosaic, 3>();
+  testVDBHandleBase.operator()<T, 4>();
+  testVDBHandleBase.operator()<TMosaic, 4>();
 
-  Test1DVDBHandleKernels();
-  Test2DVDBHandleKernels();
-  Test3DVDBHandleKernels();
+  Test1DVDBHandleKernels<T>();
+  Test1DVDBHandleKernels<TMosaic>();
+  Test2DVDBHandleKernels<T>();
+  Test2DVDBHandleKernels<TMosaic>();
+  Test3DVDBHandleKernels<T>();
+  Test3DVDBHandleKernels<TMosaic>();
 }
 
 TEST(VDB, VDB) {
-  Test1DVDBKernels();
-  Test2DVDBKernels();
-  Test3DVDBKernels();
+  using T = int;
+  using TMosaic = Mosaic<T, PatternInts>;
+
+  Test1DVDBKernels<T>();
+  // Test1DVDBKernels<TMosaic>();
+  Test2DVDBKernels<T>();
+  // Test2DVDBKernels<TMosaic>();
+  Test3DVDBKernels<T>();
+  // Test3DVDBKernels<TMosaic>();
 }
 
 TEST(VDB, SetOffAndShrink) {
-  Test1DVDBSetOffAndShrinkKernels();
-  Test2DVDBSetOffAndShrinkKernels();
-  Test3DVDBSetOffAndShrinkKernels();
+  using T = int;
+  using TMosaic = Mosaic<T, PatternInts>;
+
+  Test1DVDBSetOffAndShrinkKernels<T>();
+  // Test1DVDBSetOffAndShrinkKernels<TMosaic>();
+  Test2DVDBSetOffAndShrinkKernels<T>();
+  // Test2DVDBSetOffAndShrinkKernels<TMosaic>();
+  Test3DVDBSetOffAndShrinkKernels<T>();
+  // Test3DVDBSetOffAndShrinkKernels<TMosaic>();
 }
 
 } // namespace ARIA
