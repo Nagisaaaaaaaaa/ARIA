@@ -1333,11 +1333,11 @@ TEST(VDB, VDB) {
   using TMosaic = Mosaic<T, PatternInts>;
 
   Test1DVDBKernels<T>();
-  // Test1DVDBKernels<TMosaic>();
+  Test1DVDBKernels<TMosaic>();
   Test2DVDBKernels<T>();
-  // Test2DVDBKernels<TMosaic>();
+  Test2DVDBKernels<TMosaic>();
   Test3DVDBKernels<T>();
-  // Test3DVDBKernels<TMosaic>();
+  Test3DVDBKernels<TMosaic>();
 }
 
 TEST(VDB, SetOffAndShrink) {
@@ -1345,11 +1345,11 @@ TEST(VDB, SetOffAndShrink) {
   using TMosaic = Mosaic<T, PatternInts>;
 
   Test1DVDBSetOffAndShrinkKernels<T>();
-  // Test1DVDBSetOffAndShrinkKernels<TMosaic>();
+  Test1DVDBSetOffAndShrinkKernels<TMosaic>();
   Test2DVDBSetOffAndShrinkKernels<T>();
-  // Test2DVDBSetOffAndShrinkKernels<TMosaic>();
+  Test2DVDBSetOffAndShrinkKernels<TMosaic>();
   Test3DVDBSetOffAndShrinkKernels<T>();
-  // Test3DVDBSetOffAndShrinkKernels<TMosaic>();
+  Test3DVDBSetOffAndShrinkKernels<TMosaic>();
 }
 
 } // namespace ARIA
