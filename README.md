@@ -4,36 +4,36 @@ ARIA is a collection of foundational computer graphics infrastructure **for rese
 
 ARIA is a melting pot where you can find many interesting things, such as:
 
-1. `Property`: C#-like properties.
-   1. Define a C#-like property with several lines of codes.
-   2. Even stronger than the C# built-in features.
-2. `Array`, `Vector`: Policy-based arrays and vectors.
-   1. Support CPU or GPU storages.
-   2. Support automatic AoS to SoA layouts.
-3. `TensorVector`: Policy-based multidimensional arrays and views.
-   1. Support CPU or GPU storages.
-   2. Support arbitrary multidimensional layouts.
-   3. Support fully or partially compile-time-determined layouts.
-   4. Support automatic AoS to SoA layouts.
-4. `VDB`: Light-weighted and policy-based `VDB`.
-   1. Much slower than `OpenVDB` and `NanoVDB`.
-   2. Light-weighted and easy to compile.
-   3. Support GPU storages.
-   4. Support thread-safe memory allocations.
-   5. Support thread-safe read and write accesses.
-   6. Support kernel launches for each valid coordinate.
-   7. Support arbitrary large and small coordinates.
-   8. Support automatic AoS to SoA layouts.
-5. `Object`, `Component`, `Transform`: Unity-like hierarchical objects.
-   1. Powered with C#-like `Property`s.
-   2. Interfaces are almost the same as Unity.
-6. Many other interesting features, see the documents in headers.
+- `Property`: C#-like properties.
+   - Define a C#-like property with several lines of codes.
+   - Even stronger than the C# built-in features.
+- `Array`, `Vector`: Policy-based arrays and vectors.
+   - Support CPU or GPU storages.
+   - Support automatic AoS to SoA layouts.
+- `TensorVector`: Policy-based multidimensional arrays and views.
+   - Support CPU or GPU storages.
+   - Support arbitrary multidimensional layouts.
+   - Support fully or partially compile-time-determined layouts.
+   - Support automatic AoS to SoA layouts.
+- `VDB`: Light-weighted and policy-based `VDB`.
+   - Much slower than `OpenVDB` and `NanoVDB`.
+   - Light-weighted and easy to compile.
+   - Support GPU storages.
+   - Support thread-safe memory allocations.
+   - Support thread-safe read and write accesses.
+   - Support kernel launches for each valid coordinate.
+   - Support arbitrary large and small coordinates.
+   - Support automatic AoS to SoA layouts.
+- `Object`, `Component`, `Transform`: Unity-like hierarchical objects.
+   - Powered with C#-like `Property`s.
+   - Interfaces are almost the same as Unity.
+- Many other interesting features, see the documents in headers.
 
 **ARIA is extremely radical:**
 
-1. Compiler support: Fully cross-platform but at least C++ 20 and CUDA 12.
-2. Usually, we have to modify several lines of codes before compiling...
-3. Interfaces may be revised without any warnings.
+- Compiler support: Fully cross-platform but at least C++ 20 and CUDA 12.
+- Usually, we have to modify several lines of codes before compiling...
+- Interfaces may be revised without any warnings.
 
 ARIA adheres to strict coding standards, and we add as many comments as possible to each file, including the usage of interfaces and implementation details, because we do not assume that every graphics researcher is highly familiar with C++. Even if you have only a rudimentary understanding of modern C++, you can use ARIA with confidence.
 
