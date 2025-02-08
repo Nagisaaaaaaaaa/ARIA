@@ -22,7 +22,7 @@ ARIA is a melting pot where you can find many interesting things, such as:
    - Support thread-safe memory allocations.
    - Support thread-safe read and write accesses.
    - Support kernel launches for each valid coordinate.
-   - Support arbitrary large and small coordinates.
+   - Support infinite domains with arbitrary coordinates.
    - Support automatic AoS to SoA layouts.
 - `Object`, `Component`, `Transform`: Unity-like hierarchical objects.
    - Powered with C#-like `Property`s.
