@@ -196,9 +196,9 @@ public:
   }
 
   // it[i]
-  ARIA_HOST_DEVICE constexpr TransformIterator operator[](const std::ptrdiff_t &i) const { return (*this) + i; }
+  ARIA_HOST_DEVICE constexpr auto operator[](const std::ptrdiff_t &i) const { return *((*this) + i); }
 
-  ARIA_HOST_DEVICE constexpr TransformIterator operator[](const std::ptrdiff_t &i) { return (*this) + i; }
+  ARIA_HOST_DEVICE constexpr auto operator[](const std::ptrdiff_t &i) { return *((*this) + i); }
 
   // it0 == it1
   ARIA_HOST_DEVICE friend constexpr bool operator==(const TransformIterator &a, const TransformIterator &b) noexcept {
