@@ -32,7 +32,9 @@ ARIA is a melting pot where you can find many interesting things, such as:
 **ARIA is extremely radical:**
 
 - Compiler support: Fully cross-platform but at least C++ 20 and CUDA 12.
-- Usually, we have to modify several lines of codes before compiling...
+- Usually, we have to modify several lines of codes before compiling.
+   - Different versions of compilers have different features (maybe bugs).
+   - Not that easy to bypass these issues for C++ beginners.
 - Interfaces may be revised without any warnings.
 - Here lists all (relatively) stable modules:
    - `ARIA::Core::Concurrency`,
