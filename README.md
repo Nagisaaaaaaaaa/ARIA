@@ -34,17 +34,15 @@ ARIA is a melting pot where you can find many interesting things, such as:
 - Compiler support: Fully cross-platform but at least C++ 20 and CUDA 12.
 - Usually, we have to modify several lines of codes before compiling...
 - Interfaces may be revised without any warnings.
+- Here lists all (relatively) stable modules:
+   - `ARIA::Core::Concurrency`,
+   - `ARIA::Core::Core`,
+   - `ARIA::Core::Coroutine`,
+   - `ARIA::Core::Geometry`,
+   - `ARIA::Core::Math`,
+   - `ARIA::Scene::Scene`.
 
-ARIA adheres to strict coding standards, and we add as many comments as possible to each file, including the usage of interfaces and implementation details, because we do not assume that every graphics researcher is highly familiar with C++. Even if you have only a rudimentary understanding of modern C++, you can use ARIA with confidence.
-
-Here lists all robust modules:
-
-- `ARIA::Core::Concurrency`,
-- `ARIA::Core::Core`,
-- `ARIA::Core::Coroutine`,
-- `ARIA::Core::Geometry`,
-- `ARIA::Core::Math`,
-- `ARIA::Scene::Scene`.
+But, we promise, ARIA adheres to strict coding standards, and we add as many comments as possible to each file, including the usage of interfaces and implementation details.
 
 ## Getting Started
 
