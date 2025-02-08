@@ -21,13 +21,19 @@ ARIA is a melting pot where you can find many interesting things, such as:
    3. Support GPU storages.
    4. Support thread-safe memory allocations.
    5. Support thread-safe read and write accesses.
-   6. Support automatic AoS to SoA layouts.
+   6. Support kernel launches for each valid coordinate.
+   7. Support arbitrary large and small coordinates.
+   8. Support automatic AoS to SoA layouts.
 5. `Object`, `Component`, `Transform`: Unity-like hierarchical objects.
    1. Powered with C#-like `Property`s.
    2. Interfaces are almost the same as Unity.
 6. Many other interesting features, see the documents in headers.
 
-**ARIA is radical. Interfaces may be revised all the time, but all "well-documented features" are robust enough for research usages.** The term, "well-documented features", refers to headers full of comments.
+**ARIA is extremely radical:**
+
+1. Compiler support: Fully cross-platform but at least C++ 20 and CUDA 12.
+2. Usually, we have to modify several lines of codes before compiling...
+3. Interfaces may be revised without any warnings.
 
 ARIA adheres to strict coding standards, and we add as many comments as possible to each file, including the usage of interfaces and implementation details, because we do not assume that every graphics researcher is highly familiar with C++. Even if you have only a rudimentary understanding of modern C++, you can use ARIA with confidence.
 
