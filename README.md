@@ -15,7 +15,7 @@ ARIA is a melting pot where you can find many interesting things, such as:
    - Support arbitrary multidimensional layouts.
    - Optimized for fully or partially compile-time-determined layouts.
    - Support automatic AoS to SoA layouts.
-- `VDB`: Light-weighted and policy-based `VDB`.
+- `VDB`: Light-weighted and policy-based "VDB".
    - Much slower than `OpenVDB` and `NanoVDB`.
    - Light-weighted and easy to compile.
    - Support GPU storages.
