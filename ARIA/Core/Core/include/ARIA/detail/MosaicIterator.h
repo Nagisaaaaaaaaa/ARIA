@@ -4,7 +4,6 @@
 #include "ARIA/Property.h"
 #include "ARIA/Tup.h"
 
-#include <boost/iterator/transform_iterator.hpp>
 #include <thrust/detail/copy.h>
 
 namespace ARIA {
@@ -107,6 +106,127 @@ constexpr bool is_mosaic_reference_v = is_mosaic_reference<T>::value;
 //
 //
 //
+//! We have to introduce our own `TransformIterator` here, because
+//! 1. `boost::transform_iterator` cannot be used with GPU codes.
+//! 2. `thrust::transform_iterator` performs on copies of the inputs, not references.
+//
+// It is implemented with brute force since maybe we will find a better library.
+template <typename TMosaic_, typename TBase>
+  requires(is_mosaic_v<TMosaic_>)
+class TransformIterator final {
+public:
+  using TMosaic = TMosaic_;
+
+private:
+  static_assert(ValidMosaic<TMosaic>, "The mosaic definition is invalid");
+
+public:
+  ARIA_HOST_DEVICE constexpr TransformIterator() = default;
+
+  ARIA_HOST_DEVICE constexpr explicit TransformIterator(const TBase &base) : base_(base) {}
+
+  ARIA_COPY_MOVE_ABILITY(TransformIterator, default, default);
+
+public:
+  ARIA_HOST_DEVICE constexpr const TBase &base() const { return base_; }
+
+  ARIA_HOST_DEVICE constexpr TBase &base() { return base_; }
+
+public:
+  // *it
+  ARIA_HOST_DEVICE constexpr auto operator*() const {
+    // Suppose `it` is a `MosaicIterator`, then `*it` will return a `MosaicReference`.
+    using TReferences = decltype(*base());
+    return MosaicReference<TMosaic, TReferences>{*base()};
+  }
+
+  ARIA_HOST_DEVICE constexpr auto operator*() {
+    using TReferences = decltype(*base());
+    return MosaicReference<TMosaic, TReferences>{*base()};
+  }
+
+  // ++it
+  ARIA_HOST_DEVICE constexpr TransformIterator &operator++() {
+    ++base();
+    return *this;
+  }
+
+  // it++
+  ARIA_HOST_DEVICE constexpr TransformIterator operator++(int) {
+    TransformIterator tmp = *this;
+    ++(*this);
+    return tmp;
+  }
+
+  // --it
+  ARIA_HOST_DEVICE constexpr TransformIterator &operator--() {
+    --base();
+    return *this;
+  }
+
+  // it--
+  ARIA_HOST_DEVICE constexpr TransformIterator operator--(int) {
+    TransformIterator tmp = *this;
+    --(*this);
+    return tmp;
+  }
+
+  // it + i
+  ARIA_HOST_DEVICE friend constexpr TransformIterator operator+(const TransformIterator &lhs,
+                                                                const std::ptrdiff_t &rhs) {
+    return TransformIterator{lhs.base() + rhs};
+  }
+
+  // i + it
+  ARIA_HOST_DEVICE friend constexpr TransformIterator operator+(const std::ptrdiff_t &lhs,
+                                                                const TransformIterator &rhs) {
+    return TransformIterator{lhs + rhs.base()};
+  }
+
+  // it - i
+  ARIA_HOST_DEVICE friend constexpr TransformIterator operator-(const TransformIterator &lhs,
+                                                                const std::ptrdiff_t &rhs) {
+    return TransformIterator{lhs.base() - rhs};
+  }
+
+  // it0 - it1
+  ARIA_HOST_DEVICE friend constexpr std::ptrdiff_t operator-(const TransformIterator &lhs,
+                                                             const TransformIterator &rhs) {
+    return lhs.base() - rhs.base();
+  }
+
+  // it[i]
+  ARIA_HOST_DEVICE constexpr TransformIterator operator[](const std::ptrdiff_t &i) const { return (*this) + i; }
+
+  ARIA_HOST_DEVICE constexpr TransformIterator operator[](const std::ptrdiff_t &i) { return (*this) + i; }
+
+  // it0 == it1
+  ARIA_HOST_DEVICE friend constexpr bool operator==(const TransformIterator &a, const TransformIterator &b) noexcept {
+    return a.base() == b.base();
+  }
+
+  // it0 != it1
+  ARIA_HOST_DEVICE friend constexpr bool operator!=(const TransformIterator &a, const TransformIterator &b) noexcept {
+    return a.base() != b.base();
+  }
+
+private:
+  TBase base_;
+};
+
+//
+//
+//
+template <typename TMosaic, typename TBase>
+ARIA_HOST_DEVICE constexpr auto make_transform_iterator(const TBase &base) {
+  return TransformIterator<TMosaic, TBase>{base};
+}
+
+//
+//
+//
+//
+//
 // \brief Generate a `MosaicIterator` with a tuple of iterators which
 // are consistent with the mosaic pattern.
 //
@@ -127,11 +247,7 @@ ARIA_HOST_DEVICE static constexpr auto make_mosaic_iterator(const Tup<TIterators
   thrust::tuple<TIterators...> iteratorsThrust;
   ForEach<sizeof...(TIterators)>([&]<auto i>() { get<i>(iteratorsThrust) = get<i>(iterators); });
 
-  return boost::make_transform_iterator(thrust::make_zip_iterator(iteratorsThrust),
-                                        []<typename TReferences>(const TReferences &references) {
-    // Suppose `it` is a `MosaicIterator`, then `*it` will return a `MosaicReference`.
-    return MosaicReference<TMosaic, TReferences>{references};
-  });
+  return make_transform_iterator<TMosaic>(thrust::make_zip_iterator(iteratorsThrust));
 }
 
 template <typename TNonMosaic, typename TIterator> // For non-`Mosaic`, simply return the unique iterator.
