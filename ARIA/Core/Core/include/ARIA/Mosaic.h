@@ -16,7 +16,8 @@
 /// are compatible with `Mosaic`:
 /// 1. See `Array.h`.
 /// 2. See `TensorVector.h`.
-/// 3. See `Vector.h`.
+/// 3. See `VDB.h`.
+/// 4. See `Vector.h`.
 ///
 /// Users only need to define some simple types and methods,
 /// see `class Mosaic` below, and all things will be ready.
@@ -84,6 +85,7 @@ namespace ARIA {
 ///
 /// \see Array.h
 /// \see TensorVector.h
+/// \see VDB.h
 /// \see Vector.h
 template <typename T, typename TMosaicPattern>
 class Mosaic;

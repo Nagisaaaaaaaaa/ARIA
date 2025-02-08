@@ -82,6 +82,9 @@ namespace ARIA {
 /// Launcher(volume, [=] ARIA_DEVICE(const VTec &tec, const ReadAccessor& accessor) { ... }).Launch();
 /// ```
 ///
+/// \note `VDB` supports both array of structures (AoS) and structure of arrays (SoA).
+/// See `Mosaic.h`, `Array.h`, and `Vector.h` for more details.
+///
 /// \todo `HostVDB`s have not been implemented yet.
 using vdb::detail::VDB;
 
