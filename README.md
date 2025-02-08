@@ -44,7 +44,7 @@ ARIA is a melting pot where you can find many interesting things, such as:
    - `ARIA::Core::Math`,
    - `ARIA::Scene::Scene`.
 
-But, we promise, ARIA adheres to strict coding standards, and we add as many comments as possible to each file, including the usage of interfaces and implementation details. So, feel free to import ARIA and use any feature you are interested in.
+**But, we promise, ARIA adheres to strict coding standards, and we add as many comments as possible to each file, including the usage of interfaces and implementation details. So, feel free to import ARIA and use any feature you are interested in.**
 
 ## Getting Started
 
