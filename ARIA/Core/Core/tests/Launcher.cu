@@ -7,7 +7,23 @@ namespace ARIA {
 
 namespace {
 
-ARIA_KERNEL static void TestKernel(int size, thrust::device_ptr<int> ptr) {
+struct PatternInts {
+  int v[2];
+};
+
+} // namespace
+
+template <>
+struct Mosaic<int, PatternInts> {
+  ARIA_HOST_DEVICE PatternInts operator()(const int &v) const { return {.v = {v / 2, v % 2}}; }
+
+  ARIA_HOST_DEVICE int operator()(const PatternInts &v) const { return v.v[0] * 2 + v.v[1]; }
+};
+
+namespace {
+
+template <typename TPtr>
+ARIA_KERNEL void TestKernel(int size, TPtr ptr) {
   int i = static_cast<int>(threadIdx.x) + static_cast<int>(blockIdx.x) * static_cast<int>(blockDim.x);
   if (i >= size)
     return;
@@ -15,55 +31,57 @@ ARIA_KERNEL static void TestKernel(int size, thrust::device_ptr<int> ptr) {
   ptr[i] = i;
 }
 
-void GTestLaunchBase() {
-  cuda::device_t device = cuda::device::current::get();
-
-  // Kernel.
+template <typename TStorage>
+void GTestLaunchBase_Kernel() {
   {
     int size = 10;
-    thrust::device_vector<int> v(size);
-    Launcher(TestKernel).overallSize(size).blockSize(256).Launch(size, v.data());
-    device.synchronize();
+    TStorage v(size);
+    Launcher(TestKernel<std::decay_t<decltype(v.data())>>).overallSize(size).blockSize(256).Launch(size, v.data());
+    cuda::device::current::get().synchronize();
     for (int i = 0; i < size; ++i)
       EXPECT_TRUE(v[i] == i);
   }
+}
 
-  // Integral.
+template <typename TStorage>
+void GTestLaunchBase_Integral() {
   {
     int size = 10;
-    thrust::device_vector<int> v(size);
+    TStorage v(size);
     Launcher(size, [v = v.data()] ARIA_DEVICE(const int &i) { v[i] = i; }).blockSize(256).Launch();
-    device.synchronize();
+    cuda::device::current::get().synchronize();
     for (int i = 0; i < size; ++i)
       EXPECT_TRUE(v[i] == i);
   }
 
   {
     int size = 10;
-    thrust::device_vector<int> v(size);
+    TStorage v(size);
     Launcher l = Launcher(size, [v = v.data()] ARIA_DEVICE(const int &i) { v[i] = i; }).blockSize(256);
     l.Launch();
-    device.synchronize();
+    cuda::device::current::get().synchronize();
     for (int i = 0; i < size; ++i)
       EXPECT_TRUE(v[i] == i);
   }
 
   {
     int size = 10;
-    thrust::device_vector<int> v(size);
+    TStorage v(size);
     Launcher l = Launcher(size, [v = v.data()] ARIA_DEVICE(const int &i) { v[i] = i; });
     l.blockSize(256).Launch();
-    device.synchronize();
+    cuda::device::current::get().synchronize();
     for (int i = 0; i < size; ++i)
       EXPECT_TRUE(v[i] == i);
   }
+}
 
-  // Layout.
+template <typename TStorage>
+void GTestLaunchBase_Layout() {
   {
     auto layout = make_layout_major(5, 6);
 
-    auto aD = make_tensor_vector<int, SpaceDevice>(layout);
-    auto bD = make_tensor_vector<int, SpaceDevice>(layout);
+    TStorage aD(layout);
+    TStorage bD(layout);
 
     for (int i = 0; i < aD.size<0>(); ++i) {
       for (int k = 0; k < aD.size<1>(); ++k) {
@@ -72,14 +90,14 @@ void GTestLaunchBase() {
       }
     }
 
-    auto cD = make_tensor_vector<int, SpaceDevice>(layout);
+    TStorage cD(layout);
 
     Launcher(aD.layout(), [a = aD.tensor(), b = bD.tensor(),
                            c = cD.tensor()] ARIA_DEVICE(const int &x, const int &y) { c(x, y) = a(x, y) + b(x, y); })
         .blockSize(128)
         .Launch();
 
-    device.synchronize();
+    cuda::device::current::get().synchronize();
 
     for (int i = 0; i < cD.size<0>(); ++i) {
       for (int k = 0; k < cD.size<1>(); ++k) {
@@ -92,7 +110,28 @@ void GTestLaunchBase() {
 } // namespace
 
 TEST(Launch, Base) {
-  GTestLaunchBase();
+  using T = int;
+  using TMosaic = Mosaic<T, PatternInts>;
+
+  // Kernel.
+  {
+    GTestLaunchBase_Kernel<thrust::device_vector<T>>();
+    GTestLaunchBase_Kernel<VectorDevice<T>>();
+    GTestLaunchBase_Kernel<VectorDevice<TMosaic>>();
+  }
+
+  // Integral.
+  {
+    GTestLaunchBase_Integral<thrust::device_vector<T>>();
+    GTestLaunchBase_Integral<VectorDevice<T>>();
+    GTestLaunchBase_Integral<VectorDevice<TMosaic>>();
+  }
+
+  // Layout.
+  {
+    GTestLaunchBase_Layout<TensorVectorDevice<T, C<2>>>();
+    GTestLaunchBase_Layout<TensorVectorDevice<TMosaic, C<2>>>();
+  }
 }
 
 } // namespace ARIA
