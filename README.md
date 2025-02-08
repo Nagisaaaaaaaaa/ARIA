@@ -13,7 +13,7 @@ ARIA is a melting pot where you can find many interesting things, such as:
 - `TensorVector`: Policy-based multidimensional arrays and views.
    - Support CPU or GPU storages.
    - Support arbitrary multidimensional layouts.
-   - Support fully or partially compile-time-determined layouts.
+   - Optimized for fully or partially compile-time-determined layouts.
    - Support automatic AoS to SoA layouts.
 - `VDB`: Light-weighted and policy-based `VDB`.
    - Much slower than `OpenVDB` and `NanoVDB`.
