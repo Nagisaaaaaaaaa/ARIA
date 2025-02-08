@@ -2,18 +2,49 @@
 
 ARIA is a collection of foundational computer graphics infrastructure **for research**.
 
-**WARNING: ARIA is undergoing a complete rewrite, and to date, only a small portion has been rewritten. As a result, only the following modules are stable:**
+ARIA is a melting pot where you can find many interesting things, such as:
 
-- `ARIA::Core::Concurrency`,
-- `ARIA::Core::Core`,
-- `ARIA::Core::Coroutine`,
-- `ARIA::Core::Geometry`,
-- `ARIA::Core::Math`,
-- `ARIA::Scene::Scene`.
+- `Property`: C#-like properties.
+   - Define a C#-like property with several lines of codes.
+   - Even stronger than the C# built-in features.
+- `Array`, `Vector`: Policy-based arrays and vectors.
+   - Support CPU or GPU storages.
+   - Support automatic AoS to SoA layouts.
+- `TensorVector`: Policy-based multidimensional arrays and views.
+   - Support CPU or GPU storages.
+   - Support arbitrary multidimensional layouts.
+   - Optimized for fully or partially compile-time-determined layouts.
+   - Support automatic AoS to SoA layouts.
+- `VDB`: Light-weighted and policy-based `VDB`.
+   - Much slower than `OpenVDB` and `NanoVDB`.
+   - Light-weighted and easy to compile.
+   - Support GPU storages.
+   - Support thread-safe memory allocations.
+   - Support thread-safe read and write accesses.
+   - Support kernel launches for each valid coordinate.
+   - Support infinite domains with arbitrary coordinates.
+   - Support automatic AoS to SoA layouts.
+- `Object`, `Component`, `Transform`: Unity-like hierarchical objects.
+   - Powered with C#-like `Property`s.
+   - Interfaces are almost the same as Unity.
+- Many other interesting features, see the documents in headers.
 
-ARIA is a melting pot where you can find a plethora of interesting things, such as a C++ implementation of C# properties (in `ARIA::Core::Core`), multidimensional arrays and views (in `ARIA::Core::Core`), a fully embedded Python environment (in `ARIA::Core::Core`), and a hierarchical object and component system similar to Unity's (in `ARIA::Scene::Scene`), with more powerful infrastructures to be added in the future.
+**ARIA is extremely radical:**
 
-ARIA adheres to strict coding standards, and we add as many comments as possible to each file, including the usage of interfaces and implementation details, because we do not assume that every graphics researcher is highly familiar with C++. Even if you have only a rudimentary understanding of modern C++, you can use ARIA with confidence.
+- Compiler support: Fully cross-platform but at least C++ 20 and CUDA 12.
+- Usually, we have to modify several lines of codes before compiling.
+   - Different versions of compilers have different features (maybe bugs).
+   - Not that easy to bypass these issues for C++ beginners.
+- Interfaces may be revised without any warnings.
+- Here lists all (relatively) stable modules:
+   - `ARIA::Core::Concurrency`,
+   - `ARIA::Core::Core`,
+   - `ARIA::Core::Coroutine`,
+   - `ARIA::Core::Geometry`,
+   - `ARIA::Core::Math`,
+   - `ARIA::Scene::Scene`.
+
+**But, we promise, ARIA adheres to strict coding standards, and we add as many comments as possible to each file, including the usage of interfaces and implementation details. So, feel free to import ARIA and use any feature you are interested in.**
 
 ## Getting Started
 
@@ -147,7 +178,7 @@ This tutorial shows how to integrate ARIA into a simple project with cmake and C
 
 4. **Even stronger than C#.**
 
-   The ARIA property system is even stronger than the C# built-in feature. You can write properties with arbitrary number and type of parameters. For example, suppose you are writing a 2D fluid simulator based on the lattice Boltzmann method (LBM), your code may look like this:
+   The ARIA property system is even stronger than the C# built-in features. You can write properties with arbitrary number and type of parameters. For example, suppose you are writing a 2D fluid simulator based on the lattice Boltzmann method (LBM), your code may look like this:
 
    ```c++
    using I0 = std::integral_constant<int, 0>;
