@@ -25,6 +25,7 @@ ARIA is a melting pot where you can find many interesting things, such as:
 5. `Object`, `Component`, `Transform`: Unity-like hierarchical objects.
    1. Powered with C#-like `Property`s.
    2. Interfaces are almost the same as Unity.
+6. Many other interesting features, see the documents in headers.
 
 **ARIA is radical. Interfaces may be revised all the time, but all "well-documented features" are robust enough for research usages.** The term, "well-documented features", refers to headers full of comments.
 
