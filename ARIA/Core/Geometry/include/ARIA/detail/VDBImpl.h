@@ -1080,6 +1080,9 @@ private:
 // A `VDB` is an owning object which can generate non-owning `VDBAccessor`s.
 template <typename T, auto dim, typename TSpace>
 class VDB {
+private:
+  using THandle = VDBHandle<T, dim, TSpace>;
+
 public:
   VDB() : handle_(std::make_unique<THandle>(THandle::Create())) {}
 
@@ -1091,7 +1094,7 @@ public:
   }
 
 public:
-  using value_type = T;
+  using value_type = typename THandle::value_type;
 
   using AllocateWriteAccessor = VDBAccessor<T, dim, TSpace, AllocateWrite>;
   using WriteAccessor = VDBAccessor<T, dim, TSpace, Write>;
@@ -1111,9 +1114,6 @@ public:
   void ShrinkToFit() { handle_->ShrinkToFit(); }
 
 private:
-  using THandle = VDBHandle<T, dim, TSpace>;
-  using TVec = THandle::TVec;
-
   std::unique_ptr<THandle> handle_;
 
 private:
