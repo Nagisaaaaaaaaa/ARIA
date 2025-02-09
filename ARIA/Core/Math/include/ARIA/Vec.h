@@ -99,4 +99,19 @@ using vec::detail::ToTec;
 /// ```
 using vec::detail::ToVec;
 
+//
+//
+//
+//
+//
+/// \brief The built-in `Mosaic` for `Vec`.
+/// See `Mosaic.h`, `Array.h`, and `Vector.h` for more details.
+///
+/// \example ```cpp
+/// using TMosaic0 = VecMosaic<Real, 3>;
+/// using TMosaic1 = VecMosaic<Vec3r>; // The same type as `TMosaic0`.
+/// ```
+template <typename T, auto... Ts>
+using VecMosaic = vec::detail::reduce_vec_mosaic_t<T, Ts...>;
+
 } // namespace ARIA

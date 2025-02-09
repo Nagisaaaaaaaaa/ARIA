@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ARIA/Mosaic.h"
 #include "ARIA/Property.h"
 
 #include <Eigen/Core>
@@ -97,6 +98,59 @@ static constexpr bool is_quat_v = is_quat<T>::value;
   __ARIA_PROP_AND_SUB_PROP_PREFAB_MEMBERS_QUAT(specifiers, type);                                                      \
   ARIA_PROP_END
 
+//
+//
+//
+//
+//
+// Define the built-in `Mosaic` for `Quat`.
+template <typename T>
+struct MosaicPatternQuat {
+  T v[4];
+};
+
+//
+//
+//
+template <typename T>
+struct reduce_quat_mosaic;
+
+// 1. `QuatMosaic<T>`.
+template <typename T>
+  requires(!is_quat_v<T>)
+struct reduce_quat_mosaic<T> {
+  using type = Mosaic<Quat<T>, MosaicPatternQuat<T>>;
+};
+
+// 2. `QuatMosaic<Quat<T>>`.
+template <typename T>
+  requires(is_quat_v<Quat<T>>)
+struct reduce_quat_mosaic<Quat<T>> {
+  using type = Mosaic<Quat<T>, MosaicPatternQuat<T>>;
+};
+
+template <typename T>
+using reduce_quat_mosaic_t = typename reduce_quat_mosaic<T>::type;
+
 } // namespace quat::detail
+
+//
+//
+//
+template <typename T>
+class Mosaic<quat::detail::Quat<T>, quat::detail::MosaicPatternQuat<T>> {
+private:
+  using TValue = quat::detail::Quat<T>;
+  using TPattern = quat::detail::MosaicPatternQuat<T>;
+
+public:
+  [[nodiscard]] TPattern operator()(const TValue &value) const {
+    return {.v = {value.w(), value.x(), value.y(), value.z()}};
+  }
+
+  [[nodiscard]] TValue operator()(const TPattern &pattern) const {
+    return {pattern.v[0], pattern.v[1], pattern.v[2], pattern.v[3]};
+  }
+};
 
 } // namespace ARIA

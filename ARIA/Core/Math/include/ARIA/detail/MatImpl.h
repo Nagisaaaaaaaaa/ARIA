@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ARIA/Mosaic.h"
 #include "ARIA/Property.h"
 
 #include <Eigen/Core>
@@ -230,6 +231,61 @@ static constexpr bool is_mat_rc_v = is_mat_rc<T, row, col>::value;
   __ARIA_PROP_AND_SUB_PROP_PREFAB_MEMBERS_MAT(specifiers, type);                                                       \
   ARIA_PROP_END
 
+//
+//
+//
+//
+//
+// Define the built-in `Mosaic` for `Mat`.
+template <typename T, auto row, auto col>
+struct MosaicPatternMat {
+  T v[col][row]; // Column major.
+};
+
+//
+//
+//
+template <typename T, auto... Ts>
+struct reduce_mat_mosaic;
+
+// 1. `MatMosaic<T, row, col>`.
+template <typename T, auto row, auto col>
+struct reduce_mat_mosaic<T, row, col> {
+  using type = Mosaic<Mat<T, row, col>, MosaicPatternMat<T, row, col>>;
+};
+
+// 2. `MatMosaic<Mat<T, row, col>>`.
+template <typename T, auto row, auto col>
+struct reduce_mat_mosaic<Mat<T, row, col>> {
+  using type = Mosaic<Mat<T, row, col>, MosaicPatternMat<T, row, col>>;
+};
+
+template <typename T, auto... Ts>
+using reduce_mat_mosaic_t = typename reduce_mat_mosaic<T, Ts...>::type;
+
 } // namespace mat::detail
+
+//
+//
+//
+template <typename T, auto row, auto col>
+class Mosaic<mat::detail::Mat<T, row, col>, mat::detail::MosaicPatternMat<T, row, col>> {
+private:
+  using TValue = mat::detail::Mat<T, row, col>;
+  using TPattern = mat::detail::MosaicPatternMat<T, row, col>;
+
+public:
+  [[nodiscard]] TPattern operator()(const TValue &value) const {
+    TPattern pattern;
+    ForEach<col>([&]<auto c>() { ForEach<row>([&]<auto r>() { pattern.v[c][r] = value(r, c); }); });
+    return pattern;
+  }
+
+  [[nodiscard]] TValue operator()(const TPattern &pattern) const {
+    TValue value;
+    ForEach<col>([&]<auto c>() { ForEach<row>([&]<auto r>() { value(r, c) = pattern.v[c][r]; }); });
+    return value;
+  }
+};
 
 } // namespace ARIA

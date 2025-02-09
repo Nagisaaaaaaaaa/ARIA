@@ -78,4 +78,19 @@ using Mat4r = Mat4<Real>;
 /// ```
 #define ARIA_SUB_PROP_PREFAB_MAT(specifiers, type, propName) __ARIA_SUB_PROP_PREFAB_MAT(specifiers, type, propName)
 
+//
+//
+//
+//
+//
+/// \brief The built-in `Mosaic` for `Mat`.
+/// See `Mosaic.h`, `Array.h`, and `Vector.h` for more details.
+///
+/// \example ```cpp
+/// using TMosaic0 = MatMosaic<Real, 3, 3>;
+/// using TMosaic1 = MatMosaic<Mat3r>; // The same type as `TMosaic0`.
+/// ```
+template <typename T, auto... Ts>
+using MatMosaic = mat::detail::reduce_mat_mosaic_t<T, Ts...>;
+
 } // namespace ARIA
