@@ -110,8 +110,14 @@ using vec::detail::ToVec;
 /// \example ```cpp
 /// using TMosaic0 = VecMosaic<Real, 3>;
 /// using TMosaic1 = VecMosaic<Vec3r>; // The same type as `TMosaic0`.
+/// using TMosaic2 = mosaic_t<Vec3r>;  // Also the same.
 /// ```
 template <typename T, auto... Ts>
 using VecMosaic = vec::detail::reduce_vec_mosaic_t<T, Ts...>;
+
+template <typename T, auto size>
+struct mosaic::detail::MosaicBuiltIn<Vec<T, size>> {
+  using type = VecMosaic<T, size>;
+};
 
 } // namespace ARIA

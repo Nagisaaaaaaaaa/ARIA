@@ -116,7 +116,9 @@ TEST(Vec, Mosaic) {
   static_assert(is_mosaic_v<TMosaic> && is_valid_mosaic_v<TMosaic>);
 
   using TMosaic1 = VecMosaic<T>;
+  using TMosaic2 = mosaic_t<T>;
   static_assert(std::is_same_v<TMosaic, TMosaic1>);
+  static_assert(std::is_same_v<TMosaic, TMosaic2>);
 
   Array<TMosaic, 5> vec0;
   static_assert(std::is_same_v<decltype(vec0), MosaicArray<TMosaic, 5>>);
