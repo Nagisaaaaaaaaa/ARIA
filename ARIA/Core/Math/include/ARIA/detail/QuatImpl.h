@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ARIA/Mosaic.h"
 #include "ARIA/Property.h"
 
 #include <Eigen/Core>
