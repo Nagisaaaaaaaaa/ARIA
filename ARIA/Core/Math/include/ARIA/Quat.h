@@ -86,9 +86,15 @@ template <typename TInput>
 /// \example ```cpp
 /// using TMosaic0 = QuatMosaic<Real>;
 /// using TMosaic1 = QuatMosaic<Quatr>; // The same type as `TMosaic0`.
+/// using TMosaic2 = mosaic_t<Quatr>;   // Also the same.
 /// ```
 template <typename T>
 using QuatMosaic = quat::detail::reduce_quat_mosaic_t<T>;
+
+template <typename T>
+struct mosaic::detail::MosaicBuiltIn<Quat<T>> {
+  using type = QuatMosaic<T>;
+};
 
 //
 //

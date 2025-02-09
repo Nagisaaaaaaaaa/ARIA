@@ -89,8 +89,14 @@ using Mat4r = Mat4<Real>;
 /// \example ```cpp
 /// using TMosaic0 = MatMosaic<Real, 3, 3>;
 /// using TMosaic1 = MatMosaic<Mat3r>; // The same type as `TMosaic0`.
+/// using TMosaic2 = mosaic_t<Mat3r>;  // Also the same.
 /// ```
 template <typename T, auto... Ts>
 using MatMosaic = mat::detail::reduce_mat_mosaic_t<T, Ts...>;
+
+template <typename T, auto row, auto col>
+struct mosaic::detail::MosaicBuiltIn<Mat<T, row, col>> {
+  using type = MatMosaic<T, row, col>;
+};
 
 } // namespace ARIA
