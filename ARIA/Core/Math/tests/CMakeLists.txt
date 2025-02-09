@@ -7,7 +7,7 @@ if (ARIA_BUILD_TESTS)
       MaxwellBoltzmannDistribution.cpp
       MortonCode.cpp
       MovingPoint.cpp
-      Quat.cpp
+      Quat.cu
       Vec.cu
       HARD_DEPENDENCIES
       ARIA::Core::Math
