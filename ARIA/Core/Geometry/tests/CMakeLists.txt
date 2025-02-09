@@ -3,6 +3,7 @@ if (ARIA_BUILD_TESTS)
       SOURCES
       AABB.cpp
       BVH.cu
+      MarchingCubes.cpp
       VDB.cu
       HARD_DEPENDENCIES
       ARIA::Core::Geometry
