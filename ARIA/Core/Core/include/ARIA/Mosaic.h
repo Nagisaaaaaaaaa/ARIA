@@ -90,6 +90,29 @@ namespace ARIA {
 template <typename T, typename TMosaicPattern>
 class Mosaic;
 
+//
+//
+//
+//
+//
+namespace mosaic::detail {
+
+template <typename T>
+struct MosaicBuiltIn;
+
+} // namespace mosaic::detail
+
+/// \brief Shortcuts to the ARIA built-in `Mosaic`s, which are listed here:
+/// 1. See `Mat.h`.
+/// 2. See `Quat.h`.
+/// 3. See `Vec.h`.
+///
+/// \example ```cpp
+/// using TMosaic = mosaic_t<Vec3r>;
+/// ```
+template <typename T>
+using mosaic_t = typename mosaic::detail::MosaicBuiltIn<T>::type;
+
 } // namespace ARIA
 
 //
