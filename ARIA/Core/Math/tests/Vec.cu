@@ -1,4 +1,6 @@
+#include "ARIA/Array.h"
 #include "ARIA/Vec.h"
+#include "ARIA/Vector.h"
 
 #include <gtest/gtest.h>
 
@@ -104,6 +106,39 @@ TEST(Vec, Cast) {
     EXPECT_EQ(v1.y(), 6);
     EXPECT_EQ(v1.z(), 30);
   }
+}
+
+TEST(Vec, Mosaic) {
+  using namespace mosaic::detail;
+
+  using T = Vec<int, 3>;
+  using TMosaic = VecMosaic<int, 3>;
+  static_assert(is_mosaic_v<TMosaic> && is_valid_mosaic_v<TMosaic>);
+
+  using TMosaic1 = VecMosaic<T>;
+  static_assert(std::is_same_v<TMosaic, TMosaic1>);
+
+  Array<TMosaic, 5> vec0;
+  static_assert(std::is_same_v<decltype(vec0), MosaicArray<TMosaic, 5>>);
+  VectorHost<TMosaic> vec1(5);
+  static_assert(std::is_same_v<decltype(vec1), MosaicVector<TMosaic, SpaceHost>>);
+  VectorDevice<TMosaic> vec2(5);
+  static_assert(std::is_same_v<decltype(vec2), MosaicVector<TMosaic, SpaceDevice>>);
+
+  auto testVec = [](auto &vec) {
+    for (int i = 0; i < 5; ++i) {
+      static_assert(Property<decltype(vec[i])>);
+      T value{0 * i, 1 * i, 2 * i};
+
+      vec[i] = value;  // Set.
+      T vecI = vec[i]; // Get.
+      EXPECT_EQ(vecI, value);
+      EXPECT_EQ(vec[i], value);
+    }
+  };
+  testVec(vec0);
+  testVec(vec1);
+  testVec(vec2);
 }
 
 } // namespace ARIA

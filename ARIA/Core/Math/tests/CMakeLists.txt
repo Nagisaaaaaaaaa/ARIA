@@ -8,7 +8,7 @@ if (ARIA_BUILD_TESTS)
       MortonCode.cpp
       MovingPoint.cpp
       Quat.cpp
-      Vec.cpp
+      Vec.cu
       HARD_DEPENDENCIES
       ARIA::Core::Math
   )
