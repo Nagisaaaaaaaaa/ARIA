@@ -80,6 +80,21 @@ template <typename TInput>
 //
 //
 //
+/// \brief The built-in `Mosaic` for `Quat`.
+/// See `Mosaic.h`, `Array.h`, and `Vector.h` for more details.
+///
+/// \example ```cpp
+/// using TMosaic0 = QuatMosaic<Real>;
+/// using TMosaic1 = QuatMosaic<Quatr>; // The same type as `TMosaic0`.
+/// ```
+template <typename T>
+using QuatMosaic = quat::detail::reduce_quat_mosaic_t<T>;
+
+//
+//
+//
+//
+//
 //
 //
 //
