@@ -98,6 +98,30 @@ template <typename T, typename... Ts>
   return res;
 }
 
+//
+//
+//
+//
+//
+// The built-in `Mosaic` of `Vec` is the same as that of `Mat`.
+template <typename T, auto... Ts>
+struct reduce_vec_mosaic;
+
+// 1. `VecMosaic<T, size>`.
+template <typename T, auto row>
+struct reduce_vec_mosaic<T, row> {
+  using type = Mosaic<Vec<T, row>, mat::detail::MosaicPatternMat<T, row, 1>>;
+};
+
+// 2. `VecMosaic<Vec<T, size>>`.
+template <typename T, auto row>
+struct reduce_vec_mosaic<Vec<T, row>> {
+  using type = Mosaic<Vec<T, row>, mat::detail::MosaicPatternMat<T, row, 1>>;
+};
+
+template <typename T, auto... Ts>
+using reduce_vec_mosaic_t = typename reduce_vec_mosaic<T, Ts...>::type;
+
 } // namespace vec::detail
 
 } // namespace ARIA
