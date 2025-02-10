@@ -291,6 +291,54 @@ template <>
 class MarchingCubes<3> {
 public:
 private:
+  ARIA_HOST_DEVICE void doMarchingCubesOn(const vec3i mirror, const Cell zOrder[2][2][2]) {
+    // we have OUR cells in z-order, but VTK case table assumes
+    // everything is is VTK 'hexahedron' ordering, so let's rearrange
+    // ... and while doing so, also make sure that we flip based on
+    // which direction the parent cell created this dual from
+    float4 vertex[8] = {zOrder[0 + mirror.z][0 + mirror.y][0 + mirror.x].asDualVertex(),
+                        zOrder[0 + mirror.z][0 + mirror.y][1 - mirror.x].asDualVertex(),
+                        zOrder[0 + mirror.z][1 - mirror.y][1 - mirror.x].asDualVertex(),
+                        zOrder[0 + mirror.z][1 - mirror.y][0 + mirror.x].asDualVertex(),
+                        zOrder[1 - mirror.z][0 + mirror.y][0 + mirror.x].asDualVertex(),
+                        zOrder[1 - mirror.z][0 + mirror.y][1 - mirror.x].asDualVertex(),
+                        zOrder[1 - mirror.z][1 - mirror.y][1 - mirror.x].asDualVertex(),
+                        zOrder[1 - mirror.z][1 - mirror.y][0 + mirror.x].asDualVertex()};
+
+    int index = 0;
+    for (int i = 0; i < 8; i++)
+      if (vertex[i].w > isoValue)
+        index += (1 << i);
+    if (index == 0 || index == 0xff)
+      return;
+
+    for (const int8_t *edge = &vtkMarchingCubesTriangleCases[index][0]; edge[0] > -1; edge += 3) {
+      float4 triVertex[3];
+      for (int ii = 0; ii < 3; ii++) {
+        const int8_t *vert = vtkMarchingCubes_edges[edge[ii]];
+        const float4 v0 = vertex[vert[0]];
+        const float4 v1 = vertex[vert[1]];
+        const float t = (isoValue - v0.w) / float(v1.w - v0.w);
+        triVertex[ii] = (1.f - t) * v0 + t * v1;
+      }
+
+      if (triVertex[1] == triVertex[0])
+        continue;
+      if (triVertex[2] == triVertex[0])
+        continue;
+      if (triVertex[1] == triVertex[2])
+        continue;
+
+      const int triangleID = allocTriangle();
+      if (triangleID >= 3 * outputArraySize)
+        continue;
+
+      for (int j = 0; j < 3; j++) {
+        (int &)triVertex[j].w = (4 * triangleID + j);
+        (float4 &)outputArray[3 * triangleID + j] = triVertex[j];
+      }
+    }
+  }
 };
 
 } // namespace ARIA
