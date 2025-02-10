@@ -279,6 +279,24 @@ constexpr int8 vtkMarchingSquares_edges[4][2] = {{0, 1}, {1, 3}, {2, 3}, {0, 2}}
 //
 //
 template <uint dim>
+class DualVertex {
+public:
+  DualVertex() = default;
+  ARIA_COPY_MOVE_ABILITY(DualVertex, default, default);
+
+public:
+  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, pos, pos_);
+  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, value, value_);
+
+private:
+  Vec<Real, dim> pos_;
+  Real value_;
+};
+
+//
+//
+//
+template <uint dim>
 class Cell {
 public:
   Cell() = default;
@@ -290,6 +308,13 @@ public:
 
 public:
   [[nodiscard]] Vec<Real, dim> center() const { return coord_.template cast<Real>(); }
+
+  [[nodiscard]] DualVertex<dim> dualVertex() const {
+    DualVertex<dim> v;
+    v.pos() = center();
+    v.value() = value();
+    return v;
+  }
 
 private:
   Vec<int, dim> coord_;
@@ -319,14 +344,14 @@ private:
     // everything is is VTK 'hexahedron' ordering, so let's rearrange
     // ... and while doing so, also make sure that we flip based on
     // which direction the parent cell created this dual from
-    Vec3r vertex[8] = {zOrder[0 + mirror.z][0 + mirror.y][0 + mirror.x].center(),
-                       zOrder[0 + mirror.z][0 + mirror.y][1 - mirror.x].center(),
-                       zOrder[0 + mirror.z][1 - mirror.y][1 - mirror.x].center(),
-                       zOrder[0 + mirror.z][1 - mirror.y][0 + mirror.x].center(),
-                       zOrder[1 - mirror.z][0 + mirror.y][0 + mirror.x].center(),
-                       zOrder[1 - mirror.z][0 + mirror.y][1 - mirror.x].center(),
-                       zOrder[1 - mirror.z][1 - mirror.y][1 - mirror.x].center(),
-                       zOrder[1 - mirror.z][1 - mirror.y][0 + mirror.x].center()};
+    DualVertex vertex[8] = {zOrder[0 + mirror.z][0 + mirror.y][0 + mirror.x].dualVertex(),
+                            zOrder[0 + mirror.z][0 + mirror.y][1 - mirror.x].dualVertex(),
+                            zOrder[0 + mirror.z][1 - mirror.y][1 - mirror.x].dualVertex(),
+                            zOrder[0 + mirror.z][1 - mirror.y][0 + mirror.x].dualVertex(),
+                            zOrder[1 - mirror.z][0 + mirror.y][0 + mirror.x].dualVertex(),
+                            zOrder[1 - mirror.z][0 + mirror.y][1 - mirror.x].dualVertex(),
+                            zOrder[1 - mirror.z][1 - mirror.y][1 - mirror.x].dualVertex(),
+                            zOrder[1 - mirror.z][1 - mirror.y][0 + mirror.x].dualVertex()};
 
     int index = 0;
     for (int i = 0; i < 8; i++)
