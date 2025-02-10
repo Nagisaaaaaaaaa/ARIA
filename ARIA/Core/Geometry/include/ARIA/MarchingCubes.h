@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ARIA/Math.h"
 #include "ARIA/Vec.h"
 
 namespace ARIA {
@@ -344,14 +345,14 @@ private:
     // everything is is VTK 'hexahedron' ordering, so let's rearrange
     // ... and while doing so, also make sure that we flip based on
     // which direction the parent cell created this dual from
-    const DualVertex vertex[8] = {zOrder[0 + mirror.z][0 + mirror.y][0 + mirror.x].dualVertex(),
-                                  zOrder[0 + mirror.z][0 + mirror.y][1 - mirror.x].dualVertex(),
-                                  zOrder[0 + mirror.z][1 - mirror.y][1 - mirror.x].dualVertex(),
-                                  zOrder[0 + mirror.z][1 - mirror.y][0 + mirror.x].dualVertex(),
-                                  zOrder[1 - mirror.z][0 + mirror.y][0 + mirror.x].dualVertex(),
-                                  zOrder[1 - mirror.z][0 + mirror.y][1 - mirror.x].dualVertex(),
-                                  zOrder[1 - mirror.z][1 - mirror.y][1 - mirror.x].dualVertex(),
-                                  zOrder[1 - mirror.z][1 - mirror.y][0 + mirror.x].dualVertex()};
+    const DualVertex<3> vertex[8] = {zOrder[0 + mirror.z][0 + mirror.y][0 + mirror.x].dualVertex(),
+                                     zOrder[0 + mirror.z][0 + mirror.y][1 - mirror.x].dualVertex(),
+                                     zOrder[0 + mirror.z][1 - mirror.y][1 - mirror.x].dualVertex(),
+                                     zOrder[0 + mirror.z][1 - mirror.y][0 + mirror.x].dualVertex(),
+                                     zOrder[1 - mirror.z][0 + mirror.y][0 + mirror.x].dualVertex(),
+                                     zOrder[1 - mirror.z][0 + mirror.y][1 - mirror.x].dualVertex(),
+                                     zOrder[1 - mirror.z][1 - mirror.y][1 - mirror.x].dualVertex(),
+                                     zOrder[1 - mirror.z][1 - mirror.y][0 + mirror.x].dualVertex()};
 
     int index = 0;
     for (int i = 0; i < 8; i++)
@@ -360,21 +361,17 @@ private:
     if (index == 0 || index == 0xFF)
       return;
 
-    for (const int8_t *edge = &vtkMarchingCubesTriangleCases[index][0]; edge[0] > -1; edge += 3) {
-      float4 triVertex[3];
+    for (const int8_t *edge = &vtkMarchingCubesTriangleCases[index][0]; *edge > -1; edge += 3) {
+      Vec3r triVertices[3];
       for (int ii = 0; ii < 3; ii++) {
         const int8_t *vert = vtkMarchingCubes_edges[edge[ii]];
-        const float4 v0 = vertex[vert[0]];
-        const float4 v1 = vertex[vert[1]];
-        const float t = (isoValue - v0.w) / float(v1.w - v0.w);
-        triVertex[ii] = (1.f - t) * v0 + t * v1;
+        const DualVertex<3> v0 = vertex[vert[0]];
+        const DualVertex<3> v1 = vertex[vert[1]];
+        const float t = (isoValue - v0.value()) / (v1.value() - v0.value());
+        triVertices[ii] = Lerp(v0.pos(), v1.pos(), t);
       }
 
-      if (triVertex[1] == triVertex[0])
-        continue;
-      if (triVertex[2] == triVertex[0])
-        continue;
-      if (triVertex[1] == triVertex[2])
+      if (triVertices[1] == triVertices[0] || triVertices[2] == triVertices[0] || triVertices[1] == triVertices[2])
         continue;
 
       const int triangleID = allocTriangle();
@@ -382,8 +379,8 @@ private:
         continue;
 
       for (int j = 0; j < 3; j++) {
-        (int &)triVertex[j].w = (4 * triangleID + j);
-        (float4 &)outputArray[3 * triangleID + j] = triVertex[j];
+        (int &)triVertices[j].w = (4 * triangleID + j);
+        (float4 &)outputArray[3 * triangleID + j] = triVertices[j];
       }
     }
   }
