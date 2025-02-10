@@ -284,6 +284,13 @@ class MarchingCubes;
 template <>
 class MarchingCubes<2> {
 public:
+private:
+};
+
+template <>
+class MarchingCubes<3> {
+public:
+private:
 };
 
 } // namespace ARIA
