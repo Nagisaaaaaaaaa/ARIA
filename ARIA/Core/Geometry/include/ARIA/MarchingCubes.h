@@ -279,6 +279,29 @@ constexpr int8 vtkMarchingSquares_edges[4][2] = {{0, 1}, {1, 3}, {2, 3}, {0, 2}}
 //
 //
 template <uint dim>
+class Cell {
+public:
+  Cell() = default;
+  ARIA_COPY_MOVE_ABILITY(Cell, default, default);
+
+public:
+  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, coord, coord_);
+  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, value, value_);
+
+public:
+  [[nodiscard]] Vec<Real, dim> center() const { return coord_.template cast<Real>(); }
+
+private:
+  Vec<int, dim> coord_;
+  Real value_;
+};
+
+//
+//
+//
+//
+//
+template <uint dim>
 class MarchingCubes;
 
 template <>
@@ -291,19 +314,19 @@ template <>
 class MarchingCubes<3> {
 public:
 private:
-  ARIA_HOST_DEVICE void doMarchingCubesOn(const vec3i mirror, const Cell zOrder[2][2][2]) {
+  ARIA_HOST_DEVICE void doMarchingCubesOn(const Vec<int, 3> &mirror, const Cell<3> zOrder[2][2][2]) {
     // we have OUR cells in z-order, but VTK case table assumes
     // everything is is VTK 'hexahedron' ordering, so let's rearrange
     // ... and while doing so, also make sure that we flip based on
     // which direction the parent cell created this dual from
-    float4 vertex[8] = {zOrder[0 + mirror.z][0 + mirror.y][0 + mirror.x].asDualVertex(),
-                        zOrder[0 + mirror.z][0 + mirror.y][1 - mirror.x].asDualVertex(),
-                        zOrder[0 + mirror.z][1 - mirror.y][1 - mirror.x].asDualVertex(),
-                        zOrder[0 + mirror.z][1 - mirror.y][0 + mirror.x].asDualVertex(),
-                        zOrder[1 - mirror.z][0 + mirror.y][0 + mirror.x].asDualVertex(),
-                        zOrder[1 - mirror.z][0 + mirror.y][1 - mirror.x].asDualVertex(),
-                        zOrder[1 - mirror.z][1 - mirror.y][1 - mirror.x].asDualVertex(),
-                        zOrder[1 - mirror.z][1 - mirror.y][0 + mirror.x].asDualVertex()};
+    Vec3r vertex[8] = {zOrder[0 + mirror.z][0 + mirror.y][0 + mirror.x].center(),
+                       zOrder[0 + mirror.z][0 + mirror.y][1 - mirror.x].center(),
+                       zOrder[0 + mirror.z][1 - mirror.y][1 - mirror.x].center(),
+                       zOrder[0 + mirror.z][1 - mirror.y][0 + mirror.x].center(),
+                       zOrder[1 - mirror.z][0 + mirror.y][0 + mirror.x].center(),
+                       zOrder[1 - mirror.z][0 + mirror.y][1 - mirror.x].center(),
+                       zOrder[1 - mirror.z][1 - mirror.y][1 - mirror.x].center(),
+                       zOrder[1 - mirror.z][1 - mirror.y][0 + mirror.x].center()};
 
     int index = 0;
     for (int i = 0; i < 8; i++)
