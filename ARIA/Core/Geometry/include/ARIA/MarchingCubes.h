@@ -340,7 +340,9 @@ template <>
 class MarchingCubes<3> {
 public:
 private:
-  ARIA_HOST_DEVICE void doMarchingCubesOn(const Vec<int, 3> &mirror, const Cell<3> zOrder[2][2][2], Real isoValue) {
+  template <typename F>
+  ARIA_HOST_DEVICE void
+  doMarchingCubesOn(const Vec<int, 3> &mirror, const Cell<3> zOrder[2][2][2], Real isoValue, F &&f) {
     // we have OUR cells in z-order, but VTK case table assumes
     // everything is is VTK 'hexahedron' ordering, so let's rearrange
     // ... and while doing so, also make sure that we flip based on
@@ -374,14 +376,7 @@ private:
       if (triVertices[1] == triVertices[0] || triVertices[2] == triVertices[0] || triVertices[1] == triVertices[2])
         continue;
 
-      const int triangleID = allocTriangle();
-      if (triangleID >= 3 * outputArraySize)
-        continue;
-
-      for (int j = 0; j < 3; j++) {
-        (int &)triVertices[j].w = (4 * triangleID + j);
-        (float4 &)outputArray[3 * triangleID + j] = triVertices[j];
-      }
+      f(triVertices[3]);
     }
   }
 };
