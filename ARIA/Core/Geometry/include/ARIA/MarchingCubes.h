@@ -339,25 +339,25 @@ template <>
 class MarchingCubes<3> {
 public:
 private:
-  ARIA_HOST_DEVICE void doMarchingCubesOn(const Vec<int, 3> &mirror, const Cell<3> zOrder[2][2][2]) {
+  ARIA_HOST_DEVICE void doMarchingCubesOn(const Vec<int, 3> &mirror, const Cell<3> zOrder[2][2][2], Real isoValue) {
     // we have OUR cells in z-order, but VTK case table assumes
     // everything is is VTK 'hexahedron' ordering, so let's rearrange
     // ... and while doing so, also make sure that we flip based on
     // which direction the parent cell created this dual from
-    DualVertex vertex[8] = {zOrder[0 + mirror.z][0 + mirror.y][0 + mirror.x].dualVertex(),
-                            zOrder[0 + mirror.z][0 + mirror.y][1 - mirror.x].dualVertex(),
-                            zOrder[0 + mirror.z][1 - mirror.y][1 - mirror.x].dualVertex(),
-                            zOrder[0 + mirror.z][1 - mirror.y][0 + mirror.x].dualVertex(),
-                            zOrder[1 - mirror.z][0 + mirror.y][0 + mirror.x].dualVertex(),
-                            zOrder[1 - mirror.z][0 + mirror.y][1 - mirror.x].dualVertex(),
-                            zOrder[1 - mirror.z][1 - mirror.y][1 - mirror.x].dualVertex(),
-                            zOrder[1 - mirror.z][1 - mirror.y][0 + mirror.x].dualVertex()};
+    const DualVertex vertex[8] = {zOrder[0 + mirror.z][0 + mirror.y][0 + mirror.x].dualVertex(),
+                                  zOrder[0 + mirror.z][0 + mirror.y][1 - mirror.x].dualVertex(),
+                                  zOrder[0 + mirror.z][1 - mirror.y][1 - mirror.x].dualVertex(),
+                                  zOrder[0 + mirror.z][1 - mirror.y][0 + mirror.x].dualVertex(),
+                                  zOrder[1 - mirror.z][0 + mirror.y][0 + mirror.x].dualVertex(),
+                                  zOrder[1 - mirror.z][0 + mirror.y][1 - mirror.x].dualVertex(),
+                                  zOrder[1 - mirror.z][1 - mirror.y][1 - mirror.x].dualVertex(),
+                                  zOrder[1 - mirror.z][1 - mirror.y][0 + mirror.x].dualVertex()};
 
     int index = 0;
     for (int i = 0; i < 8; i++)
-      if (vertex[i].w > isoValue)
+      if (vertex[i].value() > isoValue)
         index += (1 << i);
-    if (index == 0 || index == 0xff)
+    if (index == 0 || index == 0xFF)
       return;
 
     for (const int8_t *edge = &vtkMarchingCubesTriangleCases[index][0]; edge[0] > -1; edge += 3) {
