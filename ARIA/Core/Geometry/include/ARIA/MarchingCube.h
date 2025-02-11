@@ -300,7 +300,7 @@ template <uint dim>
 }
 
 template <uint dim>
-[[nodiscard]] ARIA_HOST_DEVICE static consteval auto MarchingCubes_edges() {
+[[nodiscard]] ARIA_HOST_DEVICE static consteval auto MarchingCubesEdges() {
   if constexpr (dim == 1)
     return vtkMarchingCubes1DEdges;
   else if constexpr (dim == 2)
@@ -352,7 +352,7 @@ public:
     for (const int8_t *edge = MarchingCubesCases<dim>()[iCases]; *edge > -1; edge += dim) {
       cuda::std::array<Vec<Real, dim>, dim> primitiveVertices;
       ForEach<dim>([&](auto i) {
-        const int8_t *vert = MarchingCubes_edges<dim>()[edge[i]];
+        const int8_t *vert = MarchingCubesEdges<dim>()[edge[i]];
         const Vec<Real, dim> p0 = positions[vert[0]];
         const Vec<Real, dim> p1 = positions[vert[1]];
         const Real v0 = values[vert[0]];
