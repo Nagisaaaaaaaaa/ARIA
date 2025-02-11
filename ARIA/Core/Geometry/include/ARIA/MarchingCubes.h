@@ -385,6 +385,9 @@ public:
     };
     cuda::std::array positions = rearrangeAndLinearize(accessorPositions);
     cuda::std::array values = rearrangeAndLinearize(accessorValues);
+    static_assert(std::is_same_v<decltype(positions), cuda::std::array<Vec<Real, dim>, powN<dim>(2)>>,
+                  "Invalid accessor of positions");
+    static_assert(std::is_same_v<decltype(values), cuda::std::array<Real, powN<dim>(2)>>, "Invalid accessor of values");
 
     int index = 0;
     ForEach<powN<dim>(2)>([&](auto i) {
