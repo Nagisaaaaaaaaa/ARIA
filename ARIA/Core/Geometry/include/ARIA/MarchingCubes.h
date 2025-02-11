@@ -334,15 +334,15 @@ public:
 
     for (const int8_t *edge = MarchingCubesCases<dim>()[iCases]; *edge > -1; edge += dim) {
       cuda::std::array<Vec<Real, dim>, dim> primitiveVertices;
-      for (uint iDim = 0; iDim < dim; iDim++) {
-        const int8_t *vert = MarchingCubes_edges<dim>()[edge[iDim]];
+      ForEach<dim>([&](auto i) {
+        const int8_t *vert = MarchingCubes_edges<dim>()[edge[i]];
         const Vec<Real, dim> p0 = positions[vert[0]];
         const Vec<Real, dim> p1 = positions[vert[1]];
         const Real v0 = values[vert[0]];
         const Real v1 = values[vert[1]];
         const float t = (isoValue - v0) / (v1 - v0);
-        primitiveVertices[iDim] = Lerp(p0, p1, t);
-      }
+        primitiveVertices[i] = Lerp(p0, p1, t);
+      });
 
       bool success = true;
       ForEach<dim>([&](auto i) {
