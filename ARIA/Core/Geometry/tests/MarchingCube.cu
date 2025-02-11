@@ -1,9 +1,9 @@
-#include "ARIA/MarchingCubes.h"
+#include "ARIA/MarchingCube.h"
 
 #include <gtest/gtest.h>
 
 namespace ARIA {
 
-TEST(MarchingCubes, Base) {}
+TEST(MarchingCube, Base) {}
 
 } // namespace ARIA

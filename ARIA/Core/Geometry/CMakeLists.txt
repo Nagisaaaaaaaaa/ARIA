@@ -10,7 +10,7 @@ CPMAddPackage(
 set(core_geometry_headers
     ARIA/AABB.h
     ARIA/BVH.h
-    ARIA/MarchingCubes.h
+    ARIA/MarchingCube.h
     ARIA/VDB.h
 )
 
