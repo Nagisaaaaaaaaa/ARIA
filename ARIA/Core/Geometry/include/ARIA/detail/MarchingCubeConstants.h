@@ -291,7 +291,7 @@ ARIA_CONST static inline constexpr int8 vtkMarchingCubes3DEdges[12][2] = {
 //
 //
 template <uint dim>
-[[nodiscard]] ARIA_HOST_DEVICE static consteval auto MarchingCubesCases() {
+[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto MarchingCubesCases() {
   if constexpr (dim == 1)
     return vtkMarchingCubes1DPointCases;
   else if constexpr (dim == 2)
@@ -301,7 +301,7 @@ template <uint dim>
 }
 
 template <uint dim>
-[[nodiscard]] ARIA_HOST_DEVICE static consteval auto MarchingCubesEdges() {
+[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto MarchingCubesEdges() {
   if constexpr (dim == 1)
     return vtkMarchingCubes1DEdges;
   else if constexpr (dim == 2)
