@@ -368,57 +368,55 @@ class MarchingCubes {
 public:
 private:
   template <typename F>
-  ARIA_HOST_DEVICE static void
-  DoMarchingCubesOn(const Vec<int, dim> &mirror, const auto &zOrder, Real isoValue, F &&f) {
-    // we have OUR cells in z-order, but VTK case table assumes
-    // everything is is VTK 'hexahedron' ordering, so let's rearrange
-    // ... and while doing so, also make sure that we flip based on
-    // which direction the parent cell created this dual from
-    DualVertex<dim> vertex[powN<dim>(2)];
+  ARIA_HOST_DEVICE static void DoMarchingCubesOn(const auto &CellsZYX, Real isoValue, F &&f) {
+    //! We have our cells in "zyx"-order, but VTK case tables assume
+    //! everthing is in VTK "hexahedron" ordering.
+    //! So, cells are rearranged and converted to dual vertices.
+    DualVertex<dim> dualVertices[powN<dim>(2)];
     if constexpr (dim == 2) {
-      vertex = {zOrder[0 + mirror.y()][0 + mirror.x()].dualVertex(), //
-                zOrder[0 + mirror.y()][1 - mirror.x()].dualVertex(), //
-                zOrder[1 - mirror.y()][1 - mirror.x()].dualVertex(), //
-                zOrder[1 - mirror.y()][0 + mirror.x()].dualVertex()};
+      dualVertices = {CellsZYX[0][0].dualVertex(), //
+                      CellsZYX[0][1].dualVertex(), //
+                      CellsZYX[1][1].dualVertex(), //
+                      CellsZYX[1][0].dualVertex()};
     } else {
-      vertex = {zOrder[0 + mirror.z()][0 + mirror.y()][0 + mirror.x()].dualVertex(),
-                zOrder[0 + mirror.z()][0 + mirror.y()][1 - mirror.x()].dualVertex(),
-                zOrder[0 + mirror.z()][1 - mirror.y()][1 - mirror.x()].dualVertex(),
-                zOrder[0 + mirror.z()][1 - mirror.y()][0 + mirror.x()].dualVertex(),
-                zOrder[1 - mirror.z()][0 + mirror.y()][0 + mirror.x()].dualVertex(),
-                zOrder[1 - mirror.z()][0 + mirror.y()][1 - mirror.x()].dualVertex(),
-                zOrder[1 - mirror.z()][1 - mirror.y()][1 - mirror.x()].dualVertex(),
-                zOrder[1 - mirror.z()][1 - mirror.y()][0 + mirror.x()].dualVertex()};
+      dualVertices = {CellsZYX[0][0][0].dualVertex(), //
+                      CellsZYX[0][0][1].dualVertex(), //
+                      CellsZYX[0][1][1].dualVertex(), //
+                      CellsZYX[0][1][0].dualVertex(), //
+                      CellsZYX[1][0][0].dualVertex(), //
+                      CellsZYX[1][0][1].dualVertex(), //
+                      CellsZYX[1][1][1].dualVertex(), //
+                      CellsZYX[1][1][0].dualVertex()};
     }
 
     int index = 0;
     ForEach<powN<dim>(2)>([&](auto i) {
-      if (vertex[i].value() > isoValue)
+      if (dualVertices[i].value() > isoValue)
         index += (1 << i);
     });
     if (index == 0 || index == powN<dim - 1>(16) - 1)
       return;
 
     for (const int8_t *edge = MarchingCubesCases<dim>()[index]; *edge > -1; edge += dim) {
-      Vec<Real, dim> triVertices[dim];
+      Vec<Real, dim> primitiveVertices[dim];
       for (int ii = 0; ii < dim; ii++) {
         const int8_t *vert = MarchingCubes_edges<dim>()[edge[ii]];
-        const DualVertex<dim> v0 = vertex[vert[0]];
-        const DualVertex<dim> v1 = vertex[vert[1]];
+        const DualVertex<dim> v0 = dualVertices[vert[0]];
+        const DualVertex<dim> v1 = dualVertices[vert[1]];
         const float t = (isoValue - v0.value()) / (v1.value() - v0.value());
-        triVertices[ii] = Lerp(v0.pos(), v1.pos(), t);
+        primitiveVertices[ii] = Lerp(v0.pos(), v1.pos(), t);
       }
 
       bool success = true;
       ForEach<dim>([&](auto i) {
         constexpr int j = (i + 1) % dim;
-        if (triVertices[i] == triVertices[j])
+        if (primitiveVertices[i] == primitiveVertices[j])
           success = false;
       });
       if (!success)
         continue;
 
-      f(triVertices);
+      f(primitiveVertices);
     }
   }
 };
