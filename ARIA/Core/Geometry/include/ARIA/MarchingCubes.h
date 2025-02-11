@@ -389,7 +389,7 @@ public:
                   "Invalid accessor of positions");
     static_assert(std::is_same_v<decltype(values), cuda::std::array<Real, powN<dim>(2)>>, "Invalid accessor of values");
 
-    int iCases = 0;
+    uint iCases = 0;
     ForEach<powN<dim>(2)>([&](auto i) {
       if (values[i] > isoValue)
         iCases += (1 << i);
@@ -399,7 +399,7 @@ public:
 
     for (const int8_t *edge = MarchingCubesCases<dim>()[iCases]; *edge > -1; edge += dim) {
       cuda::std::array<Vec<Real, dim>, dim> primitiveVertices;
-      for (int iDim = 0; iDim < dim; iDim++) {
+      for (uint iDim = 0; iDim < dim; iDim++) {
         const int8_t *vert = MarchingCubes_edges<dim>()[edge[iDim]];
         const Vec<Real, dim> p0 = positions[vert[0]];
         const Vec<Real, dim> p1 = positions[vert[1]];
