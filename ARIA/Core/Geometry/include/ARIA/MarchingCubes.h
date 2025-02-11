@@ -3,6 +3,8 @@
 #include "ARIA/Math.h"
 #include "ARIA/Vec.h"
 
+#include <cuda/std/array>
+
 namespace ARIA {
 
 ARIA_CONST static inline constexpr int8 vtkMarchingCubesTriangleCases[256][16] = {
@@ -368,24 +370,25 @@ class MarchingCubes {
 public:
   template <typename TAccessorPositions, typename TAccessorValues, typename F>
   ARIA_HOST_DEVICE static constexpr void
-  Extract(TAccessorPositions &&positions, TAccessorValues &&values, Real isoValue, F &&f) {
+  Extract(TAccessorPositions &&accessorPositions, TAccessorValues &&accessorValues, Real isoValue, F &&f) {
     //! VTK case tables assume everthing is in VTK "hexahedron" ordering.
-    //! So, cells are rearranged.
-    Vec<Real, dim> positionsVTK[powN<dim>(2)];
-    Real valuesVTK[powN<dim>(2)];
-    if constexpr (dim == 2) {
-      positionsVTK = {positions(0, 0), positions(1, 0), positions(1, 1), positions(0, 1)};
-      valuesVTK = {values(0, 0), values(1, 0), values(1, 1), values(0, 1)};
-    } else {
-      positionsVTK = {positions(0, 0, 0), positions(1, 0, 0), positions(1, 1, 0), positions(0, 1, 0), //
-                      positions(0, 0, 1), positions(1, 0, 1), positions(1, 1, 1), positions(0, 1, 1)};
-      valuesVTK = {values(0, 0, 0), values(1, 0, 0), values(1, 1, 0), values(0, 1, 0), //
-                   values(0, 0, 1), values(1, 0, 1), values(1, 1, 1), values(0, 1, 1)};
-    }
+    //! So, cells are rearranged and linearized into arrays.
+    auto rearrangeAndLinearize = []<typename TAccessor>(TAccessor &&accessor) {
+      if constexpr (dim == 2) {
+        using T = decltype(Auto(accessor(0, 0)));
+        return cuda::std::array<T, 4>{accessor(0, 0), accessor(1, 0), accessor(1, 1), accessor(0, 1)};
+      } else if constexpr (dim == 3) {
+        using T = decltype(Auto(accessor(0, 0, 0)));
+        return cuda::std::array<T, 8>{accessor(0, 0, 0), accessor(1, 0, 0), accessor(1, 1, 0), accessor(0, 1, 0), //
+                                      accessor(0, 0, 1), accessor(1, 0, 1), accessor(1, 1, 1), accessor(0, 1, 1)};
+      }
+    };
+    cuda::std::array positions = rearrangeAndLinearize(accessorPositions);
+    cuda::std::array values = rearrangeAndLinearize(accessorValues);
 
     int index = 0;
     ForEach<powN<dim>(2)>([&](auto i) {
-      if (valuesVTK[i] > isoValue)
+      if (values[i] > isoValue)
         index += (1 << i);
     });
     if (index == 0 || index == powN<dim - 1>(16) - 1)
@@ -395,10 +398,10 @@ public:
       Vec<Real, dim> primitiveVertices[dim];
       for (int ii = 0; ii < dim; ii++) {
         const int8_t *vert = MarchingCubes_edges<dim>()[edge[ii]];
-        const Vec<Real, dim> p0 = positionsVTK[vert[0]];
-        const Vec<Real, dim> p1 = positionsVTK[vert[1]];
-        const Real v0 = valuesVTK[vert[0]];
-        const Real v1 = valuesVTK[vert[1]];
+        const Vec<Real, dim> p0 = positions[vert[0]];
+        const Vec<Real, dim> p1 = positions[vert[1]];
+        const Real v0 = values[vert[0]];
+        const Real v1 = values[vert[1]];
         const float t = (isoValue - v0) / (v1 - v0);
         primitiveVertices[ii] = Lerp(p0, p1, t);
       }
