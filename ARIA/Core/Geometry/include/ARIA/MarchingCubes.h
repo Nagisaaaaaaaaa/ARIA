@@ -376,23 +376,23 @@ private:
     // which direction the parent cell created this dual from
     DualVertex<dim> vertex[powN<dim>(2)];
     if constexpr (dim == 2) {
-      vertex = {zOrder[0 + mirror.y][0 + mirror.x].dualVertex(), //
-                zOrder[0 + mirror.y][1 - mirror.x].dualVertex(), //
-                zOrder[1 - mirror.y][1 - mirror.x].dualVertex(), //
-                zOrder[1 - mirror.y][0 + mirror.x].dualVertex()};
+      vertex = {zOrder[0 + mirror.y()][0 + mirror.x()].dualVertex(), //
+                zOrder[0 + mirror.y()][1 - mirror.x()].dualVertex(), //
+                zOrder[1 - mirror.y()][1 - mirror.x()].dualVertex(), //
+                zOrder[1 - mirror.y()][0 + mirror.x()].dualVertex()};
     } else {
-      vertex = {zOrder[0 + mirror.z][0 + mirror.y][0 + mirror.x].dualVertex(),
-                zOrder[0 + mirror.z][0 + mirror.y][1 - mirror.x].dualVertex(),
-                zOrder[0 + mirror.z][1 - mirror.y][1 - mirror.x].dualVertex(),
-                zOrder[0 + mirror.z][1 - mirror.y][0 + mirror.x].dualVertex(),
-                zOrder[1 - mirror.z][0 + mirror.y][0 + mirror.x].dualVertex(),
-                zOrder[1 - mirror.z][0 + mirror.y][1 - mirror.x].dualVertex(),
-                zOrder[1 - mirror.z][1 - mirror.y][1 - mirror.x].dualVertex(),
-                zOrder[1 - mirror.z][1 - mirror.y][0 + mirror.x].dualVertex()};
+      vertex = {zOrder[0 + mirror.z()][0 + mirror.y()][0 + mirror.x()].dualVertex(),
+                zOrder[0 + mirror.z()][0 + mirror.y()][1 - mirror.x()].dualVertex(),
+                zOrder[0 + mirror.z()][1 - mirror.y()][1 - mirror.x()].dualVertex(),
+                zOrder[0 + mirror.z()][1 - mirror.y()][0 + mirror.x()].dualVertex(),
+                zOrder[1 - mirror.z()][0 + mirror.y()][0 + mirror.x()].dualVertex(),
+                zOrder[1 - mirror.z()][0 + mirror.y()][1 - mirror.x()].dualVertex(),
+                zOrder[1 - mirror.z()][1 - mirror.y()][1 - mirror.x()].dualVertex(),
+                zOrder[1 - mirror.z()][1 - mirror.y()][0 + mirror.x()].dualVertex()};
     }
 
     int index = 0;
-    ForEach<powN<dim>(2)>([&]<auto i>() {
+    ForEach<powN<dim>(2)>([&](auto i) {
       if (vertex[i].value() > isoValue)
         index += (1 << i);
     });
@@ -410,7 +410,7 @@ private:
       }
 
       bool success = true;
-      ForEach<dim>([&]<auto i>() {
+      ForEach<dim>([&](auto i) {
         constexpr int j = (i + 1) % dim;
         if (triVertices[i] == triVertices[j])
           success = false;
