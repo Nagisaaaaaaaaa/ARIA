@@ -277,6 +277,25 @@ ARIA_CONST static inline constexpr int8 vtkMarchingSquares_edges[4][2] = {{0, 1}
 //
 //
 //
+template <uint dim>
+[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto MarchingCubesCases() {
+  if constexpr (dim == 2)
+    return vtkMarchingSquaresLineCases;
+  else if constexpr (dim == 3)
+    return vtkMarchingCubesTriangleCases;
+}
+
+template <uint dim>
+[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto MarchingCubes_edges() {
+  if constexpr (dim == 2)
+    return vtkMarchingSquares_edges;
+  else if constexpr (dim == 3)
+    return vtkMarchingCubes_edges;
+}
+
+//
+//
+//
 //
 //
 template <uint dim>
