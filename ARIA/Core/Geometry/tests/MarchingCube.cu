@@ -56,6 +56,10 @@ TEST(MarchingCube, Base) {
         ++times;
         Vec2r p_00_10 = Lerp(positions(0, 0), positions(1, 0), computeT(values(0, 0), values(1, 0), isoValue));
         Vec2r p_00_01 = Lerp(positions(0, 0), positions(0, 1), computeT(values(0, 0), values(0, 1), isoValue));
+        EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_00_10.x());
+        EXPECT_FLOAT_EQ(primitiveVertices[0].y(), p_00_10.y());
+        EXPECT_FLOAT_EQ(primitiveVertices[1].x(), p_00_01.x());
+        EXPECT_FLOAT_EQ(primitiveVertices[1].y(), p_00_01.y());
       });
       EXPECT_EQ(times, 1);
     };
