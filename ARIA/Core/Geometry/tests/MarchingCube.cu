@@ -29,16 +29,16 @@ TEST(MarchingCube, Base) {
     };
 
     auto positions = [](uint i) { return std::array{Vec1r{-2.5_R}, Vec1r{2.5_R}}[i]; };
-    auto values0 = [](uint i) { return std::array{0.1_R, 0.1_R}[i]; };
-    auto values1 = [](uint i) { return std::array{0.8_R, 0.1_R}[i]; };
-    auto values2 = [](uint i) { return std::array{0.1_R, 0.8_R}[i]; };
-    auto values3 = [](uint i) { return std::array{0.8_R, 0.8_R}[i]; };
+    auto valuesOO = [](uint i) { return std::array{0.1_R, 0.1_R}[i]; };
+    auto valuesPO = [](uint i) { return std::array{0.8_R, 0.1_R}[i]; };
+    auto valuesOP = [](uint i) { return std::array{0.1_R, 0.8_R}[i]; };
+    auto valuesPP = [](uint i) { return std::array{0.8_R, 0.8_R}[i]; };
     Real isoValue = 0.4_R;
 
-    testExtract0(positions, values0, isoValue);
-    testExtract1(positions, values1, isoValue);
-    testExtract1(positions, values2, isoValue);
-    testExtract0(positions, values3, isoValue);
+    testExtract0(positions, valuesOO, isoValue);
+    testExtract1(positions, valuesPO, isoValue);
+    testExtract1(positions, valuesOP, isoValue);
+    testExtract0(positions, valuesPP, isoValue);
   }
 
   // 2D.
@@ -49,16 +49,13 @@ TEST(MarchingCube, Base) {
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &) { EXPECT_FALSE(true); });
     };
 
-    auto testExtract1_OO = [&](const auto &positions, const auto &values, Real isoValue) {
+    auto testExtract1_POOO = [&](const auto &positions, const auto &values, Real isoValue) {
       uint times = 0;
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
         EXPECT_EQ(times, 0);
         ++times;
-        Vec2r p_OO_PO = Lerp(positions(0, 0), positions(1, 0), computeT(values(0, 0), values(1, 0), isoValue));
-        Vec2r p_OO_OP = Lerp(positions(0, 0), positions(0, 1), computeT(values(0, 0), values(0, 1), isoValue));
-        fmt::print("{} {} {} {}", p_OO_PO.x(), p_OO_PO.y(), p_OO_OP.x(), p_OO_OP.y());
-        fmt::print("{} {} {} {}", primitiveVertices[0].x(), primitiveVertices[0].y(), primitiveVertices[1].x(),
-                   primitiveVertices[1].y());
+        Vec2r p_00_10 = Lerp(positions(0, 0), positions(1, 0), computeT(values(0, 0), values(1, 0), isoValue));
+        Vec2r p_00_01 = Lerp(positions(0, 0), positions(0, 1), computeT(values(0, 0), values(0, 1), isoValue));
       });
       EXPECT_EQ(times, 1);
     };
@@ -67,13 +64,18 @@ TEST(MarchingCube, Base) {
       return std::array{std::array{Vec2r{-2.5_R, -2.5_R}, Vec2r{-2.5_R, 2.5_R}}, //
                         std::array{Vec2r{2.5_R, -2.5_R}, Vec2r{2.5_R, 2.5_R}}}[i][j];
     };
-    auto values0 = [](uint i, uint j) {
+    auto values_OOOO = [](uint i, uint j) {
       return std::array{std::array{0.1_R, 0.1_R}, //
+                        std::array{0.1_R, 0.1_R}}[i][j];
+    };
+    auto values_POOO = [](uint i, uint j) {
+      return std::array{std::array{0.8_R, 0.1_R}, //
                         std::array{0.1_R, 0.1_R}}[i][j];
     };
     Real isoValue = 0.4_R;
 
-    testExtract0(positions, values0, isoValue);
+    testExtract0(positions, values_OOOO, isoValue);
+    testExtract1_POOO(positions, values_POOO, isoValue);
   }
 }
 
