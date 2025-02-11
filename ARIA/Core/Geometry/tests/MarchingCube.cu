@@ -67,6 +67,13 @@ TEST(MarchingCube, Base) {
       return std::array{std::array{Vec2r{-2.5_R, -2.5_R}, Vec2r{-2.5_R, 2.5_R}}, //
                         std::array{Vec2r{2.5_R, -2.5_R}, Vec2r{2.5_R, 2.5_R}}}[i][j];
     };
+    auto values0 = [](uint i, uint j) {
+      return std::array{std::array{0.1_R, 0.1_R}, //
+                        std::array{0.1_R, 0.1_R}}[i][j];
+    };
+    Real isoValue = 0.4_R;
+
+    testExtract0(positions, values0, isoValue);
   }
 }
 
