@@ -49,11 +49,14 @@ TEST(MarchingCube, Base) {
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &) { EXPECT_FALSE(true); });
     };
 
-    auto testExtract1_POOO = [&](const auto &positions, const auto &values, Real isoValue) {
+    auto testExtract1_ABBB = [&](const auto &positions, const auto &values, Real isoValue) {
       uint times = 0;
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
         EXPECT_EQ(times, 0);
         ++times;
+        std::ranges::sort(primitiveVertices, [](const Vec2r &a, const Vec2r &b) {
+          return a.y() < b.y() || (a.y() == b.y() && a.x() < b.x());
+        });
         Vec2r p_00_10 = Lerp(positions(0, 0), positions(1, 0), computeT(values(0, 0), values(1, 0), isoValue));
         Vec2r p_00_01 = Lerp(positions(0, 0), positions(0, 1), computeT(values(0, 0), values(0, 1), isoValue));
         EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_00_10.x());
@@ -76,10 +79,15 @@ TEST(MarchingCube, Base) {
       return std::array{std::array{0.8_R, 0.1_R}, //
                         std::array{0.1_R, 0.1_R}}[i][j];
     };
+    auto values_OPPP = [](uint i, uint j) {
+      return std::array{std::array{0.1_R, 0.8_R}, //
+                        std::array{0.8_R, 0.8_R}}[i][j];
+    };
     Real isoValue = 0.4_R;
 
     testExtract0(positions, values_OOOO, isoValue);
-    testExtract1_POOO(positions, values_POOO, isoValue);
+    testExtract1_ABBB(positions, values_POOO, isoValue);
+    testExtract1_ABBB(positions, values_OPPP, isoValue);
   }
 }
 
