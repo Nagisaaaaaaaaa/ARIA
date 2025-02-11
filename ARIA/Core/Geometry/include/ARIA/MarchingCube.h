@@ -9,7 +9,7 @@
 namespace ARIA {
 
 template <uint dim>
-class MarchingCubes {
+class MarchingCube {
 public:
   template <typename TAccessorPositions, typename TAccessorValues, typename F>
   ARIA_HOST_DEVICE static constexpr void
