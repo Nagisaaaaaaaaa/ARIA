@@ -6,8 +6,14 @@
 
 namespace ARIA {
 
+namespace {
+
+template <typename T, size_t n>
+using arr = std::array<T, n>;
+
+}
+
 TEST(MarchingCube, Base) {
-  using arr = std::array;
   auto computeT = [](Real v0, Real v1, Real isoValue) { return (isoValue - v0) / (v1 - v0); };
 
   // 1D.
