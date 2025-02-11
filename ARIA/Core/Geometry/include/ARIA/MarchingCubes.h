@@ -298,6 +298,23 @@ template <uint dim>
 //
 //
 //
+// Compute $x^N$ at compile time.
+template <int N, typename T>
+ARIA_HOST_DEVICE static T consteval powN(T x) {
+  static_assert(N >= 0);
+
+  if constexpr (N > 0) {
+    return x * powN<N - 1>(x);
+  } else {
+    return 1;
+  }
+}
+
+//
+//
+//
+//
+//
 template <uint dim>
 class DualVertex {
 public:
@@ -347,55 +364,61 @@ private:
 //
 //
 template <uint dim>
-class MarchingCubes;
-
-template <>
-class MarchingCubes<2> {
-public:
-private:
-};
-
-template <>
-class MarchingCubes<3> {
+class MarchingCubes {
 public:
 private:
   template <typename F>
-  ARIA_HOST_DEVICE void
-  doMarchingCubesOn(const Vec<int, 3> &mirror, const Cell<3> zOrder[2][2][2], Real isoValue, F &&f) {
+  ARIA_HOST_DEVICE static void
+  DoMarchingCubesOn(const Vec<int, dim> &mirror, const auto &zOrder, Real isoValue, F &&f) {
     // we have OUR cells in z-order, but VTK case table assumes
     // everything is is VTK 'hexahedron' ordering, so let's rearrange
     // ... and while doing so, also make sure that we flip based on
     // which direction the parent cell created this dual from
-    const DualVertex<3> vertex[8] = {zOrder[0 + mirror.z][0 + mirror.y][0 + mirror.x].dualVertex(),
-                                     zOrder[0 + mirror.z][0 + mirror.y][1 - mirror.x].dualVertex(),
-                                     zOrder[0 + mirror.z][1 - mirror.y][1 - mirror.x].dualVertex(),
-                                     zOrder[0 + mirror.z][1 - mirror.y][0 + mirror.x].dualVertex(),
-                                     zOrder[1 - mirror.z][0 + mirror.y][0 + mirror.x].dualVertex(),
-                                     zOrder[1 - mirror.z][0 + mirror.y][1 - mirror.x].dualVertex(),
-                                     zOrder[1 - mirror.z][1 - mirror.y][1 - mirror.x].dualVertex(),
-                                     zOrder[1 - mirror.z][1 - mirror.y][0 + mirror.x].dualVertex()};
+    DualVertex<dim> vertex[powN<dim>(2)];
+    if constexpr (dim == 2) {
+      vertex = {zOrder[0 + mirror.y][0 + mirror.x].dualVertex(), //
+                zOrder[0 + mirror.y][1 - mirror.x].dualVertex(), //
+                zOrder[1 - mirror.y][1 - mirror.x].dualVertex(), //
+                zOrder[1 - mirror.y][0 + mirror.x].dualVertex()};
+    } else {
+      vertex = {zOrder[0 + mirror.z][0 + mirror.y][0 + mirror.x].dualVertex(),
+                zOrder[0 + mirror.z][0 + mirror.y][1 - mirror.x].dualVertex(),
+                zOrder[0 + mirror.z][1 - mirror.y][1 - mirror.x].dualVertex(),
+                zOrder[0 + mirror.z][1 - mirror.y][0 + mirror.x].dualVertex(),
+                zOrder[1 - mirror.z][0 + mirror.y][0 + mirror.x].dualVertex(),
+                zOrder[1 - mirror.z][0 + mirror.y][1 - mirror.x].dualVertex(),
+                zOrder[1 - mirror.z][1 - mirror.y][1 - mirror.x].dualVertex(),
+                zOrder[1 - mirror.z][1 - mirror.y][0 + mirror.x].dualVertex()};
+    }
 
     int index = 0;
-    for (int i = 0; i < 8; i++)
+    ForEach<powN<dim>(2)>([&]<auto i>() {
       if (vertex[i].value() > isoValue)
         index += (1 << i);
-    if (index == 0 || index == 0xFF)
+    });
+    if (index == 0 || index == powN<dim - 1>(16) - 1)
       return;
 
-    for (const int8_t *edge = &vtkMarchingCubesTriangleCases[index][0]; *edge > -1; edge += 3) {
-      Vec3r triVertices[3];
-      for (int ii = 0; ii < 3; ii++) {
-        const int8_t *vert = vtkMarchingCubes_edges[edge[ii]];
-        const DualVertex<3> v0 = vertex[vert[0]];
-        const DualVertex<3> v1 = vertex[vert[1]];
+    for (const int8_t *edge = MarchingCubesCases<dim>()[index]; *edge > -1; edge += dim) {
+      Vec<Real, dim> triVertices[dim];
+      for (int ii = 0; ii < dim; ii++) {
+        const int8_t *vert = MarchingCubes_edges<dim>()[edge[ii]];
+        const DualVertex<dim> v0 = vertex[vert[0]];
+        const DualVertex<dim> v1 = vertex[vert[1]];
         const float t = (isoValue - v0.value()) / (v1.value() - v0.value());
         triVertices[ii] = Lerp(v0.pos(), v1.pos(), t);
       }
 
-      if (triVertices[1] == triVertices[0] || triVertices[2] == triVertices[0] || triVertices[1] == triVertices[2])
+      bool success = true;
+      ForEach<dim>([&]<auto i>() {
+        constexpr int j = (i + 1) % dim;
+        if (triVertices[i] == triVertices[j])
+          success = false;
+      });
+      if (!success)
         continue;
 
-      f(triVertices[3]);
+      f(triVertices);
     }
   }
 };
