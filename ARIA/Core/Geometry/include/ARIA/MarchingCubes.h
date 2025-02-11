@@ -383,30 +383,30 @@ public:
                                       accessor(0, 0, 1), accessor(1, 0, 1), accessor(1, 1, 1), accessor(0, 1, 1)};
       }
     };
-    cuda::std::array positions = rearrangeAndLinearize(accessorPositions);
-    cuda::std::array values = rearrangeAndLinearize(accessorValues);
+    cuda::std::array positions = rearrangeAndLinearize(std::forward<TAccessorPositions>(accessorPositions));
+    cuda::std::array values = rearrangeAndLinearize(std::forward<TAccessorValues>(accessorValues));
     static_assert(std::is_same_v<decltype(positions), cuda::std::array<Vec<Real, dim>, powN<dim>(2)>>,
                   "Invalid accessor of positions");
     static_assert(std::is_same_v<decltype(values), cuda::std::array<Real, powN<dim>(2)>>, "Invalid accessor of values");
 
-    int index = 0;
+    int iCases = 0;
     ForEach<powN<dim>(2)>([&](auto i) {
       if (values[i] > isoValue)
-        index += (1 << i);
+        iCases += (1 << i);
     });
-    if (index == 0 || index == powN<dim - 1>(16) - 1)
+    if (iCases == 0 || iCases == powN<dim - 1>(16) - 1)
       return;
 
-    for (const int8_t *edge = MarchingCubesCases<dim>()[index]; *edge > -1; edge += dim) {
+    for (const int8_t *edge = MarchingCubesCases<dim>()[iCases]; *edge > -1; edge += dim) {
       Vec<Real, dim> primitiveVertices[dim];
-      for (int ii = 0; ii < dim; ii++) {
-        const int8_t *vert = MarchingCubes_edges<dim>()[edge[ii]];
+      for (int iDim = 0; iDim < dim; iDim++) {
+        const int8_t *vert = MarchingCubes_edges<dim>()[edge[iDim]];
         const Vec<Real, dim> p0 = positions[vert[0]];
         const Vec<Real, dim> p1 = positions[vert[1]];
         const Real v0 = values[vert[0]];
         const Real v1 = values[vert[1]];
         const float t = (isoValue - v0) / (v1 - v0);
-        primitiveVertices[ii] = Lerp(p0, p1, t);
+        primitiveVertices[iDim] = Lerp(p0, p1, t);
       }
 
       bool success = true;
