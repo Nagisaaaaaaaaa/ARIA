@@ -7,6 +7,7 @@
 namespace ARIA {
 
 TEST(MarchingCube, Base) {
+  using arr = std::array;
   auto computeT = [](Real v0, Real v1, Real isoValue) { return (isoValue - v0) / (v1 - v0); };
 
   // 1D.
@@ -28,11 +29,11 @@ TEST(MarchingCube, Base) {
       EXPECT_EQ(times, 1);
     };
 
-    auto positions = [](uint i) { return std::array{Vec1r{-2.5_R}, Vec1r{2.5_R}}[i]; };
-    auto valuesOO = [](uint i) { return std::array{0.1_R, 0.1_R}[i]; };
-    auto valuesPO = [](uint i) { return std::array{0.8_R, 0.1_R}[i]; };
-    auto valuesOP = [](uint i) { return std::array{0.1_R, 0.8_R}[i]; };
-    auto valuesPP = [](uint i) { return std::array{0.8_R, 0.8_R}[i]; };
+    auto positions = [](uint i) { return arr{Vec1r{-2.5_R}, Vec1r{2.5_R}}[i]; };
+    auto valuesOO = [](uint i) { return arr{0.1_R, 0.1_R}[i]; };
+    auto valuesPO = [](uint i) { return arr{0.8_R, 0.1_R}[i]; };
+    auto valuesOP = [](uint i) { return arr{0.1_R, 0.8_R}[i]; };
+    auto valuesPP = [](uint i) { return arr{0.8_R, 0.8_R}[i]; };
     Real isoValue = 0.4_R;
 
     testExtract_AA(positions, valuesOO, isoValue);
@@ -68,29 +69,24 @@ TEST(MarchingCube, Base) {
     };
 
     auto positions = [](uint i, uint j) {
-      return std::array{std::array{Vec2r{-2.5_R, -2.5_R}, Vec2r{-2.5_R, 2.5_R}}, //
-                        std::array{Vec2r{2.5_R, -2.5_R}, Vec2r{2.5_R, 2.5_R}}}[i][j];
+      return arr{arr{Vec2r{-2.5_R, -2.5_R}, Vec2r{-2.5_R, 2.5_R}}, //
+                 arr{Vec2r{2.5_R, -2.5_R}, Vec2r{2.5_R, 2.5_R}}}[i][j];
     };
-    auto values_OOOO = [](uint i, uint j) {
-      return std::array{std::array{0.1_R, 0.1_R}, //
-                        std::array{0.1_R, 0.1_R}}[i][j];
-    };
-    auto values_PPPP = [](uint i, uint j) {
-      return std::array{std::array{0.8_R, 0.8_R}, //
-                        std::array{0.8_R, 0.8_R}}[i][j];
-    };
-    auto values_POOO = [](uint i, uint j) {
-      return std::array{std::array{0.8_R, 0.1_R}, //
-                        std::array{0.1_R, 0.1_R}}[i][j];
-    };
-    auto values_OPPP = [](uint i, uint j) {
-      return std::array{std::array{0.1_R, 0.8_R}, //
-                        std::array{0.8_R, 0.8_R}}[i][j];
-    };
+
+    auto values_OOOO = [](uint i, uint j) { return arr{arr{0.1_R, 0.1_R}, arr{0.1_R, 0.1_R}}[i][j]; };
+    auto values_PPPP = [](uint i, uint j) { return arr{arr{0.8_R, 0.8_R}, arr{0.8_R, 0.8_R}}[i][j]; };
+
+    auto values_POOO = [](uint i, uint j) { return arr{arr{0.8_R, 0.1_R}, arr{0.1_R, 0.1_R}}[i][j]; };
+    auto values_OPPP = [](uint i, uint j) { return arr{arr{0.1_R, 0.8_R}, arr{0.8_R, 0.8_R}}[i][j]; };
+
+    auto values_OPOO = [](uint i, uint j) { return arr{arr{0.1_R, 0.8_R}, arr{0.1_R, 0.1_R}}[i][j]; };
+    auto values_POPP = [](uint i, uint j) { return arr{arr{0.8_R, 0.1_R}, arr{0.8_R, 0.8_R}}[i][j]; };
+
     Real isoValue = 0.4_R;
 
     testExtract_AAAA(positions, values_OOOO, isoValue);
     testExtract_AAAA(positions, values_PPPP, isoValue);
+
     testExtract_ABBB(positions, values_POOO, isoValue);
     testExtract_ABBB(positions, values_OPPP, isoValue);
   }
