@@ -291,18 +291,22 @@ ARIA_CONST static inline constexpr int8 vtkMarchingCubes3DEdges[12][2] = {
 //
 template <uint dim>
 [[nodiscard]] ARIA_HOST_DEVICE static consteval auto MarchingCubesCases() {
-  if constexpr (dim == 2)
-    return vtkMarchingSquaresLineCases;
+  if constexpr (dim == 1)
+    return vtkMarchingCubes1DPointCases;
+  else if constexpr (dim == 2)
+    return vtkMarchingCubes2DLineCases;
   else if constexpr (dim == 3)
-    return vtkMarchingCubesTriangleCases;
+    return vtkMarchingCubes3DTriangleCases;
 }
 
 template <uint dim>
 [[nodiscard]] ARIA_HOST_DEVICE static consteval auto MarchingCubes_edges() {
-  if constexpr (dim == 2)
-    return vtkMarchingSquares_edges;
+  if constexpr (dim == 1)
+    return vtkMarchingCubes1DEdges;
+  else if constexpr (dim == 2)
+    return vtkMarchingCubes2DEdges;
   else if constexpr (dim == 3)
-    return vtkMarchingCubes_edges;
+    return vtkMarchingCubes3DEdges;
 }
 
 //
@@ -319,7 +323,10 @@ public:
     //! VTK case tables assume everthing is in VTK "hexahedron" ordering.
     //! So, cells are rearranged and linearized into arrays.
     auto rearrangeAndLinearize = []<typename TAccessor>(TAccessor &&accessor) {
-      if constexpr (dim == 2) {
+      if constexpr (dim == 1) {
+        using T = decltype(Auto(accessor(0)));
+        return cuda::std::array<T, 2>{accessor(0), accessor(1)};
+      } else if constexpr (dim == 2) {
         using T = decltype(Auto(accessor(0, 0)));
         return cuda::std::array<T, 4>{accessor(0, 0), accessor(1, 0), accessor(1, 1), accessor(0, 1)};
       } else if constexpr (dim == 3) {
