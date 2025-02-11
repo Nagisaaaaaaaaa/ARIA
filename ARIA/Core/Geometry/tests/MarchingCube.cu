@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <cuda/std/span>
+
 namespace ARIA {
 
 TEST(MarchingCube, Base) {
@@ -12,12 +14,12 @@ TEST(MarchingCube, Base) {
     using MC = MarchingCube<1>;
 
     auto testExtract0 = [&](const auto &positions, const auto &values, Real isoValue) {
-      MC::Extract(positions, values, isoValue, [&](cuda::std::array<Vec1r, 1>) { EXPECT_FALSE(true); });
+      MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec1r, 1> &) { EXPECT_FALSE(true); });
     };
 
     auto testExtract1 = [&](const auto &positions, const auto &values, Real isoValue) {
       uint times = 0;
-      MC::Extract(positions, values, isoValue, [&](cuda::std::array<Vec1r, 1> primitiveVertices) {
+      MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec1r, 1> &primitiveVertices) {
         EXPECT_EQ(times, 0);
         ++times;
         Vec1r p = Lerp(positions(0), positions(1), computeT(values(0), values(1), isoValue));
