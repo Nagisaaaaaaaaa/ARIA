@@ -13,11 +13,11 @@ TEST(MarchingCube, Base) {
   {
     using MC = MarchingCube<1>;
 
-    auto testExtract0 = [&](const auto &positions, const auto &values, Real isoValue) {
+    auto testExtract_AA = [&](const auto &positions, const auto &values, Real isoValue) {
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec1r, 1> &) { EXPECT_FALSE(true); });
     };
 
-    auto testExtract1 = [&](const auto &positions, const auto &values, Real isoValue) {
+    auto testExtract_AB = [&](const auto &positions, const auto &values, Real isoValue) {
       uint times = 0;
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec1r, 1> &primitiveVertices) {
         EXPECT_EQ(times, 0);
@@ -35,21 +35,21 @@ TEST(MarchingCube, Base) {
     auto valuesPP = [](uint i) { return std::array{0.8_R, 0.8_R}[i]; };
     Real isoValue = 0.4_R;
 
-    testExtract0(positions, valuesOO, isoValue);
-    testExtract1(positions, valuesPO, isoValue);
-    testExtract1(positions, valuesOP, isoValue);
-    testExtract0(positions, valuesPP, isoValue);
+    testExtract_AA(positions, valuesOO, isoValue);
+    testExtract_AA(positions, valuesPP, isoValue);
+    testExtract_AB(positions, valuesPO, isoValue);
+    testExtract_AB(positions, valuesOP, isoValue);
   }
 
   // 2D.
   {
     using MC = MarchingCube<2>;
 
-    auto testExtract0 = [&](const auto &positions, const auto &values, Real isoValue) {
+    auto testExtract_AAAA = [&](const auto &positions, const auto &values, Real isoValue) {
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &) { EXPECT_FALSE(true); });
     };
 
-    auto testExtract1_ABBB = [&](const auto &positions, const auto &values, Real isoValue) {
+    auto testExtract_ABBB = [&](const auto &positions, const auto &values, Real isoValue) {
       uint times = 0;
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
         EXPECT_EQ(times, 0);
@@ -75,6 +75,10 @@ TEST(MarchingCube, Base) {
       return std::array{std::array{0.1_R, 0.1_R}, //
                         std::array{0.1_R, 0.1_R}}[i][j];
     };
+    auto values_PPPP = [](uint i, uint j) {
+      return std::array{std::array{0.8_R, 0.8_R}, //
+                        std::array{0.8_R, 0.8_R}}[i][j];
+    };
     auto values_POOO = [](uint i, uint j) {
       return std::array{std::array{0.8_R, 0.1_R}, //
                         std::array{0.1_R, 0.1_R}}[i][j];
@@ -85,9 +89,10 @@ TEST(MarchingCube, Base) {
     };
     Real isoValue = 0.4_R;
 
-    testExtract0(positions, values_OOOO, isoValue);
-    testExtract1_ABBB(positions, values_POOO, isoValue);
-    testExtract1_ABBB(positions, values_OPPP, isoValue);
+    testExtract_AAAA(positions, values_OOOO, isoValue);
+    testExtract_AAAA(positions, values_PPPP, isoValue);
+    testExtract_ABBB(positions, values_POOO, isoValue);
+    testExtract_ABBB(positions, values_OPPP, isoValue);
   }
 }
 
