@@ -12,27 +12,25 @@ TEST(MarchingCube, Base) {
     using MC = MarchingCube<1>;
 
     auto testExtract0 = [&](const auto &positions, const auto &values, Real isoValue) {
-      MC::Extract([&](uint i) { return positions[i]; }, [&](uint i) { return values[i]; }, isoValue,
-                  [&](cuda::std::array<Vec1r, 1>) { EXPECT_FALSE(true); });
+      MC::Extract(positions, values, isoValue, [&](cuda::std::array<Vec1r, 1>) { EXPECT_FALSE(true); });
     };
 
     auto testExtract1 = [&](const auto &positions, const auto &values, Real isoValue) {
       uint times = 0;
-      MC::Extract([&](uint i) { return positions[i]; }, [&](uint i) { return values[i]; }, isoValue,
-                  [&](cuda::std::array<Vec1r, 1> primitiveVertices) {
+      MC::Extract(positions, values, isoValue, [&](cuda::std::array<Vec1r, 1> primitiveVertices) {
         EXPECT_EQ(times, 0);
         ++times;
-        Vec1r p = Lerp(positions[0], positions[1], computeT(values[0], values[1], isoValue));
+        Vec1r p = Lerp(positions(0), positions(1), computeT(values(0), values(1), isoValue));
         EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p.x());
       });
       EXPECT_EQ(times, 1);
     };
 
-    std::array positions = {Vec1r{-2.5_R}, Vec1r{2.5_R}};
-    std::array values0 = {0.1_R, 0.1_R};
-    std::array values1 = {0.8_R, 0.1_R};
-    std::array values2 = {0.1_R, 0.8_R};
-    std::array values3 = {0.8_R, 0.8_R};
+    auto positions = [](uint i) { return std::array{Vec1r{-2.5_R}, Vec1r{2.5_R}}[i]; };
+    auto values0 = [](uint i) { return std::array{0.1_R, 0.1_R}[i]; };
+    auto values1 = [](uint i) { return std::array{0.8_R, 0.1_R}[i]; };
+    auto values2 = [](uint i) { return std::array{0.1_R, 0.8_R}[i]; };
+    auto values3 = [](uint i) { return std::array{0.8_R, 0.8_R}[i]; };
     Real isoValue = 0.4_R;
 
     testExtract0(positions, values0, isoValue);
