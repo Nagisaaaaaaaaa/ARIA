@@ -278,7 +278,7 @@ ARIA_CONST static inline constexpr int8 vtkMarchingSquares_edges[4][2] = {{0, 1}
 //
 //
 template <uint dim>
-[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto MarchingCubesCases() {
+[[nodiscard]] ARIA_HOST_DEVICE static consteval auto MarchingCubesCases() {
   if constexpr (dim == 2)
     return vtkMarchingSquaresLineCases;
   else if constexpr (dim == 3)
@@ -286,7 +286,7 @@ template <uint dim>
 }
 
 template <uint dim>
-[[nodiscard]] ARIA_HOST_DEVICE static constexpr auto MarchingCubes_edges() {
+[[nodiscard]] ARIA_HOST_DEVICE static consteval auto MarchingCubes_edges() {
   if constexpr (dim == 2)
     return vtkMarchingSquares_edges;
   else if constexpr (dim == 3)
@@ -344,9 +344,9 @@ public:
   ARIA_REF_PROP(public, ARIA_HOST_DEVICE, value, value_);
 
 public:
-  [[nodiscard]] Vec<Real, dim> center() const { return coord_.template cast<Real>(); }
+  [[nodiscard]] ARIA_HOST_DEVICE Vec<Real, dim> center() const { return coord_.template cast<Real>(); }
 
-  [[nodiscard]] DualVertex<dim> dualVertex() const {
+  [[nodiscard]] ARIA_HOST_DEVICE DualVertex<dim> dualVertex() const {
     DualVertex<dim> v;
     v.pos() = center();
     v.value() = value();
