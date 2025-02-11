@@ -43,10 +43,10 @@ public:
     if (iCases == 0 || iCases == pow<pow<dim - 1>(2)>(4) - 1)
       return;
 
-    for (const int8_t *edge = MarchingCubesCases<dim>()[iCases]; *edge > -1; edge += dim) {
+    for (const int8_t *edge = marching_cube::detail::MarchingCubesCases<dim>()[iCases]; *edge > -1; edge += dim) {
       cuda::std::array<Vec<Real, dim>, dim> primitiveVertices;
       ForEach<dim>([&](auto i) {
-        const int8_t *vert = MarchingCubesEdges<dim>()[edge[i]];
+        const int8_t *vert = marching_cube::detail::MarchingCubesEdges<dim>()[edge[i]];
         const Vec<Real, dim> p0 = positions[vert[0]];
         const Vec<Real, dim> p1 = positions[vert[1]];
         const Real v0 = values[vert[0]];

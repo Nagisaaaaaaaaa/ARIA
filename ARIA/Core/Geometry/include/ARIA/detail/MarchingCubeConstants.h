@@ -1,6 +1,10 @@
 #pragma once
 
+#include "ARIA/ARIA.h"
+
 namespace ARIA {
+
+namespace marching_cube::detail {
 
 ARIA_CONST static inline constexpr int8 vtkMarchingCubes1DPointCases[4][2] = {{-1, -1}, {0, -1}, {0, -1}, {-1, -1}};
 
@@ -305,5 +309,7 @@ template <uint dim>
   else if constexpr (dim == 3)
     return vtkMarchingCubes3DEdges;
 }
+
+} // namespace marching_cube::detail
 
 } // namespace ARIA
