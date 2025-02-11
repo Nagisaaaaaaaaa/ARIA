@@ -398,7 +398,7 @@ public:
       return;
 
     for (const int8_t *edge = MarchingCubesCases<dim>()[iCases]; *edge > -1; edge += dim) {
-      Vec<Real, dim> primitiveVertices[dim];
+      cuda::std::array<Vec<Real, dim>, dim> primitiveVertices;
       for (int iDim = 0; iDim < dim; iDim++) {
         const int8_t *vert = MarchingCubes_edges<dim>()[edge[iDim]];
         const Vec<Real, dim> p0 = positions[vert[0]];
