@@ -346,7 +346,7 @@ public:
       if (values[i] > isoValue)
         iCases += (1 << i);
     });
-    if (iCases == 0 || iCases == pow<dim - 1>(16) - 1)
+    if (iCases == 0 || iCases == pow<pow<dim - 1>(2)>(4) - 1)
       return;
 
     for (const int8_t *edge = MarchingCubesCases<dim>()[iCases]; *edge > -1; edge += dim) {
