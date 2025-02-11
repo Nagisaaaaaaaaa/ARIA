@@ -301,15 +301,16 @@ template <uint dim>
 //
 //
 // Compute $x^N$ at compile time.
-template <int N, typename T>
-ARIA_HOST_DEVICE static T consteval powN(T x) {
-  static_assert(N >= 0);
-
-  if constexpr (N > 0) {
-    return x * powN<N - 1>(x);
-  } else {
+template <uint n, typename T>
+ARIA_HOST_DEVICE static T constexpr pow(const T &a) {
+  if constexpr (n == 0)
     return 1;
-  }
+
+  T res = pow<n / 2>(a);
+  if constexpr (n % 2)
+    return res * res * a;
+  else
+    return res * res;
 }
 
 //
@@ -337,16 +338,16 @@ public:
     };
     cuda::std::array positions = rearrangeAndLinearize(std::forward<TAccessorPositions>(accessorPositions));
     cuda::std::array values = rearrangeAndLinearize(std::forward<TAccessorValues>(accessorValues));
-    static_assert(std::is_same_v<decltype(positions), cuda::std::array<Vec<Real, dim>, powN<dim>(2)>>,
+    static_assert(std::is_same_v<decltype(positions), cuda::std::array<Vec<Real, dim>, pow<dim>(2)>>,
                   "Invalid accessor of positions");
-    static_assert(std::is_same_v<decltype(values), cuda::std::array<Real, powN<dim>(2)>>, "Invalid accessor of values");
+    static_assert(std::is_same_v<decltype(values), cuda::std::array<Real, pow<dim>(2)>>, "Invalid accessor of values");
 
     uint iCases = 0;
-    ForEach<powN<dim>(2)>([&](auto i) {
+    ForEach<pow<dim>(2)>([&](auto i) {
       if (values[i] > isoValue)
         iCases += (1 << i);
     });
-    if (iCases == 0 || iCases == powN<dim - 1>(16) - 1)
+    if (iCases == 0 || iCases == pow<dim - 1>(16) - 1)
       return;
 
     for (const int8_t *edge = MarchingCubesCases<dim>()[iCases]; *edge > -1; edge += dim) {
