@@ -15,23 +15,6 @@ namespace ARIA {
 
 namespace vdb::detail {
 
-// Compute $x^N$ at compile time.
-template <int N, typename T>
-ARIA_HOST_DEVICE static T consteval powN(T x) {
-  static_assert(N >= 0);
-
-  if constexpr (N > 0) {
-    return x * powN<N - 1>(x);
-  } else {
-    return 1;
-  }
-}
-
-//
-//
-//
-//
-//
 // Fwd.
 template <typename T, auto dim, typename TSpace>
 class VDB;
@@ -164,7 +147,7 @@ protected:
   static constexpr int nCellsPerBlockDim = std::max(512 / (1 << dim), 32);
 
   // Number of cells per block.
-  static constexpr int nCellsPerBlock = vdb::detail::powN<dim>(nCellsPerBlockDim); // = nCellsPerBlockDim^dim
+  static constexpr int nCellsPerBlock = pow<dim>(nCellsPerBlockDim); // = nCellsPerBlockDim^dim
 
   //
   //

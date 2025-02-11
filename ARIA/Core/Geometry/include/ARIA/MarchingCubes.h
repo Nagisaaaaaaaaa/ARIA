@@ -300,24 +300,6 @@ template <uint dim>
 //
 //
 //
-// Compute $x^N$ at compile time.
-template <uint n, typename T>
-ARIA_HOST_DEVICE static T constexpr pow(const T &a) {
-  if constexpr (n == 0)
-    return 1;
-
-  T res = pow<n / 2>(a);
-  if constexpr (n % 2)
-    return res * res * a;
-  else
-    return res * res;
-}
-
-//
-//
-//
-//
-//
 template <uint dim>
 class MarchingCubes {
 public:
