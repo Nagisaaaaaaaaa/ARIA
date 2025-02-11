@@ -21,9 +21,11 @@ TEST(MarchingCube, Base) {
       MC::Extract([&](uint i) { return positions[i]; }, [&](uint i) { return values[i]; }, isoValue,
                   [&](cuda::std::array<Vec1r, 1> primitiveVertices) {
         EXPECT_EQ(times, 0);
+        ++times;
         Vec1r p = Lerp(positions[0], positions[1], computeT(values[0], values[1], isoValue));
         EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p.x());
       });
+      EXPECT_EQ(times, 1);
     };
 
     std::array positions = {Vec1r{-2.5_R}, Vec1r{2.5_R}};
