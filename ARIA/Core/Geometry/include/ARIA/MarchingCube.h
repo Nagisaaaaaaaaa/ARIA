@@ -7,6 +7,24 @@
 
 namespace ARIA {
 
+ARIA_CONST static inline constexpr int8 vtkMarchingLinesLineCases[4][2] = {{-1, -1}, {0, -1}, {0, -1}, {-1, -1}};
+
+ARIA_CONST static inline constexpr int8 vtkMarchingLines_edges[1][2] = {{0, 1}};
+
+//
+//
+//
+ARIA_CONST static inline constexpr int8 vtkMarchingSquaresLineCases[16][5] = {
+    {-1, -1, -1, -1, -1}, {0, 3, -1, -1, -1}, {1, 0, -1, -1, -1}, {1, 3, -1, -1, -1},
+    {2, 1, -1, -1, -1},   {0, 3, 2, 1, -1},   {2, 0, -1, -1, -1}, {2, 3, -1, -1, -1},
+    {3, 2, -1, -1, -1},   {0, 2, -1, -1, -1}, {1, 0, 3, 2, -1},   {1, 2, -1, -1, -1},
+    {3, 1, -1, -1, -1},   {0, 1, -1, -1, -1}, {3, 0, -1, -1, -1}, {-1, -1, -1, -1, -1}};
+
+ARIA_CONST static inline constexpr int8 vtkMarchingSquares_edges[4][2] = {{0, 1}, {1, 3}, {2, 3}, {0, 2}};
+
+//
+//
+//
 ARIA_CONST static inline constexpr int8 vtkMarchingCubesTriangleCases[256][16] = {
     {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},  // 0 0
     {0, 3, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},     // 1 1
@@ -267,14 +285,6 @@ ARIA_CONST static inline constexpr int8 vtkMarchingCubesTriangleCases[256][16] =
 
 ARIA_CONST static inline constexpr int8 vtkMarchingCubes_edges[12][2] = {
     {0, 1}, {1, 2}, {3, 2}, {0, 3}, {4, 5}, {5, 6}, {7, 6}, {4, 7}, {0, 4}, {1, 5}, {3, 7}, {2, 6}};
-
-ARIA_CONST static inline constexpr int8 vtkMarchingSquaresLineCases[16][5] = {
-    {-1, -1, -1, -1, -1}, {0, 3, -1, -1, -1}, {1, 0, -1, -1, -1}, {1, 3, -1, -1, -1},
-    {2, 1, -1, -1, -1},   {0, 3, 2, 1, -1},   {2, 0, -1, -1, -1}, {2, 3, -1, -1, -1},
-    {3, 2, -1, -1, -1},   {0, 2, -1, -1, -1}, {1, 0, 3, 2, -1},   {1, 2, -1, -1, -1},
-    {3, 1, -1, -1, -1},   {0, 1, -1, -1, -1}, {3, 0, -1, -1, -1}, {-1, -1, -1, -1, -1}};
-
-ARIA_CONST static inline constexpr int8 vtkMarchingSquares_edges[4][2] = {{0, 1}, {1, 3}, {2, 3}, {0, 2}};
 
 //
 //
