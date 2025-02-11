@@ -56,11 +56,17 @@ public:
       });
 
       bool success = true;
-      ForEach<dim>([&](auto i) {
-        constexpr int j = (i + 1) % dim;
-        if (primitiveVertices[i] == primitiveVertices[j])
+      if constexpr (dim == 1) {
+      } else if constexpr (dim == 2) {
+        if (primitiveVertices[0] == primitiveVertices[1])
           success = false;
-      });
+      } else if constexpr (dim == 3) {
+        if (primitiveVertices[0] == primitiveVertices[1] || //
+            primitiveVertices[1] == primitiveVertices[2] || //
+            primitiveVertices[2] == primitiveVertices[0])
+          success = false;
+      }
+
       if (!success)
         continue;
 
