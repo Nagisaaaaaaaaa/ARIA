@@ -318,54 +318,6 @@ ARIA_HOST_DEVICE static T consteval powN(T x) {
 //
 //
 template <uint dim>
-class DualVertex {
-public:
-  DualVertex() = default;
-  ARIA_COPY_MOVE_ABILITY(DualVertex, default, default);
-
-public:
-  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, pos, pos_);
-  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, value, value_);
-
-private:
-  Vec<Real, dim> pos_;
-  Real value_;
-};
-
-//
-//
-//
-template <uint dim>
-class Cell {
-public:
-  Cell() = default;
-  ARIA_COPY_MOVE_ABILITY(Cell, default, default);
-
-public:
-  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, coord, coord_);
-  ARIA_REF_PROP(public, ARIA_HOST_DEVICE, value, value_);
-
-public:
-  [[nodiscard]] ARIA_HOST_DEVICE Vec<Real, dim> center() const { return coord_.template cast<Real>(); }
-
-  [[nodiscard]] ARIA_HOST_DEVICE DualVertex<dim> dualVertex() const {
-    DualVertex<dim> v;
-    v.pos() = center();
-    v.value() = value();
-    return v;
-  }
-
-private:
-  Vec<int, dim> coord_;
-  Real value_;
-};
-
-//
-//
-//
-//
-//
-template <uint dim>
 class MarchingCubes {
 public:
   template <typename TAccessorPositions, typename TAccessorValues, typename F>
