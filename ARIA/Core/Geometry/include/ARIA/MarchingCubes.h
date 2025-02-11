@@ -366,27 +366,25 @@ private:
 template <uint dim>
 class MarchingCubes {
 public:
-private:
-  template <typename F>
-  ARIA_HOST_DEVICE static void DoMarchingCubesOn(const auto &CellsZYX, Real isoValue, F &&f) {
-    //! We have our cells in "zyx"-order, but VTK case tables assume
-    //! everthing is in VTK "hexahedron" ordering.
+  template <typename TAccessor, typename F>
+  ARIA_HOST_DEVICE static constexpr void Extract(TAccessor &&accessor, Real isoValue, F &&f) {
+    //! VTK case tables assume everthing is in VTK "hexahedron" ordering.
     //! So, cells are rearranged and converted to dual vertices.
     DualVertex<dim> dualVertices[powN<dim>(2)];
     if constexpr (dim == 2) {
-      dualVertices = {CellsZYX[0][0].dualVertex(), //
-                      CellsZYX[0][1].dualVertex(), //
-                      CellsZYX[1][1].dualVertex(), //
-                      CellsZYX[1][0].dualVertex()};
+      dualVertices = {accessor(0, 0).dualVertex(), //
+                      accessor(1, 0).dualVertex(), //
+                      accessor(1, 1).dualVertex(), //
+                      accessor(0, 1).dualVertex()};
     } else {
-      dualVertices = {CellsZYX[0][0][0].dualVertex(), //
-                      CellsZYX[0][0][1].dualVertex(), //
-                      CellsZYX[0][1][1].dualVertex(), //
-                      CellsZYX[0][1][0].dualVertex(), //
-                      CellsZYX[1][0][0].dualVertex(), //
-                      CellsZYX[1][0][1].dualVertex(), //
-                      CellsZYX[1][1][1].dualVertex(), //
-                      CellsZYX[1][1][0].dualVertex()};
+      dualVertices = {accessor(0, 0, 0).dualVertex(), //
+                      accessor(1, 0, 0).dualVertex(), //
+                      accessor(1, 1, 0).dualVertex(), //
+                      accessor(0, 1, 0).dualVertex(), //
+                      accessor(0, 0, 1).dualVertex(), //
+                      accessor(1, 0, 1).dualVertex(), //
+                      accessor(1, 1, 1).dualVertex(), //
+                      accessor(0, 1, 1).dualVertex()};
     }
 
     int index = 0;
