@@ -121,6 +121,8 @@ TEST(MarchingCube, D1) {
   auto positions3 = [&](uint64 i) { return positions0(i); };
   auto positions4 = [&]<std::integral I>(const I &i) { return positions0(i); };
   auto positions5 = [&]<typename I>(const Tec<I> &c) { return positions0(get<0>(c)); };
+  auto positions6 = [&]<auto i>(C<i>) { return positions0(i); };
+  auto positions7 = [&]<auto i>(Tec<C<i>>) { return positions0(i); };
 
   auto valuesOO = [](uint i) { return arr{0.1_R, 0.1_R}[i]; };
   auto valuesPP = [](uint i) { return arr{0.8_R, 0.8_R}[i]; };
@@ -144,6 +146,8 @@ TEST(MarchingCube, D1) {
   testExtract(positions3);
   testExtract(positions4);
   testExtract(positions5);
+  testExtract(positions6);
+  testExtract(positions7);
 
   Test1D_CUDA();
 }
@@ -291,6 +295,8 @@ TEST(MarchingCube, D2) {
   auto positions3 = [&](uint64 i, uint64 j) { return positions0(i, j); };
   auto positions4 = [&]<std::integral I, std::integral J>(const I &i, const J &j) { return positions0(i, j); };
   auto positions5 = [&]<typename I, typename J>(const Tec<I, J> &c) { return positions0(get<0>(c), get<1>(c)); };
+  auto positions6 = [&]<auto i, auto j>(C<i>, C<j>) { return positions0(i, j); };
+  auto positions7 = [&]<auto i, auto j>(Tec<C<i>, C<j>>) { return positions0(i, j); };
 
   auto values_OOOO = [](uint i, uint j) { return arr{arr{0.1_R, 0.1_R}, arr{0.1_R, 0.1_R}}[i][j]; };
   auto values_PPPP = [](uint i, uint j) { return arr{arr{0.8_R, 0.8_R}, arr{0.8_R, 0.8_R}}[i][j]; };
@@ -350,6 +356,8 @@ TEST(MarchingCube, D2) {
   testExtract(positions3);
   testExtract(positions4);
   testExtract(positions5);
+  testExtract(positions6);
+  testExtract(positions7);
 }
 
 TEST(MarchingCube, D3) {
@@ -596,6 +604,8 @@ TEST(MarchingCube, D3) {
   auto positions5 = [&]<typename I, typename J, typename K>(const Tec<I, J, K> &c) {
     return positions0(get<0>(c), get<1>(c), get<2>(c));
   };
+  auto positions6 = [&]<auto i, auto j, auto k>(C<i>, C<j>, C<k>) { return positions0(i, j, k); };
+  auto positions7 = [&]<auto i, auto j, auto k>(Tec<C<i>, C<j>, C<k>>) { return positions0(i, j, k); };
 
   auto values_OOOO = [](uint i, uint j, uint k) { return arr{arr{0.1_R, 0.1_R}, arr{0.1_R, 0.1_R}}[i][j]; };
   auto values_PPPP = [](uint i, uint j, uint k) { return arr{arr{0.8_R, 0.8_R}, arr{0.8_R, 0.8_R}}[i][j]; };
@@ -655,6 +665,8 @@ TEST(MarchingCube, D3) {
   testExtract(positions3);
   testExtract(positions4);
   testExtract(positions5);
+  testExtract(positions6);
+  testExtract(positions7);
 }
 
 } // namespace ARIA
