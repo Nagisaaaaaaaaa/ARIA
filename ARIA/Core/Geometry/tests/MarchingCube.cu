@@ -270,7 +270,7 @@ TEST(MarchingCube, D2) {
 TEST(MarchingCube, D3) {
   using MC = MarchingCube<3>;
 
-  auto extractAndGatherVertices = [](const auto &positions, const auto &values, Real isoValue) {
+  auto extractAndGatherVertices_2Triangles = [](const auto &positions, const auto &values, Real isoValue) {
     uint times = 0;
     std::vector<Vec3r> vertices;
     MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec3r, 3> &primitiveVertices) {
@@ -291,7 +291,7 @@ TEST(MarchingCube, D3) {
   };
 
   auto testExtract_BAAA = [&](const auto &positions, const auto &values, Real isoValue) {
-    std::vector vertices = extractAndGatherVertices(positions, values, isoValue);
+    std::vector vertices = extractAndGatherVertices_2Triangles(positions, values, isoValue);
 
     Vec3r p_000_100 =
         Lerp(positions(0, 0, 0), positions(1, 0, 0), ComputeT(values(0, 0, 0), values(1, 0, 0), isoValue));
@@ -311,7 +311,7 @@ TEST(MarchingCube, D3) {
   };
 
   auto testExtract_ABAA = [&](const auto &positions, const auto &values, Real isoValue) {
-    std::vector vertices = extractAndGatherVertices(positions, values, isoValue);
+    std::vector vertices = extractAndGatherVertices_2Triangles(positions, values, isoValue);
 
     Vec3r p_000_010 =
         Lerp(positions(0, 0, 0), positions(0, 1, 0), ComputeT(values(0, 0, 0), values(0, 1, 0), isoValue));
