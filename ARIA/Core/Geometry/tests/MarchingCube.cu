@@ -50,14 +50,18 @@ TEST(MarchingCube, D1) {
   };
 
   auto positions = [](uint i) { return arr{Vec1r{-2.5_R}, Vec1r{2.5_R}}[i]; };
+
   auto valuesOO = [](uint i) { return arr{0.1_R, 0.1_R}[i]; };
+  auto valuesPP = [](uint i) { return arr{0.8_R, 0.8_R}[i]; };
+
   auto valuesPO = [](uint i) { return arr{0.8_R, 0.1_R}[i]; };
   auto valuesOP = [](uint i) { return arr{0.1_R, 0.8_R}[i]; };
-  auto valuesPP = [](uint i) { return arr{0.8_R, 0.8_R}[i]; };
+
   Real isoValue = 0.4_R;
 
   testExtract_AA(positions, valuesOO, isoValue);
   testExtract_AA(positions, valuesPP, isoValue);
+
   testExtract_BA(positions, valuesPO, isoValue);
   testExtract_BA(positions, valuesOP, isoValue);
 }
