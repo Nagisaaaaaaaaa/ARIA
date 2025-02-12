@@ -19,12 +19,33 @@ public:
     //! So, cells are rearranged and linearized into arrays.
     auto rearrangeAndLinearize = []<typename TAccessor>(TAccessor &&accessor) {
       if constexpr (dim == 1) {
+        auto access = [&](uint i) {
+          if constexpr (is_invocable_with_brackets_v<decltype(accessor), uint> ||
+                        std::is_invocable_v<decltype(accessor), uint>)
+            invoke_with_brackets_or_parentheses(accessor, i);
+          else
+            invoke_with_brackets_or_parentheses(accessor, Tup{i});
+        };
         using T = decltype(Auto(access(0)));
         return cuda::std::array<T, 2>{access(0), access(1)};
       } else if constexpr (dim == 2) {
+        auto access = [&](uint i, uint j) {
+          if constexpr (is_invocable_with_brackets_v<decltype(accessor), uint, uint> ||
+                        std::is_invocable_v<decltype(accessor), uint, uint>)
+            invoke_with_brackets_or_parentheses(accessor, i, j);
+          else
+            invoke_with_brackets_or_parentheses(accessor, Tup{i, j});
+        };
         using T = decltype(Auto(access(0, 0)));
         return cuda::std::array<T, 4>{access(0, 0), access(1, 0), access(1, 1), access(0, 1)};
       } else if constexpr (dim == 3) {
+        auto access = [&](uint i, uint j, uint k) {
+          if constexpr (is_invocable_with_brackets_v<decltype(accessor), uint, uint, uint> ||
+                        std::is_invocable_v<decltype(accessor), uint, uint, uint>)
+            invoke_with_brackets_or_parentheses(accessor, i, j, k);
+          else
+            invoke_with_brackets_or_parentheses(accessor, Tup{i, j, k});
+        };
         using T = decltype(Auto(access(0, 0, 0)));
         return cuda::std::array<T, 8>{access(0, 0, 0), access(1, 0, 0), access(1, 1, 0), access(0, 1, 0), //
                                       access(0, 0, 1), access(1, 0, 1), access(1, 1, 1), access(0, 1, 1)};
