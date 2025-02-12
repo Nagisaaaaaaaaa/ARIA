@@ -19,7 +19,7 @@ public:
     //! So, cells are rearranged and linearized into arrays.
     auto rearrangeAndLinearize = []<typename TAccessor>(TAccessor &&accessor) {
       if constexpr (dim == 1) {
-        using T = decltype(Auto(accessor(0)));
+        using T = decltype(Auto(access(0)));
         return cuda::std::array<T, 2>{access(0), access(1)};
       } else if constexpr (dim == 2) {
         using T = decltype(Auto(access(0, 0)));
