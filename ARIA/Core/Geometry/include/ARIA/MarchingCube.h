@@ -24,11 +24,14 @@ public:
     //! we will try and invoke the accessors with difference kinds of parameters.
     auto rearrangeAndLinearize = []<typename TAccessor>(TAccessor &&accessor) {
       if constexpr (dim == 1) {
+        //! `int8` is used here because it can be implicitly converted to `int`, `uint`, ...
         auto access = [&](int8 i) {
           if constexpr (is_invocable_with_brackets_v<decltype(accessor), int8> ||
                         std::is_invocable_v<decltype(accessor), int8>)
+            // Try `accessor[0]` and `accessor(0)`.
             return invoke_with_brackets_or_parentheses(accessor, i);
           else
+            // Try `accessor[Tup{0}]` and `accessor(Tup{0})`.
             return invoke_with_brackets_or_parentheses(accessor, Tup{i});
         };
         using T = decltype(Auto(access(0)));
