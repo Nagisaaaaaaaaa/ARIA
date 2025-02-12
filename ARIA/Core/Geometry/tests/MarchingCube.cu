@@ -42,9 +42,9 @@ TEST(MarchingCube, D1) {
     uint times = 0;
     MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec1r, 1> &primitiveVertices) {
       EXPECT_EQ(times, 0);
-      ++times;
       Vec1r p = Lerp(positions(0), positions(1), ComputeT(values(0), values(1), isoValue));
       ExpectEq(primitiveVertices[0], p);
+      ++times;
     });
     EXPECT_EQ(times, 1);
   };
@@ -77,12 +77,12 @@ TEST(MarchingCube, D2) {
     uint times = 0;
     MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
       EXPECT_EQ(times, 0);
-      ++times;
       SortPrimitiveVertices(primitiveVertices);
       Vec2r p_00_10 = Lerp(positions(0, 0), positions(1, 0), ComputeT(values(0, 0), values(1, 0), isoValue));
       Vec2r p_00_01 = Lerp(positions(0, 0), positions(0, 1), ComputeT(values(0, 0), values(0, 1), isoValue));
       ExpectEq(primitiveVertices[0], p_00_10);
       ExpectEq(primitiveVertices[1], p_00_01);
+      ++times;
     });
     EXPECT_EQ(times, 1);
   };
@@ -91,12 +91,12 @@ TEST(MarchingCube, D2) {
     uint times = 0;
     MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
       EXPECT_EQ(times, 0);
-      ++times;
       SortPrimitiveVertices(primitiveVertices);
       Vec2r p_00_01 = Lerp(positions(0, 0), positions(0, 1), ComputeT(values(0, 0), values(0, 1), isoValue));
       Vec2r p_01_11 = Lerp(positions(0, 1), positions(1, 1), ComputeT(values(0, 1), values(1, 1), isoValue));
       ExpectEq(primitiveVertices[0], p_00_01);
       ExpectEq(primitiveVertices[1], p_01_11);
+      ++times;
     });
     EXPECT_EQ(times, 1);
   };
@@ -105,12 +105,12 @@ TEST(MarchingCube, D2) {
     uint times = 0;
     MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
       EXPECT_EQ(times, 0);
-      ++times;
       SortPrimitiveVertices(primitiveVertices);
       Vec2r p_00_10 = Lerp(positions(0, 0), positions(1, 0), ComputeT(values(0, 0), values(1, 0), isoValue));
       Vec2r p_10_11 = Lerp(positions(1, 0), positions(1, 1), ComputeT(values(1, 0), values(1, 1), isoValue));
       ExpectEq(primitiveVertices[0], p_00_10);
       ExpectEq(primitiveVertices[1], p_10_11);
+      ++times;
     });
     EXPECT_EQ(times, 1);
   };
@@ -119,12 +119,12 @@ TEST(MarchingCube, D2) {
     uint times = 0;
     MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
       EXPECT_EQ(times, 0);
-      ++times;
       SortPrimitiveVertices(primitiveVertices);
       Vec2r p_10_11 = Lerp(positions(1, 0), positions(1, 1), ComputeT(values(1, 0), values(1, 1), isoValue));
       Vec2r p_01_11 = Lerp(positions(0, 1), positions(1, 1), ComputeT(values(0, 1), values(1, 1), isoValue));
       ExpectEq(primitiveVertices[0], p_10_11);
       ExpectEq(primitiveVertices[1], p_01_11);
+      ++times;
     });
     EXPECT_EQ(times, 1);
   };
@@ -133,12 +133,12 @@ TEST(MarchingCube, D2) {
     uint times = 0;
     MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
       EXPECT_EQ(times, 0);
-      ++times;
       SortPrimitiveVertices(primitiveVertices);
       Vec2r p_00_10 = Lerp(positions(0, 0), positions(1, 0), ComputeT(values(0, 0), values(1, 0), isoValue));
       Vec2r p_01_11 = Lerp(positions(0, 1), positions(1, 1), ComputeT(values(0, 1), values(1, 1), isoValue));
       ExpectEq(primitiveVertices[0], p_00_10);
       ExpectEq(primitiveVertices[1], p_01_11);
+      ++times;
     });
     EXPECT_EQ(times, 1);
   };
@@ -147,12 +147,12 @@ TEST(MarchingCube, D2) {
     uint times = 0;
     MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
       EXPECT_EQ(times, 0);
-      ++times;
       SortPrimitiveVertices(primitiveVertices);
       Vec2r p_00_01 = Lerp(positions(0, 0), positions(0, 1), ComputeT(values(0, 0), values(0, 1), isoValue));
       Vec2r p_10_11 = Lerp(positions(1, 0), positions(1, 1), ComputeT(values(1, 0), values(1, 1), isoValue));
       ExpectEq(primitiveVertices[0], p_00_01);
       ExpectEq(primitiveVertices[1], p_10_11);
+      ++times;
     });
     EXPECT_EQ(times, 1);
   };
