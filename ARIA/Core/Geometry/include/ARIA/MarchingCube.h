@@ -83,7 +83,7 @@ public:
         const VecDr p1 = positions[vert[1]];
         const Real v0 = values[vert[0]];
         const Real v1 = values[vert[1]];
-        const float t = (isoValue - v0) / (v1 - v0);
+        const Real t = (isoValue - v0) / (v1 - v0);
         primitiveVertices[i] = Lerp(p0, p1, t);
       });
 
@@ -102,6 +102,7 @@ public:
       if (!success)
         continue;
 
+      // Calls `f` with the primitive vertices.
       f(primitiveVertices);
     }
   }
