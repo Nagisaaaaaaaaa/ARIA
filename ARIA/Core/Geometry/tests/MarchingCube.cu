@@ -270,11 +270,7 @@ TEST(MarchingCube, D2) {
 TEST(MarchingCube, D3) {
   using MC = MarchingCube<3>;
 
-  auto testExtract_AAAA = [&](const auto &positions, const auto &values, Real isoValue) {
-    MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec3r, 3> &) { EXPECT_FALSE(true); });
-  };
-
-  auto testExtract_BAAA = [&](const auto &positions, const auto &values, Real isoValue) {
+  auto extractAndGatherVertices = [](const auto &positions, const auto &values, Real isoValue) {
     uint times = 0;
     std::vector<Vec3r> vertices;
     MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec3r, 3> &primitiveVertices) {
@@ -286,6 +282,16 @@ TEST(MarchingCube, D3) {
     });
     EXPECT_EQ(vertices.size(), 6);
     SortPrimitiveVertices(vertices);
+    EXPECT_EQ(times, 2);
+    return vertices;
+  };
+
+  auto testExtract_AAAA = [&](const auto &positions, const auto &values, Real isoValue) {
+    MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec3r, 3> &) { EXPECT_FALSE(true); });
+  };
+
+  auto testExtract_BAAA = [&](const auto &positions, const auto &values, Real isoValue) {
+    std::vector vertices = extractAndGatherVertices(positions, values, isoValue);
 
     Vec3r p_000_100 =
         Lerp(positions(0, 0, 0), positions(1, 0, 0), ComputeT(values(0, 0, 0), values(1, 0, 0), isoValue));
@@ -305,17 +311,7 @@ TEST(MarchingCube, D3) {
   };
 
   auto testExtract_ABAA = [&](const auto &positions, const auto &values, Real isoValue) {
-    uint times = 0;
-    std::vector<Vec3r> vertices;
-    MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec3r, 3> &primitiveVertices) {
-      EXPECT_TRUE(times == 0 || times == 1);
-      vertices.emplace_back(primitiveVertices[0]);
-      vertices.emplace_back(primitiveVertices[1]);
-      vertices.emplace_back(primitiveVertices[2]);
-      ++times;
-    });
-    EXPECT_EQ(vertices.size(), 6);
-    SortPrimitiveVertices(vertices);
+    std::vector vertices = extractAndGatherVertices(positions, values, isoValue);
 
     Vec3r p_000_010 =
         Lerp(positions(0, 0, 0), positions(0, 1, 0), ComputeT(values(0, 0, 0), values(0, 1, 0), isoValue));
