@@ -34,6 +34,7 @@ public:
             // Try `accessor[Tup{0}]` and `accessor(Tup{0})`.
             return invoke_with_brackets_or_parentheses(accessor, Tup{i});
         };
+        // Rearrange and linearize into a `cuda::std::array`.
         using T = decltype(Auto(access(0)));
         return cuda::std::array<T, 2>{access(0), access(1)};
       } else if constexpr (dim == 2) {
