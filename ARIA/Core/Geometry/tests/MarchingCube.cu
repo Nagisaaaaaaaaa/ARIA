@@ -304,6 +304,36 @@ TEST(MarchingCube, D3) {
     ExpectEq(vertices[5], p_001_011);
   };
 
+  auto testExtract_ABAA = [&](const auto &positions, const auto &values, Real isoValue) {
+    uint times = 0;
+    std::vector<Vec3r> vertices;
+    MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec3r, 3> &primitiveVertices) {
+      EXPECT_TRUE(times == 0 || times == 1);
+      vertices.emplace_back(primitiveVertices[0]);
+      vertices.emplace_back(primitiveVertices[1]);
+      vertices.emplace_back(primitiveVertices[2]);
+      ++times;
+    });
+    EXPECT_EQ(vertices.size(), 6);
+    SortPrimitiveVertices(vertices);
+
+    Vec3r p_000_010 =
+        Lerp(positions(0, 0, 0), positions(0, 1, 0), ComputeT(values(0, 0, 0), values(0, 1, 0), isoValue));
+    Vec3r p_010_110 =
+        Lerp(positions(0, 1, 0), positions(1, 1, 0), ComputeT(values(0, 1, 0), values(1, 1, 0), isoValue));
+    Vec3r p_001_011 =
+        Lerp(positions(0, 0, 1), positions(0, 1, 1), ComputeT(values(0, 0, 1), values(0, 1, 1), isoValue));
+    Vec3r p_011_111 =
+        Lerp(positions(0, 1, 1), positions(1, 1, 1), ComputeT(values(0, 1, 1), values(1, 1, 1), isoValue));
+
+    ExpectEq(vertices[0], p_000_010);
+    ExpectEq(vertices[1], p_010_110);
+    ExpectEq(vertices[2], p_010_110);
+    ExpectEq(vertices[3], p_001_011);
+    ExpectEq(vertices[4], p_001_011);
+    ExpectEq(vertices[5], p_011_111);
+  };
+
   auto positions = [](uint i, uint j, uint k) {
     return Vec3r{
         i == 0 ? -0.25_R : 3.75_R,
@@ -343,6 +373,9 @@ TEST(MarchingCube, D3) {
 
   testExtract_BAAA(positions, values_POOO, isoValue);
   testExtract_BAAA(positions, values_OPPP, isoValue);
+
+  testExtract_ABAA(positions, values_OPOO, isoValue);
+  testExtract_ABAA(positions, values_POPP, isoValue);
 }
 
 } // namespace ARIA
