@@ -20,6 +20,12 @@ static inline void SortPrimitiveVertices(const cuda::std::span<Vec2r, 2> &primit
                     [](const Vec2r &a, const Vec2r &b) { return a.y() < b.y() || (a.y() == b.y() && a.x() < b.x()); });
 };
 
+static inline void SortPrimitiveVertices(const cuda::std::span<Vec3r> &primitiveVertices) {
+  std::ranges::sort(primitiveVertices, [](const Vec3r &a, const Vec3r &b) {
+    return a.z() < b.z() || (a.z() == b.z() && (a.y() < b.y() || (a.y() == b.y() && a.x() < b.x())));
+  });
+};
+
 static inline void ExpectEq(const Vec1r &a, const Vec1r &b) {
   EXPECT_FLOAT_EQ(a.x(), b.x());
 }
@@ -27,6 +33,12 @@ static inline void ExpectEq(const Vec1r &a, const Vec1r &b) {
 static inline void ExpectEq(const Vec2r &a, const Vec2r &b) {
   EXPECT_FLOAT_EQ(a.x(), b.x());
   EXPECT_FLOAT_EQ(a.y(), b.y());
+}
+
+static inline void ExpectEq(const Vec3r &a, const Vec3r &b) {
+  EXPECT_FLOAT_EQ(a.x(), b.x());
+  EXPECT_FLOAT_EQ(a.y(), b.y());
+  EXPECT_FLOAT_EQ(a.z(), b.z());
 }
 
 } // namespace
@@ -262,6 +274,36 @@ TEST(MarchingCube, D3) {
     MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec3r, 3> &) { EXPECT_FALSE(true); });
   };
 
+  auto testExtract_POOO = [&](const auto &positions, const auto &values, Real isoValue) {
+    uint times = 0;
+    std::vector<Vec3r> vertices;
+    MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec3r, 3> &primitiveVertices) {
+      EXPECT_TRUE(times == 0 || times == 1);
+      vertices.emplace_back(primitiveVertices[0]);
+      vertices.emplace_back(primitiveVertices[1]);
+      vertices.emplace_back(primitiveVertices[2]);
+      ++times;
+    });
+    EXPECT_EQ(vertices.size(), 6);
+    SortPrimitiveVertices(vertices);
+
+    Vec3r p_000_100 =
+        Lerp(positions(0, 0, 0), positions(1, 0, 0), ComputeT(values(0, 0, 0), values(1, 0, 0), isoValue));
+    Vec3r p_000_010 =
+        Lerp(positions(0, 0, 0), positions(0, 1, 0), ComputeT(values(0, 0, 0), values(0, 1, 0), isoValue));
+    Vec3r p_001_101 =
+        Lerp(positions(0, 0, 1), positions(1, 0, 1), ComputeT(values(0, 0, 1), values(1, 0, 1), isoValue));
+    Vec3r p_001_011 =
+        Lerp(positions(0, 0, 1), positions(0, 1, 1), ComputeT(values(0, 0, 1), values(0, 1, 1), isoValue));
+
+    ExpectEq(vertices[0], p_000_100);
+    ExpectEq(vertices[1], p_000_010);
+    ExpectEq(vertices[2], p_000_010);
+    ExpectEq(vertices[3], p_001_101);
+    ExpectEq(vertices[4], p_001_101);
+    ExpectEq(vertices[5], p_001_011);
+  };
+
   auto positions = [](uint i, uint j, uint k) {
     return Vec3r{
         i == 0 ? -0.25_R : 3.75_R,
@@ -298,6 +340,8 @@ TEST(MarchingCube, D3) {
 
   testExtract_AAAA(positions, values_OOOO, isoValue);
   testExtract_AAAA(positions, values_PPPP, isoValue);
+
+  testExtract_POOO(positions, values_POOO, isoValue);
 }
 
 } // namespace ARIA
