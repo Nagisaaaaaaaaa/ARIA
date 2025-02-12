@@ -602,4 +602,54 @@ TEST(MarchingCube, D3) {
   testExtract(positions5);
 }
 
+TEST(MarchingCube, D1Degenerated) {
+  using MC = MarchingCube<1>;
+
+  auto positions0 = [](int i) { return arr{Vec1r{-2.5_R}, Vec1r{-2.5_R}}[i]; };
+
+  auto testExtract_AA = [&](const auto &positions, const auto &values, Real isoValue) {
+    MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec1r, 1> &) { EXPECT_FALSE(true); });
+  };
+
+  auto testExtract_BA = [&](const auto &positions, const auto &values, Real isoValue) {
+    uint times = 0;
+    MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec1r, 1> &primitiveVertices) {
+      EXPECT_EQ(times, 0);
+      Vec1r p = Lerp(positions0(0), positions0(1), ComputeT(values(0), values(1), isoValue));
+      ExpectEq(primitiveVertices[0], p);
+      ++times;
+    });
+    EXPECT_EQ(times, 1);
+  };
+
+  auto positions1 = [&](uint i) { return positions0(i); };
+  auto positions2 = [&](int64 i) { return positions0(i); };
+  auto positions3 = [&](uint64 i) { return positions0(i); };
+  auto positions4 = [&]<std::integral I>(const I &i) { return positions0(i); };
+  auto positions5 = [&]<typename I>(const Tec<I> &c) { return positions0(get<0>(c)); };
+
+  auto valuesOO = [](uint i) { return arr{0.1_R, 0.1_R}[i]; };
+  auto valuesPP = [](uint i) { return arr{0.8_R, 0.8_R}[i]; };
+
+  auto valuesPO = [](uint i) { return arr{0.8_R, 0.1_R}[i]; };
+  auto valuesOP = [](uint i) { return arr{0.1_R, 0.8_R}[i]; };
+
+  Real isoValue = 0.4_R;
+
+  auto testExtract = [&](const auto &positions) {
+    testExtract_AA(positions, valuesOO, isoValue);
+    testExtract_AA(positions, valuesPP, isoValue);
+
+    testExtract_BA(positions, valuesPO, isoValue);
+    testExtract_BA(positions, valuesOP, isoValue);
+  };
+
+  testExtract(positions0);
+  testExtract(positions1);
+  testExtract(positions2);
+  testExtract(positions3);
+  testExtract(positions4);
+  testExtract(positions5);
+}
+
 } // namespace ARIA
