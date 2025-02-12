@@ -15,6 +15,11 @@ ARIA_HOST_DEVICE static inline Real ComputeT(Real v0, Real v1, Real isoValue) {
   return (isoValue - v0) / (v1 - v0);
 }
 
+ARIA_HOST_DEVICE static inline void SortPrimitiveVertices(const cuda::std::span<Vec2r, 2> &primitiveVertices) {
+  std::ranges::sort(primitiveVertices,
+                    [](const Vec2r &a, const Vec2r &b) { return a.y() < b.y() || (a.y() == b.y() && a.x() < b.x()); });
+};
+
 } // namespace
 
 TEST(MarchingCube, Base) {
@@ -54,12 +59,6 @@ TEST(MarchingCube, Base) {
   {
     using MC = MarchingCube<2>;
 
-    auto sortPrimitiveVertices = [](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
-      std::ranges::sort(primitiveVertices, [](const Vec2r &a, const Vec2r &b) {
-        return a.y() < b.y() || (a.y() == b.y() && a.x() < b.x());
-      });
-    };
-
     auto testExtract_AAAA = [&](const auto &positions, const auto &values, Real isoValue) {
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &) { EXPECT_FALSE(true); });
     };
@@ -69,7 +68,7 @@ TEST(MarchingCube, Base) {
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
         EXPECT_EQ(times, 0);
         ++times;
-        sortPrimitiveVertices(primitiveVertices);
+        SortPrimitiveVertices(primitiveVertices);
         Vec2r p_00_10 = Lerp(positions(0, 0), positions(1, 0), ComputeT(values(0, 0), values(1, 0), isoValue));
         Vec2r p_00_01 = Lerp(positions(0, 0), positions(0, 1), ComputeT(values(0, 0), values(0, 1), isoValue));
         EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_00_10.x());
@@ -85,7 +84,7 @@ TEST(MarchingCube, Base) {
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
         EXPECT_EQ(times, 0);
         ++times;
-        sortPrimitiveVertices(primitiveVertices);
+        SortPrimitiveVertices(primitiveVertices);
         Vec2r p_00_01 = Lerp(positions(0, 0), positions(0, 1), ComputeT(values(0, 0), values(0, 1), isoValue));
         Vec2r p_01_11 = Lerp(positions(0, 1), positions(1, 1), ComputeT(values(0, 1), values(1, 1), isoValue));
         EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_00_01.x());
@@ -101,7 +100,7 @@ TEST(MarchingCube, Base) {
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
         EXPECT_EQ(times, 0);
         ++times;
-        sortPrimitiveVertices(primitiveVertices);
+        SortPrimitiveVertices(primitiveVertices);
         Vec2r p_00_10 = Lerp(positions(0, 0), positions(1, 0), ComputeT(values(0, 0), values(1, 0), isoValue));
         Vec2r p_10_11 = Lerp(positions(1, 0), positions(1, 1), ComputeT(values(1, 0), values(1, 1), isoValue));
         EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_00_10.x());
@@ -117,7 +116,7 @@ TEST(MarchingCube, Base) {
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
         EXPECT_EQ(times, 0);
         ++times;
-        sortPrimitiveVertices(primitiveVertices);
+        SortPrimitiveVertices(primitiveVertices);
         Vec2r p_10_11 = Lerp(positions(1, 0), positions(1, 1), ComputeT(values(1, 0), values(1, 1), isoValue));
         Vec2r p_01_11 = Lerp(positions(0, 1), positions(1, 1), ComputeT(values(0, 1), values(1, 1), isoValue));
         EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_10_11.x());
@@ -133,7 +132,7 @@ TEST(MarchingCube, Base) {
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
         EXPECT_EQ(times, 0);
         ++times;
-        sortPrimitiveVertices(primitiveVertices);
+        SortPrimitiveVertices(primitiveVertices);
         Vec2r p_00_10 = Lerp(positions(0, 0), positions(1, 0), ComputeT(values(0, 0), values(1, 0), isoValue));
         Vec2r p_01_11 = Lerp(positions(0, 1), positions(1, 1), ComputeT(values(0, 1), values(1, 1), isoValue));
         EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_00_10.x());
@@ -149,7 +148,7 @@ TEST(MarchingCube, Base) {
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
         EXPECT_EQ(times, 0);
         ++times;
-        sortPrimitiveVertices(primitiveVertices);
+        SortPrimitiveVertices(primitiveVertices);
         Vec2r p_00_01 = Lerp(positions(0, 0), positions(0, 1), ComputeT(values(0, 0), values(0, 1), isoValue));
         Vec2r p_10_11 = Lerp(positions(1, 0), positions(1, 1), ComputeT(values(1, 0), values(1, 1), isoValue));
         EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_00_01.x());
@@ -164,7 +163,7 @@ TEST(MarchingCube, Base) {
       uint times = 0;
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
         EXPECT_TRUE(times == 0 || times == 1);
-        sortPrimitiveVertices(primitiveVertices);
+        SortPrimitiveVertices(primitiveVertices);
         if (times == 0) {
           Vec2r p_00_10 = Lerp(positions(0, 0), positions(1, 0), ComputeT(values(0, 0), values(1, 0), isoValue));
           Vec2r p_00_01 = Lerp(positions(0, 0), positions(0, 1), ComputeT(values(0, 0), values(0, 1), isoValue));
@@ -189,7 +188,7 @@ TEST(MarchingCube, Base) {
       uint times = 0;
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
         EXPECT_TRUE(times == 0 || times == 1);
-        sortPrimitiveVertices(primitiveVertices);
+        SortPrimitiveVertices(primitiveVertices);
         if (times == 0) {
           Vec2r p_00_10 = Lerp(positions(0, 0), positions(1, 0), ComputeT(values(0, 0), values(1, 0), isoValue));
           Vec2r p_10_11 = Lerp(positions(1, 0), positions(1, 1), ComputeT(values(1, 0), values(1, 1), isoValue));
