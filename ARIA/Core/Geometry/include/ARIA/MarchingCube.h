@@ -76,9 +76,12 @@ public:
     //! In order to support various accessors such as `accessor(0, 1)` and `accessor(Tup{0, 1})`,
     //! we will try and invoke the accessors with difference kinds of parameters.
     auto rearrangeAndLinearize = []<typename TAccessor>(TAccessor &&accessor) {
+      //! `int8` is used here because it can be implicitly converted to `int`, `uint`, ...
+      constexpr C<int8{0}> _0;
+      constexpr C<int8{1}> _1;
+
       if constexpr (dim == 1) {
-        //! `int8` is used here because it can be implicitly converted to `int`, `uint`, ...
-        auto access = [&](int8 i) {
+        auto access = [&]<int8 i>(C<i>) {
           if constexpr (is_invocable_with_brackets_v<decltype(accessor), int8> ||
                         std::is_invocable_v<decltype(accessor), int8>)
             // Try `accessor[0]` and `accessor(0)`.
@@ -88,29 +91,29 @@ public:
             return invoke_with_brackets_or_parentheses(accessor, Tup{i});
         };
         // Rearrange and linearize into a `cuda::std::array`.
-        using T = decltype(Auto(access(0)));
-        return cuda::std::array<T, 2>{access(0), access(1)};
+        using T = decltype(Auto(access(_0)));
+        return cuda::std::array<T, 2>{access(_0), access(_1)};
       } else if constexpr (dim == 2) {
-        auto access = [&](int8 i, int8 j) {
+        auto access = [&]<int8 i, int8 j>(C<i>, C<j>) {
           if constexpr (is_invocable_with_brackets_v<decltype(accessor), int8, int8> ||
                         std::is_invocable_v<decltype(accessor), int8, int8>)
             return invoke_with_brackets_or_parentheses(accessor, i, j);
           else
             return invoke_with_brackets_or_parentheses(accessor, Tup{i, j});
         };
-        using T = decltype(Auto(access(0, 0)));
-        return cuda::std::array<T, 4>{access(0, 0), access(1, 0), access(1, 1), access(0, 1)};
+        using T = decltype(Auto(access(_0, _0)));
+        return cuda::std::array<T, 4>{access(_0, _0), access(_1, _0), access(_1, _1), access(_0, _1)};
       } else if constexpr (dim == 3) {
-        auto access = [&](int8 i, int8 j, int8 k) {
+        auto access = [&]<int8 i, int8 j, int8 k>(C<i>, C<j>, C<k>) {
           if constexpr (is_invocable_with_brackets_v<decltype(accessor), int8, int8, int8> ||
                         std::is_invocable_v<decltype(accessor), int8, int8, int8>)
             return invoke_with_brackets_or_parentheses(accessor, i, j, k);
           else
             return invoke_with_brackets_or_parentheses(accessor, Tup{i, j, k});
         };
-        using T = decltype(Auto(access(0, 0, 0)));
-        return cuda::std::array<T, 8>{access(0, 0, 0), access(1, 0, 0), access(1, 1, 0), access(0, 1, 0), //
-                                      access(0, 0, 1), access(1, 0, 1), access(1, 1, 1), access(0, 1, 1)};
+        using T = decltype(Auto(access(_0, _0, _0)));
+        return cuda::std::array<T, 8>{access(_0, _0, _0), access(_1, _0, _0), access(_1, _1, _0), access(_0, _1, _0), //
+                                      access(_0, _0, _1), access(_1, _0, _1), access(_1, _1, _1), access(_0, _1, _1)};
       }
     };
     cuda::std::array positions = rearrangeAndLinearize(std::forward<TAccessorPositions>(accessorPositions));
