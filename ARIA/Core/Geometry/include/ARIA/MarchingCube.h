@@ -37,6 +37,30 @@ namespace ARIA {
 /// See https://en.wikipedia.org/wiki/Marching_cubes.
 ///
 /// \tparam dim Dimension of the system.
+///
+/// \example ```cpp
+/// using MC = MarchingCube<2>; // This example is in 2D.
+///
+/// // The positions of the 4 dual vertices, that is, the 4 vertices of the input square.
+/// // `positions` will only be invoked with `(0, 0)`, `(1, 0)`, `(0, 1)` and `(1, 1)`.
+/// auto positions = [&](uint x, uint y) -> Vec2r { ... };
+/// // The values of the 4 dual vertices.
+/// // `values` will only be invoked with `(0, 0)`, `(1, 0)`, `(0, 1)` and `(1, 1)`.
+/// auto values = [&](uint x, uint y) -> Real { ... };
+/// // For `positions` and `values`, the parameter type can also be
+/// // `Tup<uint, uint>` instead of `uint, uint`, or something else.
+/// Real isoValue = 0.5_R;
+///
+/// // Extract line segments from the 4 dual vertices with the given iso-value.
+/// // We will get 0, 1, or 2 line segments.
+/// MC::Extract(positions, values, isoValue, [](cuda::std::span<Vec2r, 2> vertices) {
+///   // Get a line segment with endpoints `v0` and `v1`.
+///   // For cases where there are multiple line segments,
+///   // this lambda function will be called multiple times.
+///   Vec2r v0 = vertices[0];
+///   Vec2r v1 = vertices[1];
+/// });
+/// ```
 template <uint dim>
 class MarchingCube {
 public:
