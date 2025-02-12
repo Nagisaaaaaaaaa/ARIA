@@ -15,8 +15,13 @@ public:
   template <typename TAccessorPositions, typename TAccessorValues, typename F>
   ARIA_HOST_DEVICE static constexpr void
   Extract(TAccessorPositions &&accessorPositions, TAccessorValues &&accessorValues, Real isoValue, F &&f) {
-    //! VTK case tables assume everthing is in VTK "hexahedron" ordering.
-    //! So, cells are rearranged and linearized into arrays.
+    //! The implementation is mainly based on https://github.com/ingowald/cudaAmrIsoSurfaceExtraction.
+    //! It is recommended to read the paper before continue.
+
+    // VTK case tables assume everything is in VTK "hexahedron" ordering.
+    // So, dual cells are rearranged and linearized into arrays.
+    //! In order to support various accessors such as `accessor(0, 1)` and `accessor(Tup{0, 1})`,
+    //! we will try and invoke the accessors with difference kinds of parameters.
     auto rearrangeAndLinearize = []<typename TAccessor>(TAccessor &&accessor) {
       if constexpr (dim == 1) {
         auto access = [&](int8 i) {
