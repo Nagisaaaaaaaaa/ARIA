@@ -38,7 +38,7 @@ TEST(MarchingCube, D1) {
     MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec1r, 1> &) { EXPECT_FALSE(true); });
   };
 
-  auto testExtract_AB = [&](const auto &positions, const auto &values, Real isoValue) {
+  auto testExtract_BA = [&](const auto &positions, const auto &values, Real isoValue) {
     uint times = 0;
     MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec1r, 1> &primitiveVertices) {
       EXPECT_EQ(times, 0);
@@ -58,8 +58,8 @@ TEST(MarchingCube, D1) {
 
   testExtract_AA(positions, valuesOO, isoValue);
   testExtract_AA(positions, valuesPP, isoValue);
-  testExtract_AB(positions, valuesPO, isoValue);
-  testExtract_AB(positions, valuesOP, isoValue);
+  testExtract_BA(positions, valuesPO, isoValue);
+  testExtract_BA(positions, valuesOP, isoValue);
 }
 
 TEST(MarchingCube, D2) {
