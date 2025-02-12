@@ -29,6 +29,14 @@
 
 namespace ARIA {
 
+/// \brief A policy-based marching cube implementation.
+///
+/// Marching cubes is a computer graphics algorithm,
+/// published in the 1987 SIGGRAPH proceedings by Lorensen and Cline, for extracting
+/// a polygonal mesh of an iso-surface from a three-dimensional discrete scalar field.
+/// See https://en.wikipedia.org/wiki/Marching_cubes.
+///
+/// \tparam dim Dimension of the system.
 template <uint dim>
 class MarchingCube {
 public:
