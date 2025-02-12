@@ -20,6 +20,11 @@ static inline void SortPrimitiveVertices(const cuda::std::span<Vec2r, 2> &primit
                     [](const Vec2r &a, const Vec2r &b) { return a.y() < b.y() || (a.y() == b.y() && a.x() < b.x()); });
 };
 
+static inline void ExpectEq(const Vec2r &a, const Vec2r &b) {
+  EXPECT_FLOAT_EQ(a.x(), b.x());
+  EXPECT_FLOAT_EQ(a.y(), b.y());
+}
+
 } // namespace
 
 TEST(MarchingCube, Base) {
@@ -71,10 +76,8 @@ TEST(MarchingCube, Base) {
         SortPrimitiveVertices(primitiveVertices);
         Vec2r p_00_10 = Lerp(positions(0, 0), positions(1, 0), ComputeT(values(0, 0), values(1, 0), isoValue));
         Vec2r p_00_01 = Lerp(positions(0, 0), positions(0, 1), ComputeT(values(0, 0), values(0, 1), isoValue));
-        EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_00_10.x());
-        EXPECT_FLOAT_EQ(primitiveVertices[0].y(), p_00_10.y());
-        EXPECT_FLOAT_EQ(primitiveVertices[1].x(), p_00_01.x());
-        EXPECT_FLOAT_EQ(primitiveVertices[1].y(), p_00_01.y());
+        ExpectEq(primitiveVertices[0], p_00_10);
+        ExpectEq(primitiveVertices[1], p_00_01);
       });
       EXPECT_EQ(times, 1);
     };
@@ -87,10 +90,8 @@ TEST(MarchingCube, Base) {
         SortPrimitiveVertices(primitiveVertices);
         Vec2r p_00_01 = Lerp(positions(0, 0), positions(0, 1), ComputeT(values(0, 0), values(0, 1), isoValue));
         Vec2r p_01_11 = Lerp(positions(0, 1), positions(1, 1), ComputeT(values(0, 1), values(1, 1), isoValue));
-        EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_00_01.x());
-        EXPECT_FLOAT_EQ(primitiveVertices[0].y(), p_00_01.y());
-        EXPECT_FLOAT_EQ(primitiveVertices[1].x(), p_01_11.x());
-        EXPECT_FLOAT_EQ(primitiveVertices[1].y(), p_01_11.y());
+        ExpectEq(primitiveVertices[0], p_00_01);
+        ExpectEq(primitiveVertices[1], p_01_11);
       });
       EXPECT_EQ(times, 1);
     };
@@ -103,10 +104,8 @@ TEST(MarchingCube, Base) {
         SortPrimitiveVertices(primitiveVertices);
         Vec2r p_00_10 = Lerp(positions(0, 0), positions(1, 0), ComputeT(values(0, 0), values(1, 0), isoValue));
         Vec2r p_10_11 = Lerp(positions(1, 0), positions(1, 1), ComputeT(values(1, 0), values(1, 1), isoValue));
-        EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_00_10.x());
-        EXPECT_FLOAT_EQ(primitiveVertices[0].y(), p_00_10.y());
-        EXPECT_FLOAT_EQ(primitiveVertices[1].x(), p_10_11.x());
-        EXPECT_FLOAT_EQ(primitiveVertices[1].y(), p_10_11.y());
+        ExpectEq(primitiveVertices[0], p_00_10);
+        ExpectEq(primitiveVertices[1], p_10_11);
       });
       EXPECT_EQ(times, 1);
     };
@@ -119,10 +118,8 @@ TEST(MarchingCube, Base) {
         SortPrimitiveVertices(primitiveVertices);
         Vec2r p_10_11 = Lerp(positions(1, 0), positions(1, 1), ComputeT(values(1, 0), values(1, 1), isoValue));
         Vec2r p_01_11 = Lerp(positions(0, 1), positions(1, 1), ComputeT(values(0, 1), values(1, 1), isoValue));
-        EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_10_11.x());
-        EXPECT_FLOAT_EQ(primitiveVertices[0].y(), p_10_11.y());
-        EXPECT_FLOAT_EQ(primitiveVertices[1].x(), p_01_11.x());
-        EXPECT_FLOAT_EQ(primitiveVertices[1].y(), p_01_11.y());
+        ExpectEq(primitiveVertices[0], p_10_11);
+        ExpectEq(primitiveVertices[1], p_01_11);
       });
       EXPECT_EQ(times, 1);
     };
@@ -135,10 +132,8 @@ TEST(MarchingCube, Base) {
         SortPrimitiveVertices(primitiveVertices);
         Vec2r p_00_10 = Lerp(positions(0, 0), positions(1, 0), ComputeT(values(0, 0), values(1, 0), isoValue));
         Vec2r p_01_11 = Lerp(positions(0, 1), positions(1, 1), ComputeT(values(0, 1), values(1, 1), isoValue));
-        EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_00_10.x());
-        EXPECT_FLOAT_EQ(primitiveVertices[0].y(), p_00_10.y());
-        EXPECT_FLOAT_EQ(primitiveVertices[1].x(), p_01_11.x());
-        EXPECT_FLOAT_EQ(primitiveVertices[1].y(), p_01_11.y());
+        ExpectEq(primitiveVertices[0], p_00_10);
+        ExpectEq(primitiveVertices[1], p_01_11);
       });
       EXPECT_EQ(times, 1);
     };
@@ -151,10 +146,8 @@ TEST(MarchingCube, Base) {
         SortPrimitiveVertices(primitiveVertices);
         Vec2r p_00_01 = Lerp(positions(0, 0), positions(0, 1), ComputeT(values(0, 0), values(0, 1), isoValue));
         Vec2r p_10_11 = Lerp(positions(1, 0), positions(1, 1), ComputeT(values(1, 0), values(1, 1), isoValue));
-        EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_00_01.x());
-        EXPECT_FLOAT_EQ(primitiveVertices[0].y(), p_00_01.y());
-        EXPECT_FLOAT_EQ(primitiveVertices[1].x(), p_10_11.x());
-        EXPECT_FLOAT_EQ(primitiveVertices[1].y(), p_10_11.y());
+        ExpectEq(primitiveVertices[0], p_00_01);
+        ExpectEq(primitiveVertices[1], p_10_11);
       });
       EXPECT_EQ(times, 1);
     };
@@ -167,17 +160,13 @@ TEST(MarchingCube, Base) {
         if (times == 0) {
           Vec2r p_00_10 = Lerp(positions(0, 0), positions(1, 0), ComputeT(values(0, 0), values(1, 0), isoValue));
           Vec2r p_00_01 = Lerp(positions(0, 0), positions(0, 1), ComputeT(values(0, 0), values(0, 1), isoValue));
-          EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_00_10.x());
-          EXPECT_FLOAT_EQ(primitiveVertices[0].y(), p_00_10.y());
-          EXPECT_FLOAT_EQ(primitiveVertices[1].x(), p_00_01.x());
-          EXPECT_FLOAT_EQ(primitiveVertices[1].y(), p_00_01.y());
+          ExpectEq(primitiveVertices[0], p_00_10);
+          ExpectEq(primitiveVertices[1], p_00_01);
         } else if (times == 1) {
           Vec2r p_10_11 = Lerp(positions(1, 0), positions(1, 1), ComputeT(values(1, 0), values(1, 1), isoValue));
           Vec2r p_01_11 = Lerp(positions(0, 1), positions(1, 1), ComputeT(values(0, 1), values(1, 1), isoValue));
-          EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_10_11.x());
-          EXPECT_FLOAT_EQ(primitiveVertices[0].y(), p_10_11.y());
-          EXPECT_FLOAT_EQ(primitiveVertices[1].x(), p_01_11.x());
-          EXPECT_FLOAT_EQ(primitiveVertices[1].y(), p_01_11.y());
+          ExpectEq(primitiveVertices[0], p_10_11);
+          ExpectEq(primitiveVertices[1], p_01_11);
         }
         ++times;
       });
@@ -192,17 +181,13 @@ TEST(MarchingCube, Base) {
         if (times == 0) {
           Vec2r p_00_10 = Lerp(positions(0, 0), positions(1, 0), ComputeT(values(0, 0), values(1, 0), isoValue));
           Vec2r p_10_11 = Lerp(positions(1, 0), positions(1, 1), ComputeT(values(1, 0), values(1, 1), isoValue));
-          EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_00_10.x());
-          EXPECT_FLOAT_EQ(primitiveVertices[0].y(), p_00_10.y());
-          EXPECT_FLOAT_EQ(primitiveVertices[1].x(), p_10_11.x());
-          EXPECT_FLOAT_EQ(primitiveVertices[1].y(), p_10_11.y());
+          ExpectEq(primitiveVertices[0], p_00_10);
+          ExpectEq(primitiveVertices[1], p_10_11);
         } else if (times == 1) {
           Vec2r p_00_01 = Lerp(positions(0, 0), positions(0, 1), ComputeT(values(0, 0), values(0, 1), isoValue));
           Vec2r p_01_11 = Lerp(positions(0, 1), positions(1, 1), ComputeT(values(0, 1), values(1, 1), isoValue));
-          EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_00_01.x());
-          EXPECT_FLOAT_EQ(primitiveVertices[0].y(), p_00_01.y());
-          EXPECT_FLOAT_EQ(primitiveVertices[1].x(), p_01_11.x());
-          EXPECT_FLOAT_EQ(primitiveVertices[1].y(), p_01_11.y());
+          ExpectEq(primitiveVertices[0], p_00_01);
+          ExpectEq(primitiveVertices[1], p_01_11);
         }
         ++times;
       });
