@@ -62,7 +62,7 @@ TEST(MarchingCube, Base) {
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &) { EXPECT_FALSE(true); });
     };
 
-    auto testExtract_ABBB = [&](const auto &positions, const auto &values, Real isoValue) {
+    auto testExtract_BAAA = [&](const auto &positions, const auto &values, Real isoValue) {
       uint times = 0;
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
         EXPECT_EQ(times, 0);
@@ -78,7 +78,7 @@ TEST(MarchingCube, Base) {
       EXPECT_EQ(times, 1);
     };
 
-    auto testExtract_BABB = [&](const auto &positions, const auto &values, Real isoValue) {
+    auto testExtract_ABAA = [&](const auto &positions, const auto &values, Real isoValue) {
       uint times = 0;
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
         EXPECT_EQ(times, 0);
@@ -113,11 +113,11 @@ TEST(MarchingCube, Base) {
     testExtract_AAAA(positions, values_OOOO, isoValue);
     testExtract_AAAA(positions, values_PPPP, isoValue);
 
-    testExtract_ABBB(positions, values_POOO, isoValue);
-    testExtract_ABBB(positions, values_OPPP, isoValue);
+    testExtract_BAAA(positions, values_POOO, isoValue);
+    testExtract_BAAA(positions, values_OPPP, isoValue);
 
-    testExtract_BABB(positions, values_OPOO, isoValue);
-    testExtract_BABB(positions, values_POPP, isoValue);
+    testExtract_ABAA(positions, values_OPOO, isoValue);
+    testExtract_ABAA(positions, values_POPP, isoValue);
   }
 }
 
