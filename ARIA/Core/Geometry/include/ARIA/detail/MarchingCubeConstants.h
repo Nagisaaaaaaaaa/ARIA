@@ -6,6 +6,7 @@ namespace ARIA {
 
 namespace marching_cube::detail {
 
+// The lookup tables are copied from VTK.
 ARIA_CONST static inline constexpr int8 vtkMarchingCubes1DPointCases[4][2] = {{-1, -1}, {0, -1}, {0, -1}, {-1, -1}};
 
 ARIA_CONST static inline constexpr int8 vtkMarchingCubes1DEdges[1][2] = {{0, 1}};
@@ -290,6 +291,7 @@ ARIA_CONST static inline constexpr int8 vtkMarchingCubes3DEdges[12][2] = {
 //
 //
 //
+// Access the lookup tables with templated functions.
 template <uint dim>
 [[nodiscard]] ARIA_HOST_DEVICE static constexpr auto MarchingCubesCases() {
   if constexpr (dim == 1)
