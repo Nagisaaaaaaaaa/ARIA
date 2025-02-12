@@ -652,4 +652,208 @@ TEST(MarchingCube, D1Degenerated) {
   testExtract(positions5);
 }
 
+TEST(MarchingCube, D2Degenerated) {
+  using MC = MarchingCube<2>;
+
+  auto positions0 = [](int i, int j) {
+    return arr{arr{Vec2r{-2.5_R, -2.5_R}, Vec2r{-2.5_R, 3.75_R}}, //
+               arr{Vec2r{3.75_R, -2.5_R}, Vec2r{3.75_R, 3.75_R}}}[i][j];
+  };
+
+  auto testExtract_AAAA = [&](const auto &positions, const auto &values, Real isoValue) {
+    MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &) { EXPECT_FALSE(true); });
+  };
+
+  auto testExtract_BAAA = [&](const auto &positions, const auto &values, Real isoValue) {
+    uint times = 0;
+    MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
+      EXPECT_EQ(times, 0);
+      SortPrimitiveVertices(primitiveVertices);
+      Vec2r p_00_10 = Lerp(positions0(0, 0), positions0(1, 0), ComputeT(values(0, 0), values(1, 0), isoValue));
+      Vec2r p_00_01 = Lerp(positions0(0, 0), positions0(0, 1), ComputeT(values(0, 0), values(0, 1), isoValue));
+      ExpectEq(primitiveVertices[0], p_00_10);
+      ExpectEq(primitiveVertices[1], p_00_01);
+      ++times;
+    });
+    EXPECT_EQ(times, 1);
+  };
+
+  auto testExtract_ABAA = [&](const auto &positions, const auto &values, Real isoValue) {
+    uint times = 0;
+    MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
+      EXPECT_EQ(times, 0);
+      SortPrimitiveVertices(primitiveVertices);
+      Vec2r p_00_01 = Lerp(positions0(0, 0), positions0(0, 1), ComputeT(values(0, 0), values(0, 1), isoValue));
+      Vec2r p_01_11 = Lerp(positions0(0, 1), positions0(1, 1), ComputeT(values(0, 1), values(1, 1), isoValue));
+      ExpectEq(primitiveVertices[0], p_00_01);
+      ExpectEq(primitiveVertices[1], p_01_11);
+      ++times;
+    });
+    EXPECT_EQ(times, 1);
+  };
+
+  auto testExtract_AABA = [&](const auto &positions, const auto &values, Real isoValue) {
+    uint times = 0;
+    MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
+      EXPECT_EQ(times, 0);
+      SortPrimitiveVertices(primitiveVertices);
+      Vec2r p_00_10 = Lerp(positions0(0, 0), positions0(1, 0), ComputeT(values(0, 0), values(1, 0), isoValue));
+      Vec2r p_10_11 = Lerp(positions0(1, 0), positions0(1, 1), ComputeT(values(1, 0), values(1, 1), isoValue));
+      ExpectEq(primitiveVertices[0], p_00_10);
+      ExpectEq(primitiveVertices[1], p_10_11);
+      ++times;
+    });
+    EXPECT_EQ(times, 1);
+  };
+
+  auto testExtract_AAAB = [&](const auto &positions, const auto &values, Real isoValue) {
+    uint times = 0;
+    MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
+      EXPECT_EQ(times, 0);
+      SortPrimitiveVertices(primitiveVertices);
+      Vec2r p_10_11 = Lerp(positions0(1, 0), positions0(1, 1), ComputeT(values(1, 0), values(1, 1), isoValue));
+      Vec2r p_01_11 = Lerp(positions0(0, 1), positions0(1, 1), ComputeT(values(0, 1), values(1, 1), isoValue));
+      ExpectEq(primitiveVertices[0], p_10_11);
+      ExpectEq(primitiveVertices[1], p_01_11);
+      ++times;
+    });
+    EXPECT_EQ(times, 1);
+  };
+
+  auto testExtract_BBAA = [&](const auto &positions, const auto &values, Real isoValue) {
+    uint times = 0;
+    MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
+      EXPECT_EQ(times, 0);
+      SortPrimitiveVertices(primitiveVertices);
+      Vec2r p_00_10 = Lerp(positions0(0, 0), positions0(1, 0), ComputeT(values(0, 0), values(1, 0), isoValue));
+      Vec2r p_01_11 = Lerp(positions0(0, 1), positions0(1, 1), ComputeT(values(0, 1), values(1, 1), isoValue));
+      ExpectEq(primitiveVertices[0], p_00_10);
+      ExpectEq(primitiveVertices[1], p_01_11);
+      ++times;
+    });
+    EXPECT_EQ(times, 1);
+  };
+
+  auto testExtract_BABA = [&](const auto &positions, const auto &values, Real isoValue) {
+    uint times = 0;
+    MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
+      EXPECT_EQ(times, 0);
+      SortPrimitiveVertices(primitiveVertices);
+      Vec2r p_00_01 = Lerp(positions0(0, 0), positions0(0, 1), ComputeT(values(0, 0), values(0, 1), isoValue));
+      Vec2r p_10_11 = Lerp(positions0(1, 0), positions0(1, 1), ComputeT(values(1, 0), values(1, 1), isoValue));
+      ExpectEq(primitiveVertices[0], p_00_01);
+      ExpectEq(primitiveVertices[1], p_10_11);
+      ++times;
+    });
+    EXPECT_EQ(times, 1);
+  };
+
+  auto testExtract_POOP = [&](const auto &positions, const auto &values, Real isoValue) {
+    uint times = 0;
+    MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
+      EXPECT_TRUE(times == 0 || times == 1);
+      SortPrimitiveVertices(primitiveVertices);
+      if (times == 0) {
+        Vec2r p_00_10 = Lerp(positions0(0, 0), positions0(1, 0), ComputeT(values(0, 0), values(1, 0), isoValue));
+        Vec2r p_00_01 = Lerp(positions0(0, 0), positions0(0, 1), ComputeT(values(0, 0), values(0, 1), isoValue));
+        ExpectEq(primitiveVertices[0], p_00_10);
+        ExpectEq(primitiveVertices[1], p_00_01);
+      } else if (times == 1) {
+        Vec2r p_10_11 = Lerp(positions0(1, 0), positions0(1, 1), ComputeT(values(1, 0), values(1, 1), isoValue));
+        Vec2r p_01_11 = Lerp(positions0(0, 1), positions0(1, 1), ComputeT(values(0, 1), values(1, 1), isoValue));
+        ExpectEq(primitiveVertices[0], p_10_11);
+        ExpectEq(primitiveVertices[1], p_01_11);
+      }
+      ++times;
+    });
+    EXPECT_EQ(times, 2);
+  };
+
+  auto testExtract_OPPO = [&](const auto &positions, const auto &values, Real isoValue) {
+    uint times = 0;
+    MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
+      EXPECT_TRUE(times == 0 || times == 1);
+      SortPrimitiveVertices(primitiveVertices);
+      if (times == 0) {
+        Vec2r p_00_10 = Lerp(positions0(0, 0), positions0(1, 0), ComputeT(values(0, 0), values(1, 0), isoValue));
+        Vec2r p_10_11 = Lerp(positions0(1, 0), positions0(1, 1), ComputeT(values(1, 0), values(1, 1), isoValue));
+        ExpectEq(primitiveVertices[0], p_00_10);
+        ExpectEq(primitiveVertices[1], p_10_11);
+      } else if (times == 1) {
+        Vec2r p_00_01 = Lerp(positions0(0, 0), positions0(0, 1), ComputeT(values(0, 0), values(0, 1), isoValue));
+        Vec2r p_01_11 = Lerp(positions0(0, 1), positions0(1, 1), ComputeT(values(0, 1), values(1, 1), isoValue));
+        ExpectEq(primitiveVertices[0], p_00_01);
+        ExpectEq(primitiveVertices[1], p_01_11);
+      }
+      ++times;
+    });
+    EXPECT_EQ(times, 2);
+  };
+
+  auto positions1 = [&](uint i, uint j) { return positions0(i, j); };
+  auto positions2 = [&](int64 i, int64 j) { return positions0(i, j); };
+  auto positions3 = [&](uint64 i, uint64 j) { return positions0(i, j); };
+  auto positions4 = [&]<std::integral I, std::integral J>(const I &i, const J &j) { return positions0(i, j); };
+  auto positions5 = [&]<typename I, typename J>(const Tec<I, J> &c) { return positions0(get<0>(c), get<1>(c)); };
+
+  auto values_OOOO = [](uint i, uint j) { return arr{arr{0.1_R, 0.1_R}, arr{0.1_R, 0.1_R}}[i][j]; };
+  auto values_PPPP = [](uint i, uint j) { return arr{arr{0.8_R, 0.8_R}, arr{0.8_R, 0.8_R}}[i][j]; };
+
+  auto values_POOO = [](uint i, uint j) { return arr{arr{0.8_R, 0.1_R}, arr{0.1_R, 0.1_R}}[i][j]; };
+  auto values_OPPP = [](uint i, uint j) { return arr{arr{0.1_R, 0.8_R}, arr{0.8_R, 0.8_R}}[i][j]; };
+
+  auto values_OPOO = [](uint i, uint j) { return arr{arr{0.1_R, 0.8_R}, arr{0.1_R, 0.1_R}}[i][j]; };
+  auto values_POPP = [](uint i, uint j) { return arr{arr{0.8_R, 0.1_R}, arr{0.8_R, 0.8_R}}[i][j]; };
+
+  auto values_OOPO = [](uint i, uint j) { return arr{arr{0.1_R, 0.1_R}, arr{0.8_R, 0.1_R}}[i][j]; };
+  auto values_PPOP = [](uint i, uint j) { return arr{arr{0.8_R, 0.8_R}, arr{0.1_R, 0.8_R}}[i][j]; };
+
+  auto values_OOOP = [](uint i, uint j) { return arr{arr{0.1_R, 0.1_R}, arr{0.1_R, 0.8_R}}[i][j]; };
+  auto values_PPPO = [](uint i, uint j) { return arr{arr{0.8_R, 0.8_R}, arr{0.8_R, 0.1_R}}[i][j]; };
+
+  auto values_PPOO = [](uint i, uint j) { return arr{arr{0.8_R, 0.8_R}, arr{0.1_R, 0.1_R}}[i][j]; };
+  auto values_OOPP = [](uint i, uint j) { return arr{arr{0.1_R, 0.1_R}, arr{0.8_R, 0.8_R}}[i][j]; };
+
+  auto values_POPO = [](uint i, uint j) { return arr{arr{0.8_R, 0.1_R}, arr{0.8_R, 0.1_R}}[i][j]; };
+  auto values_OPOP = [](uint i, uint j) { return arr{arr{0.1_R, 0.8_R}, arr{0.1_R, 0.8_R}}[i][j]; };
+
+  auto values_POOP = [](uint i, uint j) { return arr{arr{0.8_R, 0.1_R}, arr{0.1_R, 0.8_R}}[i][j]; };
+  auto values_OPPO = [](uint i, uint j) { return arr{arr{0.1_R, 0.8_R}, arr{0.8_R, 0.1_R}}[i][j]; };
+
+  Real isoValue = 0.4_R;
+
+  auto testExtract = [&](const auto &positions) {
+    testExtract_AAAA(positions, values_OOOO, isoValue);
+    testExtract_AAAA(positions, values_PPPP, isoValue);
+
+    testExtract_BAAA(positions, values_POOO, isoValue);
+    testExtract_BAAA(positions, values_OPPP, isoValue);
+
+    testExtract_ABAA(positions, values_OPOO, isoValue);
+    testExtract_ABAA(positions, values_POPP, isoValue);
+
+    testExtract_AABA(positions, values_OOPO, isoValue);
+    testExtract_AABA(positions, values_PPOP, isoValue);
+
+    testExtract_AAAB(positions, values_OOOP, isoValue);
+    testExtract_AAAB(positions, values_PPPO, isoValue);
+
+    testExtract_BBAA(positions, values_PPOO, isoValue);
+    testExtract_BBAA(positions, values_OOPP, isoValue);
+
+    testExtract_BABA(positions, values_POPO, isoValue);
+    testExtract_BABA(positions, values_OPOP, isoValue);
+
+    testExtract_POOP(positions, values_POOP, isoValue);
+    testExtract_OPPO(positions, values_OPPO, isoValue);
+  };
+
+  testExtract(positions0);
+  testExtract(positions1);
+  testExtract(positions2);
+  testExtract(positions3);
+  testExtract(positions4);
+  testExtract(positions5);
+}
+
 } // namespace ARIA
