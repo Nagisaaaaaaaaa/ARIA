@@ -15,7 +15,7 @@ ARIA_HOST_DEVICE static inline Real ComputeT(Real v0, Real v1, Real isoValue) {
   return (isoValue - v0) / (v1 - v0);
 }
 
-ARIA_HOST_DEVICE static inline void SortPrimitiveVertices(const cuda::std::span<Vec2r, 2> &primitiveVertices) {
+static inline void SortPrimitiveVertices(const cuda::std::span<Vec2r, 2> &primitiveVertices) {
   std::ranges::sort(primitiveVertices,
                     [](const Vec2r &a, const Vec2r &b) { return a.y() < b.y() || (a.y() == b.y() && a.x() < b.x()); });
 };
