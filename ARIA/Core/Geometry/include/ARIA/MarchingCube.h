@@ -1,5 +1,25 @@
 #pragma once
 
+/// \file
+/// \brief A policy-based marching cube implementation.
+///
+/// Marching cubes is a computer graphics algorithm,
+/// published in the 1987 SIGGRAPH proceedings by Lorensen and Cline, for extracting
+/// a polygonal mesh of an iso-surface from a three-dimensional discrete scalar field.
+/// See https://en.wikipedia.org/wiki/Marching_cubes.
+///
+/// This file introduces the 1D, 2D, and 3D versions of marching cube.
+/// We say "cube" instead of "cubes" because:
+/// 1. The input is exactly ONE line, square, or cube.
+/// 2. The output is the points, lines, or triangles extracted from the input.
+///
+/// Users can implement their own marching "cubes" based on it.
+
+//
+//
+//
+//
+//
 #include "ARIA/Invocations.h"
 #include "ARIA/Math.h"
 #include "ARIA/Vec.h"
