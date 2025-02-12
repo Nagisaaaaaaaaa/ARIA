@@ -94,6 +94,22 @@ TEST(MarchingCube, Base) {
       EXPECT_EQ(times, 1);
     };
 
+    auto testExtract_AABA = [&](const auto &positions, const auto &values, Real isoValue) {
+      uint times = 0;
+      MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
+        EXPECT_EQ(times, 0);
+        ++times;
+        sortPrimitiveVertices(primitiveVertices);
+        Vec2r p_00_10 = Lerp(positions(0, 0), positions(1, 0), computeT(values(0, 0), values(1, 0), isoValue));
+        Vec2r p_10_11 = Lerp(positions(1, 0), positions(1, 1), computeT(values(1, 0), values(1, 1), isoValue));
+        EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_00_10.x());
+        EXPECT_FLOAT_EQ(primitiveVertices[0].y(), p_00_10.y());
+        EXPECT_FLOAT_EQ(primitiveVertices[1].x(), p_10_11.x());
+        EXPECT_FLOAT_EQ(primitiveVertices[1].y(), p_10_11.y());
+      });
+      EXPECT_EQ(times, 1);
+    };
+
     auto positions = [](uint i, uint j) {
       return arr{arr{Vec2r{-2.5_R, -2.5_R}, Vec2r{-2.5_R, 2.5_R}}, //
                  arr{Vec2r{2.5_R, -2.5_R}, Vec2r{2.5_R, 2.5_R}}}[i][j];
@@ -108,6 +124,9 @@ TEST(MarchingCube, Base) {
     auto values_OPOO = [](uint i, uint j) { return arr{arr{0.1_R, 0.8_R}, arr{0.1_R, 0.1_R}}[i][j]; };
     auto values_POPP = [](uint i, uint j) { return arr{arr{0.8_R, 0.1_R}, arr{0.8_R, 0.8_R}}[i][j]; };
 
+    auto values_OOPO = [](uint i, uint j) { return arr{arr{0.1_R, 0.1_R}, arr{0.8_R, 0.1_R}}[i][j]; };
+    auto values_PPOP = [](uint i, uint j) { return arr{arr{0.8_R, 0.8_R}, arr{0.1_R, 0.8_R}}[i][j]; };
+
     Real isoValue = 0.4_R;
 
     testExtract_AAAA(positions, values_OOOO, isoValue);
@@ -118,6 +137,9 @@ TEST(MarchingCube, Base) {
 
     testExtract_ABAA(positions, values_OPOO, isoValue);
     testExtract_ABAA(positions, values_POPP, isoValue);
+
+    testExtract_AABA(positions, values_OOPO, isoValue);
+    testExtract_AABA(positions, values_PPOP, isoValue);
   }
 }
 
