@@ -350,6 +350,26 @@ TEST(MarchingCube, D3) {
     ExpectEq(vertices[5], p_101_111);
   };
 
+  auto testExtract_AAAB = [&](const auto &positions, const auto &values, Real isoValue) {
+    std::vector vertices = extractAndGatherVertices_2Triangles(positions, values, isoValue);
+
+    Vec3r p_100_110 =
+        Lerp(positions(1, 0, 0), positions(1, 1, 0), ComputeT(values(1, 0, 0), values(1, 1, 0), isoValue));
+    Vec3r p_010_110 =
+        Lerp(positions(0, 1, 0), positions(1, 1, 0), ComputeT(values(0, 1, 0), values(1, 1, 0), isoValue));
+    Vec3r p_101_111 =
+        Lerp(positions(1, 0, 1), positions(1, 1, 1), ComputeT(values(1, 0, 1), values(1, 1, 1), isoValue));
+    Vec3r p_011_111 =
+        Lerp(positions(0, 1, 1), positions(1, 1, 1), ComputeT(values(0, 1, 1), values(1, 1, 1), isoValue));
+
+    ExpectEq(vertices[0], p_100_110);
+    ExpectEq(vertices[1], p_100_110);
+    ExpectEq(vertices[2], p_010_110);
+    ExpectEq(vertices[3], p_101_111);
+    ExpectEq(vertices[4], p_011_111);
+    ExpectEq(vertices[5], p_011_111);
+  };
+
   auto positions = [](uint i, uint j, uint k) {
     return Vec3r{
         i == 0 ? -0.25_R : 3.75_R,
@@ -395,6 +415,9 @@ TEST(MarchingCube, D3) {
 
   testExtract_AABA(positions, values_OOPO, isoValue);
   testExtract_AABA(positions, values_PPOP, isoValue);
+
+  testExtract_AAAB(positions, values_OOOP, isoValue);
+  testExtract_AAAB(positions, values_PPPO, isoValue);
 }
 
 } // namespace ARIA
