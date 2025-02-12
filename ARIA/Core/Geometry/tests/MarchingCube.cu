@@ -274,7 +274,7 @@ TEST(MarchingCube, D3) {
     MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec3r, 3> &) { EXPECT_FALSE(true); });
   };
 
-  auto testExtract_POOO = [&](const auto &positions, const auto &values, Real isoValue) {
+  auto testExtract_BAAA = [&](const auto &positions, const auto &values, Real isoValue) {
     uint times = 0;
     std::vector<Vec3r> vertices;
     MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec3r, 3> &primitiveVertices) {
@@ -341,7 +341,8 @@ TEST(MarchingCube, D3) {
   testExtract_AAAA(positions, values_OOOO, isoValue);
   testExtract_AAAA(positions, values_PPPP, isoValue);
 
-  testExtract_POOO(positions, values_POOO, isoValue);
+  testExtract_BAAA(positions, values_POOO, isoValue);
+  testExtract_BAAA(positions, values_OPPP, isoValue);
 }
 
 } // namespace ARIA
