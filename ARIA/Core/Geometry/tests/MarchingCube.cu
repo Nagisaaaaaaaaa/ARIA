@@ -295,6 +295,9 @@ TEST(MarchingCube, D3) {
   auto values_OPPO = [](uint i, uint j, uint k) { return arr{arr{0.1_R, 0.8_R}, arr{0.8_R, 0.1_R}}[i][j]; };
 
   Real isoValue = 0.4_R;
+
+  testExtract_AAAA(positions, values_OOOO, isoValue);
+  testExtract_AAAA(positions, values_PPPP, isoValue);
 }
 
 } // namespace ARIA
