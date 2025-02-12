@@ -43,7 +43,7 @@ static inline void ExpectEq(const Vec3r &a, const Vec3r &b) {
 }
 
 template <typename TPositions, typename TValues>
-void TestCUDA_1D_Extract_AA(const TPositions &positions, const TValues &values, Real isoValue) {
+void Test1D_CUDA_Extract_AA(const TPositions &positions, const TValues &values, Real isoValue) {
   using MC = MarchingCube<1>;
   Launcher(1, [=] ARIA_DEVICE(int i) {
     MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec1r, 1> &) { ARIA_ASSERT(false); });
@@ -51,7 +51,7 @@ void TestCUDA_1D_Extract_AA(const TPositions &positions, const TValues &values, 
 }
 
 template <typename TPositions, typename TValues>
-void TestCUDA_1D_Extract_BA(const TPositions &positions, const TValues &values, Real isoValue) {
+void Test1D_CUDA_Extract_BA(const TPositions &positions, const TValues &values, Real isoValue) {
   using MC = MarchingCube<1>;
   auto positions0 = [] ARIA_HOST_DEVICE(int i) { return Vec1r{i == 0 ? -0.25_R : 3.75_R}; };
   Launcher(1, [=] ARIA_DEVICE(int i) {
@@ -66,7 +66,7 @@ void TestCUDA_1D_Extract_BA(const TPositions &positions, const TValues &values, 
   }).Launch();
 }
 
-void TestCUDA_1D() {
+void Test1D_CUDA() {
   auto positions0 = [] ARIA_HOST_DEVICE(int i) { return Vec1r{i == 0 ? -0.25_R : 3.75_R}; };
   auto positions1 = [=] ARIA_HOST_DEVICE(uint i) { return positions0(i); };
   auto positions2 = [=] ARIA_HOST_DEVICE(int64 i) { return positions0(i); };
@@ -81,11 +81,11 @@ void TestCUDA_1D() {
   Real isoValue = 0.4_R;
 
   auto testExtract = [&](const auto &positions) {
-    TestCUDA_1D_Extract_AA(positions, valuesOO, isoValue);
-    TestCUDA_1D_Extract_AA(positions, valuesPP, isoValue);
+    Test1D_CUDA_Extract_AA(positions, valuesOO, isoValue);
+    Test1D_CUDA_Extract_AA(positions, valuesPP, isoValue);
 
-    TestCUDA_1D_Extract_BA(positions, valuesPO, isoValue);
-    TestCUDA_1D_Extract_BA(positions, valuesOP, isoValue);
+    Test1D_CUDA_Extract_BA(positions, valuesPO, isoValue);
+    Test1D_CUDA_Extract_BA(positions, valuesOP, isoValue);
   };
 
   testExtract(positions0);
@@ -144,6 +144,8 @@ TEST(MarchingCube, D1) {
   testExtract(positions3);
   testExtract(positions4);
   testExtract(positions5);
+
+  Test1D_CUDA();
 }
 
 TEST(MarchingCube, D2) {
@@ -653,10 +655,6 @@ TEST(MarchingCube, D3) {
   testExtract(positions3);
   testExtract(positions4);
   testExtract(positions5);
-}
-
-TEST(MarchingCube, CUDA) {
-  TestCUDA_1D();
 }
 
 } // namespace ARIA
