@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ARIA/Invocations.h"
 #include "ARIA/Math.h"
 #include "ARIA/Vec.h"
 #include "ARIA/detail/MarchingCubeConstants.h"
@@ -19,14 +20,14 @@ public:
     auto rearrangeAndLinearize = []<typename TAccessor>(TAccessor &&accessor) {
       if constexpr (dim == 1) {
         using T = decltype(Auto(accessor(0)));
-        return cuda::std::array<T, 2>{accessor(0), accessor(1)};
+        return cuda::std::array<T, 2>{access(0), access(1)};
       } else if constexpr (dim == 2) {
-        using T = decltype(Auto(accessor(0, 0)));
-        return cuda::std::array<T, 4>{accessor(0, 0), accessor(1, 0), accessor(1, 1), accessor(0, 1)};
+        using T = decltype(Auto(access(0, 0)));
+        return cuda::std::array<T, 4>{access(0, 0), access(1, 0), access(1, 1), access(0, 1)};
       } else if constexpr (dim == 3) {
-        using T = decltype(Auto(accessor(0, 0, 0)));
-        return cuda::std::array<T, 8>{accessor(0, 0, 0), accessor(1, 0, 0), accessor(1, 1, 0), accessor(0, 1, 0), //
-                                      accessor(0, 0, 1), accessor(1, 0, 1), accessor(1, 1, 1), accessor(0, 1, 1)};
+        using T = decltype(Auto(access(0, 0, 0)));
+        return cuda::std::array<T, 8>{access(0, 0, 0), access(1, 0, 0), access(1, 1, 0), access(0, 1, 0), //
+                                      access(0, 0, 1), access(1, 0, 1), access(1, 1, 1), access(0, 1, 1)};
       }
     };
     cuda::std::array positions = rearrangeAndLinearize(std::forward<TAccessorPositions>(accessorPositions));
