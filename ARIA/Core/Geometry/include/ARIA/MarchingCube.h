@@ -47,8 +47,9 @@ namespace ARIA {
 /// // The values of the 4 dual vertices.
 /// // `values` will only be invoked with `(0, 0)`, `(1, 0)`, `(0, 1)` and `(1, 1)`.
 /// auto values = [&](uint x, uint y) -> Real { ... };
-/// // For `positions` and `values`, the parameter type can also be
-/// // `Tup<uint, uint>` instead of `uint, uint`, or something else.
+/// // For `positions` and `values`, the parameter type can also be something like
+/// // `T, U`, `Tup<T, U>`, `C<i>, C<j>`, and `Tup<C<i>, C<j>>`, where
+/// // `T, U` should be `<typename T, typename U>`, and `i, j` be `<auto i, auto j>`.
 /// Real isoValue = 0.5_R;
 ///
 /// // Extract line segments from the 4 dual vertices with the given iso-value.
