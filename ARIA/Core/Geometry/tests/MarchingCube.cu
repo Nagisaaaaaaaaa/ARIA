@@ -52,6 +52,12 @@ TEST(MarchingCube, Base) {
   {
     using MC = MarchingCube<2>;
 
+    auto sortPrimitiveVertices = [](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
+      std::ranges::sort(primitiveVertices, [](const Vec2r &a, const Vec2r &b) {
+        return a.y() < b.y() || (a.y() == b.y() && a.x() < b.x());
+      });
+    };
+
     auto testExtract_AAAA = [&](const auto &positions, const auto &values, Real isoValue) {
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &) { EXPECT_FALSE(true); });
     };
@@ -61,15 +67,29 @@ TEST(MarchingCube, Base) {
       MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
         EXPECT_EQ(times, 0);
         ++times;
-        std::ranges::sort(primitiveVertices, [](const Vec2r &a, const Vec2r &b) {
-          return a.y() < b.y() || (a.y() == b.y() && a.x() < b.x());
-        });
+        sortPrimitiveVertices(primitiveVertices);
         Vec2r p_00_10 = Lerp(positions(0, 0), positions(1, 0), computeT(values(0, 0), values(1, 0), isoValue));
         Vec2r p_00_01 = Lerp(positions(0, 0), positions(0, 1), computeT(values(0, 0), values(0, 1), isoValue));
         EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_00_10.x());
         EXPECT_FLOAT_EQ(primitiveVertices[0].y(), p_00_10.y());
         EXPECT_FLOAT_EQ(primitiveVertices[1].x(), p_00_01.x());
         EXPECT_FLOAT_EQ(primitiveVertices[1].y(), p_00_01.y());
+      });
+      EXPECT_EQ(times, 1);
+    };
+
+    auto testExtract_BABB = [&](const auto &positions, const auto &values, Real isoValue) {
+      uint times = 0;
+      MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec2r, 2> &primitiveVertices) {
+        EXPECT_EQ(times, 0);
+        ++times;
+        sortPrimitiveVertices(primitiveVertices);
+        Vec2r p_00_01 = Lerp(positions(0, 0), positions(0, 1), computeT(values(0, 0), values(0, 1), isoValue));
+        Vec2r p_01_11 = Lerp(positions(0, 1), positions(1, 1), computeT(values(0, 1), values(1, 1), isoValue));
+        EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p_00_01.x());
+        EXPECT_FLOAT_EQ(primitiveVertices[0].y(), p_00_01.y());
+        EXPECT_FLOAT_EQ(primitiveVertices[1].x(), p_01_11.x());
+        EXPECT_FLOAT_EQ(primitiveVertices[1].y(), p_01_11.y());
       });
       EXPECT_EQ(times, 1);
     };
@@ -95,6 +115,9 @@ TEST(MarchingCube, Base) {
 
     testExtract_ABBB(positions, values_POOO, isoValue);
     testExtract_ABBB(positions, values_OPPP, isoValue);
+
+    testExtract_BABB(positions, values_OPOO, isoValue);
+    testExtract_BABB(positions, values_POPP, isoValue);
   }
 }
 
