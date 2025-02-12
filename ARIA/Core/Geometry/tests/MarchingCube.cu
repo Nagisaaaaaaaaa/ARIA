@@ -66,7 +66,8 @@ TEST(MarchingCube, D1) {
   auto positions1 = [&](uint i) { return positions0(i); };
   auto positions2 = [&](int64 i) { return positions0(i); };
   auto positions3 = [&](uint64 i) { return positions0(i); };
-  auto positions4 = [&]<typename I>(const Tec<I> &c) { return positions0(get<0>(c)); };
+  auto positions4 = [&]<std::integral I>(const I &i) { return positions0(i); };
+  auto positions5 = [&]<typename I>(const Tec<I> &c) { return positions0(get<0>(c)); };
 
   auto valuesOO = [](uint i) { return arr{0.1_R, 0.1_R}[i]; };
   auto valuesPP = [](uint i) { return arr{0.8_R, 0.8_R}[i]; };
@@ -89,6 +90,7 @@ TEST(MarchingCube, D1) {
   testExtract(positions2);
   testExtract(positions3);
   testExtract(positions4);
+  testExtract(positions5);
 }
 
 TEST(MarchingCube, D2) {
@@ -232,7 +234,8 @@ TEST(MarchingCube, D2) {
   auto positions1 = [&](uint i, uint j) { return positions0(i, j); };
   auto positions2 = [&](int64 i, int64 j) { return positions0(i, j); };
   auto positions3 = [&](uint64 i, uint64 j) { return positions0(i, j); };
-  auto positions4 = [&]<typename I, typename J>(const Tec<I, J> &c) { return positions0(get<0>(c), get<1>(c)); };
+  auto positions4 = [&]<std::integral I, std::integral J>(const I &i, const J &j) { return positions0(i, j); };
+  auto positions5 = [&]<typename I, typename J>(const Tec<I, J> &c) { return positions0(get<0>(c), get<1>(c)); };
 
   auto values_OOOO = [](uint i, uint j) { return arr{arr{0.1_R, 0.1_R}, arr{0.1_R, 0.1_R}}[i][j]; };
   auto values_PPPP = [](uint i, uint j) { return arr{arr{0.8_R, 0.8_R}, arr{0.8_R, 0.8_R}}[i][j]; };
@@ -291,6 +294,7 @@ TEST(MarchingCube, D2) {
   testExtract(positions2);
   testExtract(positions3);
   testExtract(positions4);
+  testExtract(positions5);
 }
 
 TEST(MarchingCube, D3) {
@@ -531,7 +535,10 @@ TEST(MarchingCube, D3) {
   auto positions1 = [&](uint i, uint j, uint k) { return positions0(i, j, k); };
   auto positions2 = [&](int64 i, int64 j, int64 k) { return positions0(i, j, k); };
   auto positions3 = [&](uint64 i, uint64 j, uint64 k) { return positions0(i, j, k); };
-  auto positions4 = [&]<typename I, typename J, typename K>(const Tec<I, J, K> &c) {
+  auto positions4 = [&]<std::integral I, std::integral J, std::integral K>(const I &i, const J &j, const K &k) {
+    return positions0(i, j, k);
+  };
+  auto positions5 = [&]<typename I, typename J, typename K>(const Tec<I, J, K> &c) {
     return positions0(get<0>(c), get<1>(c), get<2>(c));
   };
 
@@ -592,6 +599,7 @@ TEST(MarchingCube, D3) {
   testExtract(positions2);
   testExtract(positions3);
   testExtract(positions4);
+  testExtract(positions5);
 }
 
 } // namespace ARIA
