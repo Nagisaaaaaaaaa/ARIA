@@ -20,6 +20,10 @@ static inline void SortPrimitiveVertices(const cuda::std::span<Vec2r, 2> &primit
                     [](const Vec2r &a, const Vec2r &b) { return a.y() < b.y() || (a.y() == b.y() && a.x() < b.x()); });
 };
 
+static inline void ExpectEq(const Vec1r &a, const Vec1r &b) {
+  EXPECT_FLOAT_EQ(a.x(), b.x());
+}
+
 static inline void ExpectEq(const Vec2r &a, const Vec2r &b) {
   EXPECT_FLOAT_EQ(a.x(), b.x());
   EXPECT_FLOAT_EQ(a.y(), b.y());
@@ -40,7 +44,7 @@ TEST(MarchingCube, D1) {
       EXPECT_EQ(times, 0);
       ++times;
       Vec1r p = Lerp(positions(0), positions(1), ComputeT(values(0), values(1), isoValue));
-      EXPECT_FLOAT_EQ(primitiveVertices[0].x(), p.x());
+      ExpectEq(primitiveVertices[0], p);
     });
     EXPECT_EQ(times, 1);
   };
