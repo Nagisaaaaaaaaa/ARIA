@@ -17,6 +17,7 @@ public:
   Extract(TAccessorPositions &&accessorPositions, TAccessorValues &&accessorValues, Real isoValue, F &&f) {
     //! The implementation is mainly based on https://github.com/ingowald/cudaAmrIsoSurfaceExtraction.
     //! It is recommended to read the paper before continue.
+    using VecDr = Vec<Real, dim>;
 
     // VTK case tables assume everything is in VTK "hexahedron" ordering.
     // So, dual cells are rearranged and linearized into arrays.
@@ -62,7 +63,7 @@ public:
     };
     cuda::std::array positions = rearrangeAndLinearize(std::forward<TAccessorPositions>(accessorPositions));
     cuda::std::array values = rearrangeAndLinearize(std::forward<TAccessorValues>(accessorValues));
-    static_assert(std::is_same_v<decltype(positions), cuda::std::array<Vec<Real, dim>, pow<dim>(2)>>,
+    static_assert(std::is_same_v<decltype(positions), cuda::std::array<VecDr, pow<dim>(2)>>,
                   "Invalid accessor of positions");
     static_assert(std::is_same_v<decltype(values), cuda::std::array<Real, pow<dim>(2)>>, "Invalid accessor of values");
 
@@ -75,11 +76,11 @@ public:
       return;
 
     for (const int8_t *edge = marching_cube::detail::MarchingCubesCases<dim>()[iCases]; *edge > -1; edge += dim) {
-      cuda::std::array<Vec<Real, dim>, dim> primitiveVertices;
+      cuda::std::array<VecDr, dim> primitiveVertices;
       ForEach<dim>([&](auto i) {
         const int8_t *vert = marching_cube::detail::MarchingCubesEdges<dim>()[edge[i]];
-        const Vec<Real, dim> p0 = positions[vert[0]];
-        const Vec<Real, dim> p1 = positions[vert[1]];
+        const VecDr p0 = positions[vert[0]];
+        const VecDr p1 = positions[vert[1]];
         const Real v0 = values[vert[0]];
         const Real v1 = values[vert[1]];
         const float t = (isoValue - v0) / (v1 - v0);
