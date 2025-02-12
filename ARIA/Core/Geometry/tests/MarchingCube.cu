@@ -1,3 +1,4 @@
+#include "ARIA/Launcher.h"
 #include "ARIA/MarchingCube.h"
 
 #include <gtest/gtest.h>
@@ -39,6 +40,58 @@ static inline void ExpectEq(const Vec3r &a, const Vec3r &b) {
   EXPECT_FLOAT_EQ(a.x(), b.x());
   EXPECT_FLOAT_EQ(a.y(), b.y());
   EXPECT_FLOAT_EQ(a.z(), b.z());
+}
+
+template <typename TPositions, typename TValues>
+void TestCUDA_1D_Extract_AA(const TPositions &positions, const TValues &values, Real isoValue) {
+  using MC = MarchingCube<1>;
+  Launcher(1, [=] ARIA_DEVICE(int i) {
+    MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec1r, 1> &) { ARIA_ASSERT(false); });
+  }).Launch();
+}
+
+template <typename TPositions, typename TValues>
+void TestCUDA_1D_Extract_BA(const TPositions &positions, const TValues &values, Real isoValue) {
+  using MC = MarchingCube<1>;
+  auto positions0 = [] ARIA_HOST_DEVICE(int i) { return Vec1r{i == 0 ? -0.25_R : 3.75_R}; };
+  Launcher(1, [=] ARIA_DEVICE(int i) {
+    uint times = 0;
+    MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec1r, 1> &primitiveVertices) {
+      ARIA_ASSERT(times == 0);
+      Vec1r p = Lerp(positions0(0), positions0(1), ComputeT(values(0), values(1), isoValue));
+      ARIA_ASSERT(primitiveVertices[0] == p);
+      ++times;
+    });
+    ARIA_ASSERT(times == 1);
+  }).Launch();
+}
+
+void TestCUDA_1D() {
+  auto positions0 = [] ARIA_HOST_DEVICE(int i) { return Vec1r{i == 0 ? -0.25_R : 3.75_R}; };
+  auto positions1 = [=] ARIA_HOST_DEVICE(uint i) { return positions0(i); };
+  auto positions2 = [=] ARIA_HOST_DEVICE(int64 i) { return positions0(i); };
+  auto positions3 = [=] ARIA_HOST_DEVICE(uint64 i) { return positions0(i); };
+
+  auto valuesOO = [] ARIA_HOST_DEVICE(uint i) { return i == 0 ? 0.1_R : 0.1_R; };
+  auto valuesPP = [] ARIA_HOST_DEVICE(uint i) { return i == 0 ? 0.8_R : 0.8_R; };
+
+  auto valuesPO = [] ARIA_HOST_DEVICE(uint i) { return i == 0 ? 0.8_R : 0.1_R; };
+  auto valuesOP = [] ARIA_HOST_DEVICE(uint i) { return i == 0 ? 0.1_R : 0.8_R; };
+
+  Real isoValue = 0.4_R;
+
+  auto testExtract = [&](const auto &positions) {
+    TestCUDA_1D_Extract_AA(positions, valuesOO, isoValue);
+    TestCUDA_1D_Extract_AA(positions, valuesPP, isoValue);
+
+    TestCUDA_1D_Extract_BA(positions, valuesPO, isoValue);
+    TestCUDA_1D_Extract_BA(positions, valuesOP, isoValue);
+  };
+
+  testExtract(positions0);
+  testExtract(positions1);
+  testExtract(positions2);
+  testExtract(positions3);
 }
 
 } // namespace
@@ -600,6 +653,10 @@ TEST(MarchingCube, D3) {
   testExtract(positions3);
   testExtract(positions4);
   testExtract(positions5);
+}
+
+TEST(MarchingCube, CUDA) {
+  TestCUDA_1D();
 }
 
 } // namespace ARIA
