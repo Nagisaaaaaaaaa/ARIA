@@ -19,9 +19,9 @@ public:
     //! So, cells are rearranged and linearized into arrays.
     auto rearrangeAndLinearize = []<typename TAccessor>(TAccessor &&accessor) {
       if constexpr (dim == 1) {
-        auto access = [&](uint i) {
-          if constexpr (is_invocable_with_brackets_v<decltype(accessor), uint> ||
-                        std::is_invocable_v<decltype(accessor), uint>)
+        auto access = [&](int8 i) {
+          if constexpr (is_invocable_with_brackets_v<decltype(accessor), int8> ||
+                        std::is_invocable_v<decltype(accessor), int8>)
             return invoke_with_brackets_or_parentheses(accessor, i);
           else
             return invoke_with_brackets_or_parentheses(accessor, Tup{i});
@@ -29,9 +29,9 @@ public:
         using T = decltype(Auto(access(0)));
         return cuda::std::array<T, 2>{access(0), access(1)};
       } else if constexpr (dim == 2) {
-        auto access = [&](uint i, uint j) {
-          if constexpr (is_invocable_with_brackets_v<decltype(accessor), uint, uint> ||
-                        std::is_invocable_v<decltype(accessor), uint, uint>)
+        auto access = [&](int8 i, int8 j) {
+          if constexpr (is_invocable_with_brackets_v<decltype(accessor), int8, int8> ||
+                        std::is_invocable_v<decltype(accessor), int8, int8>)
             return invoke_with_brackets_or_parentheses(accessor, i, j);
           else
             return invoke_with_brackets_or_parentheses(accessor, Tup{i, j});
@@ -39,9 +39,9 @@ public:
         using T = decltype(Auto(access(0, 0)));
         return cuda::std::array<T, 4>{access(0, 0), access(1, 0), access(1, 1), access(0, 1)};
       } else if constexpr (dim == 3) {
-        auto access = [&](uint i, uint j, uint k) {
-          if constexpr (is_invocable_with_brackets_v<decltype(accessor), uint, uint, uint> ||
-                        std::is_invocable_v<decltype(accessor), uint, uint, uint>)
+        auto access = [&](int8 i, int8 j, int8 k) {
+          if constexpr (is_invocable_with_brackets_v<decltype(accessor), int8, int8, int8> ||
+                        std::is_invocable_v<decltype(accessor), int8, int8, int8>)
             return invoke_with_brackets_or_parentheses(accessor, i, j, k);
           else
             return invoke_with_brackets_or_parentheses(accessor, Tup{i, j, k});
