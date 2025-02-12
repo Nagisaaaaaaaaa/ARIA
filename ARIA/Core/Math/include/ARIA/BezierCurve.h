@@ -7,6 +7,7 @@
 /// A set of discrete "control points" defines a smooth, continuous curve by means of a formula.
 /// Usually the curve is intended to approximate a real-world shape that otherwise
 /// has no mathematical representation or whose representation is unknown or too complicated.
+
 //
 //
 //
