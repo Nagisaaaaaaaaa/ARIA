@@ -10,8 +10,8 @@
 ///
 /// This file introduces the 1D, 2D, and 3D versions of marching cube.
 /// We say "cube" instead of "cubes" because:
-/// 1. The input is exactly ONE line, square, or cube.
-/// 2. The output is the points, lines, or triangles extracted from the input.
+/// 1. The input is exactly ONE line segment, square, or cube.
+/// 2. The output is the points, line segments, or triangles extracted from the input.
 ///
 /// Users can implement their own marching "cubes" based on it.
 
