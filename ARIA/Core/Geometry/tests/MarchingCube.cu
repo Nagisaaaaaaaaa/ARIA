@@ -49,7 +49,7 @@ TEST(MarchingCube, D1) {
     EXPECT_EQ(times, 1);
   };
 
-  auto positions = [](uint i) { return arr{Vec1r{-2.5_R}, Vec1r{2.5_R}}[i]; };
+  auto positions = [](uint i) { return arr{Vec1r{-2.5_R}, Vec1r{3.75_R}}[i]; };
 
   auto valuesOO = [](uint i) { return arr{0.1_R, 0.1_R}[i]; };
   auto valuesPP = [](uint i) { return arr{0.8_R, 0.8_R}[i]; };
@@ -200,8 +200,8 @@ TEST(MarchingCube, D2) {
   };
 
   auto positions = [](uint i, uint j) {
-    return arr{arr{Vec2r{-2.5_R, -2.5_R}, Vec2r{-2.5_R, 2.5_R}}, //
-               arr{Vec2r{2.5_R, -2.5_R}, Vec2r{2.5_R, 2.5_R}}}[i][j];
+    return arr{arr{Vec2r{-2.5_R, -2.5_R}, Vec2r{-2.5_R, 3.75_R}}, //
+               arr{Vec2r{3.75_R, -2.5_R}, Vec2r{3.75_R, 3.75_R}}}[i][j];
   };
 
   auto values_OOOO = [](uint i, uint j) { return arr{arr{0.1_R, 0.1_R}, arr{0.1_R, 0.1_R}}[i][j]; };
