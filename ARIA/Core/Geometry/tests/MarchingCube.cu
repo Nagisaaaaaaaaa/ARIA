@@ -255,4 +255,46 @@ TEST(MarchingCube, D2) {
   testExtract_OPPO(positions, values_OPPO, isoValue);
 }
 
+TEST(MarchingCube, D3) {
+  using MC = MarchingCube<3>;
+
+  auto testExtract_AAAA = [&](const auto &positions, const auto &values, Real isoValue) {
+    MC::Extract(positions, values, isoValue, [&](const cuda::std::span<Vec3r, 3> &) { EXPECT_FALSE(true); });
+  };
+
+  auto positions = [](uint i, uint j, uint k) {
+    return Vec3r{
+        i == 0 ? -0.25_R : 3.75_R,
+        j == 0 ? -0.25_R : 3.75_R,
+        k == 0 ? -0.25_R : 3.75_R,
+    };
+  };
+
+  auto values_OOOO = [](uint i, uint j, uint k) { return arr{arr{0.1_R, 0.1_R}, arr{0.1_R, 0.1_R}}[i][j]; };
+  auto values_PPPP = [](uint i, uint j, uint k) { return arr{arr{0.8_R, 0.8_R}, arr{0.8_R, 0.8_R}}[i][j]; };
+
+  auto values_POOO = [](uint i, uint j, uint k) { return arr{arr{0.8_R, 0.1_R}, arr{0.1_R, 0.1_R}}[i][j]; };
+  auto values_OPPP = [](uint i, uint j, uint k) { return arr{arr{0.1_R, 0.8_R}, arr{0.8_R, 0.8_R}}[i][j]; };
+
+  auto values_OPOO = [](uint i, uint j, uint k) { return arr{arr{0.1_R, 0.8_R}, arr{0.1_R, 0.1_R}}[i][j]; };
+  auto values_POPP = [](uint i, uint j, uint k) { return arr{arr{0.8_R, 0.1_R}, arr{0.8_R, 0.8_R}}[i][j]; };
+
+  auto values_OOPO = [](uint i, uint j, uint k) { return arr{arr{0.1_R, 0.1_R}, arr{0.8_R, 0.1_R}}[i][j]; };
+  auto values_PPOP = [](uint i, uint j, uint k) { return arr{arr{0.8_R, 0.8_R}, arr{0.1_R, 0.8_R}}[i][j]; };
+
+  auto values_OOOP = [](uint i, uint j, uint k) { return arr{arr{0.1_R, 0.1_R}, arr{0.1_R, 0.8_R}}[i][j]; };
+  auto values_PPPO = [](uint i, uint j, uint k) { return arr{arr{0.8_R, 0.8_R}, arr{0.8_R, 0.1_R}}[i][j]; };
+
+  auto values_PPOO = [](uint i, uint j, uint k) { return arr{arr{0.8_R, 0.8_R}, arr{0.1_R, 0.1_R}}[i][j]; };
+  auto values_OOPP = [](uint i, uint j, uint k) { return arr{arr{0.1_R, 0.1_R}, arr{0.8_R, 0.8_R}}[i][j]; };
+
+  auto values_POPO = [](uint i, uint j, uint k) { return arr{arr{0.8_R, 0.1_R}, arr{0.8_R, 0.1_R}}[i][j]; };
+  auto values_OPOP = [](uint i, uint j, uint k) { return arr{arr{0.1_R, 0.8_R}, arr{0.1_R, 0.8_R}}[i][j]; };
+
+  auto values_POOP = [](uint i, uint j, uint k) { return arr{arr{0.8_R, 0.1_R}, arr{0.1_R, 0.8_R}}[i][j]; };
+  auto values_OPPO = [](uint i, uint j, uint k) { return arr{arr{0.1_R, 0.8_R}, arr{0.8_R, 0.1_R}}[i][j]; };
+
+  Real isoValue = 0.4_R;
+}
+
 } // namespace ARIA
