@@ -5,6 +5,7 @@
 ///
 /// `AABB` is implemented generically in dimension, thus can support
 /// physics systems with any dimensions, 1D, 2D, 3D, 4D, ...
+
 //
 //
 //
@@ -32,7 +33,7 @@ namespace ARIA {
 ///
 /// \note `AABB` is implemented with `Vec`, which internally uses `Eigen::Vector`.
 /// So, all functions are currently not `constexpr`.
-template <typename T, auto d>
+template <typename T, uint d>
 class AABB final {
 public:
   /// \brief Construct an empty `AABB`, whose each dimension `i`,

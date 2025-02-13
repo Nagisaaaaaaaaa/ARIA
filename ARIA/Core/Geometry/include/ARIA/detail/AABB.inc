@@ -5,7 +5,7 @@ namespace ARIA {
 namespace aabb::detail {
 
 // See the comments below.
-template <typename T, auto d, auto n, typename U, typename... Us>
+template <typename T, uint d, uint n, typename U, typename... Us>
 static decltype(auto) ConstructVecWithNEqualedValuesImpl(const U &v, Us &&...vs) {
   if constexpr (n == 0)
     return Vec<T, d>(std::forward<Us>(vs)...);
@@ -14,7 +14,7 @@ static decltype(auto) ConstructVecWithNEqualedValuesImpl(const U &v, Us &&...vs)
 }
 
 // A function wrapper which calls the constructor of `Vec<T, d>` with `d` equaled values.
-template <typename T, auto d>
+template <typename T, uint d>
 static decltype(auto) ConstructVecWithNEqualedValues(const T &value) {
   return ConstructVecWithNEqualedValuesImpl<T, d, d>(value);
 }
@@ -26,7 +26,7 @@ static decltype(auto) ConstructVecWithNEqualedValues(const T &value) {
 //
 //
 //
-template <typename T, auto d>
+template <typename T, uint d>
 ARIA_HOST_DEVICE inline /*constexpr*/ AABB<T, d>::AABB()
     : infAndSup_{aabb::detail::ConstructVecWithNEqualedValues<T, d>(supremum<T>),
                  aabb::detail::ConstructVecWithNEqualedValues<T, d>(infimum<T>)} {}
@@ -36,12 +36,12 @@ ARIA_HOST_DEVICE inline /*constexpr*/ AABB<T, d>::AABB()
 //
 //
 //
-template <typename T, auto d>
+template <typename T, uint d>
 ARIA_HOST_DEVICE inline /*constexpr*/ const Vec<T, d> &AABB<T, d>::operator[](uint i) const {
   return infAndSup_[i];
 }
 
-template <typename T, auto d>
+template <typename T, uint d>
 ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> &AABB<T, d>::operator[](uint i) {
   return infAndSup_[i];
 }
@@ -51,7 +51,7 @@ ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> &AABB<T, d>::operator[](uint i) 
 //
 //
 //
-template <typename T, auto d>
+template <typename T, uint d>
 ARIA_HOST_DEVICE inline /*constexpr*/ bool AABB<T, d>::empty() const {
   bool res = false;
 
@@ -66,7 +66,7 @@ ARIA_HOST_DEVICE inline /*constexpr*/ bool AABB<T, d>::empty() const {
   return res;
 }
 
-template <typename T, auto d>
+template <typename T, uint d>
 template <typename... Args>
 ARIA_HOST_DEVICE inline /*constexpr*/ void AABB<T, d>::Unionize(Args &&...args) {
   *this = unionized(*this, std::forward<Args>(args)...);
@@ -77,17 +77,17 @@ ARIA_HOST_DEVICE inline /*constexpr*/ void AABB<T, d>::Unionize(Args &&...args) 
 //
 //
 //
-template <typename T, auto d>
+template <typename T, uint d>
 ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::diagonal() const {
   return sup() - inf();
 }
 
-template <typename T, auto d>
+template <typename T, uint d>
 ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::center() const {
   return (sup() + inf()) / T{2};
 }
 
-template <typename T, auto d>
+template <typename T, uint d>
 ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::offset(const Vec<T, d> &p) const {
   return (p - inf()).cwiseQuotient(sup() - inf());
 }
@@ -97,7 +97,7 @@ ARIA_HOST_DEVICE inline /*constexpr*/ Vec<T, d> AABB<T, d>::offset(const Vec<T, 
 //
 //
 //
-template <typename T, auto d>
+template <typename T, uint d>
 template <typename... Args>
 ARIA_HOST_DEVICE inline /*constexpr*/ AABB<T, d> AABB<T, d>::unionized(Args &&...args) {
   // Union an `AABB` with another `AABB` or a `Vec`.
@@ -165,7 +165,7 @@ namespace aabb::detail {
 template <typename T>
 struct is_aabb : std::false_type {};
 
-template <typename T, auto d>
+template <typename T, uint d>
 struct is_aabb<AABB<T, d>> : std::true_type {};
 
 template <typename T>
@@ -175,13 +175,13 @@ static constexpr bool is_aabb_v = is_aabb<T>::value;
 //
 //
 // Whether the given type is `AABB<T, d>`.
-template <typename T, auto d>
+template <typename T, uint d>
 struct is_aabb_d : std::false_type {};
 
-template <typename T, auto d>
+template <typename T, uint d>
 struct is_aabb_d<AABB<T, d>, d> : std::true_type {};
 
-template <typename T, auto d>
+template <typename T, uint d>
 static constexpr bool is_aabb_d_v = is_aabb_d<T, d>::value;
 
 } // namespace aabb::detail
