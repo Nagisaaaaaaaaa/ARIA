@@ -1,9 +1,33 @@
 #pragma once
 
+/// \file
+/// \brief A triangle implementation.
+///
+/// `Triangle` is implemented generically in dimension, thus can support
+/// physics systems with any dimensions, 1D, 2D, 3D, 4D, ...
+
+//
+//
+//
+//
+//
 #include "ARIA/Vec.h"
 
 namespace ARIA {
 
+/// \brief A triangle implementation.
+///
+/// \tparam d Dimension.
+///
+/// \example ```cpp
+/// // Create a `Triangle`.
+/// Triangle3r tri{{0_R, 0_R, 0_R}, {1_R, 0_R, 0_R}, {0_R, 1_R, 0_R}};
+///
+/// // Get the vertices and normal of the `Triangle`.
+/// Vec3r v0 = tri[0], v1 = tri[1], v2 = tri[2];
+/// Vec3r normal = tri.normal();
+/// Vec3r stableNormal = tri.stableNormal();
+/// ```
 template <typename T, uint d>
 class Triangle final {
 private:
