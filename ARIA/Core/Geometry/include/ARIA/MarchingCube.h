@@ -47,8 +47,9 @@ namespace ARIA {
 /// // The values of the 4 dual vertices.
 /// // `values` will only be invoked with `(0, 0)`, `(1, 0)`, `(0, 1)` and `(1, 1)`.
 /// auto values = [&](uint x, uint y) -> Real { ... };
-/// // For `positions` and `values`, the parameter type can also be
-/// // `Tup<uint, uint>` instead of `uint, uint`, or something else.
+/// // For `positions` and `values`, the parameter type can also be something like
+/// // `T, U`, `Tup<T, U>`, `C<i>, C<j>`, and `Tup<C<i>, C<j>>`, where
+/// // `T, U` should be `<typename T, typename U>`, and `i, j` be `<auto i, auto j>`.
 /// Real isoValue = 0.5_R;
 ///
 /// // Extract line segments from the 4 dual vertices with the given iso-value.
@@ -82,8 +83,16 @@ public:
 
       if constexpr (dim == 1) {
         auto access = [&]<int8 i>(C<i>) {
-          if constexpr (is_invocable_with_brackets_v<decltype(accessor), int8> ||
-                        std::is_invocable_v<decltype(accessor), int8>)
+          if constexpr (is_invocable_with_brackets_v<decltype(accessor), C<i>> ||
+                        std::is_invocable_v<decltype(accessor), C<i>>)
+            // Try `accessor[0_I]` and `accessor(0_I)`.
+            return invoke_with_brackets_or_parentheses(accessor, C<i>{});
+          else if constexpr (is_invocable_with_brackets_v<decltype(accessor), Tup<C<i>>> ||
+                             std::is_invocable_v<decltype(accessor), Tup<C<i>>>)
+            // Try `accessor[Tup{0_I}]` and `accessor(Tup{0_I})`.
+            return invoke_with_brackets_or_parentheses(accessor, Tup<C<i>>{});
+          else if constexpr (is_invocable_with_brackets_v<decltype(accessor), int8> ||
+                             std::is_invocable_v<decltype(accessor), int8>)
             // Try `accessor[0]` and `accessor(0)`.
             return invoke_with_brackets_or_parentheses(accessor, i);
           else
@@ -95,8 +104,14 @@ public:
         return cuda::std::array<T, 2>{access(_0), access(_1)};
       } else if constexpr (dim == 2) {
         auto access = [&]<int8 i, int8 j>(C<i>, C<j>) {
-          if constexpr (is_invocable_with_brackets_v<decltype(accessor), int8, int8> ||
-                        std::is_invocable_v<decltype(accessor), int8, int8>)
+          if constexpr (is_invocable_with_brackets_v<decltype(accessor), C<i>, C<j>> ||
+                        std::is_invocable_v<decltype(accessor), C<i>, C<j>>)
+            return invoke_with_brackets_or_parentheses(accessor, C<i>{}, C<j>{});
+          else if constexpr (is_invocable_with_brackets_v<decltype(accessor), Tup<C<i>, C<j>>> ||
+                             std::is_invocable_v<decltype(accessor), Tup<C<i>, C<j>>>)
+            return invoke_with_brackets_or_parentheses(accessor, Tup<C<i>, C<j>>{});
+          else if constexpr (is_invocable_with_brackets_v<decltype(accessor), int8, int8> ||
+                             std::is_invocable_v<decltype(accessor), int8, int8>)
             return invoke_with_brackets_or_parentheses(accessor, i, j);
           else
             return invoke_with_brackets_or_parentheses(accessor, Tup{i, j});
@@ -105,8 +120,14 @@ public:
         return cuda::std::array<T, 4>{access(_0, _0), access(_1, _0), access(_1, _1), access(_0, _1)};
       } else if constexpr (dim == 3) {
         auto access = [&]<int8 i, int8 j, int8 k>(C<i>, C<j>, C<k>) {
-          if constexpr (is_invocable_with_brackets_v<decltype(accessor), int8, int8, int8> ||
-                        std::is_invocable_v<decltype(accessor), int8, int8, int8>)
+          if constexpr (is_invocable_with_brackets_v<decltype(accessor), C<i>, C<j>, C<k>> ||
+                        std::is_invocable_v<decltype(accessor), C<i>, C<j>, C<k>>)
+            return invoke_with_brackets_or_parentheses(accessor, C<i>{}, C<j>{}, C<k>{});
+          else if constexpr (is_invocable_with_brackets_v<decltype(accessor), Tup<C<i>, C<j>, C<k>>> ||
+                             std::is_invocable_v<decltype(accessor), Tup<C<i>, C<j>, C<k>>>)
+            return invoke_with_brackets_or_parentheses(accessor, Tup<C<i>, C<j>, C<k>>{});
+          else if constexpr (is_invocable_with_brackets_v<decltype(accessor), int8, int8, int8> ||
+                             std::is_invocable_v<decltype(accessor), int8, int8, int8>)
             return invoke_with_brackets_or_parentheses(accessor, i, j, k);
           else
             return invoke_with_brackets_or_parentheses(accessor, Tup{i, j, k});

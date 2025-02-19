@@ -179,7 +179,8 @@ public:
 template <typename... Ts>
 struct ValidTypeSetArgsImpl {
   using TNoCheck = TypeSetNoCheck<Ts...>;
-  static constexpr bool value = (std::is_same_v<Ts, TNoCheck::template Get<TNoCheck::template idx<Ts>>> && ...);
+  static constexpr bool value =
+      (std::is_same_v<Ts, typename TNoCheck::template Get<TNoCheck::template idx<Ts>>> && ...);
 };
 
 template <typename... Ts>
