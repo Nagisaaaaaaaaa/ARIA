@@ -131,13 +131,19 @@ struct Off {};
 //
 //
 //
+/// \brief Compute `abs(v)`, where `v` is determined at compile-time.
+template <auto v>
+ARIA_HOST_DEVICE static consteval auto Abs() {
+  return v < decltype(v){} ? -v : v;
+}
+
 /// \brief Compute `a^n`, where `n` is determined at compile-time.
 template <uint n, typename T>
-ARIA_HOST_DEVICE static constexpr T pow(const T &a) {
+ARIA_HOST_DEVICE static constexpr T Pow(const T &a) {
   if constexpr (n == 0)
     return static_cast<T>(1);
 
-  T half = pow<n / 2>(a);
+  T half = Pow<n / 2>(a);
   if constexpr (n % 2)
     return half * half * a;
   else

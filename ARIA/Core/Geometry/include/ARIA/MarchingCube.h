@@ -139,16 +139,16 @@ public:
     };
     cuda::std::array positions = rearrangeAndLinearize(std::forward<TAccessorPositions>(accessorPositions));
     cuda::std::array values = rearrangeAndLinearize(std::forward<TAccessorValues>(accessorValues));
-    static_assert(std::is_same_v<decltype(positions), cuda::std::array<VecDr, pow<dim>(2)>>,
+    static_assert(std::is_same_v<decltype(positions), cuda::std::array<VecDr, Pow<dim>(2)>>,
                   "Invalid accessor of positions");
-    static_assert(std::is_same_v<decltype(values), cuda::std::array<Real, pow<dim>(2)>>, "Invalid accessor of values");
+    static_assert(std::is_same_v<decltype(values), cuda::std::array<Real, Pow<dim>(2)>>, "Invalid accessor of values");
 
     uint iCases = 0;
-    ForEach<pow<dim>(2)>([&](auto i) {
+    ForEach<Pow<dim>(2)>([&](auto i) {
       if (values[i] > isoValue)
         iCases += (1 << i);
     });
-    if (iCases == 0 || iCases == pow<pow<dim - 1>(2)>(4) - 1)
+    if (iCases == 0 || iCases == Pow<Pow<dim - 1>(2)>(4) - 1)
       return;
 
     for (const int8_t *edge = marching_cube::detail::MarchingCubesCases<dim>()[iCases]; *edge > -1; edge += dim) {
