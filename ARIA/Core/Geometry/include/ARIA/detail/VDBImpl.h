@@ -147,7 +147,7 @@ protected:
   static constexpr int nCellsPerBlockDim = std::max(512 / (1 << dim), 32);
 
   // Number of cells per block.
-  static constexpr int nCellsPerBlock = pow<dim>(nCellsPerBlockDim); // = nCellsPerBlockDim^dim
+  static constexpr int nCellsPerBlock = Pow<dim>(nCellsPerBlockDim); // = nCellsPerBlockDim^dim
 
   //
   //
