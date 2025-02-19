@@ -553,9 +553,11 @@ TEST(Tup, OperatorsInt) {
     Tec2 c = a + b;
     Tec2 d = a - b;
     Tec2 e = a * b;
+    Tec2 f = a / b;
     expectTec2(c, 7, 18);
     expectTec2(d, -3, -4);
     expectTec2(e, 10, 77);
+    expectTec2(f, 0, 0);
   }
 
   {
@@ -564,9 +566,11 @@ TEST(Tup, OperatorsInt) {
     constexpr let c = a + b;
     constexpr let d = a - b;
     constexpr let e = a * b;
+    constexpr let f = a / b;
     static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(Tec{7_I, 18_I})>>);
     static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(Tec{-3_I, -4_I})>>);
     static_assert(std::is_same_v<decltype(e), std::add_const_t<decltype(Tec{10_I, 77_I})>>);
+    static_assert(std::is_same_v<decltype(f), std::add_const_t<decltype(Tec{0_I, 0_I})>>);
   }
 
   {
@@ -575,12 +579,15 @@ TEST(Tup, OperatorsInt) {
     let c = a + b;
     let d = a - b;
     let e = a * b;
+    let f = a / b;
     static_assert(std::is_same_v<decltype(c), decltype(Tec{7_I, 18})>);
     static_assert(std::is_same_v<decltype(d), decltype(Tec{-3_I, -4})>);
     static_assert(std::is_same_v<decltype(e), decltype(Tec{10_I, 77})>);
+    static_assert(std::is_same_v<decltype(f), decltype(Tec{0_I, 0})>);
     EXPECT_EQ(get<1>(c), 18);
     EXPECT_EQ(get<1>(d), -4);
     EXPECT_EQ(get<1>(e), 77);
+    EXPECT_EQ(get<1>(f), 0);
   }
 
   {
@@ -589,15 +596,19 @@ TEST(Tup, OperatorsInt) {
     Tec2 c0 = a + b;
     Tec2 c1 = a - b;
     Tec2 c2 = a * b;
-    Tec2 c3 = b + a;
-    Tec2 c4 = b - a;
-    Tec2 c5 = b * a;
+    Tec2 c3 = a / b;
+    Tec2 c4 = b + a;
+    Tec2 c5 = b - a;
+    Tec2 c6 = b * a;
+    Tec2 c7 = b / a;
     expectTec2(c0, 7, 12);
     expectTec2(c1, -3, 2);
     expectTec2(c2, 10, 35);
-    expectTec2(c3, 7, 12);
-    expectTec2(c4, 3, -2);
-    expectTec2(c5, 10, 35);
+    expectTec2(c3, 0, 1);
+    expectTec2(c4, 7, 12);
+    expectTec2(c5, 3, -2);
+    expectTec2(c6, 10, 35);
+    expectTec2(c7, 2, 0);
   }
 
   {
@@ -606,15 +617,19 @@ TEST(Tup, OperatorsInt) {
     constexpr let c0 = a + b;
     constexpr let c1 = a - b;
     constexpr let c2 = a * b;
-    constexpr let c3 = b + a;
-    constexpr let c4 = b - a;
-    constexpr let c5 = b * a;
+    constexpr let c3 = a / b;
+    constexpr let c4 = b + a;
+    constexpr let c5 = b - a;
+    constexpr let c6 = b * a;
+    constexpr let c7 = b / a;
     static_assert(std::is_same_v<decltype(c0), std::add_const_t<decltype(Tec{7_I, 12_I})>>);
     static_assert(std::is_same_v<decltype(c1), std::add_const_t<decltype(Tec{-3_I, 2_I})>>);
     static_assert(std::is_same_v<decltype(c2), std::add_const_t<decltype(Tec{10_I, 35_I})>>);
-    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(Tec{7_I, 12_I})>>);
-    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(Tec{3_I, -2_I})>>);
-    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(Tec{10_I, 35_I})>>);
+    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(Tec{0_I, 1_I})>>);
+    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(Tec{7_I, 12_I})>>);
+    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(Tec{3_I, -2_I})>>);
+    static_assert(std::is_same_v<decltype(c6), std::add_const_t<decltype(Tec{10_I, 35_I})>>);
+    static_assert(std::is_same_v<decltype(c7), std::add_const_t<decltype(Tec{2_I, 0_I})>>);
   }
 
   {
@@ -623,21 +638,27 @@ TEST(Tup, OperatorsInt) {
     constexpr let c0 = a + b;
     constexpr let c1 = a - b;
     constexpr let c2 = a * b;
-    constexpr let c3 = b + a;
-    constexpr let c4 = b - a;
-    constexpr let c5 = b * a;
+    constexpr let c3 = a / b;
+    constexpr let c4 = b + a;
+    constexpr let c5 = b - a;
+    constexpr let c6 = b * a;
+    constexpr let c7 = b / a;
     static_assert(std::is_same_v<decltype(c0), std::add_const_t<decltype(Tec{7_I, 12})>>);
     static_assert(std::is_same_v<decltype(c1), std::add_const_t<decltype(Tec{-3_I, 2})>>);
     static_assert(std::is_same_v<decltype(c2), std::add_const_t<decltype(Tec{10_I, 35})>>);
-    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(Tec{7_I, 12})>>);
-    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(Tec{3_I, -2})>>);
-    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(Tec{10_I, 35})>>);
+    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(Tec{0_I, 1})>>);
+    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(Tec{7_I, 12})>>);
+    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(Tec{3_I, -2})>>);
+    static_assert(std::is_same_v<decltype(c6), std::add_const_t<decltype(Tec{10_I, 35})>>);
+    static_assert(std::is_same_v<decltype(c7), std::add_const_t<decltype(Tec{2_I, 0})>>);
     EXPECT_EQ(get<1>(c0), 12);
     EXPECT_EQ(get<1>(c1), 2);
     EXPECT_EQ(get<1>(c2), 35);
-    EXPECT_EQ(get<1>(c3), 12);
-    EXPECT_EQ(get<1>(c4), -2);
-    EXPECT_EQ(get<1>(c5), 35);
+    EXPECT_EQ(get<1>(c3), 1);
+    EXPECT_EQ(get<1>(c4), 12);
+    EXPECT_EQ(get<1>(c5), -2);
+    EXPECT_EQ(get<1>(c6), 35);
+    EXPECT_EQ(get<1>(c7), 0);
   }
 
   // 3D.
@@ -647,9 +668,11 @@ TEST(Tup, OperatorsInt) {
     Tec3 c = a + b;
     Tec3 d = a - b;
     Tec3 e = a * b;
+    Tec3 f = a / b;
     expectTec3(c, 7, 18, -9);
     expectTec3(d, -3, -4, -1);
     expectTec3(e, 10, 77, 20);
+    expectTec3(f, 0, 0, 1);
   }
 
   {
@@ -658,9 +681,11 @@ TEST(Tup, OperatorsInt) {
     constexpr let c = a + b;
     constexpr let d = a - b;
     constexpr let e = a * b;
+    constexpr let f = a / b;
     static_assert(std::is_same_v<decltype(c), std::add_const_t<decltype(Tec{7_I, 18_I, -9_I})>>);
     static_assert(std::is_same_v<decltype(d), std::add_const_t<decltype(Tec{-3_I, -4_I, -1_I})>>);
     static_assert(std::is_same_v<decltype(e), std::add_const_t<decltype(Tec{10_I, 77_I, 20_I})>>);
+    static_assert(std::is_same_v<decltype(f), std::add_const_t<decltype(Tec{0_I, 0_I, 1_I})>>);
   }
 
   {
@@ -669,12 +694,15 @@ TEST(Tup, OperatorsInt) {
     let c = a + b;
     let d = a - b;
     let e = a * b;
+    let f = a / b;
     static_assert(std::is_same_v<decltype(c), decltype(Tec{7_I, 18, -9_I})>);
     static_assert(std::is_same_v<decltype(d), decltype(Tec{-3_I, -4, -1_I})>);
     static_assert(std::is_same_v<decltype(e), decltype(Tec{10_I, 77, 20_I})>);
+    static_assert(std::is_same_v<decltype(f), decltype(Tec{0_I, 0, 1_I})>);
     EXPECT_EQ(get<1>(c), 18);
     EXPECT_EQ(get<1>(d), -4);
     EXPECT_EQ(get<1>(e), 77);
+    EXPECT_EQ(get<1>(f), 0);
   }
 
   {
@@ -683,15 +711,19 @@ TEST(Tup, OperatorsInt) {
     Tec3 c0 = a + b;
     Tec3 c1 = a - b;
     Tec3 c2 = a * b;
-    Tec3 c3 = b + a;
-    Tec3 c4 = b - a;
-    Tec3 c5 = b * a;
+    Tec3 c3 = a / b;
+    Tec3 c4 = b + a;
+    Tec3 c5 = b - a;
+    Tec3 c6 = b * a;
+    Tec3 c7 = b / a;
     expectTec3(c0, 7, 12, 0);
     expectTec3(c1, -3, 2, -10);
     expectTec3(c2, 10, 35, -25);
-    expectTec3(c3, 7, 12, 0);
-    expectTec3(c4, 3, -2, 10);
-    expectTec3(c5, 10, 35, -25);
+    expectTec3(c3, 0, 1, -1);
+    expectTec3(c4, 7, 12, 0);
+    expectTec3(c5, 3, -2, 10);
+    expectTec3(c6, 10, 35, -25);
+    expectTec3(c7, 2, 0, -1);
   }
 
   {
@@ -700,15 +732,19 @@ TEST(Tup, OperatorsInt) {
     constexpr let c0 = a + b;
     constexpr let c1 = a - b;
     constexpr let c2 = a * b;
-    constexpr let c3 = b + a;
-    constexpr let c4 = b - a;
-    constexpr let c5 = b * a;
+    constexpr let c3 = a / b;
+    constexpr let c4 = b + a;
+    constexpr let c5 = b - a;
+    constexpr let c6 = b * a;
+    constexpr let c7 = b / a;
     static_assert(std::is_same_v<decltype(c0), std::add_const_t<decltype(Tec{7_I, 12_I, 0_I})>>);
     static_assert(std::is_same_v<decltype(c1), std::add_const_t<decltype(Tec{-3_I, 2_I, -10_I})>>);
     static_assert(std::is_same_v<decltype(c2), std::add_const_t<decltype(Tec{10_I, 35_I, -25_I})>>);
-    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(Tec{7_I, 12_I, 0_I})>>);
-    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(Tec{3_I, -2_I, 10_I})>>);
-    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(Tec{10_I, 35_I, -25_I})>>);
+    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(Tec{0_I, 1_I, -1_I})>>);
+    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(Tec{7_I, 12_I, 0_I})>>);
+    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(Tec{3_I, -2_I, 10_I})>>);
+    static_assert(std::is_same_v<decltype(c6), std::add_const_t<decltype(Tec{10_I, 35_I, -25_I})>>);
+    static_assert(std::is_same_v<decltype(c7), std::add_const_t<decltype(Tec{2_I, 0_I, -1_I})>>);
   }
 
   {
@@ -717,21 +753,27 @@ TEST(Tup, OperatorsInt) {
     constexpr let c0 = a + b;
     constexpr let c1 = a - b;
     constexpr let c2 = a * b;
-    constexpr let c3 = b + a;
-    constexpr let c4 = b - a;
-    constexpr let c5 = b * a;
+    constexpr let c3 = a / b;
+    constexpr let c4 = b + a;
+    constexpr let c5 = b - a;
+    constexpr let c6 = b * a;
+    constexpr let c7 = b / a;
     static_assert(std::is_same_v<decltype(c0), std::add_const_t<decltype(Tec{7_I, 12, 0_I})>>);
     static_assert(std::is_same_v<decltype(c1), std::add_const_t<decltype(Tec{-3_I, 2, -10_I})>>);
     static_assert(std::is_same_v<decltype(c2), std::add_const_t<decltype(Tec{10_I, 35, -25_I})>>);
-    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(Tec{7_I, 12, 0_I})>>);
-    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(Tec{3_I, -2, 10_I})>>);
-    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(Tec{10_I, 35, -25_I})>>);
+    static_assert(std::is_same_v<decltype(c3), std::add_const_t<decltype(Tec{0_I, 1, -1_I})>>);
+    static_assert(std::is_same_v<decltype(c4), std::add_const_t<decltype(Tec{7_I, 12, 0_I})>>);
+    static_assert(std::is_same_v<decltype(c5), std::add_const_t<decltype(Tec{3_I, -2, 10_I})>>);
+    static_assert(std::is_same_v<decltype(c6), std::add_const_t<decltype(Tec{10_I, 35, -25_I})>>);
+    static_assert(std::is_same_v<decltype(c7), std::add_const_t<decltype(Tec{2_I, 0, -1_I})>>);
     EXPECT_EQ(get<1>(c0), 12);
     EXPECT_EQ(get<1>(c1), 2);
     EXPECT_EQ(get<1>(c2), 35);
-    EXPECT_EQ(get<1>(c3), 12);
-    EXPECT_EQ(get<1>(c4), -2);
-    EXPECT_EQ(get<1>(c5), 35);
+    EXPECT_EQ(get<1>(c3), 1);
+    EXPECT_EQ(get<1>(c4), 12);
+    EXPECT_EQ(get<1>(c5), -2);
+    EXPECT_EQ(get<1>(c6), 35);
+    EXPECT_EQ(get<1>(c7), 0);
   }
 }
 
