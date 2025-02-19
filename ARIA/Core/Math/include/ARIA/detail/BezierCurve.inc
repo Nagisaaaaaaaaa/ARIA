@@ -143,7 +143,7 @@ public:
     // Directly compute the Bernstein polynomials.
     for (uint i = 0; i < nCPs; ++i) {
       VecDim cp = invoke_with_parentheses_or_brackets(controlPoints(), i);
-      pos += cp * nCr(degree, i) * std::pow(1 - t, degree - i) * std::pow(t, i);
+      pos += cp * nCr(degree, i) * pow(1 - t, degree - i) * pow(t, i);
     }
 
     return pos;
