@@ -11,6 +11,7 @@ set(core_geometry_headers
     ARIA/AABB.h
     ARIA/BVH.h
     ARIA/MarchingCube.h
+    ARIA/Triangle.h
     ARIA/VDB.h
 )
 

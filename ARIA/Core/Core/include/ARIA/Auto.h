@@ -84,7 +84,7 @@ namespace ARIA {
 /// \see Property.h
 /// \see PropertyImpl.h
 template <property::detail::ProxyType T>
-ARIA_HOST_DEVICE auto Auto(T &&v) {
+ARIA_HOST_DEVICE constexpr auto Auto(T &&v) {
   if constexpr //! For ARIA property, note that this should be checked before any other proxy systems.
       (property::detail::PropertyType<std::decay_t<T>>)
     return std::forward<T>(v).value();
@@ -104,7 +104,7 @@ ARIA_HOST_DEVICE auto Auto(T &&v) {
 }
 
 template <property::detail::NonProxyType T>
-ARIA_HOST_DEVICE decltype(auto) Auto(T &&v) {
+ARIA_HOST_DEVICE constexpr decltype(auto) Auto(T &&v) {
   if constexpr (std::is_lvalue_reference_v<decltype(v)>) //! For l-value, simply return the reference.
     return std::forward<T>(v);
   else {                            //! For r-value and others, never return a reference.
