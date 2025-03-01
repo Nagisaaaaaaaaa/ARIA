@@ -125,3 +125,25 @@ using reduce_vec_mosaic_t = typename reduce_vec_mosaic<T, Ts...>::type;
 } // namespace vec::detail
 
 } // namespace ARIA
+
+//
+//
+//
+//
+//
+// Support `fmt` formatting.
+template <typename T, auto size>
+struct fmt::formatter<ARIA::vec::detail::Vec<T, size>> {
+  constexpr auto parse(fmt::format_parse_context &ctx) { return ctx.begin(); }
+
+  template <typename FormatContext>
+  auto format(const ARIA::vec::detail::Vec<T, size> &vec, FormatContext &ctx) {
+    fmt::format_to(ctx.out(), "(");
+    ARIA::ForEach<size>([&]<auto i>() {
+      if constexpr (i > 0)
+        fmt::format_to(ctx.out(), ", ");
+      fmt::format_to(ctx.out(), "{}", vec[i]);
+    });
+    return fmt::format_to(ctx.out(), ")");
+  }
+};
