@@ -143,4 +143,21 @@ TEST(Vec, Mosaic) {
   testVec(vec2);
 }
 
+TEST(Vec, Format) {
+  {
+    std::string s = fmt::format("{}", Vec1u{233U});
+    EXPECT_EQ(s, "(233)");
+  }
+
+  {
+    std::string s = fmt::format("{}", Vec2i{100, -100});
+    EXPECT_EQ(s, "(100, -100)");
+  }
+
+  {
+    std::string s = fmt::format("{}", Vec3f{0.1, -1.2, 2.3});
+    EXPECT_EQ(s, "(0.1, -1.2, 2.3)");
+  }
+}
+
 } // namespace ARIA
