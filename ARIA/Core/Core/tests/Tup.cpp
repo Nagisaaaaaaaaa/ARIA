@@ -983,7 +983,7 @@ TEST(Tup, OperatorsConstantZeros) {
     static_assert(C<0.0>{} == 0);
   }
 
-  // `operator*` and `operator/` for scalars with constant zeros.
+  // `operator*` and `operator/` for "scalar operate scalar" with constant zeros.
   {
     int a = 233;
     static_assert(std::is_same_v<decltype(C<0>{} * a), C<0>>);
@@ -1032,7 +1032,7 @@ TEST(Tup, OperatorsConstantZeros) {
     static_assert(std::is_same_v<decltype(C<0.0>{} / a), C<0.0>>);
   }
 
-  // `operator*` and `operator/` for `Tec`s with constant zeros.
+  // `operator*` and `operator/` for "`Tec` operate scalar" with constant zeros.
   {
     auto testInt = []<typename T>() {
       Tec a{T(0), C<T(0)>{}};
