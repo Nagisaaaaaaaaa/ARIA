@@ -974,4 +974,63 @@ TEST(Tup, OperatorsFloat) {
   }
 }
 
+TEST(Tup, OperatorsConstantZeros) {
+  // `operator==`.
+  {
+    static_assert(C<0>{} == 0);
+    static_assert(C<0U>{} == 0);
+    static_assert(C<0.0F>{} == 0);
+    static_assert(C<0.0>{} == 0);
+  }
+
+  // `operator*` and `operator/` for scalars with constant zeros.
+  {
+    int a = 233;
+    static_assert(std::is_same_v<decltype(C<0>{} * a), C<0>>);
+    static_assert(std::is_same_v<decltype(C<0>{} / a), C<0>>);
+    static_assert(std::is_same_v<decltype(C<0U>{} * a), C<0U>>);
+    static_assert(std::is_same_v<decltype(C<0U>{} / a), C<0U>>);
+    static_assert(std::is_same_v<decltype(C<0.0F>{} * a), C<0.0F>>);
+    static_assert(std::is_same_v<decltype(C<0.0F>{} / a), C<0.0F>>);
+    static_assert(std::is_same_v<decltype(C<0.0>{} * a), C<0.0>>);
+    static_assert(std::is_same_v<decltype(C<0.0>{} / a), C<0.0>>);
+  }
+
+  {
+    uint a = 233;
+    static_assert(std::is_same_v<decltype(C<0>{} * a), C<0U>>);
+    static_assert(std::is_same_v<decltype(C<0>{} / a), C<0U>>);
+    static_assert(std::is_same_v<decltype(C<0U>{} * a), C<0U>>);
+    static_assert(std::is_same_v<decltype(C<0U>{} / a), C<0U>>);
+    static_assert(std::is_same_v<decltype(C<0.0F>{} * a), C<0.0F>>);
+    static_assert(std::is_same_v<decltype(C<0.0F>{} / a), C<0.0F>>);
+    static_assert(std::is_same_v<decltype(C<0.0>{} * a), C<0.0>>);
+    static_assert(std::is_same_v<decltype(C<0.0>{} / a), C<0.0>>);
+  }
+
+  {
+    float a = 233.0F;
+    static_assert(std::is_same_v<decltype(C<0>{} * a), C<0.0F>>);
+    static_assert(std::is_same_v<decltype(C<0>{} / a), C<0.0F>>);
+    static_assert(std::is_same_v<decltype(C<0U>{} * a), C<0.0F>>);
+    static_assert(std::is_same_v<decltype(C<0U>{} / a), C<0.0F>>);
+    static_assert(std::is_same_v<decltype(C<0.0F>{} * a), C<0.0F>>);
+    static_assert(std::is_same_v<decltype(C<0.0F>{} / a), C<0.0F>>);
+    static_assert(std::is_same_v<decltype(C<0.0>{} * a), C<0.0>>);
+    static_assert(std::is_same_v<decltype(C<0.0>{} / a), C<0.0>>);
+  }
+
+  {
+    double a = 233.0;
+    static_assert(std::is_same_v<decltype(C<0>{} * a), C<0.0>>);
+    static_assert(std::is_same_v<decltype(C<0>{} / a), C<0.0>>);
+    static_assert(std::is_same_v<decltype(C<0U>{} * a), C<0.0>>);
+    static_assert(std::is_same_v<decltype(C<0U>{} / a), C<0.0>>);
+    static_assert(std::is_same_v<decltype(C<0.0F>{} * a), C<0.0>>);
+    static_assert(std::is_same_v<decltype(C<0.0F>{} / a), C<0.0>>);
+    static_assert(std::is_same_v<decltype(C<0.0>{} * a), C<0.0>>);
+    static_assert(std::is_same_v<decltype(C<0.0>{} / a), C<0.0>>);
+  }
+}
+
 } // namespace ARIA
