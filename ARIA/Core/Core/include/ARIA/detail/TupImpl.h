@@ -372,21 +372,21 @@ FillTec(const std::decay_t<decltype(get<0>(std::declval<ARIA::tup::detail::Tec<T
 template <auto t, typename U>
   requires(t == 0 && std::is_arithmetic_v<U>)
 [[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator*(C<t>, U) {
-  static_assert(t * U(1) == 0, "Invalid types for arithmetic operations");
+  static_assert(t * U(1) == 0, "Invalid types for arithmetic operators");
   return C<t * U(1)>{};
 }
 
 template <typename U, auto t>
   requires(t == 0 && std::is_arithmetic_v<U>)
 [[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator*(U, C<t>) {
-  static_assert(U(1) * t == 0, "Invalid types for arithmetic operations");
+  static_assert(U(1) * t == 0, "Invalid types for arithmetic operators");
   return C<U(1) * t>{};
 }
 
 template <auto t, typename U>
   requires(t == 0 && std::is_arithmetic_v<U>)
 [[nodiscard]] ARIA_HOST_DEVICE constexpr auto operator/(C<t>, U) {
-  static_assert(t / U(1) == 0, "Invalid types for arithmetic operations");
+  static_assert(t / U(1) == 0, "Invalid types for arithmetic operators");
   return C<t / U(1)>{};
 }
 
