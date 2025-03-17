@@ -1036,60 +1036,68 @@ TEST(Tup, OperatorsConstantZeros) {
   {
     auto testInt = []<typename T>() {
       Tec a{T(0), C<T(0)>{}};
-      int b = 233;
-      let c0 = a * b;
-      let c1 = b * a;
-      let c2 = a / b;
-      static_assert(std::is_same_v<decltype(get<0>(c0)), T &>);
-      static_assert(std::is_same_v<decltype(get<1>(c0)), C<T(0)>>);
-      static_assert(std::is_same_v<decltype(get<0>(c1)), T &>);
-      static_assert(std::is_same_v<decltype(get<1>(c1)), C<T(0)>>);
-      static_assert(std::is_same_v<decltype(get<0>(c2)), T &>);
-      static_assert(std::is_same_v<decltype(get<1>(c2)), C<T(0)>>);
+      ForEach<MakeTypeArray<int, C<233>>>([&]<typename B>() {
+        B b;
+        let c0 = a * b;
+        let c1 = b * a;
+        let c2 = a / b;
+        static_assert(std::is_same_v<decltype(get<0>(c0)), T &>);
+        static_assert(std::is_same_v<decltype(get<1>(c0)), C<T(0)>>);
+        static_assert(std::is_same_v<decltype(get<0>(c1)), T &>);
+        static_assert(std::is_same_v<decltype(get<1>(c1)), C<T(0)>>);
+        static_assert(std::is_same_v<decltype(get<0>(c2)), T &>);
+        static_assert(std::is_same_v<decltype(get<1>(c2)), C<T(0)>>);
+      });
     };
 
     auto testUInt = []<typename T>() {
       using U = std::conditional_t<std::is_same_v<T, int>, uint, T>;
       Tec a{T(0), C<T(0)>{}};
-      uint b = 233U;
-      let c0 = a * b;
-      let c1 = b * a;
-      let c2 = a / b;
-      static_assert(std::is_same_v<decltype(get<0>(c0)), U &>);
-      static_assert(std::is_same_v<decltype(get<1>(c0)), C<U(0)>>);
-      static_assert(std::is_same_v<decltype(get<0>(c1)), U &>);
-      static_assert(std::is_same_v<decltype(get<1>(c1)), C<U(0)>>);
-      static_assert(std::is_same_v<decltype(get<0>(c2)), U &>);
-      static_assert(std::is_same_v<decltype(get<1>(c2)), C<U(0)>>);
+      ForEach<MakeTypeArray<uint, C<233U>>>([&]<typename B>() {
+        B b;
+        let c0 = a * b;
+        let c1 = b * a;
+        let c2 = a / b;
+        static_assert(std::is_same_v<decltype(get<0>(c0)), U &>);
+        static_assert(std::is_same_v<decltype(get<1>(c0)), C<U(0)>>);
+        static_assert(std::is_same_v<decltype(get<0>(c1)), U &>);
+        static_assert(std::is_same_v<decltype(get<1>(c1)), C<U(0)>>);
+        static_assert(std::is_same_v<decltype(get<0>(c2)), U &>);
+        static_assert(std::is_same_v<decltype(get<1>(c2)), C<U(0)>>);
+      });
     };
 
     auto testFloat = []<typename T>() {
       using U = std::conditional_t<std::is_same_v<T, double>, double, float>;
       Tec a{T(0), C<T(0)>{}};
-      float b = 233.0F;
-      let c0 = a * b;
-      let c1 = b * a;
-      let c2 = a / b;
-      static_assert(std::is_same_v<decltype(get<0>(c0)), U &>);
-      static_assert(std::is_same_v<decltype(get<1>(c0)), C<U(0)>>);
-      static_assert(std::is_same_v<decltype(get<0>(c1)), U &>);
-      static_assert(std::is_same_v<decltype(get<1>(c1)), C<U(0)>>);
-      static_assert(std::is_same_v<decltype(get<0>(c2)), U &>);
-      static_assert(std::is_same_v<decltype(get<1>(c2)), C<U(0)>>);
+      ForEach<MakeTypeArray<float, C<233.0F>>>([&]<typename B>() {
+        B b;
+        let c0 = a * b;
+        let c1 = b * a;
+        let c2 = a / b;
+        static_assert(std::is_same_v<decltype(get<0>(c0)), U &>);
+        static_assert(std::is_same_v<decltype(get<1>(c0)), C<U(0)>>);
+        static_assert(std::is_same_v<decltype(get<0>(c1)), U &>);
+        static_assert(std::is_same_v<decltype(get<1>(c1)), C<U(0)>>);
+        static_assert(std::is_same_v<decltype(get<0>(c2)), U &>);
+        static_assert(std::is_same_v<decltype(get<1>(c2)), C<U(0)>>);
+      });
     };
 
     auto testDouble = []<typename T>() {
       Tec a{T(0), C<T(0)>{}};
-      double b = 233.0;
-      let c0 = a * b;
-      let c1 = b * a;
-      let c2 = a / b;
-      static_assert(std::is_same_v<decltype(get<0>(c0)), double &>);
-      static_assert(std::is_same_v<decltype(get<1>(c0)), C<0.0>>);
-      static_assert(std::is_same_v<decltype(get<0>(c1)), double &>);
-      static_assert(std::is_same_v<decltype(get<1>(c1)), C<0.0>>);
-      static_assert(std::is_same_v<decltype(get<0>(c2)), double &>);
-      static_assert(std::is_same_v<decltype(get<1>(c2)), C<0.0>>);
+      ForEach<MakeTypeArray<double, C<233.0>>>([&]<typename B>() {
+        B b;
+        let c0 = a * b;
+        let c1 = b * a;
+        let c2 = a / b;
+        static_assert(std::is_same_v<decltype(get<0>(c0)), double &>);
+        static_assert(std::is_same_v<decltype(get<1>(c0)), C<0.0>>);
+        static_assert(std::is_same_v<decltype(get<0>(c1)), double &>);
+        static_assert(std::is_same_v<decltype(get<1>(c1)), C<0.0>>);
+        static_assert(std::is_same_v<decltype(get<0>(c2)), double &>);
+        static_assert(std::is_same_v<decltype(get<1>(c2)), C<0.0>>);
+      });
     };
 
     testInt.operator()<int>();
@@ -1117,60 +1125,68 @@ TEST(Tup, OperatorsConstantZeros) {
   {
     auto testInt = []<typename T>() {
       Tec a{T(0), C<T(0)>{}};
-      Tec b{C<233>{}, 233};
-      let c0 = a * b;
-      let c1 = b * a;
-      let c2 = a / b;
-      static_assert(std::is_same_v<decltype(get<0>(c0)), T &>);
-      static_assert(std::is_same_v<decltype(get<1>(c0)), C<T(0)>>);
-      static_assert(std::is_same_v<decltype(get<0>(c1)), T &>);
-      static_assert(std::is_same_v<decltype(get<1>(c1)), C<T(0)>>);
-      static_assert(std::is_same_v<decltype(get<0>(c2)), T &>);
-      static_assert(std::is_same_v<decltype(get<1>(c2)), C<T(0)>>);
+      ForEach<MakeTypeArray<Tec<C<233>, int>, Tec<C<233>, C<233>>>>([&]<typename B>() {
+        B b;
+        let c0 = a * b;
+        let c1 = b * a;
+        let c2 = a / b;
+        static_assert(std::is_same_v<decltype(get<0>(c0)), T &>);
+        static_assert(std::is_same_v<decltype(get<1>(c0)), C<T(0)>>);
+        static_assert(std::is_same_v<decltype(get<0>(c1)), T &>);
+        static_assert(std::is_same_v<decltype(get<1>(c1)), C<T(0)>>);
+        static_assert(std::is_same_v<decltype(get<0>(c2)), T &>);
+        static_assert(std::is_same_v<decltype(get<1>(c2)), C<T(0)>>);
+      });
     };
 
     auto testUInt = []<typename T>() {
       using U = std::conditional_t<std::is_same_v<T, int>, uint, T>;
       Tec a{T(0), C<T(0)>{}};
-      Tec b{C<233U>{}, 233U};
-      let c0 = a * b;
-      let c1 = b * a;
-      let c2 = a / b;
-      static_assert(std::is_same_v<decltype(get<0>(c0)), U &>);
-      static_assert(std::is_same_v<decltype(get<1>(c0)), C<U(0)>>);
-      static_assert(std::is_same_v<decltype(get<0>(c1)), U &>);
-      static_assert(std::is_same_v<decltype(get<1>(c1)), C<U(0)>>);
-      static_assert(std::is_same_v<decltype(get<0>(c2)), U &>);
-      static_assert(std::is_same_v<decltype(get<1>(c2)), C<U(0)>>);
+      ForEach<MakeTypeArray<Tec<C<233U>, uint>, Tec<C<233U>, C<233U>>>>([&]<typename B>() {
+        B b;
+        let c0 = a * b;
+        let c1 = b * a;
+        let c2 = a / b;
+        static_assert(std::is_same_v<decltype(get<0>(c0)), U &>);
+        static_assert(std::is_same_v<decltype(get<1>(c0)), C<U(0)>>);
+        static_assert(std::is_same_v<decltype(get<0>(c1)), U &>);
+        static_assert(std::is_same_v<decltype(get<1>(c1)), C<U(0)>>);
+        static_assert(std::is_same_v<decltype(get<0>(c2)), U &>);
+        static_assert(std::is_same_v<decltype(get<1>(c2)), C<U(0)>>);
+      });
     };
 
     auto testFloat = []<typename T>() {
       using U = std::conditional_t<std::is_same_v<T, double>, double, float>;
       Tec a{T(0), C<T(0)>{}};
-      Tec b{C<233.0F>{}, 233.0F};
-      let c0 = a * b;
-      let c1 = b * a;
-      let c2 = a / b;
-      static_assert(std::is_same_v<decltype(get<0>(c0)), U &>);
-      static_assert(std::is_same_v<decltype(get<1>(c0)), C<U(0)>>);
-      static_assert(std::is_same_v<decltype(get<0>(c1)), U &>);
-      static_assert(std::is_same_v<decltype(get<1>(c1)), C<U(0)>>);
-      static_assert(std::is_same_v<decltype(get<0>(c2)), U &>);
-      static_assert(std::is_same_v<decltype(get<1>(c2)), C<U(0)>>);
+      ForEach<MakeTypeArray<Tec<C<233.0F>, float>, Tec<C<233.0F>, C<233.0F>>>>([&]<typename B>() {
+        B b;
+        let c0 = a * b;
+        let c1 = b * a;
+        let c2 = a / b;
+        static_assert(std::is_same_v<decltype(get<0>(c0)), U &>);
+        static_assert(std::is_same_v<decltype(get<1>(c0)), C<U(0)>>);
+        static_assert(std::is_same_v<decltype(get<0>(c1)), U &>);
+        static_assert(std::is_same_v<decltype(get<1>(c1)), C<U(0)>>);
+        static_assert(std::is_same_v<decltype(get<0>(c2)), U &>);
+        static_assert(std::is_same_v<decltype(get<1>(c2)), C<U(0)>>);
+      });
     };
 
     auto testDouble = []<typename T>() {
       Tec a{T(0), C<T(0)>{}};
-      Tec b{C<233.0>{}, 233.0};
-      let c0 = a * b;
-      let c1 = b * a;
-      let c2 = a / b;
-      static_assert(std::is_same_v<decltype(get<0>(c0)), double &>);
-      static_assert(std::is_same_v<decltype(get<1>(c0)), C<0.0>>);
-      static_assert(std::is_same_v<decltype(get<0>(c1)), double &>);
-      static_assert(std::is_same_v<decltype(get<1>(c1)), C<0.0>>);
-      static_assert(std::is_same_v<decltype(get<0>(c2)), double &>);
-      static_assert(std::is_same_v<decltype(get<1>(c2)), C<0.0>>);
+      ForEach<MakeTypeArray<Tec<C<233.0>, double>, Tec<C<233.0>, C<233.0>>>>([&]<typename B>() {
+        B b;
+        let c0 = a * b;
+        let c1 = b * a;
+        let c2 = a / b;
+        static_assert(std::is_same_v<decltype(get<0>(c0)), double &>);
+        static_assert(std::is_same_v<decltype(get<1>(c0)), C<0.0>>);
+        static_assert(std::is_same_v<decltype(get<0>(c1)), double &>);
+        static_assert(std::is_same_v<decltype(get<1>(c1)), C<0.0>>);
+        static_assert(std::is_same_v<decltype(get<0>(c2)), double &>);
+        static_assert(std::is_same_v<decltype(get<1>(c2)), C<0.0>>);
+      });
     };
 
     testInt.operator()<int>();
