@@ -1261,6 +1261,35 @@ TEST(Tup, Math) {
       });
     });
   }
+
+  // 3D.
+  {
+    Tec v0{1_I, 2_I, 3_I};
+    Tec v1{5_I, 6_I, 7_I};
+
+    static_assert(Dot(v0, v1) == 38_I);
+    static_assert(NormSquared(v1) == 110_I);
+  }
+
+  {
+    ForEach<MakeTypeArray<Tec<C<1>, C<2>, C<3>>, Tec<C<1>, C<2>, int>, Tec<C<1>, int, C<3>>, Tec<int, C<2>, C<3>>, //
+                          Tec<C<1>, int, int>, Tec<int, C<2>, int>, Tec<int, int, C<3>>, Tec<int, int, int>>>(
+        [&]<typename T>() {
+      ForEach<MakeTypeArray<Tec<C<5>, C<6>, C<7>>, Tec<C<5>, C<6>, int>, Tec<C<5>, int, C<7>>, Tec<int, C<6>, C<7>>, //
+                            Tec<C<5>, int, int>, Tec<int, C<6>, int>, Tec<int, int, C<7>>, Tec<int, int, int>>>(
+          [&]<typename U>() {
+        constexpr T v0{1_I, 2_I, 3_I};
+        constexpr U v1{5_I, 6_I, 7_I};
+        T v2{1_I, 2_I, 3_I};
+        U v3{5_I, 6_I, 7_I};
+
+        static_assert(Dot(v0, v1) == 38);
+        static_assert(NormSquared(v1) == 110);
+        EXPECT_EQ(Dot(v2, v3), 38);
+        EXPECT_EQ(NormSquared(v3), 110);
+      });
+    });
+  }
 }
 
 } // namespace ARIA
