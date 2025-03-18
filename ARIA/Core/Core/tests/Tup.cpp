@@ -1211,4 +1211,56 @@ TEST(Tup, OperatorsConstantZeros) {
   }
 }
 
+TEST(Tup, Math) {
+  // 1D.
+  {
+    Tec v0{1_I};
+    Tec v1{5_I};
+
+    static_assert(Dot(v0, v1) == 5_I);
+    static_assert(NormSquared(v1) == 25_I);
+  }
+
+  {
+    ForEach<MakeTypeArray<Tec<C<1>>, Tec<int>>>([&]<typename T>() {
+      ForEach<MakeTypeArray<Tec<C<5>>, Tec<int>>>([&]<typename U>() {
+        constexpr T v0{1_I};
+        constexpr U v1{5_I};
+        T v2{1_I};
+        U v3{5_I};
+
+        static_assert(Dot(v0, v1) == 5);
+        static_assert(NormSquared(v1) == 25);
+        EXPECT_EQ(Dot(v2, v3), 5);
+        EXPECT_EQ(NormSquared(v3), 25);
+      });
+    });
+  }
+
+  // 2D.
+  {
+    Tec v0{1_I, 2_I};
+    Tec v1{5_I, 6_I};
+
+    static_assert(Dot(v0, v1) == 17_I);
+    static_assert(NormSquared(v1) == 61_I);
+  }
+
+  {
+    ForEach<MakeTypeArray<Tec<C<1>, C<2>>, Tec<C<1>, int>, Tec<int, C<2>>, Tec<int, int>>>([&]<typename T>() {
+      ForEach<MakeTypeArray<Tec<C<5>, C<6>>, Tec<C<5>, int>, Tec<int, C<6>>, Tec<int, int>>>([&]<typename U>() {
+        constexpr T v0{1_I, 2_I};
+        constexpr U v1{5_I, 6_I};
+        T v2{1_I, 2_I};
+        U v3{5_I, 6_I};
+
+        static_assert(Dot(v0, v1) == 17);
+        static_assert(NormSquared(v1) == 61);
+        EXPECT_EQ(Dot(v2, v3), 17);
+        EXPECT_EQ(NormSquared(v3), 61);
+      });
+    });
+  }
+}
+
 } // namespace ARIA

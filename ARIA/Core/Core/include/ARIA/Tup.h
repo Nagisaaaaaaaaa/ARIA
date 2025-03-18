@@ -164,4 +164,13 @@ using tup::detail::to_tup_t;
 /// ```
 using tup::detail::ToArray;
 
+//
+//
+//
+//
+//
+using tup::detail::Dot;
+
+using tup::detail::NormSquared;
+
 } // namespace ARIA
