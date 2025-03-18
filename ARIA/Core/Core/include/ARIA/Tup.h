@@ -188,4 +188,6 @@ using tup::detail::Dot;
 /// ```
 using tup::detail::NormSquared;
 
+using tup::detail::Cross;
+
 } // namespace ARIA

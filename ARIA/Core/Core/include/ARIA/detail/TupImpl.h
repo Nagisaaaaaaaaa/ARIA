@@ -352,6 +352,16 @@ template <typename... Ts>
   return Dot(a, a);
 }
 
+template <typename... Ts0, typename... Ts1>
+[[nodiscard]] ARIA_HOST_DEVICE constexpr auto Cross(const Tec<Ts0...> &a, const Tec<Ts1...> &b) {
+  static_assert(sizeof...(Ts0) == 3 && sizeof...(Ts1) == 3,
+                "Cross product is only implemented for `Tec`s with ranks equal to 3");
+
+  return Tec{get<1>(a) * get<2>(b) - get<2>(a) * get<1>(b), //
+             get<2>(a) * get<0>(b) - get<0>(a) * get<2>(b), //
+             get<0>(a) * get<1>(b) - get<1>(a) * get<0>(b)};
+}
+
 } // namespace tup::detail
 
 } // namespace ARIA
