@@ -188,6 +188,14 @@ using tup::detail::Dot;
 /// ```
 using tup::detail::NormSquared;
 
+/// \brief Compute the cross product of two `Tec`s.
+///
+/// \example ```cpp
+/// Tec v0{1_I, 2_I, 3_I};
+/// Tec v1{5_I, 6_I, 7_I};
+/// static_assert(Cross(v0, v1) == Tec{-4_I, 8_I, -4_I});
+/// static_assert(std::is_same_v<decltype(Cross(v0, v1)), Tec<C<-4>, C<8>, C<-4>>>);
+/// ```
 using tup::detail::Cross;
 
 } // namespace ARIA
