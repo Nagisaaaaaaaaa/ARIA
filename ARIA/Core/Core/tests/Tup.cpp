@@ -1269,6 +1269,7 @@ TEST(Tup, Math) {
 
     static_assert(std::is_same_v<decltype(Dot(v0, v1)), C<38>>);
     static_assert(std::is_same_v<decltype(NormSquared(v1)), C<110>>);
+    static_assert(std::is_same_v<decltype(Cross(v0, v1)), Tec<C<-4>, C<8>, C<-4>>>);
   }
 
   {
@@ -1285,8 +1286,11 @@ TEST(Tup, Math) {
 
         static_assert(Dot(v0, v1) == 38);
         static_assert(NormSquared(v1) == 110);
+        static_assert(Cross(v0, v1) == Tec{-4, 8, -4});
         EXPECT_EQ(Dot(v2, v3), 38);
         EXPECT_EQ(NormSquared(v3), 110);
+        Tec rhs{-4, 8, -4};
+        EXPECT_EQ(Cross(v2, v3), rhs);
       });
     });
   }
