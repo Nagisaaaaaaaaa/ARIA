@@ -1326,6 +1326,29 @@ TEST(Tup, MathConstantZeros) {
     test.operator()<float>();
     test.operator()<double>();
   }
+
+  // `Cross` with constant zeros.
+  {
+    auto test = []<typename T>() {
+      constexpr auto zero = C<T(0)>{};
+
+      constexpr Tec v0{T(1), zero, zero};
+      constexpr Tec v1{zero, T(1), zero};
+      Tec v2{T(1), zero, zero};
+      Tec v3{zero, T(1), zero};
+
+      static_assert(std::is_same_v<decltype(Cross(v0, v1)), Tec<C<T(0)>, C<T(0)>, T>>);
+      static_assert(std::is_same_v<decltype(Cross(v2, v3)), Tec<C<T(0)>, C<T(0)>, T>>);
+      constexpr Tec rhs{zero, zero, T(1)};
+      static_assert(Cross(v0, v1) == rhs);
+      EXPECT_EQ(Cross(v2, v3), rhs);
+    };
+
+    test.operator()<int>();
+    test.operator()<uint>();
+    test.operator()<float>();
+    test.operator()<double>();
+  }
 }
 
 } // namespace ARIA
