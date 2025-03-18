@@ -333,6 +333,8 @@ template <typename T, typename... Ts>
 //
 template <typename... Ts0, typename... Ts1>
 [[nodiscard]] ARIA_HOST_DEVICE constexpr auto Dot(const Tec<Ts0...> &a, const Tec<Ts1...> &b) {
+  static_assert(sizeof...(Ts0) > 0, "Empty `Tec`s are not allowed");
+
   //! `Ts0` is automatically required to have the same number of elements as `Ts1` at next line.
   using TRes = decltype(((std::declval<Ts0>() * std::declval<Ts1>()) + ...));
   if constexpr (is_static_v<TRes>) {
