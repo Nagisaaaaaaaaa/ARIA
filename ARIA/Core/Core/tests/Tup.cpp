@@ -1350,10 +1350,34 @@ TEST(Tup, MathConstantZeros) {
       EXPECT_EQ(Cross(v2B, v3), rhs);
     };
 
+    auto testFP = []<typename T>() {
+      constexpr auto zero = C<T(0)>{};
+
+      constexpr Tec v0A{T(1.2), zero, zero};
+      constexpr Tec v0B{T(1.2), T(2.3), zero};
+      constexpr Tec v1{zero, T(6.7), zero};
+      Tec v2A{T(1.2), zero, zero};
+      Tec v2B{T(1.2), T(2.3), zero};
+      Tec v3{zero, T(6.7), zero};
+
+      static_assert(std::is_same_v<decltype(Cross(v0A, v1)), Tec<C<T(0)>, C<T(0)>, T>>);
+      static_assert(std::is_same_v<decltype(Cross(v0B, v1)), Tec<C<T(0)>, C<T(0)>, T>>);
+      static_assert(std::is_same_v<decltype(Cross(v2A, v3)), Tec<C<T(0)>, C<T(0)>, T>>);
+      static_assert(std::is_same_v<decltype(Cross(v2B, v3)), Tec<C<T(0)>, C<T(0)>, T>>);
+      constexpr Tec rhs{zero, zero, T(1.2) * T(6.7)};
+      static_assert(Cross(v0A, v1) == rhs);
+      static_assert(Cross(v0B, v1) == rhs);
+      EXPECT_EQ(Cross(v2A, v3), rhs);
+      EXPECT_EQ(Cross(v2B, v3), rhs);
+    };
+
     test.operator()<int>();
     test.operator()<uint>();
     test.operator()<float>();
     test.operator()<double>();
+
+    testFP.operator()<float>();
+    testFP.operator()<double>();
   }
 }
 
