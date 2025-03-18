@@ -164,4 +164,38 @@ using tup::detail::to_tup_t;
 /// ```
 using tup::detail::ToArray;
 
+//
+//
+//
+//
+//
+/// \brief Compute the dot product of two `Tec`s.
+///
+/// \example ```cpp
+/// Tec v0{1_I, 2_I};
+/// Tec v1{5_I, 6_I};
+/// static_assert(Dot(v0, v1) == 17_I);
+/// static_assert(std::is_same_v<decltype(Dot(v0, v1)), C<17>>);
+/// ```
+using tup::detail::Dot;
+
+/// \brief Compute the squared norm of a `Tec`.
+///
+/// \example ```cpp
+/// Tec v{5_I, 6_I};
+/// static_assert(NormSquared(v) == 61_I);
+/// static_assert(std::is_same_v<decltype(NormSquared(v)), C<61>>);
+/// ```
+using tup::detail::NormSquared;
+
+/// \brief Compute the cross product of two `Tec`s.
+///
+/// \example ```cpp
+/// Tec v0{1_I, 2_I, 3_I};
+/// Tec v1{5_I, 6_I, 7_I};
+/// static_assert(Cross(v0, v1) == Tec{-4_I, 8_I, -4_I});
+/// static_assert(std::is_same_v<decltype(Cross(v0, v1)), Tec<C<-4>, C<8>, C<-4>>>);
+/// ```
+using tup::detail::Cross;
+
 } // namespace ARIA

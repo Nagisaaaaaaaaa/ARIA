@@ -1211,4 +1211,174 @@ TEST(Tup, OperatorsConstantZeros) {
   }
 }
 
+TEST(Tup, Math) {
+  // 1D.
+  {
+    Tec v0{1_I};
+    Tec v1{5_I};
+
+    static_assert(std::is_same_v<decltype(Dot(v0, v1)), C<5>>);
+    static_assert(std::is_same_v<decltype(NormSquared(v1)), C<25>>);
+  }
+
+  {
+    ForEach<MakeTypeArray<Tec<C<1>>, Tec<int>>>([&]<typename T>() {
+      ForEach<MakeTypeArray<Tec<C<5>>, Tec<int>>>([&]<typename U>() {
+        constexpr T v0{1_I};
+        constexpr U v1{5_I};
+        T v2{1_I};
+        U v3{5_I};
+
+        static_assert(Dot(v0, v1) == 5);
+        static_assert(NormSquared(v1) == 25);
+        EXPECT_EQ(Dot(v2, v3), 5);
+        EXPECT_EQ(NormSquared(v3), 25);
+      });
+    });
+  }
+
+  // 2D.
+  {
+    Tec v0{1_I, 2_I};
+    Tec v1{5_I, 6_I};
+
+    static_assert(std::is_same_v<decltype(Dot(v0, v1)), C<17>>);
+    static_assert(std::is_same_v<decltype(NormSquared(v1)), C<61>>);
+  }
+
+  {
+    ForEach<MakeTypeArray<Tec<C<1>, C<2>>, Tec<C<1>, int>, Tec<int, C<2>>, Tec<int, int>>>([&]<typename T>() {
+      ForEach<MakeTypeArray<Tec<C<5>, C<6>>, Tec<C<5>, int>, Tec<int, C<6>>, Tec<int, int>>>([&]<typename U>() {
+        constexpr T v0{1_I, 2_I};
+        constexpr U v1{5_I, 6_I};
+        T v2{1_I, 2_I};
+        U v3{5_I, 6_I};
+
+        static_assert(Dot(v0, v1) == 17);
+        static_assert(NormSquared(v1) == 61);
+        EXPECT_EQ(Dot(v2, v3), 17);
+        EXPECT_EQ(NormSquared(v3), 61);
+      });
+    });
+  }
+
+  // 3D.
+  {
+    Tec v0{1_I, 2_I, 3_I};
+    Tec v1{5_I, 6_I, 7_I};
+
+    static_assert(std::is_same_v<decltype(Dot(v0, v1)), C<38>>);
+    static_assert(std::is_same_v<decltype(NormSquared(v1)), C<110>>);
+    static_assert(std::is_same_v<decltype(Cross(v0, v1)), Tec<C<-4>, C<8>, C<-4>>>);
+  }
+
+  {
+    ForEach<MakeTypeArray<Tec<C<1>, C<2>, C<3>>, Tec<C<1>, C<2>, int>, Tec<C<1>, int, C<3>>, Tec<int, C<2>, C<3>>, //
+                          Tec<C<1>, int, int>, Tec<int, C<2>, int>, Tec<int, int, C<3>>, Tec<int, int, int>>>(
+        [&]<typename T>() {
+      ForEach<MakeTypeArray<Tec<C<5>, C<6>, C<7>>, Tec<C<5>, C<6>, int>, Tec<C<5>, int, C<7>>, Tec<int, C<6>, C<7>>, //
+                            Tec<C<5>, int, int>, Tec<int, C<6>, int>, Tec<int, int, C<7>>, Tec<int, int, int>>>(
+          [&]<typename U>() {
+        constexpr T v0{1_I, 2_I, 3_I};
+        constexpr U v1{5_I, 6_I, 7_I};
+        T v2{1_I, 2_I, 3_I};
+        U v3{5_I, 6_I, 7_I};
+
+        static_assert(Dot(v0, v1) == 38);
+        static_assert(NormSquared(v1) == 110);
+        static_assert(Cross(v0, v1) == Tec{-4, 8, -4});
+        EXPECT_EQ(Dot(v2, v3), 38);
+        EXPECT_EQ(NormSquared(v3), 110);
+        Tec rhs{-4, 8, -4};
+        EXPECT_EQ(Cross(v2, v3), rhs);
+      });
+    });
+  }
+}
+
+TEST(Tup, MathConstantZeros) {
+  // `Dot` with constant zeros.
+  {
+    auto test = []<typename T>() {
+      constexpr auto zero = C<T(0)>{};
+
+      { // 1D.
+        Tec v0{zero};
+        Tec v1{T(5)};
+        static_assert(std::is_same_v<decltype(Dot(v0, v1)), C<T(0)>>);
+      }
+
+      { // 2D.
+        Tec v0{zero, T(2)};
+        Tec v1{T(5), zero};
+        static_assert(std::is_same_v<decltype(Dot(v0, v1)), C<T(0)>>);
+      }
+
+      { // 3D.
+        Tec v0{zero, T(2), zero};
+        Tec v1{T(5), zero, T(7)};
+        static_assert(std::is_same_v<decltype(Dot(v0, v1)), C<T(0)>>);
+      }
+    };
+
+    test.operator()<int>();
+    test.operator()<uint>();
+    test.operator()<float>();
+    test.operator()<double>();
+  }
+
+  // `Cross` with constant zeros.
+  {
+    auto test = []<typename T>() {
+      constexpr auto zero = C<T(0)>{};
+
+      constexpr Tec v0A{T(1), zero, zero};
+      constexpr Tec v0B{T(1), T(2), zero};
+      constexpr Tec v1{zero, T(6), zero};
+      Tec v2A{T(1), zero, zero};
+      Tec v2B{T(1), T(2), zero};
+      Tec v3{zero, T(6), zero};
+
+      static_assert(std::is_same_v<decltype(Cross(v0A, v1)), Tec<C<T(0)>, C<T(0)>, T>>);
+      static_assert(std::is_same_v<decltype(Cross(v0B, v1)), Tec<C<T(0)>, C<T(0)>, T>>);
+      static_assert(std::is_same_v<decltype(Cross(v2A, v3)), Tec<C<T(0)>, C<T(0)>, T>>);
+      static_assert(std::is_same_v<decltype(Cross(v2B, v3)), Tec<C<T(0)>, C<T(0)>, T>>);
+      constexpr Tec rhs{zero, zero, T(6)};
+      static_assert(Cross(v0A, v1) == rhs);
+      static_assert(Cross(v0B, v1) == rhs);
+      EXPECT_EQ(Cross(v2A, v3), rhs);
+      EXPECT_EQ(Cross(v2B, v3), rhs);
+    };
+
+    auto testFP = []<typename T>() {
+      constexpr auto zero = C<T(0)>{};
+
+      constexpr Tec v0A{T(1.2), zero, zero};
+      constexpr Tec v0B{T(1.2), T(2.3), zero};
+      constexpr Tec v1{zero, T(6.7), zero};
+      Tec v2A{T(1.2), zero, zero};
+      Tec v2B{T(1.2), T(2.3), zero};
+      Tec v3{zero, T(6.7), zero};
+
+      static_assert(std::is_same_v<decltype(Cross(v0A, v1)), Tec<C<T(0)>, C<T(0)>, T>>);
+      static_assert(std::is_same_v<decltype(Cross(v0B, v1)), Tec<C<T(0)>, C<T(0)>, T>>);
+      static_assert(std::is_same_v<decltype(Cross(v2A, v3)), Tec<C<T(0)>, C<T(0)>, T>>);
+      static_assert(std::is_same_v<decltype(Cross(v2B, v3)), Tec<C<T(0)>, C<T(0)>, T>>);
+      constexpr Tec rhs{zero, zero, T(1.2) * T(6.7)};
+      static_assert(Cross(v0A, v1) == rhs);
+      static_assert(Cross(v0B, v1) == rhs);
+      EXPECT_EQ(Cross(v2A, v3), rhs);
+      EXPECT_EQ(Cross(v2B, v3), rhs);
+    };
+
+    test.operator()<int>();
+    test.operator()<uint>();
+    test.operator()<float>();
+    test.operator()<double>();
+
+    testFP.operator()<float>();
+    testFP.operator()<double>();
+  }
+}
+
 } // namespace ARIA
