@@ -331,6 +331,7 @@ template <typename T, typename... Ts>
 //
 //
 //
+// Math-related features.
 template <typename... Ts0, typename... Ts1>
 [[nodiscard]] ARIA_HOST_DEVICE constexpr auto Dot(const Tec<Ts0...> &a, const Tec<Ts1...> &b) {
   static_assert(sizeof...(Ts0) > 0, "Empty `Tec`s are not allowed");

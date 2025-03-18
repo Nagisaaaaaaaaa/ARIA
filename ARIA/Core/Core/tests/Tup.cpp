@@ -1217,8 +1217,8 @@ TEST(Tup, Math) {
     Tec v0{1_I};
     Tec v1{5_I};
 
-    static_assert(Dot(v0, v1) == 5_I);
-    static_assert(NormSquared(v1) == 25_I);
+    static_assert(std::is_same_v<decltype(Dot(v0, v1)), C<5>>);
+    static_assert(std::is_same_v<decltype(NormSquared(v1)), C<25>>);
   }
 
   {
@@ -1242,8 +1242,8 @@ TEST(Tup, Math) {
     Tec v0{1_I, 2_I};
     Tec v1{5_I, 6_I};
 
-    static_assert(Dot(v0, v1) == 17_I);
-    static_assert(NormSquared(v1) == 61_I);
+    static_assert(std::is_same_v<decltype(Dot(v0, v1)), C<17>>);
+    static_assert(std::is_same_v<decltype(NormSquared(v1)), C<61>>);
   }
 
   {
@@ -1267,8 +1267,8 @@ TEST(Tup, Math) {
     Tec v0{1_I, 2_I, 3_I};
     Tec v1{5_I, 6_I, 7_I};
 
-    static_assert(Dot(v0, v1) == 38_I);
-    static_assert(NormSquared(v1) == 110_I);
+    static_assert(std::is_same_v<decltype(Dot(v0, v1)), C<38>>);
+    static_assert(std::is_same_v<decltype(NormSquared(v1)), C<110>>);
   }
 
   {
