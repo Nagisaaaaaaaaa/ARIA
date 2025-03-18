@@ -1296,4 +1296,36 @@ TEST(Tup, Math) {
   }
 }
 
+TEST(Tup, MathConstantZeros) {
+  // `Dot` with constant zeros.
+  {
+    auto test = []<typename T>() {
+      constexpr auto zero = C<T(0)>{};
+
+      { // 1D.
+        Tec v0{zero};
+        Tec v1{T(5)};
+        static_assert(std::is_same_v<decltype(Dot(v0, v1)), C<T(0)>>);
+      }
+
+      { // 2D.
+        Tec v0{zero, T(2)};
+        Tec v1{T(5), zero};
+        static_assert(std::is_same_v<decltype(Dot(v0, v1)), C<T(0)>>);
+      }
+
+      { // 3D.
+        Tec v0{zero, T(2), zero};
+        Tec v1{T(5), zero, T(7)};
+        static_assert(std::is_same_v<decltype(Dot(v0, v1)), C<T(0)>>);
+      }
+    };
+
+    test.operator()<int>();
+    test.operator()<uint>();
+    test.operator()<float>();
+    test.operator()<double>();
+  }
+}
+
 } // namespace ARIA
