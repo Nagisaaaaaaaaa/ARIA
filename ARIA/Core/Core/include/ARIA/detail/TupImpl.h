@@ -326,6 +326,29 @@ template <typename T, typename... Ts>
   return res;
 }
 
+//
+//
+//
+//
+//
+template <typename... Ts0, typename... Ts1>
+[[nodiscard]] ARIA_HOST_DEVICE constexpr auto Dot(const Tec<Ts0...> &a, const Tec<Ts1...> &b) {
+  //! `Ts0` is automatically required to have the same number of elements as `Ts1` at next line.
+  using TRes = decltype(((std::declval<Ts0>() * std::declval<Ts1>()) + ...));
+  if constexpr (is_static_v<TRes>) {
+    return TRes{};
+  } else {
+    TRes res{};
+    ForEach<sizeof...(Ts0)>([&]<auto i>() { res += get<i>(a) * get<i>(b); });
+    return res;
+  }
+}
+
+template <typename... Ts>
+[[nodiscard]] ARIA_HOST_DEVICE constexpr auto NormSquared(const Tec<Ts...> &a) {
+  return Dot(a, a);
+}
+
 } // namespace tup::detail
 
 } // namespace ARIA
