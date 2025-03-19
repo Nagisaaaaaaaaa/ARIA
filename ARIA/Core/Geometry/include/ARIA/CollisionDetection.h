@@ -48,6 +48,13 @@ template <typename T, uint d>
       noIntersect |= noIntersectAt(a);
     });
   });
+  if (noIntersect)
+    return false;
+
+  if (noIntersectAt(u0) || noIntersectAt(u1) || noIntersectAt(u2))
+    return false;
+
+  return true;
 }
 
 } // namespace ARIA
