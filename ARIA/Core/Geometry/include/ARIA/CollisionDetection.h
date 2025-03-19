@@ -38,6 +38,16 @@ template <typename T, uint d>
 
     return (std::max({p[0], p[1], p[2]}) < -r) || (std::min({p[0], p[1], p[2]}) > r);
   };
+
+  bool noIntersect = false;
+  ForEach<3>([&]<auto iU>() {
+    ForEach<3>([&]<auto iF>() {
+      if (noIntersect)
+        return;
+      Tec a = Cross(get<iU>(u), ToTec(f[iF]));
+      noIntersect |= noIntersectAt(a);
+    });
+  });
 }
 
 } // namespace ARIA
