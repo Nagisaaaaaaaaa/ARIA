@@ -54,6 +54,9 @@ template <typename T, uint d>
   if (noIntersectAt(u0) || noIntersectAt(u1) || noIntersectAt(u2))
     return false;
 
+  if (noIntersectAt(tri.stableNormal()))
+    return false;
+
   return true;
 }
 
