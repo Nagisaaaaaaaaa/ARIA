@@ -10,8 +10,8 @@ CPMAddPackage(
 set(core_geometry_headers
     ARIA/AABB.h
     ARIA/BVH.h
+    ARIA/CollisionDetection.h
     ARIA/MarchingCube.h
-    ARIA/SAT.h
     ARIA/Triangle.h
     ARIA/VDB.h
 )
