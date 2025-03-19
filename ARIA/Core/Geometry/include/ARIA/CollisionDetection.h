@@ -17,6 +17,14 @@ template <typename T, uint d>
 
   std::array<VecDT, 3> f;
   ForEach<3>([&]<auto i>() { f[i] = v[(i + 1) % 3] - v[i]; });
+
+  constexpr C<T(0)> _0;
+  constexpr C<T(1)> _1;
+
+  constexpr Tec u0{_1, _0, _0};
+  constexpr Tec u1{_0, _1, _0};
+  constexpr Tec u2{_0, _0, _1};
+  constexpr Tup u{u0, u1, u2};
 }
 
 } // namespace ARIA
