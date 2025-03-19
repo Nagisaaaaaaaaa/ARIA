@@ -4,6 +4,7 @@ if (ARIA_BUILD_TESTS)
       AABB.cpp
       BVH.cu
       MarchingCube.cu
+      SAT.cpp
       Triangle.cpp
       VDB.cu
       HARD_DEPENDENCIES
