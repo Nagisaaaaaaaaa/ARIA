@@ -25,6 +25,19 @@ template <typename T, uint d>
   constexpr Tec u1{_0, _1, _0};
   constexpr Tec u2{_0, _0, _1};
   constexpr Tup u{u0, u1, u2};
+
+  auto noIntersectAt = [&](const auto &axis) {
+    std::array p{Dot(ToTec(v[0]), axis), //
+                 Dot(ToTec(v[1]), axis), //
+                 Dot(ToTec(v[2]), axis)};
+
+    auto abs = []<typename U>(const U &v) { return v < U(_0) ? -v : v; };
+    T r = Dot(ToTec(e), Tec{abs(Dot(u0, axis)), //
+                            abs(Dot(u1, axis)), //
+                            abs(Dot(u2, axis))});
+
+    return (std::max({p[0], p[1], p[2]}) < -r) || (std::min({p[0], p[1], p[2]}) > r);
+  };
 }
 
 } // namespace ARIA
