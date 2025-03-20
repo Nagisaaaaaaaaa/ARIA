@@ -331,6 +331,52 @@ template <typename T, typename... Ts>
 //
 //
 //
+// Commonly-used constants.
+template <uint n, auto v, auto... Ts>
+consteval auto ConstantImpl() {
+  if constexpr (n == 0)
+    return Tec<C<Ts>...>{};
+  else
+    return ConstantImpl<n - 1, v, v, Ts...>();
+}
+
+template <typename T, uint n, auto... Ts>
+consteval auto IndexSequenceImpl() {
+  if constexpr (n == 0)
+    return Tec<C<T(Ts)>...>{};
+  else
+    return IndexSequenceImpl<T, n - 1, n - 1, Ts...>();
+}
+
+template <typename T, uint n, uint i, auto... Ts>
+consteval auto UnitImpl() {
+  if constexpr (n == 0)
+    return Tec<C<T(Ts)>...>{};
+  else
+    return UnitImpl<T, n - 1, i, (n == i + 1 ? 1 : 0), Ts...>();
+}
+
+template <uint n, auto v>
+using TecConstant = decltype(ConstantImpl<n, v>());
+
+template <typename T, uint n>
+using TecZero = decltype(ConstantImpl<n, T(0)>());
+
+template <typename T, uint n>
+using TecOne = decltype(ConstantImpl<n, T(1)>());
+
+template <typename T, uint n>
+using TecIndexSequence = decltype(IndexSequenceImpl<T, n>());
+
+template <typename T, uint n, uint i>
+  requires(i < n)
+using TecUnit = decltype(UnitImpl<T, n, i>());
+
+//
+//
+//
+//
+//
 // Math-related features.
 template <typename... Ts0, typename... Ts1>
 [[nodiscard]] ARIA_HOST_DEVICE constexpr auto Dot(const Tec<Ts0...> &a, const Tec<Ts1...> &b) {
