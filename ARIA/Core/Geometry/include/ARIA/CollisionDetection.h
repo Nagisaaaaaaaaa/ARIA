@@ -5,17 +5,17 @@
 
 namespace ARIA {
 
-template <typename T, uint d>
-[[nodiscard]] ARIA_HOST_DEVICE bool SATImpl(const AABB<T, d> &aabb, const Triangle<T, d> &tri) {
-  using VecDT = Vec<T, d>;
+template <typename T>
+[[nodiscard]] ARIA_HOST_DEVICE bool SATImpl(const AABB3<T> &aabb, const Triangle3<T> &tri) {
+  using Vec3T = Vec3<T>;
 
-  VecDT c = aabb.center();
-  VecDT e = aabb.diagonal() / 2_R;
+  Vec3T c = aabb.center();
+  Vec3T e = aabb.diagonal() / 2_R;
 
   Triangle v = tri;
   ForEach<3>([&]<auto i>() { v[i] -= c; });
 
-  std::array<VecDT, 3> f;
+  std::array<Vec3T, 3> f;
   ForEach<3>([&]<auto i>() { f[i] = v[(i + 1) % 3] - v[i]; });
 
   constexpr C<T(0)> _0;
