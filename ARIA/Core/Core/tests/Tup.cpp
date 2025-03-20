@@ -1211,6 +1211,37 @@ TEST(Tup, OperatorsConstantZeros) {
   }
 }
 
+TEST(Tup, Constants) {
+  ForEach<MakeTypeArray<int, uint, float, double>>([]<typename T>() {
+    static_assert(std::is_same_v<TecZero<T, 0>, Tec<>>);
+    static_assert(std::is_same_v<TecZero<T, 1>, Tec<C<T(0)>>>);
+    static_assert(std::is_same_v<TecZero<T, 2>, Tec<C<T(0)>, C<T(0)>>>);
+    static_assert(std::is_same_v<TecZero<T, 3>, Tec<C<T(0)>, C<T(0)>, C<T(0)>>>);
+    static_assert(std::is_same_v<TecZero<T, 4>, Tec<C<T(0)>, C<T(0)>, C<T(0)>, C<T(0)>>>);
+  });
+
+  ForEach<MakeTypeArray<int, uint, float, double>>([]<typename T>() {
+    static_assert(std::is_same_v<TecOne<T, 0>, Tec<>>);
+    static_assert(std::is_same_v<TecOne<T, 1>, Tec<C<T(1)>>>);
+    static_assert(std::is_same_v<TecOne<T, 2>, Tec<C<T(1)>, C<T(1)>>>);
+    static_assert(std::is_same_v<TecOne<T, 3>, Tec<C<T(1)>, C<T(1)>, C<T(1)>>>);
+    static_assert(std::is_same_v<TecOne<T, 4>, Tec<C<T(1)>, C<T(1)>, C<T(1)>, C<T(1)>>>);
+  });
+
+  ForEach<MakeTypeArray<int, uint, float, double>>([]<typename T>() {
+    static_assert(std::is_same_v<TecUnit<T, 1, 0>, Tec<C<T(1)>>>);
+    static_assert(std::is_same_v<TecUnit<T, 2, 0>, Tec<C<T(1)>, C<T(0)>>>);
+    static_assert(std::is_same_v<TecUnit<T, 2, 1>, Tec<C<T(0)>, C<T(1)>>>);
+    static_assert(std::is_same_v<TecUnit<T, 3, 0>, Tec<C<T(1)>, C<T(0)>, C<T(0)>>>);
+    static_assert(std::is_same_v<TecUnit<T, 3, 1>, Tec<C<T(0)>, C<T(1)>, C<T(0)>>>);
+    static_assert(std::is_same_v<TecUnit<T, 3, 2>, Tec<C<T(0)>, C<T(0)>, C<T(1)>>>);
+    static_assert(std::is_same_v<TecUnit<T, 4, 0>, Tec<C<T(1)>, C<T(0)>, C<T(0)>, C<T(0)>>>);
+    static_assert(std::is_same_v<TecUnit<T, 4, 1>, Tec<C<T(0)>, C<T(1)>, C<T(0)>, C<T(0)>>>);
+    static_assert(std::is_same_v<TecUnit<T, 4, 2>, Tec<C<T(0)>, C<T(0)>, C<T(1)>, C<T(0)>>>);
+    static_assert(std::is_same_v<TecUnit<T, 4, 3>, Tec<C<T(0)>, C<T(0)>, C<T(0)>, C<T(1)>>>);
+  });
+}
+
 TEST(Tup, Math) {
   // 1D.
   {
