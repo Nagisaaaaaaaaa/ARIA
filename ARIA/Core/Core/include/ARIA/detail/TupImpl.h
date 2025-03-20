@@ -356,28 +356,28 @@ template <typename T, typename... Ts>
 //
 //
 // Commonly-used constants.
-template <uint n, auto v, auto... Ts>
+template <uint n, auto v, auto... vs>
 consteval auto ConstantImpl() {
   if constexpr (n == 0)
-    return Tec<C<Ts>...>{};
+    return Tec<C<vs>...>{};
   else
-    return ConstantImpl<n - 1, v, v, Ts...>();
+    return ConstantImpl<n - 1, v, v, vs...>();
 }
 
-template <typename T, uint n, auto... Ts>
+template <typename T, uint n, auto... vs>
 consteval auto IndexSequenceImpl() {
   if constexpr (n == 0)
-    return Tec<C<T(Ts)>...>{};
+    return Tec<C<T(vs)>...>{};
   else
-    return IndexSequenceImpl<T, n - 1, n - 1, Ts...>();
+    return IndexSequenceImpl<T, n - 1, n - 1, vs...>();
 }
 
-template <typename T, uint n, uint i, auto... Ts>
+template <typename T, uint n, uint i, auto... vs>
 consteval auto UnitImpl() {
   if constexpr (n == 0)
-    return Tec<C<T(Ts)>...>{};
+    return Tec<C<T(vs)>...>{};
   else
-    return UnitImpl<T, n - 1, i, (n == i + 1 ? 1 : 0), Ts...>();
+    return UnitImpl<T, n - 1, i, (n == i + 1 ? 1 : 0), vs...>();
 }
 
 template <uint n, auto v>
