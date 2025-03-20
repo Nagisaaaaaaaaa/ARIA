@@ -1213,6 +1213,14 @@ TEST(Tup, OperatorsConstantZeros) {
 
 TEST(Tup, Constants) {
   ForEach<MakeTypeArray<int, uint, float, double>>([]<typename T>() {
+    static_assert(std::is_same_v<TecConstant<0, T(233)>, Tec<>>);
+    static_assert(std::is_same_v<TecConstant<1, T(233)>, Tec<C<T(233)>>>);
+    static_assert(std::is_same_v<TecConstant<2, T(233)>, Tec<C<T(233)>, C<T(233)>>>);
+    static_assert(std::is_same_v<TecConstant<3, T(233)>, Tec<C<T(233)>, C<T(233)>, C<T(233)>>>);
+    static_assert(std::is_same_v<TecConstant<4, T(233)>, Tec<C<T(233)>, C<T(233)>, C<T(233)>, C<T(233)>>>);
+  });
+
+  ForEach<MakeTypeArray<int, uint, float, double>>([]<typename T>() {
     static_assert(std::is_same_v<TecZero<T, 0>, Tec<>>);
     static_assert(std::is_same_v<TecZero<T, 1>, Tec<C<T(0)>>>);
     static_assert(std::is_same_v<TecZero<T, 2>, Tec<C<T(0)>, C<T(0)>>>);
