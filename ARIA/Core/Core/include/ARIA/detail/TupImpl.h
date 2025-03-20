@@ -82,9 +82,9 @@ template <auto n, typename F, typename... Ts>
     return Tec{std::forward<Ts>(ts)...};
   } else {
     if constexpr (std::is_invocable_v<F, C<n - i1>>)
-      return make_tec_impl<n - i1>(std::forward<F>(f), f(C<n - i1>{}), ts...);
+      return make_tec_impl<n - i1>(std::forward<F>(f), f(C<n - i1>{}), std::forward<Ts>(ts)...);
     else
-      return make_tec_impl<n - i1>(std::forward<F>(f), f.template operator()<n - i1>(), ts...);
+      return make_tec_impl<n - i1>(std::forward<F>(f), f.template operator()<n - i1>(), std::forward<Ts>(ts)...);
   }
 }
 
