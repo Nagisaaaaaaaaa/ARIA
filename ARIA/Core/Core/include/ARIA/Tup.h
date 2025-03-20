@@ -169,6 +169,51 @@ using tup::detail::ToArray;
 //
 //
 //
+/// \brief Define a `Tec` with the same compile-time values.
+///
+/// \example ```cpp
+/// // Type of `v233` is `Tec<C<233>, C<233>, C<233>>`.
+/// constexpr Tec v233 = TecConstant<3, 233>{};
+/// ```
+using tup::detail::TecConstant;
+
+/// \brief Define a `Tec` with compile-time zeros.
+///
+/// \example ```cpp
+/// // Type of `zero` is `Tec<C<0>, C<0>, C<0>>`.
+/// constexpr Tec zero = TecZero<int, 3>{};
+/// ```
+using tup::detail::TecZero;
+
+/// \brief Define a `Tec` with compile-time ones.
+///
+/// \example ```cpp
+/// // Type of `one` is `Tec<C<1>, C<1>, C<1>>`.
+/// constexpr Tec one = TecOne<int, 3>{};
+/// ```
+using tup::detail::TecOne;
+
+/// \brief Define a `Tec` with compile-time `0`, `1`, `2`, ...
+///
+/// \example ```cpp
+/// // Type of `idx` is `Tec<C<0>, C<1>, C<2>>`.
+/// constexpr Tec idx = TecIndexSequence<int, 3>{};
+/// ```
+using tup::detail::TecIndexSequence;
+
+/// \brief Define a `Tec` with one compile-time `1` among zeros.
+///
+/// \example ```cpp
+/// // Type of `unit` is `Tec<C<0>, C<0>, C<1>>`.
+/// constexpr Tec unit = TecUnit<int, 3, 2>{};
+/// ```
+using tup::detail::TecUnit;
+
+//
+//
+//
+//
+//
 /// \brief Compute the dot product of two `Tec`s.
 ///
 /// \example ```cpp
