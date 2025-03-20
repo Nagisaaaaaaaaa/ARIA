@@ -51,10 +51,10 @@ template <typename T>
   if (isS)
     return false;
 
-  if (isSt(u0) || isSt(u1) || isSt(u2))
+  if (isSA(u0) || isSA(u1) || isSA(u2))
     return false;
 
-  if (isSt(tri.stableNormal()))
+  if (isSA(tri.stableNormal()))
     return false;
 
   return true;
