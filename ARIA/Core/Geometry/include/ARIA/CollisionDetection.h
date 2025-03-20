@@ -36,7 +36,7 @@ template <typename T>
                             abs(Dot(u1, axis)), //
                             abs(Dot(u2, axis))});
 
-    return (std::max({p[0], p[1], p[2]}) < -r) || (std::min({p[0], p[1], p[2]}) > r);
+    return std::max({p[0], p[1], p[2]}) < -r || std::min({p[0], p[1], p[2]}) > r;
   };
 
   bool isS = false;
