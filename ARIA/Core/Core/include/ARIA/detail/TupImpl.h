@@ -72,6 +72,30 @@ using Tec = cute::tuple<Ts...>;
 //
 //
 //
+template <auto n, typename F, typename... Ts>
+[[nodiscard]] ARIA_HOST_DEVICE constexpr auto make_tec_impl(F &&f, Ts &&...ts) {
+  using TIdx = decltype(n);
+  constexpr TIdx i0(0);
+  constexpr TIdx i1(1);
+
+  if constexpr (n == i0) {
+    return Tec{std::forward<Ts>(ts)...};
+  } else {
+    if constexpr (std::is_invocable_v<F, C<n - i1>>)
+      return make_tec_impl<n - i1>(std::forward<F>(f), f(C<n - i1>{}), ts...);
+    else
+      return make_tec_impl<n - i1>(std::forward<F>(f), f.template operator()<n - i1>(), ts...);
+  }
+}
+
+template <auto n, typename F>
+[[nodiscard]] ARIA_HOST_DEVICE constexpr auto make_tec(F &&f) {
+  return make_tec_impl<n>(std::forward<F>(f));
+}
+
+//
+//
+//
 //
 //
 // TODO: Great efforts are made to bypass the MSVC bug.
