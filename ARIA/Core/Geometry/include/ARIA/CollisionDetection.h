@@ -54,7 +54,7 @@ template <typename T>
   if (isSA(u0) || isSA(u1) || isSA(u2))
     return false;
 
-  if (isSA(tri.stableNormal()))
+  if (isSA(f[0].cross(f[1])))
     return false;
 
   return true;
