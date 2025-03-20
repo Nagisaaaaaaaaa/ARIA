@@ -69,6 +69,22 @@ using tup::detail::Tec;
 //
 //
 //
+/// \brief Make a `Tec` with a given functor.
+///
+/// \example ```cpp
+/// // Type of `v0` and `v1` is `Tec<C<0>, C<3>, C<6>>`.
+/// constexpr Tec v0 = make_tec<3>([](auto i) { return i * 3_I; });
+/// constexpr Tec v1 = make_tec<3>([]<auto i> { return i * 3_I; });
+///
+/// // Type of `v2` and `v3` is `Tec<C<0>, int, int>`.
+/// constexpr Tec v2 = make_tec<3>([](auto i) { return i * 3; });
+/// constexpr Tec v3 = make_tec<3>([]<auto i> { return i * 3; });
+/// ```
+using tup::detail::make_tec;
+
+//
+//
+//
 using tup::detail::Tec1;
 using tup::detail::Tec2;
 using tup::detail::Tec3;
