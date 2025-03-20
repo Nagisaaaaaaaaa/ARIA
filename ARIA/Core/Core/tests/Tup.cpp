@@ -72,51 +72,63 @@ TEST(Tup, Base) {
 
   {
     ForEach<MakeTypeArray<int, uint>>([]<typename T>() {
-      constexpr Tec v0 = make_tec<T(0)>([](auto i) { return i; });
-      constexpr Tec v1 = make_tec<T(1)>([](auto i) { return i; });
-      constexpr Tec v2 = make_tec<T(2)>([](auto i) { return i; });
-      constexpr Tec v3 = make_tec<T(3)>([](auto i) { return i; });
-      constexpr Tec v4 = make_tec<T(4)>([](auto i) { return i; });
+      ForEach<MakeTypeArray<decltype([](auto i) { return i; }),       //
+                            decltype([]<auto i>() { return C<i>{}; }) //
+                            >>([]<typename F>() {
+        constexpr Tec v0 = make_tec<T(0)>(F{});
+        constexpr Tec v1 = make_tec<T(1)>(F{});
+        constexpr Tec v2 = make_tec<T(2)>(F{});
+        constexpr Tec v3 = make_tec<T(3)>(F{});
+        constexpr Tec v4 = make_tec<T(4)>(F{});
 
-      static_assert(std::is_same_v<decltype(v0), const Tec<>>);
-      static_assert(std::is_same_v<decltype(v1), const Tec<C<T(0)>>>);
-      static_assert(std::is_same_v<decltype(v2), const Tec<C<T(0)>, C<T(1)>>>);
-      static_assert(std::is_same_v<decltype(v3), const Tec<C<T(0)>, C<T(1)>, C<T(2)>>>);
-      static_assert(std::is_same_v<decltype(v4), const Tec<C<T(0)>, C<T(1)>, C<T(2)>, C<T(3)>>>);
+        static_assert(std::is_same_v<decltype(v0), const Tec<>>);
+        static_assert(std::is_same_v<decltype(v1), const Tec<C<T(0)>>>);
+        static_assert(std::is_same_v<decltype(v2), const Tec<C<T(0)>, C<T(1)>>>);
+        static_assert(std::is_same_v<decltype(v3), const Tec<C<T(0)>, C<T(1)>, C<T(2)>>>);
+        static_assert(std::is_same_v<decltype(v4), const Tec<C<T(0)>, C<T(1)>, C<T(2)>, C<T(3)>>>);
+      });
     });
 
     ForEach<MakeTypeArray<int, uint>>([]<typename T>() {
-      constexpr Tec v0 = make_tec<T(0)>([](auto i) { return i * C<T(3)>{}; });
-      constexpr Tec v1 = make_tec<T(1)>([](auto i) { return i * C<T(3)>{}; });
-      constexpr Tec v2 = make_tec<T(2)>([](auto i) { return i * C<T(3)>{}; });
-      constexpr Tec v3 = make_tec<T(3)>([](auto i) { return i * C<T(3)>{}; });
-      constexpr Tec v4 = make_tec<T(4)>([](auto i) { return i * C<T(3)>{}; });
+      ForEach<MakeTypeArray<decltype([](auto i) { return i * C<T(3)>{}; }),       //
+                            decltype([]<auto i>() { return C<i>{} * C<T(3)>{}; }) //
+                            >>([]<typename F>() {
+        constexpr Tec v0 = make_tec<T(0)>(F{});
+        constexpr Tec v1 = make_tec<T(1)>(F{});
+        constexpr Tec v2 = make_tec<T(2)>(F{});
+        constexpr Tec v3 = make_tec<T(3)>(F{});
+        constexpr Tec v4 = make_tec<T(4)>(F{});
 
-      static_assert(std::is_same_v<decltype(v0), const Tec<>>);
-      static_assert(std::is_same_v<decltype(v1), const Tec<C<T(0)>>>);
-      static_assert(std::is_same_v<decltype(v2), const Tec<C<T(0)>, C<T(3)>>>);
-      static_assert(std::is_same_v<decltype(v3), const Tec<C<T(0)>, C<T(3)>, C<T(6)>>>);
-      static_assert(std::is_same_v<decltype(v4), const Tec<C<T(0)>, C<T(3)>, C<T(6)>, C<T(9)>>>);
+        static_assert(std::is_same_v<decltype(v0), const Tec<>>);
+        static_assert(std::is_same_v<decltype(v1), const Tec<C<T(0)>>>);
+        static_assert(std::is_same_v<decltype(v2), const Tec<C<T(0)>, C<T(3)>>>);
+        static_assert(std::is_same_v<decltype(v3), const Tec<C<T(0)>, C<T(3)>, C<T(6)>>>);
+        static_assert(std::is_same_v<decltype(v4), const Tec<C<T(0)>, C<T(3)>, C<T(6)>, C<T(9)>>>);
+      });
     });
 
     ForEach<MakeTypeArray<int, uint>>([]<typename T>() {
-      constexpr Tec v0 = make_tec<T(0)>([](auto i) { return i * T(3); });
-      constexpr Tec v1 = make_tec<T(1)>([](auto i) { return i * T(3); });
-      constexpr Tec v2 = make_tec<T(2)>([](auto i) { return i * T(3); });
-      constexpr Tec v3 = make_tec<T(3)>([](auto i) { return i * T(3); });
-      constexpr Tec v4 = make_tec<T(4)>([](auto i) { return i * T(3); });
+      ForEach<MakeTypeArray<decltype([](auto i) { return i * T(3); }),       //
+                            decltype([]<auto i>() { return C<i>{} * T(3); }) //
+                            >>([]<typename F>() {
+        constexpr Tec v0 = make_tec<T(0)>(F{});
+        constexpr Tec v1 = make_tec<T(1)>(F{});
+        constexpr Tec v2 = make_tec<T(2)>(F{});
+        constexpr Tec v3 = make_tec<T(3)>(F{});
+        constexpr Tec v4 = make_tec<T(4)>(F{});
 
-      static_assert(std::is_same_v<decltype(v0), const Tec<>>);
-      static_assert(std::is_same_v<decltype(v1), const Tec<C<T(0)>>>);
-      static_assert(std::is_same_v<decltype(v2), const Tec<C<T(0)>, T>>);
-      static_assert(std::is_same_v<decltype(v3), const Tec<C<T(0)>, T, T>>);
-      static_assert(std::is_same_v<decltype(v4), const Tec<C<T(0)>, T, T, T>>);
+        static_assert(std::is_same_v<decltype(v0), const Tec<>>);
+        static_assert(std::is_same_v<decltype(v1), const Tec<C<T(0)>>>);
+        static_assert(std::is_same_v<decltype(v2), const Tec<C<T(0)>, T>>);
+        static_assert(std::is_same_v<decltype(v3), const Tec<C<T(0)>, T, T>>);
+        static_assert(std::is_same_v<decltype(v4), const Tec<C<T(0)>, T, T, T>>);
 
-      static_assert(v0 == Tec{});
-      static_assert(v1 == Tec{C<T(0)>{}});
-      static_assert(v2 == Tec{C<T(0)>{}, T(3)});
-      static_assert(v3 == Tec{C<T(0)>{}, T(3), T(6)});
-      static_assert(v4 == Tec{C<T(0)>{}, T(3), T(6), T(9)});
+        static_assert(v0 == Tec{});
+        static_assert(v1 == Tec{C<T(0)>{}});
+        static_assert(v2 == Tec{C<T(0)>{}, T(3)});
+        static_assert(v3 == Tec{C<T(0)>{}, T(3), T(6)});
+        static_assert(v4 == Tec{C<T(0)>{}, T(3), T(6), T(9)});
+      });
     });
   }
 
