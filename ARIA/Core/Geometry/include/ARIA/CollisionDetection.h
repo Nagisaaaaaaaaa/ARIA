@@ -26,7 +26,7 @@ template <typename T>
   constexpr Tec u2{_0, _0, _1};
   constexpr Tup u{u0, u1, u2};
 
-  auto noIntersectAt = [&](const auto &axis) {
+  auto isSA = [&](const auto &axis) {
     std::array p{Dot(ToTec(v[0]), axis), //
                  Dot(ToTec(v[1]), axis), //
                  Dot(ToTec(v[2]), axis)};
@@ -39,22 +39,22 @@ template <typename T>
     return (std::max({p[0], p[1], p[2]}) < -r) || (std::min({p[0], p[1], p[2]}) > r);
   };
 
-  bool noIntersect = false;
+  bool isS = false;
   ForEach<3>([&]<auto iU>() {
     ForEach<3>([&]<auto iF>() {
-      if (noIntersect)
+      if (isS)
         return;
       Tec a = Cross(get<iU>(u), ToTec(f[iF]));
-      noIntersect |= noIntersectAt(a);
+      isS |= isSA(a);
     });
   });
-  if (noIntersect)
+  if (isS)
     return false;
 
-  if (noIntersectAt(u0) || noIntersectAt(u1) || noIntersectAt(u2))
+  if (isSt(u0) || isSt(u1) || isSt(u2))
     return false;
 
-  if (noIntersectAt(tri.stableNormal()))
+  if (isSt(tri.stableNormal()))
     return false;
 
   return true;
