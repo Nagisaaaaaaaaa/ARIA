@@ -72,6 +72,30 @@ using Tec = cute::tuple<Ts...>;
 //
 //
 //
+template <auto n, typename F, typename... Ts>
+[[nodiscard]] ARIA_HOST_DEVICE constexpr auto make_tec_impl(F &&f, Ts &&...ts) {
+  using TIdx = decltype(n);
+  constexpr TIdx i0(0);
+  constexpr TIdx i1(1);
+
+  if constexpr (n == i0) {
+    return Tec{std::forward<Ts>(ts)...};
+  } else {
+    if constexpr (std::is_invocable_v<F, C<n - i1>>)
+      return make_tec_impl<n - i1>(std::forward<F>(f), f(C<n - i1>{}), std::forward<Ts>(ts)...);
+    else
+      return make_tec_impl<n - i1>(std::forward<F>(f), f.template operator()<n - i1>(), std::forward<Ts>(ts)...);
+  }
+}
+
+template <auto n, typename F>
+[[nodiscard]] ARIA_HOST_DEVICE constexpr auto make_tec(F &&f) {
+  return make_tec_impl<n>(std::forward<F>(f));
+}
+
+//
+//
+//
 //
 //
 // TODO: Great efforts are made to bypass the MSVC bug.
@@ -325,6 +349,52 @@ template <typename T, typename... Ts>
   ForEach<rank>([&]<auto i>() { res[i] = get<i>(tec); });
   return res;
 }
+
+//
+//
+//
+//
+//
+// Commonly-used constants.
+template <uint n, auto v, auto... vs>
+consteval auto ConstantImpl() {
+  if constexpr (n == 0)
+    return Tec<C<vs>...>{};
+  else
+    return ConstantImpl<n - 1, v, v, vs...>();
+}
+
+template <typename T, uint n, auto... vs>
+consteval auto IndexSequenceImpl() {
+  if constexpr (n == 0)
+    return Tec<C<T(vs)>...>{};
+  else
+    return IndexSequenceImpl<T, n - 1, n - 1, vs...>();
+}
+
+template <typename T, uint n, uint i, auto... vs>
+consteval auto UnitImpl() {
+  if constexpr (n == 0)
+    return Tec<C<T(vs)>...>{};
+  else
+    return UnitImpl<T, n - 1, i, (n == i + 1 ? 1 : 0), vs...>();
+}
+
+template <uint n, auto v>
+using TecConstant = decltype(ConstantImpl<n, v>());
+
+template <typename T, uint n>
+using TecZero = decltype(ConstantImpl<n, T(0)>());
+
+template <typename T, uint n>
+using TecOne = decltype(ConstantImpl<n, T(1)>());
+
+template <typename T, uint n>
+using TecIndexSequence = decltype(IndexSequenceImpl<T, n>());
+
+template <typename T, uint n, uint i>
+  requires(i < n)
+using TecUnit = decltype(UnitImpl<T, n, i>());
 
 //
 //

@@ -71,6 +71,68 @@ TEST(Tup, Base) {
   }
 
   {
+    ForEach<MakeTypeArray<int, uint>>([]<typename T>() {
+      ForEach<MakeTypeArray<decltype([](auto i) { return i; }),       //
+                            decltype([]<auto i>() { return C<i>{}; }) //
+                            >>([]<typename F>() {
+        constexpr Tec v0 = make_tec<T(0)>(F{});
+        constexpr Tec v1 = make_tec<T(1)>(F{});
+        constexpr Tec v2 = make_tec<T(2)>(F{});
+        constexpr Tec v3 = make_tec<T(3)>(F{});
+        constexpr Tec v4 = make_tec<T(4)>(F{});
+
+        static_assert(std::is_same_v<decltype(v0), const Tec<>>);
+        static_assert(std::is_same_v<decltype(v1), const Tec<C<T(0)>>>);
+        static_assert(std::is_same_v<decltype(v2), const Tec<C<T(0)>, C<T(1)>>>);
+        static_assert(std::is_same_v<decltype(v3), const Tec<C<T(0)>, C<T(1)>, C<T(2)>>>);
+        static_assert(std::is_same_v<decltype(v4), const Tec<C<T(0)>, C<T(1)>, C<T(2)>, C<T(3)>>>);
+      });
+    });
+
+    ForEach<MakeTypeArray<int, uint>>([]<typename T>() {
+      ForEach<MakeTypeArray<decltype([](auto i) { return i * C<T(3)>{}; }),       //
+                            decltype([]<auto i>() { return C<i>{} * C<T(3)>{}; }) //
+                            >>([]<typename F>() {
+        constexpr Tec v0 = make_tec<T(0)>(F{});
+        constexpr Tec v1 = make_tec<T(1)>(F{});
+        constexpr Tec v2 = make_tec<T(2)>(F{});
+        constexpr Tec v3 = make_tec<T(3)>(F{});
+        constexpr Tec v4 = make_tec<T(4)>(F{});
+
+        static_assert(std::is_same_v<decltype(v0), const Tec<>>);
+        static_assert(std::is_same_v<decltype(v1), const Tec<C<T(0)>>>);
+        static_assert(std::is_same_v<decltype(v2), const Tec<C<T(0)>, C<T(3)>>>);
+        static_assert(std::is_same_v<decltype(v3), const Tec<C<T(0)>, C<T(3)>, C<T(6)>>>);
+        static_assert(std::is_same_v<decltype(v4), const Tec<C<T(0)>, C<T(3)>, C<T(6)>, C<T(9)>>>);
+      });
+    });
+
+    ForEach<MakeTypeArray<int, uint>>([]<typename T>() {
+      ForEach<MakeTypeArray<decltype([](auto i) { return i * T(3); }),       //
+                            decltype([]<auto i>() { return C<i>{} * T(3); }) //
+                            >>([]<typename F>() {
+        constexpr Tec v0 = make_tec<T(0)>(F{});
+        constexpr Tec v1 = make_tec<T(1)>(F{});
+        constexpr Tec v2 = make_tec<T(2)>(F{});
+        constexpr Tec v3 = make_tec<T(3)>(F{});
+        constexpr Tec v4 = make_tec<T(4)>(F{});
+
+        static_assert(std::is_same_v<decltype(v0), const Tec<>>);
+        static_assert(std::is_same_v<decltype(v1), const Tec<C<T(0)>>>);
+        static_assert(std::is_same_v<decltype(v2), const Tec<C<T(0)>, T>>);
+        static_assert(std::is_same_v<decltype(v3), const Tec<C<T(0)>, T, T>>);
+        static_assert(std::is_same_v<decltype(v4), const Tec<C<T(0)>, T, T, T>>);
+
+        static_assert(v0 == Tec{});
+        static_assert(v1 == Tec{C<T(0)>{}});
+        static_assert(v2 == Tec{C<T(0)>{}, T(3)});
+        static_assert(v3 == Tec{C<T(0)>{}, T(3), T(6)});
+        static_assert(v4 == Tec{C<T(0)>{}, T(3), T(6), T(9)});
+      });
+    });
+  }
+
+  {
     constexpr Tec1 v1{1};
     constexpr Tec2 v2{1, 2.0F};
     constexpr Tec3 v3{1, 2.0F, C<3U>{}};
@@ -1209,6 +1271,53 @@ TEST(Tup, OperatorsConstantZeros) {
     testDouble.operator()<float>();
     testDouble.operator()<double>();
   }
+}
+
+TEST(Tup, Constants) {
+  ForEach<MakeTypeArray<int, uint, float, double>>([]<typename T>() {
+    static_assert(std::is_same_v<TecConstant<0, T(233)>, Tec<>>);
+    static_assert(std::is_same_v<TecConstant<1, T(233)>, Tec<C<T(233)>>>);
+    static_assert(std::is_same_v<TecConstant<2, T(233)>, Tec<C<T(233)>, C<T(233)>>>);
+    static_assert(std::is_same_v<TecConstant<3, T(233)>, Tec<C<T(233)>, C<T(233)>, C<T(233)>>>);
+    static_assert(std::is_same_v<TecConstant<4, T(233)>, Tec<C<T(233)>, C<T(233)>, C<T(233)>, C<T(233)>>>);
+  });
+
+  ForEach<MakeTypeArray<int, uint, float, double>>([]<typename T>() {
+    static_assert(std::is_same_v<TecZero<T, 0>, Tec<>>);
+    static_assert(std::is_same_v<TecZero<T, 1>, Tec<C<T(0)>>>);
+    static_assert(std::is_same_v<TecZero<T, 2>, Tec<C<T(0)>, C<T(0)>>>);
+    static_assert(std::is_same_v<TecZero<T, 3>, Tec<C<T(0)>, C<T(0)>, C<T(0)>>>);
+    static_assert(std::is_same_v<TecZero<T, 4>, Tec<C<T(0)>, C<T(0)>, C<T(0)>, C<T(0)>>>);
+  });
+
+  ForEach<MakeTypeArray<int, uint, float, double>>([]<typename T>() {
+    static_assert(std::is_same_v<TecOne<T, 0>, Tec<>>);
+    static_assert(std::is_same_v<TecOne<T, 1>, Tec<C<T(1)>>>);
+    static_assert(std::is_same_v<TecOne<T, 2>, Tec<C<T(1)>, C<T(1)>>>);
+    static_assert(std::is_same_v<TecOne<T, 3>, Tec<C<T(1)>, C<T(1)>, C<T(1)>>>);
+    static_assert(std::is_same_v<TecOne<T, 4>, Tec<C<T(1)>, C<T(1)>, C<T(1)>, C<T(1)>>>);
+  });
+
+  ForEach<MakeTypeArray<int, uint, float, double>>([]<typename T>() {
+    static_assert(std::is_same_v<TecIndexSequence<T, 0>, Tec<>>);
+    static_assert(std::is_same_v<TecIndexSequence<T, 1>, Tec<C<T(0)>>>);
+    static_assert(std::is_same_v<TecIndexSequence<T, 2>, Tec<C<T(0)>, C<T(1)>>>);
+    static_assert(std::is_same_v<TecIndexSequence<T, 3>, Tec<C<T(0)>, C<T(1)>, C<T(2)>>>);
+    static_assert(std::is_same_v<TecIndexSequence<T, 4>, Tec<C<T(0)>, C<T(1)>, C<T(2)>, C<T(3)>>>);
+  });
+
+  ForEach<MakeTypeArray<int, uint, float, double>>([]<typename T>() {
+    static_assert(std::is_same_v<TecUnit<T, 1, 0>, Tec<C<T(1)>>>);
+    static_assert(std::is_same_v<TecUnit<T, 2, 0>, Tec<C<T(1)>, C<T(0)>>>);
+    static_assert(std::is_same_v<TecUnit<T, 2, 1>, Tec<C<T(0)>, C<T(1)>>>);
+    static_assert(std::is_same_v<TecUnit<T, 3, 0>, Tec<C<T(1)>, C<T(0)>, C<T(0)>>>);
+    static_assert(std::is_same_v<TecUnit<T, 3, 1>, Tec<C<T(0)>, C<T(1)>, C<T(0)>>>);
+    static_assert(std::is_same_v<TecUnit<T, 3, 2>, Tec<C<T(0)>, C<T(0)>, C<T(1)>>>);
+    static_assert(std::is_same_v<TecUnit<T, 4, 0>, Tec<C<T(1)>, C<T(0)>, C<T(0)>, C<T(0)>>>);
+    static_assert(std::is_same_v<TecUnit<T, 4, 1>, Tec<C<T(0)>, C<T(1)>, C<T(0)>, C<T(0)>>>);
+    static_assert(std::is_same_v<TecUnit<T, 4, 2>, Tec<C<T(0)>, C<T(0)>, C<T(1)>, C<T(0)>>>);
+    static_assert(std::is_same_v<TecUnit<T, 4, 3>, Tec<C<T(0)>, C<T(0)>, C<T(0)>, C<T(1)>>>);
+  });
 }
 
 TEST(Tup, Math) {

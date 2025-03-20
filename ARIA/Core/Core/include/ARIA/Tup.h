@@ -69,6 +69,22 @@ using tup::detail::Tec;
 //
 //
 //
+/// \brief Make a `Tec` with the given functor.
+///
+/// \example ```cpp
+/// // Type of `v0` and `v1` is `Tec<C<0>, C<3>, C<6>>`.
+/// constexpr Tec v0 = make_tec<3>([](auto i) { return i * 3_I; });
+/// constexpr Tec v1 = make_tec<3>([]<auto i> { return i * 3_I; });
+///
+/// // Type of `v2` and `v3` is `Tec<C<0>, int, int>`.
+/// constexpr Tec v2 = make_tec<3>([](auto i) { return i * 3; });
+/// constexpr Tec v3 = make_tec<3>([]<auto i> { return i * 3; });
+/// ```
+using tup::detail::make_tec;
+
+//
+//
+//
 using tup::detail::Tec1;
 using tup::detail::Tec2;
 using tup::detail::Tec3;
@@ -163,6 +179,51 @@ using tup::detail::to_tup_t;
 /// std::array<int, 2> array2 = ToArray(Tec{5_I, 6_I});
 /// ```
 using tup::detail::ToArray;
+
+//
+//
+//
+//
+//
+/// \brief Define a `Tec` with the same compile-time values.
+///
+/// \example ```cpp
+/// // Type of `v233` is `Tec<C<233>, C<233>, C<233>>`.
+/// constexpr Tec v233 = TecConstant<3, 233>{};
+/// ```
+using tup::detail::TecConstant;
+
+/// \brief Define a `Tec` with compile-time zeros.
+///
+/// \example ```cpp
+/// // Type of `zero` is `Tec<C<0>, C<0>, C<0>>`.
+/// constexpr Tec zero = TecZero<int, 3>{};
+/// ```
+using tup::detail::TecZero;
+
+/// \brief Define a `Tec` with compile-time ones.
+///
+/// \example ```cpp
+/// // Type of `one` is `Tec<C<1>, C<1>, C<1>>`.
+/// constexpr Tec one = TecOne<int, 3>{};
+/// ```
+using tup::detail::TecOne;
+
+/// \brief Define a `Tec` with compile-time `0`, `1`, `2`, ...
+///
+/// \example ```cpp
+/// // Type of `idx` is `Tec<C<0>, C<1>, C<2>>`.
+/// constexpr Tec idx = TecIndexSequence<int, 3>{};
+/// ```
+using tup::detail::TecIndexSequence;
+
+/// \brief Define a `Tec` with one compile-time `1` among zeros.
+///
+/// \example ```cpp
+/// // Type of `unit` is `Tec<C<0>, C<0>, C<1>>`.
+/// constexpr Tec unit = TecUnit<int, 3, 2>{};
+/// ```
+using tup::detail::TecUnit;
 
 //
 //
