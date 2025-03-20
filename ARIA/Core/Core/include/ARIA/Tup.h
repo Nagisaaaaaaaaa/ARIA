@@ -69,7 +69,7 @@ using tup::detail::Tec;
 //
 //
 //
-/// \brief Make a `Tec` with a given functor.
+/// \brief Make a `Tec` with the given functor.
 ///
 /// \example ```cpp
 /// // Type of `v0` and `v1` is `Tec<C<0>, C<3>, C<6>>`.
