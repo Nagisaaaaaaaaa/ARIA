@@ -1229,6 +1229,14 @@ TEST(Tup, Constants) {
   });
 
   ForEach<MakeTypeArray<int, uint, float, double>>([]<typename T>() {
+    static_assert(std::is_same_v<TecIndexSequence<T, 0>, Tec<>>);
+    static_assert(std::is_same_v<TecIndexSequence<T, 1>, Tec<C<T(0)>>>);
+    static_assert(std::is_same_v<TecIndexSequence<T, 2>, Tec<C<T(0)>, C<T(1)>>>);
+    static_assert(std::is_same_v<TecIndexSequence<T, 3>, Tec<C<T(0)>, C<T(1)>, C<T(2)>>>);
+    static_assert(std::is_same_v<TecIndexSequence<T, 4>, Tec<C<T(0)>, C<T(1)>, C<T(2)>, C<T(3)>>>);
+  });
+
+  ForEach<MakeTypeArray<int, uint, float, double>>([]<typename T>() {
     static_assert(std::is_same_v<TecUnit<T, 1, 0>, Tec<C<T(1)>>>);
     static_assert(std::is_same_v<TecUnit<T, 2, 0>, Tec<C<T(1)>, C<T(0)>>>);
     static_assert(std::is_same_v<TecUnit<T, 2, 1>, Tec<C<T(0)>, C<T(1)>>>);
