@@ -6,25 +6,6 @@ namespace ARIA {
 
 namespace {
 
-template <typename T, uint d>
-ARIA_HOST_DEVICE bool IsIn(const Vec<T, d> &p, const AABB<T, d> &aabb) {
-  bool res = true;
-  ForEach<d>([&]<auto i>() { res = res && p[i] >= aabb.inf()[i] && p[i] <= aabb.sup()[i]; });
-  return res;
-}
-
-template <typename T, uint d>
-ARIA_HOST_DEVICE T DistSquared(const Vec<T, d> &p, const AABB<T, d> &aabb) {
-  T distSq(0);
-  ForEach<d>([&]<auto i>() {
-    if (p[i] < aabb.inf()[i])
-      distSq += Pow<2>(aabb.inf()[i] - p[i]);
-    if (p[i] > aabb.sup()[i])
-      distSq += Pow<2>(p[i] - aabb.sup()[i]);
-  });
-  return distSq;
-}
-
 template <typename T, typename F>
 void ForEachDivision(uint division, const Triangle3<T> &tri, const F &f) {
   using Vec3T = Vec3<T>;
@@ -45,6 +26,25 @@ void ForEachDivision(uint division, const Triangle3<T> &tri, const F &f) {
     ForEachDivision(division - 1, {p01, p12, p20}, f);
     ForEachDivision(division - 1, {p20, p12, p2}, f);
   }
+}
+
+template <typename T, uint d>
+ARIA_HOST_DEVICE bool IsIn(const Vec<T, d> &p, const AABB<T, d> &aabb) {
+  bool res = true;
+  ForEach<d>([&]<auto i>() { res = res && p[i] >= aabb.inf()[i] && p[i] <= aabb.sup()[i]; });
+  return res;
+}
+
+template <typename T, uint d>
+ARIA_HOST_DEVICE T DistSquared(const Vec<T, d> &p, const AABB<T, d> &aabb) {
+  T distSq(0);
+  ForEach<d>([&]<auto i>() {
+    if (p[i] < aabb.inf()[i])
+      distSq += Pow<2>(aabb.inf()[i] - p[i]);
+    if (p[i] > aabb.sup()[i])
+      distSq += Pow<2>(p[i] - aabb.sup()[i]);
+  });
+  return distSq;
 }
 
 template <typename T>
