@@ -48,12 +48,17 @@ ARIA_HOST_DEVICE T DistSquared(const Vec<T, d> &p, const AABB<T, d> &aabb) {
 }
 
 template <typename T>
-bool Collide(const AABB3<T> &aabb, const Triangle3<T> &tri) {
+ARIA_HOST_DEVICE T DistSquared(const AABB3<T> &aabb, const Triangle3<T> &tri) {
   T distSq = infinity<T>;
   ForEachDivision(16, tri, [&](const Triangle3<T> &t) {
     distSq = std::min({distSq, DistSquared(t[0], aabb), DistSquared(t[1], aabb), DistSquared(t[2], aabb)});
   });
-  return distSq == T(0);
+  return distSq;
+}
+
+template <typename T>
+bool Collide(const AABB3<T> &aabb, const Triangle3<T> &tri) {
+  return DistSquared(aabb, tri) == T(0);
 }
 
 } // namespace
