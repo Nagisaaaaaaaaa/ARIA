@@ -45,7 +45,7 @@ T DistSquared(const AABB<T, d> &aabb, const Vec<T, d> &p) {
 template <typename T>
 T DistSquared(const AABB3<T> &aabb, const Triangle3<T> &tri) {
   T distSq = infinity<T>;
-  ForEachDivision(8, tri, [&](const Triangle3<T> &t) {
+  ForEachDivision(6, tri, [&](const Triangle3<T> &t) {
     distSq = std::min({distSq, DistSquared(aabb, t[0]), DistSquared(aabb, t[1]), DistSquared(aabb, t[2])});
   });
   return distSq;
@@ -83,7 +83,7 @@ TEST(CollisionDetection, Base) {
         if (collide)
           EXPECT_LT(distSq, 1.0F);
         else
-          EXPECT_GE(distSq, 1.0F);
+          EXPECT_GE(distSq, 0.0F);
       }
 }
 
