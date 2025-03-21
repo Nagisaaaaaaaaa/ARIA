@@ -1,8 +1,8 @@
 #include "ARIA/CollisionDetection.h"
+#include "ARIA/Launcher.h"
+#include "ARIA/Vector.h"
 
 #include <gtest/gtest.h>
-
-#include <random>
 
 namespace ARIA {
 
@@ -51,40 +51,44 @@ ARIA_HOST_DEVICE T DistSquared(const AABB3<T> &aabb, const Triangle3<T> &tri) {
   return distSq;
 }
 
-} // namespace
-
-TEST(CollisionDetection, Base) {
-  std::mt19937 gen(0);
-  std::uniform_real_distribution<float> dis(-100.0F, 100.0F);
-
-  AABB3f aabb{Vec3f{dis(gen), dis(gen), dis(gen)}, Vec3f(dis(gen), dis(gen), dis(gen))};
+void TestSAT_AABBTriangle() {
+  AABB3f aabb{Vec3f{-31.4159F, 12.34567F, -98.76543F}, Vec3f(95.1413F, 66.66666F, -11.4514F)};
 
   Vec3f pMin = aabb.inf() - aabb.diagonal();
   Vec3f pMax = aabb.sup() + aabb.diagonal();
 
-  constexpr int n = 5;
+  constexpr int n = 10;
 
-  std::vector<Vec3f> ps;
+  VectorHost<Vec3f> psH;
   for (int z = 0; z < n; ++z)
     for (int y = 0; y < n; ++y)
       for (int x = 0; x < n; ++x) {
         Vec3f p = pMin + (pMax - pMin).cwiseProduct(Vec3f(x, y, z) / static_cast<float>(n - 1));
-        ps.emplace_back(p);
+        psH.push_back(p);
       }
 
-  for (const auto &p0 : ps)
-    for (const auto &p1 : ps)
-      for (const auto &p2 : ps) {
-        Triangle3f tri{p0, p1, p2};
+  VectorDevice<Vec3f> psD = psH;
+  int nPs = psD.size();
 
-        bool collide = SATImpl(aabb, tri);
-        float distSq = DistSquared(aabb, tri);
+  Launcher(make_layout_major(nPs, nPs, nPs), [aabb, ps = psD.data()] ARIA_DEVICE(int x, int y, int z) {
+    Triangle3f tri{ps[x], ps[y], ps[z]};
 
-        if (collide)
-          EXPECT_LT(distSq, 1.0F);
-        else
-          EXPECT_GT(distSq, 1e-12);
-      }
+    bool collide = SATImpl(aabb, tri);
+    float distSq = DistSquared(aabb, tri);
+
+    if (collide)
+      ARIA_ASSERT(distSq < 1.0F);
+    else
+      ARIA_ASSERT(distSq > 1e-10);
+  }).Launch();
+
+  cuda::device::current::get().synchronize();
+}
+
+} // namespace
+
+TEST(CollisionDetection, Base) {
+  TestSAT_AABBTriangle();
 }
 
 } // namespace ARIA

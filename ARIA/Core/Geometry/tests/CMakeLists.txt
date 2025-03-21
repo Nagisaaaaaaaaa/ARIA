@@ -3,7 +3,7 @@ if (ARIA_BUILD_TESTS)
       SOURCES
       AABB.cpp
       BVH.cu
-      CollisionDetection.cpp
+      CollisionDetection.cu
       MarchingCube.cu
       Triangle.cpp
       VDB.cu
