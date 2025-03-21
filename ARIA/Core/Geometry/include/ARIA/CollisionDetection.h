@@ -45,7 +45,7 @@ template <typename T>
       if (isS)
         return;
       Tec a = Cross(get<iU>(u), ToTec(f[iF]));
-      isS |= isSA(a);
+      isS = isSA(a);
     });
   });
   if (isS)
