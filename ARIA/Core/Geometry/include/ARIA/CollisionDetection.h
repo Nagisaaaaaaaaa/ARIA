@@ -40,22 +40,11 @@ template <typename T>
   };
 
   bool isS = false;
-  ForEach<3>([&]<auto iU>() {
-    ForEach<3>([&]<auto iF>() {
-      auto a = Auto(Cross(get<iU>(u), ToTec(f[iF])));
-      isS = isS || isSA(a);
-    });
-  });
-  if (isS)
-    return false;
+  ForEach<3>([&]<auto iU>() { ForEach<3>([&]<auto iF>() { isS = isS || isSA(Cross(get<iU>(u), ToTec(f[iF]))); }); });
+  isS = isS || isSA(u0) || isSA(u1) || isSA(u2);
+  isS = isS || isSA(ToTec(f[0].cross(f[1])));
 
-  if (isSA(u0) || isSA(u1) || isSA(u2))
-    return false;
-
-  if (isSA(ToTec(f[0].cross(f[1]))))
-    return false;
-
-  return true;
+  return !isS;
 }
 
 } // namespace ARIA
