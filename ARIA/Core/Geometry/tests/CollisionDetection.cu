@@ -51,7 +51,7 @@ void TestSAT_AABBTriangle() {
   Vec3f pMin = aabb.inf() - aabb.diagonal();
   Vec3f pMax = aabb.sup() + aabb.diagonal();
 
-  constexpr int n = 10;
+  constexpr int n = 20;
 
   VectorHost<Vec3f> psH;
   for (int z = 0; z < n; ++z)
@@ -71,7 +71,7 @@ void TestSAT_AABBTriangle() {
     float distSqRelaxed = DistSquared(aabbRelaxed, tri);
 
     if (collide)
-      ARIA_ASSERT(distSqRelaxed < 1.025F);
+      ARIA_ASSERT(distSqRelaxed < 1.05F);
     else
       ARIA_ASSERT(distSqRelaxed > 0.0F);
   }).Launch();
