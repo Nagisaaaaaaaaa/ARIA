@@ -53,7 +53,7 @@ ARIA_HOST_DEVICE T DistSquared(const AABB3<T> &aabb, const Triangle3<T> &tri) {
 
 void TestSAT_AABBTriangle() {
   AABB3f aabb{Vec3f{-31.4159F, 12.34567F, -98.76543F}, Vec3f(95.1413F, 66.66666F, -11.4514F)};
-  AABB3f aabbRelaxed = aabb;
+  AABB3f aabbRelaxed = aabb; // A little bit smaller.
   aabbRelaxed.inf() += aabb.diagonal() * 0.0001F;
   aabbRelaxed.sup() -= aabb.diagonal() * 0.0001F;
 
