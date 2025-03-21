@@ -67,7 +67,7 @@ void TestSAT_AABBTriangle() {
   Launcher(make_layout_major(nPs, nPs, nPs), [aabb, aabbRelaxed, ps = psD.data()] ARIA_DEVICE(int x, int y, int z) {
     Triangle3f tri{ps[x], ps[y], ps[z]};
 
-    bool collide = SATImpl(aabb, tri);
+    bool collide = collision_detection::detail::SAT(aabb, tri);
     float distSqRelaxed = DistSquared(aabbRelaxed, tri);
 
     if (collide)

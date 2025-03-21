@@ -5,8 +5,10 @@
 
 namespace ARIA {
 
+namespace collision_detection::detail {
+
 template <typename T>
-[[nodiscard]] ARIA_HOST_DEVICE bool SATImpl(const AABB3<T> &aabb, const Triangle3<T> &tri) {
+[[nodiscard]] ARIA_HOST_DEVICE bool SAT(const AABB3<T> &aabb, const Triangle3<T> &tri) {
   using Vec3T = Vec3<T>;
 
   Vec3T c = aabb.center();
@@ -46,5 +48,7 @@ template <typename T>
 
   return !isS;
 }
+
+} // namespace collision_detection::detail
 
 } // namespace ARIA
