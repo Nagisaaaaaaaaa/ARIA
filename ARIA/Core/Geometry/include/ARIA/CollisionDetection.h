@@ -42,10 +42,8 @@ template <typename T>
   bool isS = false;
   ForEach<3>([&]<auto iU>() {
     ForEach<3>([&]<auto iF>() {
-      if (isS)
-        return;
       Tec a = Cross(get<iU>(u), ToTec(f[iF]));
-      isS = isSA(a);
+      isS = isS || isSA(a);
     });
   });
   if (isS)
