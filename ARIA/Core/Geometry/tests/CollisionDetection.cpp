@@ -29,14 +29,7 @@ void ForEachDivision(uint division, const Triangle3<T> &tri, const F &f) {
 }
 
 template <typename T, uint d>
-ARIA_HOST_DEVICE bool IsIn(const Vec<T, d> &p, const AABB<T, d> &aabb) {
-  bool res = true;
-  ForEach<d>([&]<auto i>() { res = res && p[i] >= aabb.inf()[i] && p[i] <= aabb.sup()[i]; });
-  return res;
-}
-
-template <typename T, uint d>
-ARIA_HOST_DEVICE T DistSquared(const Vec<T, d> &p, const AABB<T, d> &aabb) {
+T DistSquared(const AABB<T, d> &aabb, const Vec<T, d> &p) {
   T distSq(0);
   ForEach<d>([&]<auto i>() {
     if (p[i] < aabb.inf()[i])
@@ -48,10 +41,10 @@ ARIA_HOST_DEVICE T DistSquared(const Vec<T, d> &p, const AABB<T, d> &aabb) {
 }
 
 template <typename T>
-ARIA_HOST_DEVICE T DistSquared(const AABB3<T> &aabb, const Triangle3<T> &tri) {
+T DistSquared(const AABB3<T> &aabb, const Triangle3<T> &tri) {
   T distSq = infinity<T>;
   ForEachDivision(16, tri, [&](const Triangle3<T> &t) {
-    distSq = std::min({distSq, DistSquared(t[0], aabb), DistSquared(t[1], aabb), DistSquared(t[2], aabb)});
+    distSq = std::min({distSq, DistSquared(aabb, t[0]), DistSquared(aabb, t[1]), DistSquared(aabb, t[2])});
   });
   return distSq;
 }
