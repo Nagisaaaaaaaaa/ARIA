@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <random>
+
 namespace ARIA {
 
 namespace {
@@ -21,10 +23,10 @@ void ForEachDivision(uint division, const Triangle3<T> &tri, const F &f) {
     Vec3T p12 = (p1 + p2) / 2;
     Vec3T p20 = (p2 + p0) / 2;
 
-    ForEachDivision(division - 1, {p0, p01, p20}, f);
-    ForEachDivision(division - 1, {p01, p1, p12}, f);
-    ForEachDivision(division - 1, {p01, p12, p20}, f);
-    ForEachDivision(division - 1, {p20, p12, p2}, f);
+    ForEachDivision<T, F>(division - 1, {p0, p01, p20}, f);
+    ForEachDivision<T, F>(division - 1, {p01, p1, p12}, f);
+    ForEachDivision<T, F>(division - 1, {p01, p12, p20}, f);
+    ForEachDivision<T, F>(division - 1, {p20, p12, p2}, f);
   }
 }
 
@@ -43,7 +45,7 @@ T DistSquared(const AABB<T, d> &aabb, const Vec<T, d> &p) {
 template <typename T>
 T DistSquared(const AABB3<T> &aabb, const Triangle3<T> &tri) {
   T distSq = infinity<T>;
-  ForEachDivision(16, tri, [&](const Triangle3<T> &t) {
+  ForEachDivision(8, tri, [&](const Triangle3<T> &t) {
     distSq = std::min({distSq, DistSquared(aabb, t[0]), DistSquared(aabb, t[1]), DistSquared(aabb, t[2])});
   });
   return distSq;
@@ -51,6 +53,38 @@ T DistSquared(const AABB3<T> &aabb, const Triangle3<T> &tri) {
 
 } // namespace
 
-TEST(CollisionDetection, Base) {}
+TEST(CollisionDetection, Base) {
+  std::mt19937 gen(0);
+  std::uniform_real_distribution<float> dis(-100.0F, 100.0F);
+
+  AABB3f aabb{Vec3f{dis(gen), dis(gen), dis(gen)}, Vec3f(dis(gen), dis(gen), dis(gen))};
+
+  Vec3f pMin = aabb.inf() - aabb.diagonal();
+  Vec3f pMax = aabb.sup() + aabb.diagonal();
+
+  constexpr int n = 10;
+
+  std::vector<Vec3f> ps;
+  for (int z = 0; z < n; ++z)
+    for (int y = 0; y < n; ++y)
+      for (int x = 0; x < n; ++x) {
+        Vec3f p = pMin + (pMax - pMin).cwiseProduct(Vec3f(x, y, z) / static_cast<float>(n - 1));
+        ps.emplace_back(p);
+      }
+
+  for (const auto &p0 : ps)
+    for (const auto &p1 : ps)
+      for (const auto &p2 : ps) {
+        Triangle3f tri{p0, p1, p2};
+
+        bool collide = SATImpl(aabb, tri);
+        float distSq = DistSquared(aabb, tri);
+
+        if (collide)
+          EXPECT_LT(distSq, 1.0F);
+        else
+          EXPECT_GE(distSq, 1.0F);
+      }
+}
 
 } // namespace ARIA
