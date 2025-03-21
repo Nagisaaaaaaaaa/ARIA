@@ -7,6 +7,8 @@ namespace ARIA {
 
 namespace collision_detection::detail {
 
+//! This implementation is based on
+//! 2005, Christer Ericson, Real-Time Collision Detection, Chapter 5.2.9 Testing AABB Against Triangle.
 template <typename T>
 [[nodiscard]] ARIA_HOST_DEVICE bool SAT(const AABB3<T> &aabb, const Triangle3<T> &tri) {
   using Vec3T = Vec3<T>;
