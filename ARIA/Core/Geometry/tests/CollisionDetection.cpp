@@ -13,11 +13,11 @@ ARIA_HOST_DEVICE bool IsIn(const Vec<T, d> &p, const AABB<T, d> &aabb) {
   return res;
 }
 
-template <uint division, typename T, typename F>
-ARIA_HOST_DEVICE void ForEachDivision(const Triangle3<T> &tri, const F &f) {
+template <typename T, typename F>
+void ForEachDivision(uint division, const Triangle3<T> &tri, const F &f) {
   using Vec3T = Vec3<T>;
 
-  if constexpr (division == 0) {
+  if (division == 0) {
     f(tri);
   } else {
     Vec3T p0 = tri[0];
@@ -28,10 +28,10 @@ ARIA_HOST_DEVICE void ForEachDivision(const Triangle3<T> &tri, const F &f) {
     Vec3T p12 = (p1 + p2) / 2;
     Vec3T p20 = (p2 + p0) / 2;
 
-    ForEachDivision<division - 1>({p0, p01, p20}, f);
-    ForEachDivision<division - 1>({p01, p1, p12}, f);
-    ForEachDivision<division - 1>({p01, p12, p20}, f);
-    ForEachDivision<division - 1>({p20, p12, p2}, f);
+    ForEachDivision(division - 1, {p0, p01, p20}, f);
+    ForEachDivision(division - 1, {p01, p1, p12}, f);
+    ForEachDivision(division - 1, {p01, p12, p20}, f);
+    ForEachDivision(division - 1, {p20, p12, p2}, f);
   }
 }
 
