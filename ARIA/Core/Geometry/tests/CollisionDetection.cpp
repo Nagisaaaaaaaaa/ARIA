@@ -49,11 +49,6 @@ T DistSquared(const AABB3<T> &aabb, const Triangle3<T> &tri) {
   return distSq;
 }
 
-template <typename T>
-bool Collide(const AABB3<T> &aabb, const Triangle3<T> &tri) {
-  return DistSquared(aabb, tri) == T(0);
-}
-
 } // namespace
 
 TEST(CollisionDetection, Base) {}
