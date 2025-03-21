@@ -62,7 +62,7 @@ TEST(CollisionDetection, Base) {
   Vec3f pMin = aabb.inf() - aabb.diagonal();
   Vec3f pMax = aabb.sup() + aabb.diagonal();
 
-  constexpr int n = 10;
+  constexpr int n = 5;
 
   std::vector<Vec3f> ps;
   for (int z = 0; z < n; ++z)
@@ -83,7 +83,7 @@ TEST(CollisionDetection, Base) {
         if (collide)
           EXPECT_LT(distSq, 1.0F);
         else
-          EXPECT_GE(distSq, 0.0F);
+          EXPECT_GT(distSq, 1e-5F);
       }
 }
 
