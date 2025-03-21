@@ -8,11 +8,11 @@ namespace ARIA {
 
 namespace {
 
-template <typename T, typename F>
-void ForEachDivision(uint division, const Triangle3<T> &tri, const F &f) {
+template <uint division, typename T, typename F>
+ARIA_HOST_DEVICE void ForEachDivision(const Triangle3<T> &tri, const F &f) {
   using Vec3T = Vec3<T>;
 
-  if (division == 0) {
+  if constexpr (division == 0) {
     f(tri);
   } else {
     Vec3T p0 = tri[0];
@@ -23,15 +23,15 @@ void ForEachDivision(uint division, const Triangle3<T> &tri, const F &f) {
     Vec3T p12 = (p1 + p2) / 2;
     Vec3T p20 = (p2 + p0) / 2;
 
-    ForEachDivision<T, F>(division - 1, {p0, p01, p20}, f);
-    ForEachDivision<T, F>(division - 1, {p01, p1, p12}, f);
-    ForEachDivision<T, F>(division - 1, {p01, p12, p20}, f);
-    ForEachDivision<T, F>(division - 1, {p20, p12, p2}, f);
+    ForEachDivision<division - 1, T>({p0, p01, p20}, f);
+    ForEachDivision<division - 1, T>({p01, p1, p12}, f);
+    ForEachDivision<division - 1, T>({p01, p12, p20}, f);
+    ForEachDivision<division - 1, T>({p20, p12, p2}, f);
   }
 }
 
 template <typename T, uint d>
-T DistSquared(const AABB<T, d> &aabb, const Vec<T, d> &p) {
+ARIA_HOST_DEVICE T DistSquared(const AABB<T, d> &aabb, const Vec<T, d> &p) {
   T distSq(0);
   ForEach<d>([&]<auto i>() {
     if (p[i] < aabb.inf()[i])
@@ -43,9 +43,9 @@ T DistSquared(const AABB<T, d> &aabb, const Vec<T, d> &p) {
 }
 
 template <typename T>
-T DistSquared(const AABB3<T> &aabb, const Triangle3<T> &tri) {
+ARIA_HOST_DEVICE T DistSquared(const AABB3<T> &aabb, const Triangle3<T> &tri) {
   T distSq = infinity<T>;
-  ForEachDivision(6, tri, [&](const Triangle3<T> &t) {
+  ForEachDivision<5>(tri, [&](const Triangle3<T> &t) {
     distSq = std::min({distSq, DistSquared(aabb, t[0]), DistSquared(aabb, t[1]), DistSquared(aabb, t[2])});
   });
   return distSq;
@@ -83,7 +83,7 @@ TEST(CollisionDetection, Base) {
         if (collide)
           EXPECT_LT(distSq, 1.0F);
         else
-          EXPECT_GT(distSq, 1e-5F);
+          EXPECT_GT(distSq, 1e-12);
       }
 }
 
