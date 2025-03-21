@@ -31,7 +31,7 @@ template <typename T>
                  Dot(ToTec(v[1]), axis), //
                  Dot(ToTec(v[2]), axis)};
 
-    auto abs = [](const auto &v) { return v < _0 ? -v : v; };
+    auto abs = [](const auto &v) { return v < 0 ? -v : v; };
     T r = Dot(ToTec(e), Tec{abs(Dot(u0, axis)), //
                             abs(Dot(u1, axis)), //
                             abs(Dot(u2, axis))});
