@@ -13,6 +13,18 @@ ARIA_HOST_DEVICE bool IsIn(const Vec<T, d> &p, const AABB<T, d> &aabb) {
   return res;
 }
 
+template <typename T, uint d>
+ARIA_HOST_DEVICE T DistSquared(const Vec<T, d> &p, const AABB<T, d> &aabb) {
+  T distSq(0);
+  ForEach<d>([&]<auto i>() {
+    if (p[i] < aabb.inf()[i])
+      distSq += Pow<2>(aabb.inf()[i] - p[i]);
+    if (p[i] > aabb.sup()[i])
+      distSq += Pow<2>(p[i] - aabb.sup()[i]);
+  });
+  return distSq;
+}
+
 template <typename T, typename F>
 void ForEachDivision(uint division, const Triangle3<T> &tri, const F &f) {
   using Vec3T = Vec3<T>;
@@ -37,11 +49,11 @@ void ForEachDivision(uint division, const Triangle3<T> &tri, const F &f) {
 
 template <typename T>
 bool Collide(const AABB3<T> &aabb, const Triangle3<T> &tri) {
-  bool collide = false;
+  T distSq = infinity<T>;
   ForEachDivision(16, tri, [&](const Triangle3<T> &t) {
-    collide = collide || IsIn(t[0], aabb) || IsIn(t[1], aabb) || IsIn(t[2], aabb);
+    distSq = std::min({distSq, DistSquared(t[0], aabb), DistSquared(t[1], aabb), DistSquared(t[2], aabb)});
   });
-  return collide;
+  return distSq == T(0);
 }
 
 } // namespace
