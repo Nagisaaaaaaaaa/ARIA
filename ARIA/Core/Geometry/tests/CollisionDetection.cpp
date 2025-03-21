@@ -38,7 +38,7 @@ void ForEachDivision(uint division, const Triangle3<T> &tri, const F &f) {
 template <typename T>
 bool Collide(const AABB3<T> &aabb, const Triangle3<T> &tri) {
   bool collide = false;
-  ForEachDivision(16, tri, [&collide](const Triangle3<T> &t) {
+  ForEachDivision(16, tri, [&](const Triangle3<T> &t) {
     collide = collide || IsIn(t[0], aabb) || IsIn(t[1], aabb) || IsIn(t[2], aabb);
   });
   return collide;
