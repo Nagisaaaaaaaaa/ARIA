@@ -10,24 +10,17 @@ namespace {
 
 template <uint division, typename T, typename F>
 ARIA_HOST_DEVICE void ForEachDivision(const Triangle3<T> &tri, const F &f) {
-  using Vec3T = Vec3<T>;
+  for (int z = 0; z < division; ++z)
+    for (int y = 0; y < division - z; ++y) { // y + z <= division - 1
+      int x = (division - 1) - y - z;        // x + y + z = division - 1
 
-  if constexpr (division == 0) {
-    f(tri);
-  } else {
-    Vec3T p0 = tri[0];
-    Vec3T p1 = tri[1];
-    Vec3T p2 = tri[2];
+      T wX = T(x) / T(division - 1);
+      T wY = T(y) / T(division - 1);
+      T wZ = T(z) / T(division - 1);
 
-    Vec3T p01 = (p0 + p1) / 2;
-    Vec3T p12 = (p1 + p2) / 2;
-    Vec3T p20 = (p2 + p0) / 2;
-
-    ForEachDivision<division - 1, T>({p0, p01, p20}, f);
-    ForEachDivision<division - 1, T>({p01, p1, p12}, f);
-    ForEachDivision<division - 1, T>({p01, p12, p20}, f);
-    ForEachDivision<division - 1, T>({p20, p12, p2}, f);
-  }
+      Vec3<T> pos = wX * tri[0] + wY * tri[1] + wZ * tri[2];
+      f(pos);
+    }
 }
 
 template <typename T, uint d>
@@ -45,9 +38,7 @@ ARIA_HOST_DEVICE T DistSquared(const AABB<T, d> &aabb, const Vec<T, d> &p) {
 template <typename T>
 ARIA_HOST_DEVICE T DistSquared(const AABB3<T> &aabb, const Triangle3<T> &tri) {
   T distSq = infinity<T>;
-  ForEachDivision<6>(tri, [&](const Triangle3<T> &t) {
-    distSq = std::min({distSq, DistSquared(aabb, t[0]), DistSquared(aabb, t[1]), DistSquared(aabb, t[2])});
-  });
+  ForEachDivision<128>(tri, [&](const Vec3<T> &p) { distSq = std::min(distSq, DistSquared(aabb, p)); });
   return distSq;
 }
 
@@ -79,11 +70,10 @@ void TestSAT_AABBTriangle() {
     bool collide = SATImpl(aabb, tri);
     float distSqRelaxed = DistSquared(aabbRelaxed, tri);
 
-    if (collide) {
-      ARIA_ASSERT(distSqRelaxed < Pow<2>(2.0F));
-    } else {
-      ARIA_ASSERT(distSqRelaxed > 0);
-    }
+    if (collide)
+      ARIA_ASSERT(distSqRelaxed < 1.025F);
+    else
+      ARIA_ASSERT(distSqRelaxed > 0.0F);
   }).Launch();
 
   cuda::device::current::get().synchronize();
