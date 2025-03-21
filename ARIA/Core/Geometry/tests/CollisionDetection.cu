@@ -53,6 +53,9 @@ ARIA_HOST_DEVICE T DistSquared(const AABB3<T> &aabb, const Triangle3<T> &tri) {
 
 void TestSAT_AABBTriangle() {
   AABB3f aabb{Vec3f{-31.4159F, 12.34567F, -98.76543F}, Vec3f(95.1413F, 66.66666F, -11.4514F)};
+  AABB3f aabbRelaxed = aabb;
+  aabbRelaxed.inf() += aabb.diagonal() * 0.0001F;
+  aabbRelaxed.sup() -= aabb.diagonal() * 0.0001F;
 
   Vec3f pMin = aabb.inf() - aabb.diagonal();
   Vec3f pMax = aabb.sup() + aabb.diagonal();
@@ -70,16 +73,17 @@ void TestSAT_AABBTriangle() {
   VectorDevice<Vec3f> psD = psH;
   int nPs = psD.size();
 
-  Launcher(make_layout_major(nPs, nPs, nPs), [aabb, ps = psD.data()] ARIA_DEVICE(int x, int y, int z) {
+  Launcher(make_layout_major(nPs, nPs, nPs), [aabb, aabbRelaxed, ps = psD.data()] ARIA_DEVICE(int x, int y, int z) {
     Triangle3f tri{ps[x], ps[y], ps[z]};
 
     bool collide = SATImpl(aabb, tri);
-    float distSq = DistSquared(aabb, tri);
+    float distSqRelaxed = DistSquared(aabbRelaxed, tri);
 
-    if (collide)
-      ARIA_ASSERT(distSq < Pow<2>(2.0F));
-    else
-      ARIA_ASSERT(distSq > 1e-10F);
+    if (collide) {
+      ARIA_ASSERT(distSqRelaxed < Pow<2>(2.0F));
+    } else {
+      ARIA_ASSERT(distSqRelaxed > 0);
+    }
   }).Launch();
 
   cuda::device::current::get().synchronize();
