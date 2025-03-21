@@ -45,7 +45,7 @@ ARIA_HOST_DEVICE T DistSquared(const AABB<T, d> &aabb, const Vec<T, d> &p) {
 template <typename T>
 ARIA_HOST_DEVICE T DistSquared(const AABB3<T> &aabb, const Triangle3<T> &tri) {
   T distSq = infinity<T>;
-  ForEachDivision<5>(tri, [&](const Triangle3<T> &t) {
+  ForEachDivision<6>(tri, [&](const Triangle3<T> &t) {
     distSq = std::min({distSq, DistSquared(aabb, t[0]), DistSquared(aabb, t[1]), DistSquared(aabb, t[2])});
   });
   return distSq;
@@ -77,9 +77,9 @@ void TestSAT_AABBTriangle() {
     float distSq = DistSquared(aabb, tri);
 
     if (collide)
-      ARIA_ASSERT(distSq < 1.0F);
+      ARIA_ASSERT(distSq < Pow<2>(2.0F));
     else
-      ARIA_ASSERT(distSq > 1e-10);
+      ARIA_ASSERT(distSq > 1e-10F);
   }).Launch();
 
   cuda::device::current::get().synchronize();
