@@ -47,11 +47,13 @@ public:
 
 public:
   [[nodiscard]] ARIA_HOST_DEVICE /*constexpr*/ VecDT normal() const {
+    static_assert(d == 3, "`normal` is only well-defined for 3D triangles");
     VecDT normal = (operator[](1) - operator[](0)).cross(operator[](2) - operator[](0));
     return normal.normalized();
   }
 
   [[nodiscard]] ARIA_HOST_DEVICE /*constexpr*/ VecDT stableNormal() const {
+    static_assert(d == 3, "`stableNormal` is only well-defined for 3D triangles");
     VecDT normal = (operator[](1) - operator[](0)).cross(operator[](2) - operator[](0));
     return normal.stableNormalized();
   }
