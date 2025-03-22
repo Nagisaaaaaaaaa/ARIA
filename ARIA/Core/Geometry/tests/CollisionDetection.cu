@@ -1,8 +1,9 @@
 #include "ARIA/CollisionDetection.h"
 #include "ARIA/Launcher.h"
-#include "ARIA/Vector.h"
 
 #include <gtest/gtest.h>
+#include <thrust/device_vector.h>
+#include <thrust/host_vector.h>
 
 namespace ARIA {
 
@@ -53,7 +54,7 @@ void TestSAT_AABBTriangle() {
 
   constexpr int n = 20;
 
-  VectorHost<Vec3f> psH;
+  thrust::host_vector<Vec3f> psH;
   for (int z = 0; z < n; ++z)
     for (int y = 0; y < n; ++y)
       for (int x = 0; x < n; ++x) {
@@ -61,7 +62,7 @@ void TestSAT_AABBTriangle() {
         psH.push_back(p);
       }
 
-  VectorDevice<Vec3f> psD = psH;
+  thrust::device_vector<Vec3f> psD = psH;
   int nPs = psD.size();
 
   Launcher(make_layout_major(nPs, nPs, nPs), [aabb, aabbRelaxed, ps = psD.data()] ARIA_DEVICE(int x, int y, int z) {
