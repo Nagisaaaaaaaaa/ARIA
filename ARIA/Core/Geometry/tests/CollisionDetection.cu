@@ -73,7 +73,7 @@ void Test_AABBTriangle() {
     bool detection1 = DetectCollision(tri, aabb);
     ARIA_ASSERT(detection == detection1);
 
-    float distSqRelaxed = DistSquared(aabbRelaxed, tri);
+    float distSqRelaxed = DistSquared(aabbRelaxed, tri); // A little bit larger.
     if (detection)
       ARIA_ASSERT(distSqRelaxed < 1.05F);
     else
