@@ -64,9 +64,9 @@ void Test_AABBTriangle() {
       }
 
   thrust::device_vector<Vec3f> psD = psH;
-  uint nPs = psD.size();
+  int nPs = psD.size();
 
-  Launcher(make_layout_major(nPs, nPs, nPs), [aabb, aabbRelaxed, ps = psD.data()] ARIA_DEVICE(uint x, uint y, uint z) {
+  Launcher(make_layout_major(nPs, nPs, nPs), [aabb, aabbRelaxed, ps = psD.data()] ARIA_DEVICE(int x, int y, int z) {
     Triangle3f tri{ps[x], ps[y], ps[z]};
 
     bool detection = DetectCollision(aabb, tri);
