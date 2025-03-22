@@ -86,7 +86,7 @@ void TestSAT_AABBTriangle() {
 
 } // namespace
 
-TEST(CollisionDetection, Base) {
+TEST(CollisionDetection, SAT) {
   TestSAT_AABBTriangle();
 }
 
