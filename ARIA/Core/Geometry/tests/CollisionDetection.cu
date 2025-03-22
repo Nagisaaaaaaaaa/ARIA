@@ -69,12 +69,12 @@ void Test_AABBTriangle() {
   Launcher(make_layout_major(nPs, nPs, nPs), [aabb, aabbRelaxed, ps = psD.data()] ARIA_DEVICE(int x, int y, int z) {
     Triangle3f tri{ps[x], ps[y], ps[z]};
 
-    bool detection = DetectCollision(aabb, tri);
-    bool detection1 = DetectCollision(tri, aabb);
-    ARIA_ASSERT(detection == detection1);
+    bool collides = DetectCollision(aabb, tri);
+    bool collides1 = DetectCollision(tri, aabb);
+    ARIA_ASSERT(collides == collides1);
 
     float distSqRelaxed = DistSquared(aabbRelaxed, tri); // A little bit larger.
-    if (detection)
+    if (collides)
       ARIA_ASSERT(distSqRelaxed < 1.05F);
     else
       ARIA_ASSERT(distSqRelaxed > 0.0F);
