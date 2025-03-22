@@ -44,7 +44,7 @@ ARIA_HOST_DEVICE T DistSquared(const AABB3<T> &aabb, const Triangle3<T> &tri) {
   return distSq;
 }
 
-void TestSAT_AABBTriangle() {
+void Test_AABBTriangle() {
   AABB3f aabb{Vec3f{-31.4159F, 12.34567F, -98.76543F}, Vec3f(95.1413F, 66.66666F, -11.4514F)};
   AABB3f aabbRelaxed = aabb; // A little bit smaller.
   aabbRelaxed.inf() += aabb.diagonal() * 0.0001F;
@@ -69,11 +69,9 @@ void TestSAT_AABBTriangle() {
   Launcher(make_layout_major(nPs, nPs, nPs), [aabb, aabbRelaxed, ps = psD.data()] ARIA_DEVICE(int x, int y, int z) {
     Triangle3f tri{ps[x], ps[y], ps[z]};
 
-    bool detection = collision_detection::detail::SAT(aabb, tri);
-    bool detection1 = DetectCollision(aabb, tri);
-    bool detection2 = DetectCollision(tri, aabb);
+    bool detection = DetectCollision(aabb, tri);
+    bool detection1 = DetectCollision(tri, aabb);
     ARIA_ASSERT(detection == detection1);
-    ARIA_ASSERT(detection == detection2);
 
     float distSqRelaxed = DistSquared(aabbRelaxed, tri);
     if (detection)
@@ -87,8 +85,8 @@ void TestSAT_AABBTriangle() {
 
 } // namespace
 
-TEST(CollisionDetection, SAT) {
-  TestSAT_AABBTriangle();
+TEST(CollisionDetection, D3) {
+  Test_AABBTriangle();
 }
 
 } // namespace ARIA
