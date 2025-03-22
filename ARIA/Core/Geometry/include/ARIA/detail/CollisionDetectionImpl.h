@@ -32,6 +32,7 @@ template <typename T>
   constexpr Tec u2{_0, _0, _1};
   constexpr Tup u{u0, u1, u2};
 
+  // Test whether the given `axis` is a separating axis (SA).
   auto isSA = [&](const auto &axis) {
     std::array p{Dot(ToTec(v[0]), axis), //
                  Dot(ToTec(v[1]), axis), //
@@ -45,9 +46,13 @@ template <typename T>
     return std::max({p[0], p[1], p[2]}) < -r || std::min({p[0], p[1], p[2]}) > r;
   };
 
+  // Whether the two primitives are separating.
   bool isS = false;
+  // Test 9 axes given by the cross products of combination of edges from both.
   ForEach<3>([&]<auto iU>() { ForEach<3>([&]<auto iF>() { isS = isS || isSA(Cross(get<iU>(u), ToTec(f[iF]))); }); });
+  // Test 3 face normals from the AABB.
   isS = isS || isSA(u0) || isSA(u1) || isSA(u2);
+  // Test 1 face normal from the triangle.
   isS = isS || isSA(ToTec(f[0].cross(f[1])));
 
   return !isS;
