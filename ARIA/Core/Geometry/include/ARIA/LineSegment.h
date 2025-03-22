@@ -1,9 +1,31 @@
 #pragma once
 
+/// \file
+/// \brief A line segment implementation.
+///
+/// `LineSegment` is implemented generically in dimension, thus can support
+/// physics systems with any dimensions, 1D, 2D, 3D, 4D, ...
+
+//
+//
+//
+//
+//
 #include "ARIA/Vec.h"
 
 namespace ARIA {
 
+/// \brief A line segment implementation.
+///
+/// \tparam d Dimension.
+///
+/// \example ```cpp
+/// // Create a `LineSegment`.
+/// LineSegment2r seg{Vec2r{1_R, 0_R}, Vec2r{0_R, 1_R}};
+///
+/// // Get the vertices of the `LineSegment`.
+/// Vec2r v0 = seg[0], v1 = seg[1];
+/// ```
 template <typename T, uint d>
 class LineSegment final {
 private:
