@@ -22,6 +22,8 @@ template <typename T>
   std::array<Vec3T, 3> f;
   ForEach<3>([&]<auto i>() { f[i] = v[(i + 1) % 3] - v[i]; });
 
+  //! `Tec` is intensively used in the following codes to ensure that
+  //! expressions will be simplified at compile-time.
   constexpr C<T(0)> _0;
   constexpr C<T(1)> _1;
 
