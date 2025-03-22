@@ -13,8 +13,8 @@ namespace {
 template <uint division, typename T, typename F>
 ARIA_HOST_DEVICE void ForEachDivision(const Triangle3<T> &tri, const F &f) {
   for (uint z = 0; z < division; ++z)
-    for (uint y = 0; y < division - z; ++y) { // y + z <= division - 1
-      uint x = (division - 1) - y - z;        // x + y + z == division - 1
+    for (uint y = 0; y < division - z; ++y) { // `y + z <= division - 1`.
+      uint x = (division - 1) - y - z;        // `x + y + z == division - 1`.
 
       T wX = T(x) / T(division - 1);
       T wY = T(y) / T(division - 1);
