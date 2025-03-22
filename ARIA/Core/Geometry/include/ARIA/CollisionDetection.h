@@ -1,5 +1,13 @@
 #pragma once
 
+/// \file
+/// \brief Utilities for testing whether the given primitives are intersecting.
+
+//
+//
+//
+//
+//
 #include "ARIA/detail/CollisionDetectionImpl.h"
 
 namespace ARIA {
