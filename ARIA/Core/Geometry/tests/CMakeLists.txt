@@ -4,6 +4,7 @@ if (ARIA_BUILD_TESTS)
       AABB.cpp
       BVH.cu
       CollisionDetection.cu
+      LineSegment.cpp
       MarchingCube.cu
       Triangle.cpp
       VDB.cu
