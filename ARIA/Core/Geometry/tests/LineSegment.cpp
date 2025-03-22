@@ -17,7 +17,7 @@ TEST(LineSegment, Base) {
   // 2D.
   {
     LineSegment2f segDefaultConstructed;
-    LineSegment2f seg{Vec2f{1.0F, 1.2F}, Vec2f{2.0F, 2.3F}};
+    LineSegment2f seg{{1.0F, 1.2F}, {2.0F, 2.3F}};
     Vec2f v0{1.0F, 1.2F}, v1{2.0F, 2.3F};
     EXPECT_EQ(seg[0], v0);
     EXPECT_EQ(seg[1], v1);
@@ -26,7 +26,7 @@ TEST(LineSegment, Base) {
   // 3D.
   {
     LineSegment3f segDefaultConstructed;
-    LineSegment3f seg{Vec3f{1.0F, 1.2F, 1.24F}, Vec3f{2.0F, 2.3F, 2.36F}};
+    LineSegment3f seg{{1.0F, 1.2F, 1.24F}, {2.0F, 2.3F, 2.36F}};
     Vec3f v0{1.0F, 1.2F, 1.24F}, v1{2.0F, 2.3F, 2.36F};
     EXPECT_EQ(seg[0], v0);
     EXPECT_EQ(seg[1], v1);

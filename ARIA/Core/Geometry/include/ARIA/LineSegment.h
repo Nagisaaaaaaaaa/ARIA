@@ -21,7 +21,7 @@ namespace ARIA {
 ///
 /// \example ```cpp
 /// // Create a `LineSegment`.
-/// LineSegment2r seg{Vec2r{1_R, 0_R}, Vec2r{0_R, 1_R}};
+/// LineSegment2r seg{{1_R, 0_R}, {0_R, 1_R}};
 ///
 /// // Get the vertices of the `LineSegment`.
 /// Vec2r v0 = seg[0], v1 = seg[1];
