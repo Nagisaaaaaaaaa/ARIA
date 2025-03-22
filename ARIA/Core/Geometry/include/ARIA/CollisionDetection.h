@@ -17,6 +17,12 @@ template <typename T>
 }
 
 /// \brief Test whether the given `tri` and `aabb` are intersecting.
+///
+/// \example ```cpp
+/// Triangle3r tri{...};
+/// AABB3r aabb{...};
+/// bool collides = DetectCollision(tri, aabb);
+/// ```
 template <typename T>
 [[nodiscard]] ARIA_HOST_DEVICE bool DetectCollision(const Triangle3<T> &tri, const AABB3<T> &aabb) {
   return DetectCollision(aabb, tri);
