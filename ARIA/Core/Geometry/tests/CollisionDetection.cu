@@ -12,9 +12,9 @@ namespace {
 
 template <uint division, typename T, typename F>
 ARIA_HOST_DEVICE void ForEachDivision(const Triangle3<T> &tri, const F &f) {
-  for (int z = 0; z < division; ++z)
-    for (int y = 0; y < division - z; ++y) { // y + z <= division - 1
-      int x = (division - 1) - y - z;        // x + y + z == division - 1
+  for (uint z = 0; z < division; ++z)
+    for (uint y = 0; y < division - z; ++y) { // y + z <= division - 1
+      uint x = (division - 1) - y - z;        // x + y + z == division - 1
 
       T wX = T(x) / T(division - 1);
       T wY = T(y) / T(division - 1);
@@ -53,20 +53,20 @@ void Test_AABBTriangle() {
   Vec3f pMin = aabb.inf() - aabb.diagonal();
   Vec3f pMax = aabb.sup() + aabb.diagonal();
 
-  constexpr int n = 20;
+  constexpr uint n = 20;
 
   thrust::host_vector<Vec3f> psH;
-  for (int z = 0; z < n; ++z)
-    for (int y = 0; y < n; ++y)
-      for (int x = 0; x < n; ++x) {
+  for (uint z = 0; z < n; ++z)
+    for (uint y = 0; y < n; ++y)
+      for (uint x = 0; x < n; ++x) {
         Vec3f p = pMin + (pMax - pMin).cwiseProduct(Vec3f(x, y, z) / static_cast<float>(n - 1));
         psH.push_back(p);
       }
 
   thrust::device_vector<Vec3f> psD = psH;
-  int nPs = psD.size();
+  uint nPs = psD.size();
 
-  Launcher(make_layout_major(nPs, nPs, nPs), [aabb, aabbRelaxed, ps = psD.data()] ARIA_DEVICE(int x, int y, int z) {
+  Launcher(make_layout_major(nPs, nPs, nPs), [aabb, aabbRelaxed, ps = psD.data()] ARIA_DEVICE(uint x, uint y, uint z) {
     Triangle3f tri{ps[x], ps[y], ps[z]};
 
     bool detection = DetectCollision(aabb, tri);
