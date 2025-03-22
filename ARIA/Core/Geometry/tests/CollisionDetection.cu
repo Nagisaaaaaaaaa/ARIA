@@ -14,7 +14,7 @@ template <uint division, typename T, typename F>
 ARIA_HOST_DEVICE void ForEachDivision(const Triangle3<T> &tri, const F &f) {
   for (int z = 0; z < division; ++z)
     for (int y = 0; y < division - z; ++y) { // y + z <= division - 1
-      int x = (division - 1) - y - z;        // x + y + z = division - 1
+      int x = (division - 1) - y - z;        // x + y + z == division - 1
 
       T wX = T(x) / T(division - 1);
       T wY = T(y) / T(division - 1);
