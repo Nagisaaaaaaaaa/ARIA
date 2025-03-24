@@ -11,6 +11,16 @@ namespace ARIA {
 namespace {
 
 template <uint division, typename T, typename F>
+ARIA_HOST_DEVICE void ForEachDivision(const LineSegment2<T> &seg, const F &f) {
+  for (uint i = 0; i < division; ++i) {
+    T w = T(i) / T(division - 1);
+
+    Vec2<T> pos = Lerp(seg[0], seg[1], w);
+    f(pos);
+  }
+}
+
+template <uint division, typename T, typename F>
 ARIA_HOST_DEVICE void ForEachDivision(const Triangle3<T> &tri, const F &f) {
   for (uint z = 0; z < division; ++z)
     for (uint y = 0; y < division - z; ++y) { // `y + z <= division - 1`.
