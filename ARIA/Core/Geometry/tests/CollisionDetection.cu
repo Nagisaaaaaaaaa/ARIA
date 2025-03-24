@@ -10,18 +10,18 @@ namespace ARIA {
 
 namespace {
 
-template <uint division, typename T, typename F>
-ARIA_HOST_DEVICE void ForEachDivision(const LineSegment2<T> &seg, const F &f) {
+template <uint division, typename T, uint d, typename F>
+ARIA_HOST_DEVICE void ForEachDivision(const LineSegment<T, d> &seg, const F &f) {
   for (uint i = 0; i < division; ++i) {
     T w = T(i) / T(division - 1);
 
-    Vec2<T> pos = Lerp(seg[0], seg[1], w);
+    Vec<T, d> pos = Lerp(seg[0], seg[1], w);
     f(pos);
   }
 }
 
-template <uint division, typename T, typename F>
-ARIA_HOST_DEVICE void ForEachDivision(const Triangle2<T> &tri, const F &f) {
+template <uint division, typename T, uint d, typename F>
+ARIA_HOST_DEVICE void ForEachDivision(const Triangle<T, d> &tri, const F &f) {
   for (uint z = 0; z < division; ++z)
     for (uint y = 0; y < division - z; ++y) { // `y + z <= division - 1`.
       uint x = (division - 1) - y - z;        // `x + y + z == division - 1`.
@@ -30,22 +30,7 @@ ARIA_HOST_DEVICE void ForEachDivision(const Triangle2<T> &tri, const F &f) {
       T wY = T(y) / T(division - 1);
       T wZ = T(z) / T(division - 1);
 
-      Vec2<T> pos = wX * tri[0] + wY * tri[1] + wZ * tri[2];
-      f(pos);
-    }
-}
-
-template <uint division, typename T, typename F>
-ARIA_HOST_DEVICE void ForEachDivision(const Triangle3<T> &tri, const F &f) {
-  for (uint z = 0; z < division; ++z)
-    for (uint y = 0; y < division - z; ++y) { // `y + z <= division - 1`.
-      uint x = (division - 1) - y - z;        // `x + y + z == division - 1`.
-
-      T wX = T(x) / T(division - 1);
-      T wY = T(y) / T(division - 1);
-      T wZ = T(z) / T(division - 1);
-
-      Vec3<T> pos = wX * tri[0] + wY * tri[1] + wZ * tri[2];
+      Vec<T, d> pos = wX * tri[0] + wY * tri[1] + wZ * tri[2];
       f(pos);
     }
 }
