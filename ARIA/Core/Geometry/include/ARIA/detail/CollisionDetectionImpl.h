@@ -76,8 +76,8 @@ template <typename T>
   Vec2T c = aabb.center();
   Vec2T e = aabb.diagonal() / 2_R;
 
-  LineSegment v = seg;
-  ForEach<2>([&]<auto i>() { v[i] -= c; });
+  std::array<T, 2> v;
+  ForEach<2>([&]<auto i>() { v[i] = seg[i] - c; });
   auto isSA = [&](const auto &axis) { return IsSAForAABB<T>(e, v, axis); };
 
   Vec2T f = v[1] - v[0];
@@ -100,8 +100,8 @@ template <typename T>
   Vec2T c = aabb.center();
   Vec2T e = aabb.diagonal() / 2_R;
 
-  Triangle v = tri;
-  ForEach<3>([&]<auto i>() { v[i] -= c; });
+  std::array<T, 3> v;
+  ForEach<3>([&]<auto i>() { v[i] = tri[i] - c; });
   auto isSA = [&](const auto &axis) { return IsSAForAABB<T>(e, v, axis); };
 
   std::array<Vec2T, 3> f;
@@ -128,8 +128,8 @@ template <typename T>
   Vec3T c = aabb.center();
   Vec3T e = aabb.diagonal() / 2_R;
 
-  Triangle v = tri;
-  ForEach<3>([&]<auto i>() { v[i] -= c; });
+  std::array<T, 3> v;
+  ForEach<3>([&]<auto i>() { v[i] = tri[i] - c; });
   auto isSA = [&](const auto &axis) { return IsSAForAABB<T>(e, v, axis); };
 
   std::array<Vec3T, 3> f;
