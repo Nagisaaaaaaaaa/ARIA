@@ -8,6 +8,9 @@ namespace ARIA {
 
 namespace collision_detection::detail {
 
+//! The following SAT algorithms are implemented based on
+//! 2005, Christer Ericson, Real-Time Collision Detection, Chapter 5.2.9 Testing AABB Against Triangle.
+
 template <typename T>
 [[nodiscard]] ARIA_HOST_DEVICE bool SAT(const AABB2<T> &aabb, const LineSegment2<T> &seg) {
   using Vec2T = Vec2<T>;
@@ -51,8 +54,6 @@ template <typename T>
   return !isS;
 }
 
-//! This implementation is based on
-//! 2005, Christer Ericson, Real-Time Collision Detection, Chapter 5.2.9 Testing AABB Against Triangle.
 template <typename T>
 [[nodiscard]] ARIA_HOST_DEVICE bool SAT(const AABB3<T> &aabb, const Triangle3<T> &tri) {
   using Vec3T = Vec3<T>;
