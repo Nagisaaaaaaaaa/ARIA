@@ -92,6 +92,9 @@ template <typename T>
   return !isS;
 }
 
+//
+//
+//
 template <typename T>
 [[nodiscard]] ARIA_HOST_DEVICE bool SAT(const AABB3<T> &aabb, const Triangle3<T> &tri) {
   using namespace D3;
