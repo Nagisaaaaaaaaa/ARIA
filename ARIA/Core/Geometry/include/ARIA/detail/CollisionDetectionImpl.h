@@ -44,6 +44,8 @@ static ARIA_CONST constexpr Tup u{u0, u1, u2};
 template <typename T, uint d, uint n>
 [[nodiscard]] ARIA_HOST_DEVICE bool
 IsSAForAABB(const Vec<T, d> &extent, const std::array<Vec<T, d>, n> &prim, const auto &axis) {
+  static_assert(d == 1 || d == 2 || d == 3, "Collision detection algorithms are undefined for the given dimension `d`");
+
   std::array<T, n> p;
   ForEach<n>([&](auto i) { p[i] = Dot(ToTec(prim[i]), axis); });
 
@@ -61,8 +63,6 @@ IsSAForAABB(const Vec<T, d> &extent, const std::array<Vec<T, d>, n> &prim, const
     r = Dot(ToTec(extent), Tec{abs(Dot(u0, axis)), //
                                abs(Dot(u1, axis)), //
                                abs(Dot(u2, axis))});
-  } else {
-    ARIA_STATIC_ASSERT_FALSE("Collision detection algorithms are unimplemented for the given dimension `d`");
   }
 
   T max = p[0], min = p[0];
