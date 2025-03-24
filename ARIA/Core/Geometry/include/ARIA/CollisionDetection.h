@@ -12,6 +12,16 @@
 
 namespace ARIA {
 
+template <typename T>
+[[nodiscard]] ARIA_HOST_DEVICE bool DetectCollision(const AABB2<T> &aabb, const LineSegment2<T> &seg) {
+  return collision_detection::detail::SAT(aabb, seg);
+}
+
+template <typename T>
+[[nodiscard]] ARIA_HOST_DEVICE bool DetectCollision(const LineSegment2<T> &seg, const AABB2<T> &aabb) {
+  return DetectCollision(aabb, seg);
+}
+
 /// \brief Test whether the given `aabb` and `tri` are intersecting.
 ///
 /// \example ```cpp
