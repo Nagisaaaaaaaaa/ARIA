@@ -13,9 +13,24 @@ namespace collision_detection::detail {
 
 namespace D2 {
 
+// Unit `Tec`s are commonly used in collision detection algorithms.
 static ARIA_CONST constexpr Tec u0{1_I, 0_I};
 static ARIA_CONST constexpr Tec u1{0_I, 1_I};
 static ARIA_CONST constexpr Tup u{u0, u1};
+
+// Test whether the given `axis` is a separating axis (SA) for `prim` and
+// an `AABB` with extent equals to `extent` and center located at origin.
+template <typename T>
+[[nodiscard]] ARIA_HOST_DEVICE bool IsSAForAABB(const auto &extent, const auto &prim, const auto &axis) {
+  std::array p{Dot(ToTec(prim[0]), axis), //
+               Dot(ToTec(prim[1]), axis)};
+
+  auto abs = [](const auto &v) { return v < 0 ? -v : v; };
+  T r = Dot(ToTec(extent), Tec{abs(Dot(u0, axis)), //
+                               abs(Dot(u1, axis))});
+
+  return std::max(p[0], p[1]) < -r || std::min(p[0], p[1]) > r;
+}
 
 } // namespace D2
 
@@ -25,6 +40,20 @@ static ARIA_CONST constexpr Tec u0{1_I, 0_I, 0_I};
 static ARIA_CONST constexpr Tec u1{0_I, 1_I, 0_I};
 static ARIA_CONST constexpr Tec u2{0_I, 0_I, 1_I};
 static ARIA_CONST constexpr Tup u{u0, u1, u2};
+
+template <typename T>
+[[nodiscard]] ARIA_HOST_DEVICE bool IsSAForAABB(const auto &extent, const auto &prim, const auto &axis) {
+  std::array p{Dot(ToTec(prim[0]), axis), //
+               Dot(ToTec(prim[1]), axis), //
+               Dot(ToTec(prim[2]), axis)};
+
+  auto abs = [](const auto &v) { return v < 0 ? -v : v; };
+  T r = Dot(ToTec(extent), Tec{abs(Dot(u0, axis)), //
+                               abs(Dot(u1, axis)), //
+                               abs(Dot(u2, axis))});
+
+  return std::max({p[0], p[1], p[2]}) < -r || std::min({p[0], p[1], p[2]}) > r;
+}
 
 } // namespace D3
 
