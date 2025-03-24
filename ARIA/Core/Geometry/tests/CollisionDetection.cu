@@ -47,17 +47,17 @@ ARIA_HOST_DEVICE T DistSquared(const AABB<T, d> &aabb, const Vec<T, d> &p) {
   return distSq;
 }
 
-template <typename T>
-ARIA_HOST_DEVICE T DistSquared(const AABB2<T> &aabb, const LineSegment2<T> &seg) {
+template <typename T, uint d>
+ARIA_HOST_DEVICE T DistSquared(const AABB<T, d> &aabb, const LineSegment<T, d> &seg) {
   T distSq = infinity<T>;
-  ForEachDivision<128>(seg, [&](const Vec2<T> &p) { distSq = std::min(distSq, DistSquared(aabb, p)); });
+  ForEachDivision<128>(seg, [&](const Vec<T, d> &p) { distSq = std::min(distSq, DistSquared(aabb, p)); });
   return distSq;
 }
 
-template <typename T>
-ARIA_HOST_DEVICE T DistSquared(const AABB3<T> &aabb, const Triangle3<T> &tri) {
+template <typename T, uint d>
+ARIA_HOST_DEVICE T DistSquared(const AABB<T, d> &aabb, const Triangle<T, d> &tri) {
   T distSq = infinity<T>;
-  ForEachDivision<128>(tri, [&](const Vec3<T> &p) { distSq = std::min(distSq, DistSquared(aabb, p)); });
+  ForEachDivision<128>(tri, [&](const Vec<T, d> &p) { distSq = std::min(distSq, DistSquared(aabb, p)); });
   return distSq;
 }
 
