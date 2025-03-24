@@ -73,20 +73,9 @@ template <typename T>
 
   LineSegment v = seg;
   ForEach<2>([&]<auto i>() { v[i] -= c; });
+  auto isSA = [&](const auto &axis) { return IsSAForAABB<T>(e, v, axis); };
 
   Vec2T f = v[1] - v[0];
-
-  // Test whether the given `axis` is a separating axis (SA).
-  auto isSA = [&](const auto &axis) {
-    std::array p{Dot(ToTec(v[0]), axis), //
-                 Dot(ToTec(v[1]), axis)};
-
-    auto abs = [](const auto &v) { return v < 0 ? -v : v; };
-    T r = Dot(ToTec(e), Tec{abs(Dot(u0, axis)), //
-                            abs(Dot(u1, axis))});
-
-    return std::max(p[0], p[1]) < -r || std::min(p[0], p[1]) > r;
-  };
 
   // Whether the two primitives are separating.
   bool isS = false;
@@ -108,23 +97,10 @@ template <typename T>
 
   Triangle v = tri;
   ForEach<3>([&]<auto i>() { v[i] -= c; });
+  auto isSA = [&](const auto &axis) { return IsSAForAABB<T>(e, v, axis); };
 
   std::array<Vec3T, 3> f;
   ForEach<3>([&]<auto i>() { f[i] = v[(i + 1) % 3] - v[i]; });
-
-  // Test whether the given `axis` is a separating axis (SA).
-  auto isSA = [&](const auto &axis) {
-    std::array p{Dot(ToTec(v[0]), axis), //
-                 Dot(ToTec(v[1]), axis), //
-                 Dot(ToTec(v[2]), axis)};
-
-    auto abs = [](const auto &v) { return v < 0 ? -v : v; };
-    T r = Dot(ToTec(e), Tec{abs(Dot(u0, axis)), //
-                            abs(Dot(u1, axis)), //
-                            abs(Dot(u2, axis))});
-
-    return std::max({p[0], p[1], p[2]}) < -r || std::min({p[0], p[1], p[2]}) > r;
-  };
 
   // Whether the two primitives are separating.
   bool isS = false;
