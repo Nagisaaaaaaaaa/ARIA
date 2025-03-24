@@ -45,7 +45,7 @@ static ARIA_CONST constexpr Tup u{u0, u1, u2};
 template <typename T, uint d, uint n>
 [[nodiscard]] ARIA_HOST_DEVICE bool
 IsSAForAABB(const Vec<T, d> &extent, const std::array<Vec<T, d>, n> &prim, const auto &axis) {
-  static_assert(d == 1 || d == 2 || d == 3, "Collision detection algorithms are undefined for the given dimension `d`");
+  static_assert(d == 1 || d == 2 || d == 3, "SAT is undefined for the given dimension `d`");
 
   std::array<T, n> p;
   ForEach<n>([&](auto i) { p[i] = Dot(ToTec(prim[i]), axis); });
