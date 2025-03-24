@@ -34,6 +34,9 @@ template <typename T>
 
 } // namespace D2
 
+//
+//
+//
 namespace D3 {
 
 static ARIA_CONST constexpr Tec u0{1_I, 0_I, 0_I};
@@ -57,6 +60,8 @@ template <typename T>
 
 } // namespace D3
 
+//
+//
 //
 //
 //
