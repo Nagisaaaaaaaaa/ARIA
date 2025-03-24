@@ -48,6 +48,13 @@ ARIA_HOST_DEVICE T DistSquared(const AABB<T, d> &aabb, const Vec<T, d> &p) {
 }
 
 template <typename T>
+ARIA_HOST_DEVICE T DistSquared(const AABB2<T> &aabb, const LineSegment2<T> &seg) {
+  T distSq = infinity<T>;
+  ForEachDivision<16>(seg, [&](const Vec2<T> &p) { distSq = std::min(distSq, DistSquared(aabb, p)); });
+  return distSq;
+}
+
+template <typename T>
 ARIA_HOST_DEVICE T DistSquared(const AABB3<T> &aabb, const Triangle3<T> &tri) {
   T distSq = infinity<T>;
   ForEachDivision<128>(tri, [&](const Vec3<T> &p) { distSq = std::min(distSq, DistSquared(aabb, p)); });
