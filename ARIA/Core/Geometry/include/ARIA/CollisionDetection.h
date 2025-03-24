@@ -19,8 +19,8 @@ namespace ARIA {
 /// LineSegment2r seg{...};
 /// bool collides = DetectCollision(aabb, seg);
 /// ```
-template <typename T>
-[[nodiscard]] ARIA_HOST_DEVICE bool DetectCollision(const AABB2<T> &aabb, const LineSegment2<T> &seg) {
+template <typename T, uint d>
+[[nodiscard]] ARIA_HOST_DEVICE bool DetectCollision(const AABB<T, d> &aabb, const LineSegment<T, d> &seg) {
   return collision_detection::detail::SAT(aabb, seg);
 }
 
@@ -31,8 +31,8 @@ template <typename T>
 /// AABB2r aabb{...};
 /// bool collides = DetectCollision(seg, aabb);
 /// ```
-template <typename T>
-[[nodiscard]] ARIA_HOST_DEVICE bool DetectCollision(const LineSegment2<T> &seg, const AABB2<T> &aabb) {
+template <typename T, uint d>
+[[nodiscard]] ARIA_HOST_DEVICE bool DetectCollision(const LineSegment<T, d> &seg, const AABB<T, d> &aabb) {
   return DetectCollision(aabb, seg);
 }
 
