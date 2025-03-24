@@ -39,8 +39,9 @@ static ARIA_CONST constexpr Tup u{u0, u1, u2};
 //
 //
 //
-// Test whether the given `axis` is a separating axis (SA) for `prim` and
-// an `AABB` with extent equals to `extent` and center located at origin.
+// Test whether the given `axis` is a separating axis (SA) for:
+// 1. An `AABB` with extent equals to `extent` and center located at origin.
+// 2. A `prim` with `n` vertices.
 template <typename T, uint d, uint n>
 [[nodiscard]] ARIA_HOST_DEVICE bool
 IsSAForAABB(const Vec<T, d> &extent, const std::array<Vec<T, d>, n> &prim, const auto &axis) {
