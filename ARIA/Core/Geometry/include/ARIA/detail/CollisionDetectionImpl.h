@@ -87,7 +87,32 @@ template <typename T>
   // Test 2 edge normals from the AABB.
   isS = isS || isSA(u0) || isSA(u1);
   // Test 1 edge normal from the line segment.
-  isS = isS || isSA(Tec{-f[1], f[0]});
+  isS = isS || isSA(Tec{-f.y(), f.x()});
+
+  return !isS;
+}
+
+template <typename T>
+[[nodiscard]] ARIA_HOST_DEVICE bool SAT(const AABB2<T> &aabb, const Triangle2<T> &tri) {
+  using namespace D2;
+  using Vec2T = Vec2<T>;
+
+  Vec2T c = aabb.center();
+  Vec2T e = aabb.diagonal() / 2_R;
+
+  Triangle v = tri;
+  ForEach<3>([&]<auto i>() { v[i] -= c; });
+  auto isSA = [&](const auto &axis) { return IsSAForAABB<T>(e, v, axis); };
+
+  std::array<Vec2T, 3> f;
+  ForEach<3>([&]<auto i>() { f[i] = v[(i + 1) % 3] - v[i]; });
+
+  // Whether the two primitives are separating.
+  bool isS = false;
+  // Test 2 edge normals from the AABB.
+  isS = isS || isSA(u0) || isSA(u1);
+  // Test 3 edge normals from the triangle.
+  ForEach<3>([&]<auto i>() { isS = isS || isSA(Tec{-f[i].y(), f[i].x()}); });
 
   return !isS;
 }
