@@ -43,8 +43,8 @@ template <typename T>
 /// Triangle3r tri{...};
 /// bool collides = DetectCollision(aabb, tri);
 /// ```
-template <typename T>
-[[nodiscard]] ARIA_HOST_DEVICE bool DetectCollision(const AABB3<T> &aabb, const Triangle3<T> &tri) {
+template <typename T, uint d>
+[[nodiscard]] ARIA_HOST_DEVICE bool DetectCollision(const AABB<T, d> &aabb, const Triangle<T, d> &tri) {
   return collision_detection::detail::SAT(aabb, tri);
 }
 
@@ -55,8 +55,8 @@ template <typename T>
 /// AABB3r aabb{...};
 /// bool collides = DetectCollision(tri, aabb);
 /// ```
-template <typename T>
-[[nodiscard]] ARIA_HOST_DEVICE bool DetectCollision(const Triangle3<T> &tri, const AABB3<T> &aabb) {
+template <typename T, uint d>
+[[nodiscard]] ARIA_HOST_DEVICE bool DetectCollision(const Triangle<T, d> &tri, const AABB<T, d> &aabb) {
   return DetectCollision(aabb, tri);
 }
 
