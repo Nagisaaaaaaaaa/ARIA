@@ -61,8 +61,46 @@ ARIA_HOST_DEVICE T DistSquared(const AABB3<T> &aabb, const Triangle3<T> &tri) {
   return distSq;
 }
 
+void Test_AABBLineSegment() {
+  AABB2f aabb{Vec2f{-31.4159F, -98.76543F}, Vec2f{95.1413F, -11.4514F}};
+  AABB2f aabbRelaxed = aabb; // A little bit smaller.
+  aabbRelaxed.inf() += aabb.diagonal() * 0.0001F;
+  aabbRelaxed.sup() -= aabb.diagonal() * 0.0001F;
+
+  Vec2f pMin = aabb.inf() - aabb.diagonal();
+  Vec2f pMax = aabb.sup() + aabb.diagonal();
+
+  constexpr uint n = 20;
+
+  thrust::host_vector<Vec2f> psH;
+  for (uint y = 0; y < n; ++y)
+    for (uint x = 0; x < n; ++x) {
+      Vec2f p = pMin + (pMax - pMin).cwiseProduct(Vec2f(x, y) / static_cast<float>(n - 1));
+      psH.push_back(p);
+    }
+
+  thrust::device_vector<Vec2f> psD = psH;
+  int nPs = psD.size();
+
+  Launcher(make_layout_major(nPs, nPs), [aabb, aabbRelaxed, ps = psD.data()] ARIA_DEVICE(int x, int y) {
+    LineSegment2f seg{ps[x], ps[y]};
+
+    bool collides = DetectCollision(aabb, seg);
+    bool collides1 = DetectCollision(seg, aabb);
+    ARIA_ASSERT(collides == collides1);
+
+    float distSqRelaxed = DistSquared(aabbRelaxed, seg); // A little bit larger.
+    if (collides)
+      ARIA_ASSERT(distSqRelaxed < 1.05F);
+    else
+      ARIA_ASSERT(distSqRelaxed > 0.0F);
+  }).Launch();
+
+  cuda::device::current::get().synchronize();
+}
+
 void Test_AABBTriangle() {
-  AABB3f aabb{Vec3f{-31.4159F, 12.34567F, -98.76543F}, Vec3f(95.1413F, 66.66666F, -11.4514F)};
+  AABB3f aabb{Vec3f{-31.4159F, 12.34567F, -98.76543F}, Vec3f{95.1413F, 66.66666F, -11.4514F}};
   AABB3f aabbRelaxed = aabb; // A little bit smaller.
   aabbRelaxed.inf() += aabb.diagonal() * 0.0001F;
   aabbRelaxed.sup() -= aabb.diagonal() * 0.0001F;
@@ -101,6 +139,10 @@ void Test_AABBTriangle() {
 }
 
 } // namespace
+
+TEST(CollisionDetection, D2) {
+  Test_AABBLineSegment();
+}
 
 TEST(CollisionDetection, D3) {
   Test_AABBTriangle();
