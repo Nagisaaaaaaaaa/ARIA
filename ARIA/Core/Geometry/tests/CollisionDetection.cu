@@ -50,7 +50,7 @@ ARIA_HOST_DEVICE T DistSquared(const AABB<T, d> &aabb, const Vec<T, d> &p) {
 template <typename T>
 ARIA_HOST_DEVICE T DistSquared(const AABB2<T> &aabb, const LineSegment2<T> &seg) {
   T distSq = infinity<T>;
-  ForEachDivision<64>(seg, [&](const Vec2<T> &p) { distSq = std::min(distSq, DistSquared(aabb, p)); });
+  ForEachDivision<128>(seg, [&](const Vec2<T> &p) { distSq = std::min(distSq, DistSquared(aabb, p)); });
   return distSq;
 }
 
@@ -61,7 +61,7 @@ ARIA_HOST_DEVICE T DistSquared(const AABB3<T> &aabb, const Triangle3<T> &tri) {
   return distSq;
 }
 
-void Test_AABBLineSegment() {
+void Test_2D_AABBLineSegment() {
   AABB2f aabb{Vec2f{-31.4159F, -98.76543F}, Vec2f{95.1413F, -11.4514F}};
   AABB2f aabbRelaxed = aabb; // A little bit smaller.
   aabbRelaxed.inf() += aabb.diagonal() * 0.0001F;
@@ -70,7 +70,7 @@ void Test_AABBLineSegment() {
   Vec2f pMin = aabb.inf() - aabb.diagonal();
   Vec2f pMax = aabb.sup() + aabb.diagonal();
 
-  constexpr uint n = 20;
+  constexpr uint n = 40;
 
   thrust::host_vector<Vec2f> psH;
   for (uint y = 0; y < n; ++y)
@@ -99,7 +99,7 @@ void Test_AABBLineSegment() {
   cuda::device::current::get().synchronize();
 }
 
-void Test_AABBTriangle() {
+void Test_3D_AABBTriangle() {
   AABB3f aabb{Vec3f{-31.4159F, 12.34567F, -98.76543F}, Vec3f{95.1413F, 66.66666F, -11.4514F}};
   AABB3f aabbRelaxed = aabb; // A little bit smaller.
   aabbRelaxed.inf() += aabb.diagonal() * 0.0001F;
@@ -141,11 +141,11 @@ void Test_AABBTriangle() {
 } // namespace
 
 TEST(CollisionDetection, D2) {
-  Test_AABBLineSegment();
+  Test_2D_AABBLineSegment();
 }
 
 TEST(CollisionDetection, D3) {
-  Test_AABBTriangle();
+  Test_3D_AABBTriangle();
 }
 
 } // namespace ARIA
