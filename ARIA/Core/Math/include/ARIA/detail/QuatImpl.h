@@ -32,6 +32,17 @@ static constexpr bool is_quat_v = is_quat<T>::value;
 //
 //
 //
+#define __ARIA_PROP_AND_SUB_PROP_INCOMPLETE_PREFAB_MEMBERS_QUAT(specifiers, type)                                      \
+                                                                                                                       \
+  /* W. */                                                                                                             \
+  ARIA_SUB_PROP(specifiers, std::decay_t<type>::Scalar, w);                                                            \
+  /* X. */                                                                                                             \
+  ARIA_SUB_PROP(specifiers, std::decay_t<type>::Scalar, x);                                                            \
+  /* Y. */                                                                                                             \
+  ARIA_SUB_PROP(specifiers, std::decay_t<type>::Scalar, y);                                                            \
+  /* Z. */                                                                                                             \
+  ARIA_SUB_PROP(specifiers, std::decay_t<type>::Scalar, z);
+
 #define __ARIA_PROP_AND_SUB_PROP_PREFAB_MEMBERS_QUAT(specifiers, type)                                                 \
                                                                                                                        \
   /* A. */                                                                                                             \
@@ -81,6 +92,25 @@ static constexpr bool is_quat_v = is_quat<T>::value;
   ARIA_SUB_PROP(specifiers, std::decay_t<type>::Scalar, y);                                                            \
   /* Z. */                                                                                                             \
   ARIA_SUB_PROP(specifiers, std::decay_t<type>::Scalar, z);
+
+//
+//
+//
+#define __ARIA_PROP_INCOMPLETE_PREFAB_QUAT(accessGet, accessSet, specifiers, type, /*propName,*/...)                   \
+  static_assert(ARIA::quat::detail::is_quat_v<std::decay_t<type>>,                                                     \
+                "Type of the property should be `class Quat` in order to use this prefab");                            \
+                                                                                                                       \
+  ARIA_PROP_BEGIN(accessGet, accessSet, specifiers, type, /*propName,*/ __VA_ARGS__);                                  \
+  __ARIA_PROP_AND_SUB_PROP_INCOMPLETE_PREFAB_MEMBERS_QUAT(specifiers, type);                                           \
+  ARIA_PROP_END
+
+#define __ARIA_SUB_PROP_INCOMPLETE_PREFAB_QUAT(specifiers, type, /*propName,*/...)                                     \
+  static_assert(ARIA::quat::detail::is_quat_v<std::decay_t<type>>,                                                     \
+                "Type of the property should be `class Quat` in order to use this prefab");                            \
+                                                                                                                       \
+  ARIA_SUB_PROP_BEGIN(specifiers, type, /*propName,*/ __VA_ARGS__);                                                    \
+  __ARIA_PROP_AND_SUB_PROP_INCOMPLETE_PREFAB_MEMBERS_QUAT(specifiers, type);                                           \
+  ARIA_PROP_END
 
 #define __ARIA_PROP_PREFAB_QUAT(accessGet, accessSet, specifiers, type, /*propName,*/...)                              \
   static_assert(ARIA::quat::detail::is_quat_v<std::decay_t<type>>,                                                     \
