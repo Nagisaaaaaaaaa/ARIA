@@ -11,6 +11,7 @@ if (ARIA_BUILD_TESTS)
       BFloat16.cu
       BitArray.cu
       BitVector.cu
+      Builder.cpp
       Buyout.cpp
       Constant.cpp
       DisjointSet.cu
