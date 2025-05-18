@@ -36,7 +36,7 @@ namespace ARIA {
   /*ARIA_SUB_PROP_END;*/                                                                                               \
                                                                                                                        \
   /* Transform. */                                                                                                     \
-  __ARIA_SUB_PROP_INCOMPLETE_PREFAB_TRANSFORM(specifiers, Transform &, transform)
+  __ARIA_SUB_PROP_INCOMPLETE_PREFAB_TRANSFORM(specifiers, Transform &, transform);
 
 //
 //
@@ -104,7 +104,7 @@ namespace ARIA {
   ARIA_PROP_FUNC(public, specifiers, ., begin);                                                                        \
   ARIA_PROP_FUNC(public, specifiers, ., end);                                                                          \
   ARIA_PROP_FUNC(public, specifiers, ., cbegin);                                                                       \
-  ARIA_PROP_FUNC(public, specifiers, ., cend)
+  ARIA_PROP_FUNC(public, specifiers, ., cend);
 
 //
 //

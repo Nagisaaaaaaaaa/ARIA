@@ -99,7 +99,7 @@ namespace ARIA {
   /*ARIA_SUB_PROP(specifiers, Mat4r, localToWorldMat);*/                                                               \
   /* World position, rotation, and scale. */                                                                           \
   ARIA_SUB_PROP(specifiers, Vec3r, position);                                                                          \
-  ARIA_SUB_PROP(specifiers, Quatr, rotation)                                                                           \
+  ARIA_SUB_PROP(specifiers, Quatr, rotation);                                                                          \
   /*ARIA_SUB_PROP(specifiers, Vec3r, lossyScale);*/                                                                    \
   /* World 6 directions. */                                                                                            \
   /*ARIA_SUB_PROP(specifiers, Vec3r, up);*/                                                                            \
@@ -236,7 +236,7 @@ namespace ARIA {
   /* Translate, rotate, and rotate around. */                                                                          \
   ARIA_PROP_FUNC(public, specifiers, ., Translate);                                                                    \
   ARIA_PROP_FUNC(public, specifiers, ., Rotate);                                                                       \
-  ARIA_PROP_FUNC(public, specifiers, ., RotateAround)
+  ARIA_PROP_FUNC(public, specifiers, ., RotateAround);
 
 //
 //
