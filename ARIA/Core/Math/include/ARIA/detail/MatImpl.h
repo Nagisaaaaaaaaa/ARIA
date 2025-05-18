@@ -225,6 +225,9 @@ static constexpr bool is_mat_rc_v = is_mat_rc<T, row, col>::value;
   /* Z. */                                                                                                             \
   ARIA_SUB_PROP(specifiers, std::decay_t<type>::Scalar, z);
 
+//
+//
+//
 #define __ARIA_PROP_INCOMPLETE_PREFAB_MAT(accessGet, accessSet, specifiers, type, /*propName,*/...)                    \
   static_assert(ARIA::mat::detail::is_mat_v<std::decay_t<type>>,                                                       \
                 "Type of the property should be `class Mat` in order to use this prefab");                             \
@@ -241,9 +244,6 @@ static constexpr bool is_mat_rc_v = is_mat_rc<T, row, col>::value;
   __ARIA_PROP_AND_SUB_PROP_INCOMPLETE_PREFAB_MEMBERS_MAT(specifiers, type);                                            \
   ARIA_PROP_END
 
-//
-//
-//
 #define __ARIA_PROP_PREFAB_MAT(accessGet, accessSet, specifiers, type, /*propName,*/...)                               \
   static_assert(ARIA::mat::detail::is_mat_v<std::decay_t<type>>,                                                       \
                 "Type of the property should be `class Mat` in order to use this prefab");                             \
