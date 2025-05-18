@@ -60,6 +60,7 @@ static constexpr bool is_mat_rc_v = is_mat_rc<T, row, col>::value;
 //
 //
 #define __ARIA_PROP_AND_SUB_PROP_INCOMPLETE_PREFAB_MEMBERS_MAT(specifiers, type)                                       \
+                                                                                                                       \
   /* W. */                                                                                                             \
   ARIA_SUB_PROP(specifiers, std::decay_t<type>::Scalar, w);                                                            \
   /* X. */                                                                                                             \
