@@ -594,8 +594,6 @@ struct fmt::formatter<ARIA::tup::detail::Tup<Ts...>> {
   auto format(const ARIA::tup::detail::Tup<Ts...> &tup, FormatContext &ctx) {
     // Since the stream operators to `std::ostream` have already been
     // supported by `cute`, we can simply reuse them here.
-    std::ostringstream oss;
-    oss << tup;
-    return fmt::format_to(ctx.out(), "{}", oss.str());
+    return fmt::format_to(ctx.out(), "{}", (std::ostringstream{} << tup).str());
   }
 };
