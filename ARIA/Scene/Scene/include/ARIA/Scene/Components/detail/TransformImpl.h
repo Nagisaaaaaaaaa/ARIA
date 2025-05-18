@@ -86,28 +86,28 @@ namespace ARIA {
   ARIA_SUB_PROP(specifiers, Quatr, localRotation);                                                                     \
   ARIA_SUB_PROP(specifiers, Vec3r, localScale);                                                                        \
   /* Local euler angles. */                                                                                            \
-  ARIA_SUB_PROP(specifiers, Vec3r, localEulerAngles);                                                                  \
+  /*ARIA_SUB_PROP(specifiers, Vec3r, localEulerAngles);*/                                                              \
   /* Local 6 directions. */                                                                                            \
-  ARIA_SUB_PROP(specifiers, Vec3r, localUp);                                                                           \
-  ARIA_SUB_PROP(specifiers, Vec3r, localDown);                                                                         \
-  ARIA_SUB_PROP(specifiers, Vec3r, localForward);                                                                      \
-  ARIA_SUB_PROP(specifiers, Vec3r, localBack);                                                                         \
-  ARIA_SUB_PROP(specifiers, Vec3r, localLeft);                                                                         \
-  ARIA_SUB_PROP(specifiers, Vec3r, localRight);                                                                        \
+  /*ARIA_SUB_PROP(specifiers, Vec3r, localUp);*/                                                                       \
+  /*ARIA_SUB_PROP(specifiers, Vec3r, localDown);*/                                                                     \
+  /*ARIA_SUB_PROP(specifiers, Vec3r, localForward);*/                                                                  \
+  /*ARIA_SUB_PROP(specifiers, Vec3r, localBack);*/                                                                     \
+  /*ARIA_SUB_PROP(specifiers, Vec3r, localLeft);*/                                                                     \
+  /*ARIA_SUB_PROP(specifiers, Vec3r, localRight);*/                                                                    \
   /* Transform matrices. */                                                                                            \
-  ARIA_SUB_PROP(specifiers, Mat4r, localToParentMat);                                                                  \
-  ARIA_SUB_PROP(specifiers, Mat4r, localToWorldMat);                                                                   \
+  /*ARIA_SUB_PROP(specifiers, Mat4r, localToParentMat);*/                                                              \
+  /*ARIA_SUB_PROP(specifiers, Mat4r, localToWorldMat);*/                                                               \
   /* World position, rotation, and scale. */                                                                           \
   ARIA_SUB_PROP(specifiers, Vec3r, position);                                                                          \
-  ARIA_SUB_PROP(specifiers, Quatr, rotation);                                                                          \
-  ARIA_SUB_PROP(specifiers, Vec3r, lossyScale);                                                                        \
+  ARIA_SUB_PROP(specifiers, Quatr, rotation)                                                                           \
+  /*ARIA_SUB_PROP(specifiers, Vec3r, lossyScale);*/                                                                    \
   /* World 6 directions. */                                                                                            \
-  ARIA_SUB_PROP(specifiers, Vec3r, up);                                                                                \
-  ARIA_SUB_PROP(specifiers, Vec3r, down);                                                                              \
-  ARIA_SUB_PROP(specifiers, Vec3r, forward);                                                                           \
-  ARIA_SUB_PROP(specifiers, Vec3r, back);                                                                              \
-  ARIA_SUB_PROP(specifiers, Vec3r, left);                                                                              \
-  ARIA_SUB_PROP(specifiers, Vec3r, right)
+  /*ARIA_SUB_PROP(specifiers, Vec3r, up);*/                                                                            \
+  /*ARIA_SUB_PROP(specifiers, Vec3r, down);*/                                                                          \
+  /*ARIA_SUB_PROP(specifiers, Vec3r, forward);*/                                                                       \
+  /*ARIA_SUB_PROP(specifiers, Vec3r, back);*/                                                                          \
+  /*ARIA_SUB_PROP(specifiers, Vec3r, left);*/                                                                          \
+  /*ARIA_SUB_PROP(specifiers, Vec3r, right)*/
 
 //
 //
