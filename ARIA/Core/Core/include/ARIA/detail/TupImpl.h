@@ -5,6 +5,7 @@
 #include <cute/int_tuple.hpp>
 
 #include <array>
+#include <sstream>
 
 // Define CTAD for CuTe types.
 namespace cute {
@@ -574,3 +575,25 @@ template <typename... Ts0, typename Ts1>
 }
 
 } // namespace cute
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+// Support `fmt` formatting.
+template <typename... Ts>
+struct fmt::formatter<ARIA::tup::detail::Tup<Ts...>> {
+  constexpr auto parse(fmt::format_parse_context &ctx) { return ctx.begin(); }
+
+  template <typename FormatContext>
+  auto format(const ARIA::tup::detail::Tup<Ts...> &tup, FormatContext &ctx) {
+    // Since the stream operators to `std::ostream` have already been
+    // supported by `cute`, we can simply reuse them here.
+    return fmt::format_to(ctx.out(), "{}", (std::ostringstream{} << tup).str());
+  }
+};
