@@ -34,6 +34,8 @@ static constexpr bool is_quat_v = is_quat<T>::value;
 //
 #define __ARIA_PROP_AND_SUB_PROP_INCOMPLETE_PREFAB_MEMBERS_QUAT(specifiers, type)                                      \
                                                                                                                        \
+  /* I. */                                                                                                             \
+  ARIA_PROP_FUNC(public, specifiers, ., inverse);                                                                      \
   /* W. */                                                                                                             \
   ARIA_SUB_PROP(specifiers, std::decay_t<type>::Scalar, w);                                                            \
   /* X. */                                                                                                             \
