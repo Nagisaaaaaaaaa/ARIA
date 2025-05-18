@@ -47,6 +47,9 @@ TEST(Tup, Base) {
     static_assert(std::is_same_v<to_type_array_t<decltype(vSub)>, MakeTypeArray<double, std::string>>);
     static_assert(std::is_same_v<to_tup_t<MakeTypeArray<int, float, Tup<double, std::string>>>, decltype(v)>);
     static_assert(std::is_same_v<to_tup_t<MakeTypeArray<double, std::string>>, decltype(vSub)>);
+
+    EXPECT_EQ((std::ostringstream{} << v).str(), fmt::to_string(v));
+    EXPECT_EQ((std::ostringstream{} << vSub).str(), fmt::to_string(vSub));
   }
 
   // Make tec.
@@ -68,6 +71,8 @@ TEST(Tup, Base) {
 
     static_assert(std::is_same_v<to_type_array_t<decltype(v)>, MakeTypeArray<int, float, C<3U>, C<4.0>>>);
     static_assert(std::is_same_v<to_tup_t<MakeTypeArray<int, float, C<3U>, C<4.0>>>, decltype(v)>);
+
+    EXPECT_EQ((std::ostringstream{} << v).str(), fmt::to_string(v));
   }
 
   {
