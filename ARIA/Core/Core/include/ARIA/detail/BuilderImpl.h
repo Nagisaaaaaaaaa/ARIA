@@ -35,7 +35,7 @@ private:                                                                        
     template <type_array::detail::ArrayType TUVWArray1>                                                                \
     friend class ARIA_CONCAT(BuilderImpl, BUILDER_NAME);                                                               \
                                                                                                                        \
-    explicit ARIA_CONCAT(BuilderImpl, BUILDER_NAME)(TYPE && v) : v_(std::move(v)) {}                                   \
+    explicit constexpr ARIA_CONCAT(BuilderImpl, BUILDER_NAME)(TYPE && v) : v_(std::move(v)) {}                         \
                                                                                                                        \
   public:                                                                                                              \
     ARIA_CONCAT(BuilderImpl, BUILDER_NAME)() = default;                                                                \
