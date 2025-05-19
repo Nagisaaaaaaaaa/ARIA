@@ -23,6 +23,16 @@ private:                                                                        
   public:                                                                                                              \
     ARIA_CONCAT(BuilderImpl, BUILDER_NAME)() = default;                                                                \
                                                                                                                        \
+  public:                                                                                                              \
+    [[nodiscard]] constexpr operator TYPE() {                                                                          \
+      static_assert(!TUVWArray::template has<C<false>>, "Partially built");                                            \
+      return std::move(get());                                                                                         \
+    }                                                                                                                  \
+                                                                                                                       \
+    [[nodiscard]] constexpr TYPE Build() {                                                                             \
+      return static_cast<TYPE>(*this);                                                                                 \
+    }                                                                                                                  \
+                                                                                                                       \
   private:                                                                                                             \
     TYPE type_;                                                                                                        \
                                                                                                                        \
@@ -34,20 +44,11 @@ private:                                                                        
       return type_;                                                                                                    \
     };                                                                                                                 \
                                                                                                                        \
+  private:                                                                                                             \
     template <type_array::detail::ArrayType TUVWArray1>                                                                \
     friend class ARIA_CONCAT(BuilderImpl, BUILDER_NAME);                                                               \
                                                                                                                        \
     explicit ARIA_CONCAT(BuilderImpl, BUILDER_NAME)(TYPE && type) : type_(std::move(type)) {}                          \
-                                                                                                                       \
-  public:                                                                                                              \
-    [[nodiscard]] constexpr operator TYPE() {                                                                          \
-      static_assert(!TUVWArray::template has<C<false>>, "Partially built");                                            \
-      return std::move(get());                                                                                         \
-    }                                                                                                                  \
-                                                                                                                       \
-    [[nodiscard]] constexpr TYPE Build() {                                                                             \
-      return static_cast<TYPE>(*this);                                                                                 \
-    }                                                                                                                  \
                                                                                                                        \
   private:                                                                                                             \
     class ARIA_CONCAT(DummyClassForBuilderBegin, BUILDER_NAME) {}
