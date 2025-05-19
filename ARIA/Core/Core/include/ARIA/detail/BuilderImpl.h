@@ -20,35 +20,54 @@ private:                                                                        
     template <type_array::detail::ArrayType TUVWArray1>                                                                \
     using Impl = ARIA_CONCAT(BuilderImpl, BUILDER_NAME)<TUVWArray1>;                                                   \
                                                                                                                        \
-  public:                                                                                                              \
-    ARIA_CONCAT(BuilderImpl, BUILDER_NAME)() = default;                                                                \
-                                                                                                                       \
-  public:                                                                                                              \
-    [[nodiscard]] constexpr operator TYPE() {                                                                          \
-      static_assert(!TUVWArray::template has<C<false>>, "Partially built");                                            \
-      return std::move(get());                                                                                         \
-    }                                                                                                                  \
-                                                                                                                       \
-    [[nodiscard]] constexpr TYPE Build() {                                                                             \
-      return static_cast<TYPE>(*this);                                                                                 \
-    }                                                                                                                  \
-                                                                                                                       \
   private:                                                                                                             \
-    TYPE type_;                                                                                                        \
+    TYPE v_;                                                                                                           \
                                                                                                                        \
     [[nodiscard]] constexpr const TYPE &get() const {                                                                  \
-      return type_;                                                                                                    \
+      return v_;                                                                                                       \
     };                                                                                                                 \
                                                                                                                        \
     [[nodiscard]] constexpr TYPE &get() {                                                                              \
-      return type_;                                                                                                    \
+      return v_;                                                                                                       \
     };                                                                                                                 \
                                                                                                                        \
   private:                                                                                                             \
     template <type_array::detail::ArrayType TUVWArray1>                                                                \
     friend class ARIA_CONCAT(BuilderImpl, BUILDER_NAME);                                                               \
                                                                                                                        \
-    explicit ARIA_CONCAT(BuilderImpl, BUILDER_NAME)(TYPE && type) : type_(std::move(type)) {}                          \
+    explicit ARIA_CONCAT(BuilderImpl, BUILDER_NAME)(TYPE && v) : v_(std::move(v)) {}                                   \
+                                                                                                                       \
+  public:                                                                                                              \
+    ARIA_CONCAT(BuilderImpl, BUILDER_NAME)() = default;                                                                \
+                                                                                                                       \
+  public:                                                                                                              \
+    [[nodiscard]] constexpr operator TYPE() const & {                                                                  \
+      static_assert(!TUVWArray::template has<C<false>>, "The instance has not been fully built");                      \
+      return get();                                                                                                    \
+    }                                                                                                                  \
+                                                                                                                       \
+    [[nodiscard]] constexpr operator TYPE() const && {                                                                 \
+      static_assert(!TUVWArray::template has<C<false>>, "The instance has not been fully built");                      \
+      return get();                                                                                                    \
+    }                                                                                                                  \
+                                                                                                                       \
+    [[nodiscard]] constexpr operator TYPE() & {                                                                        \
+      static_assert(!TUVWArray::template has<C<false>>, "The instance has not been fully built");                      \
+      return get();                                                                                                    \
+    }                                                                                                                  \
+                                                                                                                       \
+    [[nodiscard]] constexpr operator TYPE() && {                                                                       \
+      static_assert(!TUVWArray::template has<C<false>>, "The instance has not been fully built");                      \
+      return std::move(get());                                                                                         \
+    }                                                                                                                  \
+                                                                                                                       \
+    [[nodiscard]] constexpr TYPE Build() const {                                                                       \
+      return operator TYPE();                                                                                          \
+    }                                                                                                                  \
+                                                                                                                       \
+    [[nodiscard]] constexpr TYPE Build() {                                                                             \
+      return operator TYPE();                                                                                          \
+    }                                                                                                                  \
                                                                                                                        \
   private:                                                                                                             \
     class ARIA_CONCAT(DummyClassForBuilderBegin, BUILDER_NAME) {}
