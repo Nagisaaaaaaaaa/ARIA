@@ -18,7 +18,7 @@ private:                                                                        
   class ARIA_CONCAT(BuilderImpl, BUILDER_NAME) {                                                                       \
   private:                                                                                                             \
     template <type_array::detail::ArrayType TUVWArray1>                                                                \
-    using BuilderImpl = ARIA_CONCAT(BuilderImpl, BUILDER_NAME)<TUVWArray1>;                                            \
+    using Impl = ARIA_CONCAT(BuilderImpl, BUILDER_NAME)<TUVWArray1>;                                                   \
                                                                                                                        \
   public:                                                                                                              \
     ARIA_CONCAT(BuilderImpl, BUILDER_NAME)() = default;                                                                \
@@ -70,6 +70,6 @@ private:                                                                        
   using TUVWArrayInserted = typename TUVWArray::template Insert<(I), C<true>>;                                         \
   using TUVWArrayInsertedErased = typename TUVWArrayInserted::template Erase<(I) + 1>;                                 \
                                                                                                                        \
-  return BuilderImpl<TUVWArrayInsertedErased>{std::move(get())};
+  return Impl<TUVWArrayInsertedErased>{std::move(get())};
 
 } // namespace ARIA
