@@ -4,7 +4,7 @@
 
 namespace ARIA {
 
-#define __ARIA_BUILDER_BEGIN(ACCESS, TYPE, BUILDER_NAME, N_PARTS)                                                      \
+#define __ARIA_BUILDER_BEGIN(ACCESS, SPECIFIERS, TYPE, BUILDER_NAME, N_PARTS)                                          \
                                                                                                                        \
 private:                                                                                                               \
   template <type_array::detail::ArrayType TUVWArray>                                                                   \
@@ -23,11 +23,11 @@ private:                                                                        
   private:                                                                                                             \
     TYPE v_;                                                                                                           \
                                                                                                                        \
-    [[nodiscard]] constexpr const TYPE &get() const {                                                                  \
+    [[nodiscard]] SPECIFIERS constexpr const TYPE &get() const {                                                       \
       return v_;                                                                                                       \
     };                                                                                                                 \
                                                                                                                        \
-    [[nodiscard]] constexpr TYPE &get() {                                                                              \
+    [[nodiscard]] SPECIFIERS constexpr TYPE &get() {                                                                   \
       return v_;                                                                                                       \
     };                                                                                                                 \
                                                                                                                        \
@@ -35,37 +35,37 @@ private:                                                                        
     template <type_array::detail::ArrayType TUVWArray1>                                                                \
     friend class ARIA_CONCAT(BuilderImpl, BUILDER_NAME);                                                               \
                                                                                                                        \
-    explicit constexpr ARIA_CONCAT(BuilderImpl, BUILDER_NAME)(TYPE && v) : v_{std::move(v)} {}                         \
+    SPECIFIERS explicit constexpr ARIA_CONCAT(BuilderImpl, BUILDER_NAME)(TYPE && v) : v_{std::move(v)} {}              \
                                                                                                                        \
   public:                                                                                                              \
     ARIA_CONCAT(BuilderImpl, BUILDER_NAME)() = default;                                                                \
                                                                                                                        \
   public:                                                                                                              \
-    [[nodiscard]] constexpr operator TYPE() const & {                                                                  \
+    [[nodiscard]] SPECIFIERS constexpr operator TYPE() const & {                                                       \
       static_assert(!TUVWArray::template has<C<false>>, "The instance has not been fully built");                      \
       return get();                                                                                                    \
     }                                                                                                                  \
                                                                                                                        \
-    [[nodiscard]] constexpr operator TYPE() const && {                                                                 \
+    [[nodiscard]] SPECIFIERS constexpr operator TYPE() const && {                                                      \
       static_assert(!TUVWArray::template has<C<false>>, "The instance has not been fully built");                      \
       return get();                                                                                                    \
     }                                                                                                                  \
                                                                                                                        \
-    [[nodiscard]] constexpr operator TYPE() & {                                                                        \
+    [[nodiscard]] SPECIFIERS constexpr operator TYPE() & {                                                             \
       static_assert(!TUVWArray::template has<C<false>>, "The instance has not been fully built");                      \
       return get();                                                                                                    \
     }                                                                                                                  \
                                                                                                                        \
-    [[nodiscard]] constexpr operator TYPE() && {                                                                       \
+    [[nodiscard]] SPECIFIERS constexpr operator TYPE() && {                                                            \
       static_assert(!TUVWArray::template has<C<false>>, "The instance has not been fully built");                      \
       return std::move(get());                                                                                         \
     }                                                                                                                  \
                                                                                                                        \
-    [[nodiscard]] constexpr TYPE Build() const {                                                                       \
+    [[nodiscard]] SPECIFIERS constexpr TYPE Build() const {                                                            \
       return operator TYPE();                                                                                          \
     }                                                                                                                  \
                                                                                                                        \
-    [[nodiscard]] constexpr TYPE Build() {                                                                             \
+    [[nodiscard]] SPECIFIERS constexpr TYPE Build() {                                                                  \
       return operator TYPE();                                                                                          \
     }                                                                                                                  \
                                                                                                                        \
